@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="{% static 'institutional/eitech/css/main.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body{% block body_extra %}{% endblock %}>
   {% include 'institutional/eitech/partials/preloader.html' %}
   {% include 'institutional/eitech/partials/header.html' %}
 

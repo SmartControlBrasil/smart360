@@ -1,0 +1,279 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block body_extra %} class="homepage5-body service-robotica-page"{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Menu claro só no header fixo (fundo escuro); demais páginas não têm esta classe no body. */
+  body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li > a {
+    color: #fff !important;
+  }
+  body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li:hover > a {
+    color: var(--ztc-text-text-5) !important;
+  }
+  body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li a.nav-link.active {
+    color: var(--ztc-text-text-5) !important;
+    opacity: 1;
+  }
+  body.service-robotica-page #vl-header-sticky.header-sticky .vl-header-action-item button {
+    color: #fff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="hero5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements44.png' %}" alt="" class="elements44">
+    <img src="{% static 'institutional/eitech/img/elements/elements45.png' %}" alt="" class="elements45">
+    <img src="{% static 'institutional/eitech/img/elements/elements46.png' %}" alt="" class="elements46">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hero6-header heading7">
+            <h5 data-aos="fade-left" data-aos-duration="800" style="text-transform: uppercase;"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Robótica conectada à gestão</h5>
+            <div class="space16"></div>
+            <h1 class="text-anime-style-3">Robótica e Integração com Sistemas</h1>
+            <div class="space24"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Conectamos robôs, máquinas, dados e sistemas para criar operações mais produtivas, rastreáveis e inteligentes.</p>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="1000">A robótica não deve funcionar isolada. Ela precisa conversar com sensores, CLPs, sistemas, dashboards, manutenção, dados e pessoas. Nosso foco é integrar tecnologia com operação real.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1100">
+              <a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+              <a class="vl-btn6 btn2" href="{% url 'institutional:projects' %}">Ver projetos <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-3">
+          <div class="img1 image-anime reveal">
+            <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img6.png' %}" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about5-section-area sp1">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-5" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="img1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/about-bg3.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img9.png' %}" alt="" class="about-img9">
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img10.png' %}" alt="" class="about-img10 aniamtion-key-1">
+            <img src="{% static 'institutional/eitech/img/elements/elements47.png' %}" alt="" class="elements47">
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6">
+          <div class="about5-header heading8">
+            <h5 data-aos="fade-left" data-aos-duration="800">Onde a robótica entra na operação</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Robôs, máquinas, dados e pessoas no mesmo fluxo</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Integramos robôs e equipamentos a CLPs, sensores, redes, dados, APIs e painéis para que gestão e operação compartilhem a mesma visão com rastreabilidade.</p>
+            <div class="space32"></div>
+            <div class="counter-boxarea">
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-6" data-aos="zoom-in" data-aos-duration="800"><div class="counter-box"><h2>Robôs</h2><div class="space16"></div><p>integrados ao processo</p></div></div>
+                <div class="col-lg-4 col-md-4 col-6" data-aos="zoom-in" data-aos-duration="900"><div class="counter-box"><h2>Dados</h2><div class="space16"></div><p>com rastreabilidade</p></div></div>
+                <div class="col-lg-4 col-md-4" data-aos="zoom-in" data-aos-duration="1000"><div class="space30 d-md-none d-block"></div><div class="counter-box box2"><h2>Gestão</h2><div class="space16"></div><p>mais conectada</p></div></div>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1100">
+              <a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service4-section-area sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-size: cover; background-repeat: no-repeat;">
+    <img src="{% static 'institutional/eitech/img/elements/elements42.png' %}" alt="" class="elements42">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="service-header space-margin60">
+            <div class="heading6">
+              <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">Onde aplicamos</h5>
+              <div class="space18"></div>
+              <h2 class="text-anime-style-3">Aplicações práticas para robótica, automação e integração</h2>
+            </div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Solicitar diagnóstico</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="700"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Integração de robôs à operação</a><div class="space16"></div><p>Apoio na conexão de robôs, equipamentos automatizados, células de trabalho e dispositivos de campo com o processo produtivo.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Comunicação entre máquinas e sistemas</a><div class="space16"></div><p>Integração entre equipamentos, CLPs, sensores, dashboards, APIs e plataformas de gestão.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Automação de tarefas repetitivas</a><div class="space16"></div><p>Identificação de atividades manuais ou repetitivas que podem ser padronizadas, automatizadas ou assistidas por tecnologia.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Robótica colaborativa e apoio operacional</a><div class="space16"></div><p>Análise de oportunidades para uso de robôs colaborativos, dispositivos auxiliares e soluções que aumentem eficiência e segurança.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Dados operacionais e rastreabilidade</a><div class="space16"></div><p>Coleta e organização de dados de processo para gerar histórico, indicadores, alertas e visão operacional.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:smart360' %}">Integração com Smart360</a><div class="space16"></div><p>Conexão da operação automatizada com o ecossistema Smart360 para manutenção, ativos, ordens de serviço, relatórios e IA aplicada.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:smart360' %}" class="service-btn">Conhecer Smart360</a></div></div></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about6-section-area sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="about6-header heading8">
+            <h5 data-aos="fade-left" data-aos-duration="800">Integração com sistemas</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">O ponto que transforma automação em gestão</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">A integração é o ponto que transforma automação em gestão. Quando máquinas, robôs e sistemas compartilham informações, a empresa ganha rastreabilidade, previsibilidade e capacidade de decisão.</p>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1000"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:service_automacao_industrial_clps' %}">Robôs, CLPs, sensores e atuadores</a><div class="space16"></div><p>Conexão dos dispositivos de campo com máquinas, linhas, células, painéis e rotinas operacionais.</p></div></div>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1100"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:smart360' %}">Sistemas web, dashboards, APIs e Smart360</a><div class="space16"></div><p>Integração com banco de dados, relatórios, IA aplicada e plataformas que apoiam a gestão.</p></div></div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200"><a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a></div>
+          </div>
+        </div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-5">
+          <div class="images">
+            <div class="img1 reveal image-anime"><img src="{% static 'institutional/eitech/img/all-images/about/about-img11.png' %}" alt=""></div>
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img12.png' %}" alt="" class="about-img12 aniamtion-key-1">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== WORKS AREA STARTS =======-->
+  <div class="work4-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="heading6 text-center space-margin60">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">Nossa abordagem em Robótica e Integração</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Processo antes da tecnologia</h2>
+            <div class="space16"></div>
+            <p>Antes de automatizar ou integrar, entendemos o processo. A solução precisa nascer da necessidade operacional, não apenas da tecnologia disponível.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="others-widget-area">
+            <div class="row align-items-center">
+              <div class="col-lg-4">
+                <div class="card-boxarea box1" data-aos="zoom-in" data-aos-duration="800"><div class="div text-end"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt=""><span class="d-none">Robótica</span></h3></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Entendimento do processo</a><div class="space14"></div><p>Levantamento da operação, tarefas repetitivas, gargalos, riscos e objetivos do projeto.</p></div></div>
+                <div class="space30"></div>
+                <div class="card-boxarea box2" data-aos="zoom-in" data-aos-duration="900"><div class="content-area"><a href="{% url 'institutional:contact' %}">Mapeamento dos equipamentos e sistemas</a><div class="space14"></div><p>Identificação de robôs, máquinas, CLPs, sensores, softwares, dados e pontos de integração.</p></div><div class="div text-end"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt=""><span class="d-none">Robótica</span></h3></div></div>
+              </div>
+              <div class="col-lg-4">
+                <div class="images" data-aos="zoom-in" data-aos-duration="1000">
+                  <img src="{% static 'institutional/eitech/img/elements/elements12.png' %}" alt="" class="elements12">
+                  <img src="{% static 'institutional/eitech/img/elements/elements13.png' %}" alt="" class="elements13">
+                  <img src="{% static 'institutional/eitech/img/elements/elements14.png' %}" alt="" class="elements14">
+                  <img src="{% static 'institutional/eitech/img/elements/elements15.png' %}" alt="" class="elements15">
+                  <div class="img1"><img src="{% static 'institutional/eitech/img/all-images/case/case-img4.png' %}" alt=""></div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card-boxarea box3" data-aos="zoom-in" data-aos-duration="800"><div class="div"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt=""><span class="d-none">Robótica</span></h3></div><div class="content-area2"><a href="{% url 'institutional:contact' %}">Definição da arquitetura técnica</a><div class="space14"></div><p>Escolha do fluxo de dados, pontos de comunicação, integrações, testes e documentação.</p></div></div>
+                <div class="space30"></div>
+                <div class="card-boxarea box4" data-aos="zoom-in" data-aos-duration="1000"><div class="content-area2"><a href="{% url 'institutional:contact' %}">Implementação assistida e melhoria contínua</a><div class="space14"></div><p>Testes, monitoramento, documentação e evolução conforme a operação amadurece.</p></div><div class="div"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt=""><span class="d-none">Robótica</span></h3></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="space40"></div>
+          <div class="heading6 text-center"><p>Etapas: entendimento do processo, mapeamento dos equipamentos e sistemas, identificação de oportunidades de integração, definição da arquitetura técnica, implementação assistida e testes, monitoramento, documentação e melhoria contínua.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== WORKS AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+      <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Benefícios para a empresa</h2></div></div></div>
+      <div class="row">
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Redução de retrabalho manual</a><div class="space16"></div><p>Rotinas mais padronizadas e menos dependentes de lançamentos duplicados.</p><div class="space24"></div><h5>01</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Mais rastreabilidade operacional</a><div class="space16"></div><p>Histórico de eventos, status, dados de processo e registros por equipamento.</p><div class="space24"></div><h5>02</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Integração entre chão de fábrica e gestão</a><div class="space16"></div><p>Dados saindo da operação e chegando a sistemas, dashboards e relatórios.</p><div class="space24"></div><h5>03</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Apoio à manutenção e confiabilidade</a><div class="space16"></div><p>Informações melhores para analisar falhas, recorrência, disponibilidade e histórico.</p><div class="space24"></div><h5>04</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Melhor tomada de decisão</a><div class="space16"></div><p>Indicadores e alertas com mais contexto para priorizar ações.</p><div class="space24"></div><h5>05</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Padronização de processos</a><div class="space16"></div><p>Fluxos mais claros entre equipamentos, pessoas, sistemas e registros.</p><div class="space24"></div><h5>06</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Dados mais organizados</a><div class="space16"></div><p>Base estruturada para relatórios, análises, auditoria e melhoria contínua.</p><div class="space24"></div><h5>07</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:service_inteligencia_artificial' %}">Base para IA aplicada</a><div class="space16"></div><p>Dados e integração preparados para automações, recomendações e análises com IA.</p><div class="space24"></div><h5>08</h5></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+
+  <!--===== FAQ AREA STARTS =======-->
+  <div class="faq5-section-area sp1">
+    <div class="container">
+      <div class="row"><div class="col-lg-6 m-auto"><div class="faq-header text-center heading8 space-margin60"><h5>Perguntas frequentes</h5><div class="space18"></div><h2 class="text-anime-style-3">Dúvidas sobre robótica e integração</h2></div></div></div>
+      <div class="row">
+        <div class="col-lg-10 m-auto">
+          <div class="faq-widget-area">
+            <div class="accordion" id="accordionRobotica">
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="800"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#roboticaOne" aria-expanded="true" aria-controls="roboticaOne">Robótica é só para grandes indústrias?</button></h2><div id="roboticaOne" class="accordion-collapse collapse show" data-bs-parent="#accordionRobotica"><div class="accordion-body"><p>Não. Muitas aplicações podem começar com integrações simples, dispositivos automatizados, sensores, pequenas células ou automações de apoio ao processo.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="900"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#roboticaTwo" aria-expanded="false" aria-controls="roboticaTwo">Vocês trabalham com robôs colaborativos?</button></h2><div id="roboticaTwo" class="accordion-collapse collapse" data-bs-parent="#accordionRobotica"><div class="accordion-body"><p>Podemos apoiar a análise de aplicação, integração, conexão com sistemas e organização do processo para uso de robôs colaborativos ou equipamentos automatizados.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="1000"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#roboticaThree" aria-expanded="false" aria-controls="roboticaThree">Dá para integrar robôs com dashboards e sistemas?</button></h2><div id="roboticaThree" class="accordion-collapse collapse" data-bs-parent="#accordionRobotica"><div class="accordion-body"><p>Sim. A proposta é conectar robôs, CLPs, sensores, dados e sistemas para gerar controle, rastreabilidade e indicadores.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="1100"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#roboticaFour" aria-expanded="false" aria-controls="roboticaFour">A robótica pode ajudar na manutenção?</button></h2><div id="roboticaFour" class="accordion-collapse collapse" data-bs-parent="#accordionRobotica"><div class="accordion-body"><p>Sim. Quando a operação gera dados, fica mais fácil acompanhar falhas, recorrência, disponibilidade, histórico e oportunidades de melhoria.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="1200"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#roboticaFive" aria-expanded="false" aria-controls="roboticaFive">Como começo um projeto nessa área?</button></h2><div id="roboticaFive" class="accordion-collapse collapse" data-bs-parent="#accordionRobotica"><div class="accordion-body"><p>O primeiro passo é um diagnóstico do processo, entendendo tarefas repetitivas, gargalos, equipamentos existentes, dados disponíveis e objetivos da empresa.</p></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== FAQ AREA ENDS =======-->
+
+  <!--===== CTA AREA STARTS =======-->
+  <div class="cta5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-5">
+          <div class="cta-header heading7">
+            <h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Diagnóstico técnico e operacional</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Quer conectar robótica, automação e sistemas na sua operação?</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Fale com a Smart Control Brasil e vamos identificar onde a robótica, a automação e a integração de dados podem gerar ganho real para sua empresa.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000"><a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a></div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6">
+          <div class="images-area">
+            <div class="row">
+              <div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000"><div class="img1"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img6.png' %}" alt=""></div><div class="space30 d-md-none d-block"></div></div>
+              <div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="1000"><div class="img2"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img6.png' %}" alt=""></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== CTA AREA ENDS =======-->
+{% endblock %}

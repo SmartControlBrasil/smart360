@@ -1,0 +1,217 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="hero4-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg5.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="hand-img">
+      <img src="{% static 'institutional/eitech/img/elements/elements32.png' %}" alt="" class="elements32">
+      <img src="{% static 'institutional/eitech/img/elements/elements31.png' %}" alt="" class="elements31 keyframe5">
+    </div>
+    <img src="{% static 'institutional/eitech/img/elements/elements33.png' %}" alt="" class="elements33 aniamtion-key-1">
+    <img src="{% static 'institutional/eitech/img/elements/elements34.png' %}" alt="" class="elements34">
+    <img src="{% static 'institutional/eitech/img/elements/elements35.png' %}" alt="" class="elements35">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hero4-heading heading3">
+            <h5 data-aos="fade-left" data-aos-duration="800" style="text-transform: uppercase;"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Automação conectada à operação</h5>
+            <div class="space18"></div>
+            <h1 class="text-anime-style-3">Automação Industrial e CLPs</h1>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="1000">Soluções para máquinas, processos automatizados, painéis, sensores, atuadores e integração com sistemas de gestão.</p>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="1100">A Smart Control Brasil atua com automação industrial, melhorias em máquinas, integração de sinais, sensores, atuadores, painéis, CLPs e apoio técnico para empresas que precisam aumentar controle, confiabilidade e produtividade.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Solicitar diagnóstico</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+              <a href="{% url 'institutional:projects' %}" class="vl-btn5"><span class="demo">Ver projetos</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+          <div class="her4-images-area">
+            <div class="img1" data-aos="zoom-in" data-aos-duration="1000">
+              <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img6.png' %}" alt="">
+            </div>
+            <div class="bg">
+              <img src="{% static 'institutional/eitech/img/elements/elements36.png' %}" alt="" class="keyframe5">
+            </div>
+            <img src="{% static 'institutional/eitech/img/elements/elements37.png' %}" alt="" class="elements37 aniamtion-key-1">
+            <img src="{% static 'institutional/eitech/img/elements/elements38.png' %}" alt="" class="elements38 aniamtion-key-2">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about4-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/all-images/bg/about-bg1.png' %}" alt="" class="about-bg1">
+    <img src="{% static 'institutional/eitech/img/elements/elements41.png' %}" alt="" class="elements41">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="about-images-area">
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 288 288">
+              <linearGradient id="imagewave" x1="70.711%" x2="0%" y1="70.711%" y2="0%">
+                <stop class="stop-color2" offset="0%" stop-opacity="1"></stop>
+                <stop class="stop-color1" offset="100%" stop-opacity="1"></stop>
+              </linearGradient>
+              <path fill="url(#imagewave)" d="">
+                <animate repeatCount="indefinite" attributeName="d" dur="10s" values="M37.5,186c-12.1-10.5-11.8-32.3-7.2-46.7c4.8-15,13.1-17.8,30.1-36.7C91,68.8,83.5,56.7,103.4,45c22.2-13.1,51.1-9.5,69.6-1.6c18.1,7.8,15.7,15.3,43.3,33.2c28.8,18.8,37.2,14.3,46.7,27.9c15.6,22.3,6.4,53.3,4.4,60.2c-3.3,11.2-7.1,23.9-18.5,32c-16.3,11.5-29.5,0.7-48.6,11c-16.2,8.7-12.6,19.7-28.2,33.2c-22.7,19.7-63.8,25.7-79.9,9.7c-15.2-15.1,0.3-41.7-16.6-54.9C63,186,49.7,196.7,37.5,186z;M51,171.3c-6.1-17.7-15.3-17.2-20.7-32c-8-21.9,0.7-54.6,20.7-67.1c19.5-12.3,32.8,5.5,67.7-3.4C145.2,62,145,49.9,173,43.4c12-2.8,41.4-9.6,60.2,6.6c19,16.4,16.7,47.5,16,57.7c-1.7,22.8-10.3,25.5-9.4,46.4c1,22.5,11.2,25.8,9.1,42.6c-2.2,17.6-16.3,37.5-33.5,40.8c-22,4.1-29.4-22.4-54.9-22.6c-31-0.2-40.8,39-68.3,35.7c-17.3-2-32.2-19.8-37.3-34.8C48.9,198.6,57.8,191,51,171.3z;M37.5,186c-12.1-10.5-11.8-32.3-7.2-46.7c4.8-15,13.1-17.8,30.1-36.7C91,68.8,83.5,56.7,103.4,45c22.2-13.1,51.1-9.5,69.6-1.6c18.1,7.8,15.7,15.3,43.3,33.2c28.8,18.8,37.2,14.3,46.7,27.9c15.6,22.3,6.4,53.3,4.4,60.2c-3.3,11.2-7.1,23.9-18.5,32c-16.3,11.5-29.5,0.7-48.6,11c-16.2,8.7-12.6,19.7-28.2,33.2c-22.7,19.7-63.8,25.7-79.9,9.7c-15.2-15.1,0.3-41.7-16.6-54.9C63,186,49.7,196.7,37.5,186z"></animate>
+              </path>
+            </svg>
+            <div class="img1">
+              <img src="{% static 'institutional/eitech/img/all-images/about/about-img8.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+          <div class="about-header heading6">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt=""></span>Engenharia, dados e gestão</h5>
+            <div class="space24"></div>
+            <h2 class="text-anime-style-3">Automação conectada ao processo real</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="800">A automação precisa estar conectada à operação real. Por isso, nosso foco é entender o processo, identificar gargalos, propor melhorias viáveis e integrar tecnologia com manutenção, dados e gestão.</p>
+            <div class="space24"></div>
+            <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
+              <div class="progress-bar">
+                <label>Controle e produtividade <span>01</span></label>
+                <div class="progress"><div class="progress-inner" style="width: 100%;"></div></div>
+              </div>
+              <div class="progress-bar" style="margin: 0;">
+                <label>Confiabilidade operacional <span>02</span></label>
+                <div class="progress"><div class="progress-inner" style="width: 100%;"></div></div>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Solicitar diagnóstico</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service4-section-area sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-size: cover; background-repeat: no-repeat;">
+    <img src="{% static 'institutional/eitech/img/elements/elements42.png' %}" alt="" class="elements42">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="service-header space-margin60">
+            <div class="heading6">
+              <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">Serviços e benefícios</h5>
+              <div class="space18"></div>
+              <h2 class="text-anime-style-3">Automação para controle, segurança e produtividade</h2>
+            </div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Solicitar diagnóstico</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="700"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Projetos com CLPs</a><div class="space16"></div><p>Apoio em aplicações com controladores lógicos programáveis, lógica de controle, sinais digitais/analógicos e integração com equipamentos.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Sensores e atuadores</a><div class="space16"></div><p>Integração de sensores, atuadores, comandos, proteções, dispositivos de campo e pontos de controle do processo.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Painéis e comandos elétricos</a><div class="space16"></div><p>Organização técnica de comandos, painéis, intertravamentos, acionamentos e melhorias de segurança operacional.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Integração homem-máquina</a><div class="space16"></div><p>Apoio em interfaces de operação, telas, supervisão básica e melhoria da leitura operacional do processo.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Manutenção de sistemas automatizados</a><div class="space16"></div><p>Diagnóstico de falhas, análise de sintomas, revisão de sinais, testes funcionais e suporte técnico em equipamentos automatizados.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:smart360' %}">Automação conectada à gestão</a><div class="space16"></div><p>Integração entre chão de fábrica, dados operacionais, indicadores, relatórios e sistemas como o Smart360.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:smart360' %}" class="service-btn">Conhecer Smart360</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Robótica e equipamentos especiais</a><div class="space16"></div><p>Apoio em integração de robôs, dispositivos automatizados, células de trabalho e melhorias de produtividade.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Melhoria contínua e confiabilidade</a><div class="space16"></div><p>Uso de conceitos de TPM, análise de falhas e indicadores para tornar a automação mais confiável e sustentável.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Solicitar diagnóstico</a></div></div></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+
+  <!--===== WORKS AREA STARTS =======-->
+  <div class="work4-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="heading6 text-center space-margin60">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">Nossa abordagem em Automação Industrial</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Processo técnico, segurança e melhoria contínua</h2>
+            <div class="space16"></div>
+            <p>Automação eficiente não é apenas instalar componentes. É conectar processo, segurança, manutenção, dados e operação para gerar controle real.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="others-widget-area">
+            <div class="row align-items-center">
+              <div class="col-lg-4">
+                <div class="card-boxarea box1" data-aos="zoom-in" data-aos-duration="800"><div class="div text-end"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt=""><span class="d-none">Automação</span></h3></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Levantamento do processo e necessidade</a><div class="space14"></div><p>Entendimento do cenário, operação, requisitos e objetivos técnicos.</p></div></div>
+                <div class="space30"></div>
+                <div class="card-boxarea box2" data-aos="zoom-in" data-aos-duration="900"><div class="content-area"><a href="{% url 'institutional:contact' %}">Diagnóstico técnico do equipamento ou sistema</a><div class="space14"></div><p>Análise de sinais, sintomas, riscos e condições de operação.</p></div><div class="div text-end"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt=""><span class="d-none">Automação</span></h3></div></div>
+              </div>
+              <div class="col-lg-4">
+                <div class="images" data-aos="zoom-in" data-aos-duration="1000">
+                  <img src="{% static 'institutional/eitech/img/elements/elements12.png' %}" alt="" class="elements12">
+                  <img src="{% static 'institutional/eitech/img/elements/elements13.png' %}" alt="" class="elements13">
+                  <img src="{% static 'institutional/eitech/img/elements/elements14.png' %}" alt="" class="elements14">
+                  <img src="{% static 'institutional/eitech/img/elements/elements15.png' %}" alt="" class="elements15">
+                  <div class="img1"><img src="{% static 'institutional/eitech/img/all-images/case/case-img4.png' %}" alt=""></div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card-boxarea box3" data-aos="zoom-in" data-aos-duration="800"><div class="div"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt=""><span class="d-none">Automação</span></h3></div><div class="content-area2"><a href="{% url 'institutional:contact' %}">Identificação de gargalos e riscos</a><div class="space14"></div><p>Priorização de pontos críticos para controle, segurança e produtividade.</p></div></div>
+                <div class="space30"></div>
+                <div class="card-boxarea box4" data-aos="zoom-in" data-aos-duration="1000"><div class="content-area2"><a href="{% url 'institutional:contact' %}">Implementação, testes e documentação</a><div class="space14"></div><p>Proposta de melhoria, implementação assistida, testes funcionais e evolução contínua.</p></div><div class="div"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt=""><span class="d-none">Automação</span></h3></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="space40"></div>
+          <div class="heading6 text-center">
+            <p>Etapas: levantamento do processo e necessidade, diagnóstico técnico do equipamento ou sistema, identificação de gargalos e riscos, proposta de melhoria ou integração, implementação técnica assistida, testes, documentação e melhoria contínua.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== WORKS AREA ENDS =======-->
+
+  <!--===== FAQ AREA STARTS =======-->
+  <div class="service-sidebar-area sp1" style="background-color: #fff;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 m-auto">
+          <div class="service2-widget-sidebar" style="padding: 0 !important;">
+            <h3>Perguntas frequentes</h3>
+            <div class="space20"></div>
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionAutomation">
+                <div class="space24"></div>
+                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#automationOne" aria-expanded="true" aria-controls="automationOne">Vocês trabalham com CLPs?</button></h2><div id="automationOne" class="accordion-collapse collapse show" data-bs-parent="#accordionAutomation"><div class="accordion-body"><p>Sim. Atuamos com aplicações envolvendo controladores lógicos programáveis, sinais de campo, lógica de controle, sensores, atuadores e integração com equipamentos automatizados.</p></div></div></div>
+                <div class="space24"></div>
+                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#automationTwo" aria-expanded="false" aria-controls="automationTwo">Automação industrial serve apenas para grandes indústrias?</button></h2><div id="automationTwo" class="accordion-collapse collapse" data-bs-parent="#accordionAutomation"><div class="accordion-body"><p>Não. Pequenas e médias empresas também podem aplicar automação em máquinas, processos, comandos, controles e rotinas repetitivas.</p></div></div></div>
+                <div class="space24"></div>
+                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#automationThree" aria-expanded="false" aria-controls="automationThree">Vocês fazem manutenção em equipamentos automatizados?</button></h2><div id="automationThree" class="accordion-collapse collapse" data-bs-parent="#accordionAutomation"><div class="accordion-body"><p>Sim. Podemos apoiar no diagnóstico técnico, revisão de sinais, análise de falhas, testes funcionais e melhoria de confiabilidade em sistemas automatizados.</p></div></div></div>
+                <div class="space24"></div>
+                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#automationFour" aria-expanded="false" aria-controls="automationFour">A automação pode ser integrada com sistemas e dashboards?</button></h2><div id="automationFour" class="accordion-collapse collapse" data-bs-parent="#accordionAutomation"><div class="accordion-body"><p>Sim. A proposta da Smart Control Brasil é conectar automação, dados e gestão para gerar mais visibilidade, rastreabilidade e controle operacional.</p></div></div></div>
+                <div class="space24"></div>
+                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#automationFive" aria-expanded="false" aria-controls="automationFive">Vocês trabalham com robótica?</button></h2><div id="automationFive" class="accordion-collapse collapse" data-bs-parent="#accordionAutomation"><div class="accordion-body"><p>Sim. Podemos atuar em integração, apoio técnico, análise de aplicação e conexão de robôs ou dispositivos automatizados com a operação.</p></div></div></div>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <p>Fale com a Smart Control Brasil e entenda como aplicar automação industrial de forma prática, segura e conectada à gestão.</p>
+            <div class="space24"></div>
+            <div class="btn-area1"><a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== FAQ AREA ENDS =======-->
+{% endblock %}

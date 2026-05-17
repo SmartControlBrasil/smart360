@@ -1,0 +1,615 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="hero3-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg4.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements24.png' %}" alt="" class="elements24">
+    <img src="{% static 'institutional/eitech/img/elements/elements25.png' %}" alt="" class="elements25">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hero3-header heading3">
+            <h5 data-aos="fade-left" data-aos-duration="800"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Em desenvolvimento e implantação interna</h5>
+            <div class="space24"></div>
+            <h1 class="text-anime-style-3">Smart360 — Gestão, Automação e IA para Operações Inteligentes</h1>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Uma plataforma em desenvolvimento para conectar manutenção, serviços, ativos, dados, relatórios, automações e inteligência artificial em um único ecossistema.</p>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="950">O Smart360 é o ecossistema tecnológico em desenvolvimento pela Smart Control Brasil para centralizar processos operacionais, clientes, ativos, ordens de serviço, manutenção, documentos, indicadores, relatórios, automações e inteligência artificial aplicada à gestão.</p>
+            <div class="space24"></div>
+            <form action="{% url 'institutional:contact' %}" method="get" data-aos="fade-left" data-aos-duration="1000">
+              <input type="text" placeholder="Conte brevemente seu cenário operacional">
+              <button class="vl-btn4" type="submit">Solicitar diagnóstico</button>
+            </form>
+            <div class="space24"></div>
+            <h4 data-aos="fade-left" data-aos-duration="1100">Ambiente reservado para usuários autorizados.</h4>
+            <div class="space24"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
+              <a href="{% url 'admin-shell:dashboard-entry' %}" class="vl-btn4 bnt2">Acesso restrito</a>
+            </div>
+            <div class="space24"></div>
+            <ul>
+              <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/s-icon1.svg' %}" alt=""></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/s-icon2.svg' %}" alt=""></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/s-icon3.svg' %}" alt=""></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/s-icon4.svg' %}" alt=""></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/s-icon5.svg' %}" alt=""></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/s-icon6.svg' %}" alt=""></a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-2"></div>
+        <div class="col-lg-4">
+          <div class="header-images-area">
+            <div class="img1" data-aos="zoom-in" data-aos-duration="1000">
+              <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img4.png' %}" alt="">
+              <div class="letter1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M21.1143 1.94118C21.4025 1.26041 20.7492 0.559816 20.0544 0.804604L0.801081 7.58762C0.223207 7.79121 0.0442074 8.52444 0.4628 8.97333L11.7284 21.0542C12.147 21.5031 12.8869 21.3713 13.1266 20.8051L21.1143 1.94118Z" fill="white" />
+                </svg>
+                <p>OS organizada</p>
+              </div>
+              <div class="letter2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23" fill="none">
+                  <path d="M1.77654 0.585636C1.25754 0.211338 0.542077 0.636694 0.624195 1.27073L3.33048 22.166C3.39796 22.687 3.97755 22.9687 4.4293 22.7002L18.8273 14.1402C19.2791 13.8717 19.3073 13.2285 18.8808 12.921L1.77654 0.585636Z" fill="white" />
+                </svg>
+                <p>Ativos e histórico</p>
+              </div>
+
+              <div class="letter3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="24" viewBox="0 0 18 24" fill="none">
+                  <path d="M1.0605 22.4625C1.06572 23.1001 1.8308 23.4228 2.29486 22.9831L17.5361 8.54245C17.9185 8.18014 17.8041 7.54652 17.3193 7.34209L1.9067 0.841864C1.42196 0.637427 0.884826 0.996253 0.889126 1.52164L1.0605 22.4625Z" fill="white" />
+                </svg>
+                <p>Indicadores em evolução</p>
+              </div>
+            </div>
+            <div class="img2" data-aos="zoom-in" data-aos-duration="1200">
+              <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img5.png' %}" alt="">
+
+              <div class="letter1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M21.1143 1.94118C21.4025 1.26041 20.7492 0.559816 20.0544 0.804604L0.801081 7.58762C0.223207 7.79121 0.0442074 8.52444 0.4628 8.97333L11.7284 21.0542C12.147 21.5031 12.8869 21.3713 13.1266 20.8051L21.1143 1.94118Z" fill="white" />
+                </svg>
+                <p>Relatórios e documentos</p>
+              </div>
+              <div class="letter2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" fill="none">
+                  <path d="M20.8936 1.5779C21.1818 0.897132 20.5285 0.196535 19.8337 0.441323L0.580378 7.22434C0.00250406 7.42793 -0.176496 8.16116 0.242097 8.61004L11.5077 20.691C11.9263 21.1399 12.6661 21.008 12.9059 20.4418L20.8936 1.5779Z" fill="white" />
+                </svg>
+                <p>Automação e IA aplicada</p>
+              </div>
+
+              <div class="letter3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23" fill="none">
+                  <path d="M1.75897 0.718448C1.23996 0.34415 0.524499 0.769507 0.606617 1.40354L3.3129 22.2988C3.38038 22.8198 3.95997 23.1015 4.41172 22.833L18.8097 14.273C19.2615 14.0045 19.2897 13.3614 18.8633 13.0538L1.75897 0.718448Z" fill="white" />
+                </svg>
+                <p>Fluxo modular</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about3-section-area sp1">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6">
+              <div class="images">
+                <img src="{% static 'institutional/eitech/img/elements/elements27.png' %}" alt="" class="elements27">
+                <img src="{% static 'institutional/eitech/img/elements/elements28.png' %}" alt="" class="elements28">
+                <div class="img1 image-anime reveal">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img5.png' %}" alt="">
+                </div>
+              </div>
+              <div class="space30 d-md-none d-block"></div>
+            </div>
+
+            <div class="col-lg-6 col-md-6">
+              <div class="img1 image-anime reveal">
+                <img src="{% static 'institutional/eitech/img/all-images/about/about-img6.png' %}" alt="">
+              </div>
+              <div class="space30"></div>
+              <div class="img1 image-anime reveal">
+                <img src="{% static 'institutional/eitech/img/all-images/about/about-img7.png' %}" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="about-header-area heading5">
+            <h5 data-aos="fade-left" data-aos-duration="700"><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Ecossistema Smart360</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Operação, manutenção, dados e IA em uma base modular</h2>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="800">A proposta é unir engenharia, TPM, confiabilidade, dados e tecnologia em uma plataforma modular, evolutiva e preparada para empresas que precisam de mais controle, rastreabilidade e eficiência.</p>
+            <div class="space16"></div>
+            <div class="row" data-aos="fade-left" data-aos-duration="900">
+              <div class="col-lg-5">
+                <ul>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Ordens de serviço</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Ativos e equipamentos</li>
+                </ul>
+              </div>
+              <div class="col-lg-7">
+                <ul>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Manutenção e confiabilidade</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Automação e IA aplicada</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1100">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== WORK AREA STARTS =======-->
+  <div class="works3-section-area sp2">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-7 m-auto">
+          <div class="work-header text-center space-margin60 heading5">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Como o Smart360 evolui</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Implantação com diagnóstico, configuração e evolução por etapas</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
+          <div class="works-single-boxarea">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/work-icon1.svg' %}" alt="">
+            </div>
+            <div class="space20"></div>
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Diagnóstico da operação</a>
+              <div class="space16"></div>
+              <p>Entendimento dos processos atuais, cadastros, rotinas, controles, relatórios e pontos críticos de gestão.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="space30 d-lg-block d-none"></div>
+          <div class="works-single-boxarea">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/work-icon2.svg' %}" alt="">
+            </div>
+            <div class="space20"></div>
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Configuração inicial</a>
+              <div class="space16"></div>
+              <p>Organização do ambiente, cadastro base, adaptação do fluxo e orientação para uso operacional.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
+          <div class="space60 d-lg-block d-none"></div>
+          <div class="works-single-boxarea">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/work-icon3.svg' %}" alt="">
+            </div>
+            <div class="space20"></div>
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Evolução modular</a>
+              <div class="space16"></div>
+              <p>Ampliação gradual para relatórios, dashboards, documentos, automações, IA e integrações conforme necessidade.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== WORK AREA ENDS =======-->
+
+  <!--===== OTHERS AREA STARTS =======-->
+  <div class="others3-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/elements/elements29.png' %}" alt="" class="elements29">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="others-heading heading4">
+            <h5 data-aos="fade-left" data-aos-duration="800"><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Módulos principais</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Controle operacional com visão integrada por cliente, ativo e serviço</h2>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="900">O Smart360 está sendo preparado para organizar empresas, unidades, contatos, locais de atendimento, solicitações, registros técnicos, documentos e indicadores em uma base única.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar demonstração</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+          <div class="img1">
+            <img src="{% static 'institutional/eitech/img/all-images/others/others-img1.png' %}" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== OTHERS AREA ENDS =======-->
+
+  <!--===== FEATURES AREA STARTS =======-->
+  <div class="features3-section-area sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="features heading heading5 text-center">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Módulos e benefícios</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Uma plataforma em construção para operação mais rastreável</h2>
+          </div>
+        </div>
+        <div class="space100 d-lg-block d-none"></div>
+        <div class="space60 d-lg-none d-block"></div>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="col-lg-6" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="images-area">
+            <img src="{% static 'institutional/eitech/img/elements/elements28.png' %}" alt="" class="elements28">
+            <svg xmlns="http://www.w3.org/2000/svg" width="483" height="467" viewBox="0 0 483 467" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M266.577 463.258C200.182 477.787 129.972 448.449 80.196 402.148C28.7424 354.286 2.6788 285.923 0.403656 215.667C-1.9523 142.916 8.49039 58.9734 67.7138 16.6983C123.868 -23.3859 197.78 20.6378 266.577 25.6664C326.276 30.0299 393.811 3.79349 438.363 43.7902C483.846 84.6228 489.019 155.489 478.219 215.667C468.978 267.16 420.048 295.457 386.062 335.216C346.629 381.348 325.846 450.289 266.577 463.258Z" fill="#D8CEED" fill-opacity="0.7" />
+            </svg>
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img6.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="content-area heading5">
+            <h3 class="text-anime-style-3">Gestão de Ordens de Serviço</h3>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Controle de solicitações, status, responsáveis, histórico, prioridades e acompanhamento operacional.</p>
+            <div class="space18"></div>
+            <h3 class="text-anime-style-3">Ativos e Equipamentos</h3>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="1000">Cadastro de ativos, equipamentos, locais, histórico de manutenção e organização técnica por cliente ou unidade.</p>
+            <div class="space28"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space100 d-lg-block d-none"></div>
+      <div class="space60 d-lg-block d-none"></div>
+      <div class="row align-items-center">
+        <div class="col-lg-5">
+          <div class="content-area2 heading5">
+            <h3 class="text-anime-style-3">Dashboards, relatórios e automações</h3>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Painéis para acompanhar desempenho, backlog, produtividade, recorrência, disponibilidade e pontos críticos.</p>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="1000">Organização de documentos, evidências, relatórios técnicos, registros de atendimento e histórico operacional, com evolução para automações e IA aplicada.</p>
+            <div class="space28"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
+            </div>
+          </div>
+          <div class="space50 d-lg-none d-block"></div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6" data-aos="zoom-in" data-aos-duration="1100">
+          <div class="images-area">
+            <img src="{% static 'institutional/eitech/img/elements/elements28.png' %}" alt="" class="elements28">
+            <svg xmlns="http://www.w3.org/2000/svg" width="483" height="467" viewBox="0 0 483 467" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M266.577 463.258C200.182 477.787 129.972 448.449 80.196 402.148C28.7424 354.286 2.6788 285.923 0.403656 215.667C-1.9523 142.916 8.49039 58.9734 67.7138 16.6983C123.868 -23.3859 197.78 20.6378 266.577 25.6664C326.276 30.0299 393.811 3.79349 438.363 43.7902C483.846 84.6228 489.019 155.489 478.219 215.667C468.978 267.16 420.048 295.457 386.062 335.216C346.629 381.348 325.846 450.289 266.577 463.258Z" fill="#D8CEED" fill-opacity="0.7" />
+            </svg>
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img7.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space80"></div>
+      <div class="row">
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="800">
+          <div class="works-single-boxarea">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Manutenção, TPM e Confiabilidade</a>
+              <div class="space16"></div>
+              <p>Base para planos preventivos, indicadores, análise de falhas, MTTR, MTBF e melhoria contínua da operação.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="900">
+          <div class="works-single-boxarea">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Automação e IA Aplicada</a>
+              <div class="space16"></div>
+              <p>Uso de automações e inteligência artificial para apoiar atendimento, análise de dados, recomendações e tomada de decisão.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="works-single-boxarea">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Clientes, Sites e Unidades</a>
+              <div class="space16"></div>
+              <p>Gestão de empresas, unidades, contatos, locais de atendimento e estrutura operacional por cliente.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1100">
+          <div class="works-single-boxarea">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Evolução Modular</a>
+              <div class="space16"></div>
+              <p>Arquitetura preparada para crescer por módulos: manutenção, comercial, relatórios, IA, marketplace, arquivos e integrações.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="space50 d-block d-none"></div>
+  </div>
+  <!--===== FEATURES AREA ENDS =======-->
+
+  <!--===== PRICING AREA STARTS =======-->
+  <div class="pricingplan1-section-area sp2">
+    <img src="{% static 'institutional/eitech/img/elements/elements30.png' %}" alt="" class="elements30">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="pricing-header heading5 text-center">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Planos de acesso</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Valores de pré-lançamento do Smart360</h2>
+          </div>
+          <div class="space24"></div>
+          <p class="text-center">Valores de pré-lançamento sujeitos a ajuste conforme escopo, quantidade de usuários, módulos, integrações e nível de implantação.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="tab-content">
+            <div id="monthly">
+              <div class="row">
+                <div class="col-lg-4 col-md-6" data-aos="flip-right" data-aos-duration="800">
+                  <div class="single-pricing-area">
+                    <div class="pricing-box">
+                      <h3>Starter</h3>
+                      <div class="space14"></div>
+                      <p>Para operação pequena começando a organizar serviços e controles básicos.</p>
+                      <div class="space12"></div>
+                      <ul>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Cadastro básico de clientes e contatos</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Controle inicial de serviços</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Organização de solicitações</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Acesso ao ambiente Smart360</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Evolução conforme módulos disponíveis</li>
+                      </ul>
+                      <div class="space28"></div>
+                      <h2>R$ 97 <span>/mês</span></h2>
+                      <div class="space24"></div>
+                      <div class="btn-area1">
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar acesso</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="flip-right" data-aos-duration="900">
+                  <div class="single-pricing-area">
+                    <div class="pricing-box">
+                      <h3>Professional</h3>
+                      <div class="space14"></div>
+                      <p>Para empresas que precisam organizar manutenção, ativos, ordens de serviço e indicadores.</p>
+                      <div class="space12"></div>
+                      <ul>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Ordens de serviço</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Clientes, unidades e ativos</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Histórico operacional</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Indicadores e relatórios básicos</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Suporte de implantação inicial</li>
+                      </ul>
+                      <div class="space28"></div>
+                      <h2>R$ 197 <span>/mês</span></h2>
+                      <div class="space24"></div>
+                      <div class="btn-area1">
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar demonstração</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="flip-right" data-aos-duration="1000">
+                  <div class="single-pricing-area">
+                    <div class="pricing-box">
+                      <h3>Business</h3>
+                      <div class="space14"></div>
+                      <p>Para operações com múltiplos usuários, dashboards, relatórios, automações e gestão mais estruturada.</p>
+                      <div class="space12"></div>
+                      <ul>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Múltiplos usuários</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Dashboards operacionais</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Relatórios e documentos</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Automação e IA aplicada</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Evolução modular assistida</li>
+                      </ul>
+                      <div class="space28"></div>
+                      <h2>R$ 397 <span>/mês</span></h2>
+                      <div class="space24"></div>
+                      <div class="btn-area1">
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 m-auto" data-aos="flip-right" data-aos-duration="1100">
+                  <div class="single-pricing-area">
+                    <div class="pricing-box">
+                      <h3>Implantação assistida</h3>
+                      <div class="space14"></div>
+                      <p>Configuração inicial, cadastro base, adaptação do fluxo, treinamento e acompanhamento da primeira etapa.</p>
+                      <div class="space12"></div>
+                      <ul>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Levantamento do processo atual</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Configuração inicial do ambiente</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Cadastro base assistido</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Ajuste de fluxo operacional</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Treinamento e orientação de uso</li>
+                      </ul>
+                      <div class="space28"></div>
+                      <h2>A partir de R$ 1.500</h2>
+                      <div class="space24"></div>
+                      <div class="btn-area1">
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== PRICING AREA ENDS =======-->
+
+  <!--===== FAQ AREA STARTS =======-->
+  <div class="faq3-section-area sp1">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="faq-header heading5">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Perguntas frequentes</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Como entrar na fase de implantação?</h2>
+          </div>
+          <div class="space50"></div>
+          <div class="images">
+            <div class="img1 image-anime reveal">
+              <img src="{% static 'institutional/eitech/img/all-images/faq/faq-img1.png' %}" alt="">
+            </div>
+            <div class="space30 d-lg-none d-block"></div>
+            <img src="{% static 'institutional/eitech/img/elements/elements27.png' %}" alt="" class="elements27">
+          </div>
+        </div>
+
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+          <div class="faq-accordion-area">
+            <div class="accordion" id="accordionExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    O Smart360 já está finalizado?
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Não. O Smart360 está em desenvolvimento e implantação interna, com evolução modular e abertura assistida conforme diagnóstico e aderência ao processo.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="space24"></div>
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Posso solicitar demonstração?
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Sim. A demonstração pode ser alinhada após uma conversa inicial para entender operação, usuários, volume de serviços e módulos prioritários.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="space24"></div>
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Os valores podem mudar?
+                  </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Sim. Os valores são de pré-lançamento e podem variar conforme escopo, quantidade de usuários, módulos, integrações e nível de implantação.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="space24"></div>
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    A implantação assistida é obrigatória?
+                  </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Depende do cenário. Para operações com base de clientes, ativos, históricos e fluxos específicos, a implantação assistida ajuda a acelerar o uso correto do ambiente.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="space24"></div>
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                    O acesso restrito é público?
+                  </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Não. O acesso restrito é reservado a usuários autorizados e ao acompanhamento interno da implantação.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== FAQ AREA ENDS =======-->
+
+  <!--===== CTA AREA STARTS =======-->
+  <div class="cta3-section-area">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="cta-bg-area">
+            <img src="{% static 'institutional/eitech/img/elements/elements26.png' %}" alt="" class="elements26">
+            <div class="row">
+              <div class="col-lg-8 m-auto">
+                <div class="cta-header heading1 text-center">
+                  <h2 data-aos="fade-left" data-aos-duration="700">Quer entender se o Smart360 faz sentido para sua operação?</h2>
+                  <div class="space16"></div>
+                  <p data-aos="fade-left" data-aos-duration="800">Solicite um diagnóstico para avaliar processos, cadastros, ordens de serviço, ativos, indicadores e possibilidades de implantação por etapas.</p>
+                  <div class="space24"></div>
+                  <div class="btn-area1">
+                    <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
+                    <a href="{% url 'institutional:projects' %}" class="vl-btn4 bnt2">Ver projetos</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== CTA AREA ENDS =======-->
+{% endblock %}

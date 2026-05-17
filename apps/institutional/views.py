@@ -17,12 +17,40 @@ def service_details(request):
     return render(request, "institutional/eitech/pages/service-details.html")
 
 
+def service_marketing_digital(request):
+    return render(request, "institutional/eitech/pages/service-marketing-digital.html")
+
+
+def service_automacao_industrial_clps(request):
+    return render(request, "institutional/eitech/pages/service-automacao-industrial-clps.html")
+
+
+def service_inteligencia_artificial(request):
+    return render(request, "institutional/eitech/pages/service-inteligencia-artificial.html")
+
+
+def service_robotica_integracao(request):
+    return render(request, "institutional/eitech/pages/service-robotica-integracao.html")
+
+
+def service_manutencao_tpm_confiabilidade(request):
+    return render(request, "institutional/eitech/pages/service-manutencao-tpm-confiabilidade.html")
+
+
+def service_diagnostico_ia_dados_automacao(request):
+    return render(request, "institutional/eitech/pages/service-diagnostico-ia-dados-automacao.html")
+
+
 def contact(request):
     return render(request, "institutional/eitech/pages/contact.html")
 
 
 def team(request):
     return render(request, "institutional/eitech/pages/team.html")
+
+
+def smart360(request):
+    return render(request, "institutional/eitech/pages/smart360.html")
 
 
 def projects(request):

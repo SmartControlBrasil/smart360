@@ -25,9 +25,9 @@
                                                           </div>
                                                          <a href="{% url 'institutional:home' %}">Home</a>
                                                          <div class="btn-area1">
-                                                          <a href="{% url 'institutional:home' %}" class="vl-btn1">Multi Page</a>
+                                                          <a href="{% url 'institutional:home' %}" class="vl-btn1">Página</a>
                                                           <div class="space16"></div>
-                                                          <a href="{% url 'institutional:home' %}" target="_blank" class="vl-btn1">One Page</a>
+                                                          <a href="{% url 'institutional:home' %}" target="_blank" class="vl-btn1">Seção</a>
                                                          </div>
                                                          <div class="space20 d-lg-none d-block"></div>
                                                       </div>
@@ -39,9 +39,9 @@
                                                         </div>
                                                         <a href="{% url 'institutional:about' %}">Sobre</a>
                                                         <div class="btn-area1">
-                                                          <a href="{% url 'institutional:about' %}" class="vl-btn1">Multi Page</a>
+                                                          <a href="{% url 'institutional:about' %}" class="vl-btn1">Página</a>
                                                           <div class="space16"></div>
-                                                          <a href="{% url 'institutional:about' %}" target="_blank" class="vl-btn1">One Page</a>
+                                                          <a href="{% url 'institutional:about' %}" target="_blank" class="vl-btn1">Seção</a>
                                                          </div>
                                                         <div class="space20 d-lg-none d-block"></div>
                                                       </div>
@@ -53,9 +53,9 @@
                                                         </div>
                                                         <a href="{% url 'institutional:services' %}">Soluções</a>
                                                         <div class="btn-area1">
-                                                          <a href="{% url 'institutional:services' %}" class="vl-btn1">Multi Page</a>
+                                                          <a href="{% url 'institutional:services' %}" class="vl-btn1">Página</a>
                                                           <div class="space16"></div>
-                                                          <a href="{% url 'institutional:services' %}" target="_blank" class="vl-btn1">One Page</a>
+                                                          <a href="{% url 'institutional:services' %}" target="_blank" class="vl-btn1">Seção</a>
                                                          </div>
                                                         <div class="space20 d-lg-none d-block"></div>
                                                       </div>
@@ -67,9 +67,9 @@
                                                         </div>
                                                         <a href="{% url 'institutional:projects' %}">Projetos</a>
                                                         <div class="btn-area1">
-                                                          <a href="{% url 'institutional:projects' %}" class="vl-btn1">Multi Page</a>
+                                                          <a href="{% url 'institutional:projects' %}" class="vl-btn1">Página</a>
                                                           <div class="space16"></div>
-                                                          <a href="{% url 'institutional:projects' %}" target="_blank" class="vl-btn1">One Page</a>
+                                                          <a href="{% url 'institutional:projects' %}" target="_blank" class="vl-btn1">Seção</a>
                                                          </div>
                                                         <div class="space20 d-lg-none d-block"></div>
                                                       </div>
@@ -82,9 +82,9 @@
                                                       </div>
                                                       <a href="{% url 'institutional:blog' %}">Blog</a>
                                                       <div class="btn-area1">
-                                                        <a href="{% url 'institutional:blog' %}" class="vl-btn1">Multi Page</a>
+                                                        <a href="{% url 'institutional:blog' %}" class="vl-btn1">Página</a>
                                                         <div class="space16"></div>
-                                                        <a href="{% url 'institutional:blog' %}" target="_blank" class="vl-btn1">One Page</a>
+                                                        <a href="{% url 'institutional:blog' %}" target="_blank" class="vl-btn1">Seção</a>
                                                        </div>
                                                     </div>
                                             </div>
@@ -107,7 +107,7 @@
                               <li><a href="#">Servicos <span><i class="fa-solid fa-angle-down d-lg-inline d-none"></i></span></a>
                                 <ul class="sub-menu">
                                   <li><a href="{% url 'institutional:services' %}">Servicos</a></li>
-                                  <li><a href="#" class="span-arrow">Detalhes de Servico <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
+                                  <li><a href="{% url 'institutional:service_details' %}" class="span-arrow">Detalhes de Servico <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
                                     <ul class="sub-menu menu1">
                                       <li><a href="{% url 'institutional:service_details' %}">Detalhe de Servico</a></li>
                                       <li><a href="{% url 'institutional:service_details' %}">Detalhe de Servico</a></li>
@@ -119,7 +119,7 @@
                               <li><a href="#">Projetos <span><i class="fa-solid fa-angle-down d-lg-inline d-none"></i></span></a>
                                 <ul class="sub-menu">
                                   <li><a href="{% url 'institutional:projects' %}">Projetos</a></li>
-                                  <li><a href="#" class="span-arrow">Detalhes de Projeto <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
+                                  <li><a href="{% url 'institutional:project_details' %}" class="span-arrow">Detalhes de Projeto <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
                                     <ul class="sub-menu menu1">
                                       <li><a href="{% url 'institutional:project_details' %}">Detalhe de Projeto</a></li>
                                       <li><a href="{% url 'institutional:project_details' %}">Detalhe de Projeto</a></li>
@@ -130,13 +130,13 @@
                               </li>
                               <li><a href="#">Blog <span><i class="fa-solid fa-angle-down d-lg-inline d-none"></i></span></a>
                                 <ul class="sub-menu">
-                                  <li><a href="#" class="span-arrow">Nosso Blog <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
+                                  <li><a href="{% url 'institutional:blog' %}" class="span-arrow">Nosso Blog <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
                                     <ul class="sub-menu menu1">
                                       <li><a href="{% url 'institutional:blog' %}">Lista de Artigos</a></li>
                                       <li><a href="{% url 'institutional:blog' %}">Noticias</a></li>
                                   </ul>
                                   </li>
-                                  <li><a href="#" class="span-arrow">Blog Lista <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
+                                  <li><a href="{% url 'institutional:blog' %}" class="span-arrow">Blog Lista <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
                                     <ul class="sub-menu menu1">
                                       <li><a href="{% url 'institutional:blog' %}">Blog Lista 1</a></li>
                                      <li><a href="{% url 'institutional:blog' %}">Blog Lista 2</a></li>
@@ -144,7 +144,7 @@
                                       <li><a href="{% url 'institutional:blog' %}">Blog Lista 4</a></li>
                                   </ul>
                                   </li>
-                                  <li><a href="#" class="span-arrow">Detalhes do Blog <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
+                                  <li><a href="{% url 'institutional:blog_ia_pequenas_empresas' %}" class="span-arrow">Detalhes do Blog <span><i class="fa-solid fa-angle-right d-lg-block d-none"></i></span></a>
                                     <ul class="sub-menu menu1">
                                       <li><a href="{% url 'institutional:blog_details' %}">Artigo Completo</a></li>
                                       <li><a href="{% url 'institutional:blog_details' %}">Artigo Completo</a></li>

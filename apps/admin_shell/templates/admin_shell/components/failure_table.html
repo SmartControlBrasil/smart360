@@ -1,0 +1,51 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table failure-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Ativo</th>
+                <th>Tipo</th>
+                <th>Severidade</th>
+                <th>Impacto</th>
+                <th>Parada</th>
+                <th>Data</th>
+                <th>OS vinculada</th>
+                <th>Tecnico</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in failures %}
+                <tr class="{% if item.severity == 'Critica' or item.recurrence == 'Alta' %}is-critical-row{% endif %}">
+                    <td><strong>{{ item.code }}</strong></td>
+                    <td>
+                        <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-failure-detail' failure_code=item.code %}">{{ item.asset.name }}</a>
+                        <small>{{ item.asset_code }}</small>
+                    </td>
+                    <td>
+                        <span>{{ item.failure_type }}</span>
+                        <small>{{ item.failure_mode }}</small>
+                    </td>
+                    <td>{% include "admin_shell/components/failure_severity_badge.html" with value=item.severity %}</td>
+                    <td>{{ item.impact_level }}</td>
+                    <td>{{ item.downtime }}</td>
+                    <td>{{ item.occurred_at }}</td>
+                    <td>{{ item.work_order_code|default:"-" }}</td>
+                    <td>{{ item.responsible|default:"Sem responsavel" }}</td>
+                    <td>{% include "admin_shell/components/work_order_status_badge.html" with value=item.status %}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:smart-system-failure-detail' failure_code=item.code %}">Detalhe</a>
+                            <a href="{% url 'admin-shell:smart-system-asset-detail' asset_code=item.asset_code %}">Ativo</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="11" class="empty-state-cell">Nenhum evento de falha encontrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

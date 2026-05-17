@@ -1,0 +1,279 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            <label class="asset-filter-item">
+                <span>Status</span>
+                <select name="status">
+                    <option value="">Todos</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="asset-filter-item">
+                <span>Nicho</span>
+                <select name="niche">
+                    <option value="">Todos</option>
+                    {% for n in niches %}
+                        <option value="{{ n.id }}" {% if selected_niche == n.id|stringformat:"s" %}selected{% endif %}>{{ n.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="asset-filter-item">
+                <span>Template</span>
+                <select name="template">
+                    <option value="">Todos</option>
+                    {% for t in templates %}
+                        <option value="{{ t.id }}" {% if selected_template == t.id|stringformat:"s" %}selected{% endif %}>{{ t.niche.name }} — {{ t.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:site-factory-dashboard' %}">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="summary-grid">
+        {% for card in kpi_cards %}
+            <a class="summary-card tone-{{ card.tone }} site-factory-kpi-card" href="{{ card.href }}">
+                <span>{{ card.label }}</span>
+                <strong>
+                    {% if card.format == "currency" %}R$ {{ card.value|floatformat:2 }}
+                    {% else %}{{ card.value }}{% endif %}
+                </strong>
+                <small>{{ card.helper }}</small>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Pedidos por status</h2>
+                        <p>Distribuicao no escopo filtrado.</p>
+                    </div>
+                </header>
+                <div id="ssf-chart-status" class="site-factory-chart"></div>
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Nichos mais usados</h2>
+                        <p>Volume de pedidos por nicho.</p>
+                    </div>
+                </header>
+                <div id="ssf-chart-niches" class="site-factory-chart"></div>
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Pacotes comerciais</h2>
+                        <p>Volume por nome/codigo (snapshot ou template).</p>
+                    </div>
+                </header>
+                <div id="ssf-chart-templates" class="site-factory-chart"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Ultimos pedidos</h2>
+                        <p>Atualizados conforme filtros ativos.</p>
+                    </div>
+                </header>
+                <div class="table-shell">
+                    <table class="work-order-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Empresa</th>
+                                <th>Pacote</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{% if order.company %}{{ order.company.name }}{% else %}{{ order.metadata.client_company_name|default:"—" }}{% endif %}</td>
+                                    <td>
+                                        {% if order.metadata.package_snapshot %}
+                                            {% if order.metadata.package_snapshot.commercial_name %}
+                                                {{ order.metadata.package_snapshot.commercial_name }}
+                                            {% elif order.metadata.package_snapshot.template_name %}
+                                                {{ order.metadata.package_snapshot.template_name }}
+                                            {% else %}—{% endif %}
+                                        {% elif order.selected_template %}
+                                            {{ order.selected_template.name }}
+                                        {% else %}—{% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {% if order.status == 'delivered' %}status-emerald{% elif order.status == 'cancelled' %}status-red{% elif order.status == 'review' %}status-violet{% elif order.status == 'in_production' %}status-sky{% elif order.status == 'intake_pending' %}status-amber{% else %}status-slate{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td><a class="table-action-link" href="{% url 'admin-shell:site-factory-order-detail' pk=order.pk %}">Abrir</a></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5">Nenhum pedido no filtro atual.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Ultimas entregas</h2>
+                        <p>Registros de entrega recentes.</p>
+                    </div>
+                </header>
+                <div class="table-shell">
+                    <table class="work-order-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>URL</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in recent_deliveries %}
+                                <tr>
+                                    <td><a class="table-action-link" href="{% url 'admin-shell:site-factory-order-detail' pk=d.site_order_id %}">#{{ d.site_order_id }}</a></td>
+                                    <td><a class="table-action-link" href="{{ d.delivered_url }}" target="_blank" rel="noopener">Abrir</a></td>
+                                    <td>{{ d.delivered_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3">Nenhuma entrega recente.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <div class="column-span-4" id="pending-tasks">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Tarefas pendentes</h2>
+                        <p>Producao em aberto no escopo filtrado.</p>
+                    </div>
+                </header>
+                <div class="table-shell">
+                    <table class="work-order-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Etapa</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in pending_tasks_rows %}
+                                <tr>
+                                    <td><a class="table-action-link" href="{% url 'admin-shell:site-factory-order-tasks' pk=task.site_order_id %}">#{{ task.site_order_id }}</a></td>
+                                    <td>{{ task.get_stage_display }}</td>
+                                    <td>
+                                        <span class="status-badge {% if task.status == 'done' %}status-emerald{% elif task.status == 'blocked' %}status-red{% elif task.status == 'in_progress' %}status-sky{% else %}status-slate{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3">Nenhuma tarefa pendente.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1"></script>
+{{ chart_orders_by_status|json_script:"ssf-data-status" }}
+{{ chart_top_niches|json_script:"ssf-data-niches" }}
+{{ chart_top_packages|json_script:"ssf-data-templates" }}
+<script>
+(function () {
+  function read(id) {
+    var el = document.getElementById(id);
+    if (!el) return { labels: [], series: [] };
+    try { return JSON.parse(el.textContent); } catch (e) { return { labels: [], series: [] }; }
+  }
+  function mount(elId, spec) {
+    var el = document.getElementById(elId);
+    if (!el || typeof ApexCharts === "undefined") return;
+    var chart = new ApexCharts(el, spec);
+    chart.render();
+  }
+  var st = read("ssf-data-status");
+  if (st.series && st.series.length && st.series.some(function (x) { return x > 0; })) {
+    mount("ssf-chart-status", {
+      chart: { type: "donut", height: 280, toolbar: { show: false } },
+      labels: st.labels,
+      series: st.series,
+      legend: { position: "bottom" },
+      dataLabels: { enabled: true },
+      colors: ["#6366f1", "#f59e0b", "#0ea5e9", "#a855f7", "#10b981", "#64748b", "#f43f5e"],
+    });
+  } else {
+    var es = document.getElementById("ssf-chart-status");
+    if (es) es.innerHTML = "<p class=\"widget-muted\">Sem pedidos para o filtro atual.</p>";
+  }
+  var nic = read("ssf-data-niches");
+  if (nic.series && nic.series.length && nic.series.some(function (x) { return x > 0; })) {
+    mount("ssf-chart-niches", {
+      chart: { type: "bar", height: 280, toolbar: { show: false } },
+      plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+      series: [{ name: "Pedidos", data: nic.series }],
+      xaxis: { categories: nic.labels },
+      colors: ["#8b5cf6"],
+      dataLabels: { enabled: true },
+    });
+  } else {
+    var en = document.getElementById("ssf-chart-niches");
+    if (en) en.innerHTML = "<p class=\"widget-muted\">Sem dados de nicho.</p>";
+  }
+  var tpl = read("ssf-data-templates");
+  if (tpl.series && tpl.series.length && tpl.series.some(function (x) { return x > 0; })) {
+    mount("ssf-chart-templates", {
+      chart: { type: "bar", height: 280, toolbar: { show: false } },
+      plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+      series: [{ name: "Pedidos", data: tpl.series }],
+      xaxis: { categories: tpl.labels },
+      colors: ["#0d9488"],
+      dataLabels: { enabled: true },
+    });
+  } else {
+    var et = document.getElementById("ssf-chart-templates");
+    if (et) et.innerHTML = "<p class=\"widget-muted\">Sem dados de pacotes para o filtro.</p>";
+  }
+})();
+</script>
+<style>
+.site-factory-kpi-card { text-decoration: none; color: inherit; display: block; }
+.site-factory-chart { min-height: 280px; }
+</style>
+{% endblock %}

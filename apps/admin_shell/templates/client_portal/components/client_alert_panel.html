@@ -1,0 +1,18 @@
+<section class="content-panel">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Alertas</span>
+            <h2>{{ title|default:"Alertas relevantes" }}</h2>
+        </div>
+    </div>
+    <div class="stack-list">
+        {% for alert in alerts %}
+            <article class="stack-card tone-{{ alert.tone|default:'indigo' }}">
+                <strong>{{ alert.title }}</strong>
+                <p>{{ alert.description }}</p>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhum alerta relevante para o contexto atual.</p>
+        {% endfor %}
+    </div>
+</section>

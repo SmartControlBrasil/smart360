@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Smart Control Brasil | Tecnologia, Automacao e IA{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Tecnologia, automacao e inteligencia artificial para empresas com mais controle, seguranca e eficiencia.{% endblock %}">
+
+  <link rel="shortcut icon" href="{% static 'institutional/eitech/img/logo/fav-logo1.png' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/aos.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/fontawesome.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/magnific-popup.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/mobile.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/owlcarousel.min.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/slick-slider.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/nice-select.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/main.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% include 'institutional/eitech/partials/preloader.html' %}
+  {% include 'institutional/eitech/partials/header.html' %}
+
+  {% block content %}{% endblock %}
+
+  {% include 'institutional/eitech/partials/footer.html' %}
+
+  <script src="{% static 'institutional/eitech/js/plugins/jquery-3-7-1.min.js' %}"></script>
+  {% include 'institutional/eitech/partials/scripts.html' %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

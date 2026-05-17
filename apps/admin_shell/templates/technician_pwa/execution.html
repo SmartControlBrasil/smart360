@@ -1,0 +1,261 @@
+{% load static %}
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-panel sticky-summary">
+    <div class="section-heading"><h2>{{ service.code }}</h2></div>
+    <p>{{ service.asset_code }} • {{ service.client }} • {{ service.site }}</p>
+    <div class="technician-inline-state-row">
+        <span class="technician-inline-pill" data-order-sync-state>{{ execution.offline_sync.sync_state|default:"online" }}</span>
+        <span class="technician-inline-pill" data-order-pending-summary>Pendencias locais: 0</span>
+    </div>
+    <div class="technician-kpi-grid compact">
+        {% for item in progress_cards %}
+            {% include "technician_pwa/components/mobile_kpi_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+
+{% with voiceops_bootstrap_id="technician-voiceops-bootstrap" voiceops_title="VoiceOps de Campo" voiceops_persona="technician" voiceops_description="Comandos por voz para iniciar OS, registrar problema, marcar NOK e pedir ajuda contextual." voiceops_placeholder="Ex.: iniciar ordem de servico, registrar problema no motor, adicionar peca PRT-0001." voiceops_tts_enabled=True voiceops_empty_message="Os comandos e respostas por voz da OS atual aparecem aqui." %}
+    {% include "admin_shell/components/voiceops_widget.html" %}
+{% endwith %}
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Fluxo de execucao</h2></div>
+    {% if signature_error == "technician" %}
+        <p class="technician-inline-alert critical">A conclusao exige assinatura do tecnico executor.</p>
+    {% elif signature_error == "client" %}
+        <p class="technician-inline-alert warning">Registre a assinatura do cliente ou o motivo da ausencia antes de concluir.</p>
+    {% endif %}
+    <div class="technician-step-strip">
+        {% for step in execution_steps %}
+            <span class="technician-step {% if step.done %}is-done{% endif %}">{{ step.label }}</span>
+        {% endfor %}
+    </div>
+    <div class="technician-action-grid">
+        <button type="button" class="quick-action-button" data-execution-save>Salvar andamento</button>
+        <button type="button" class="quick-action-button" data-execution-sync-now>Sincronizar agora</button>
+        <button type="button" class="quick-action-button" data-execution-complete>Concluir servico</button>
+    </div>
+    <div class="technician-inline-state-row">
+        {% for suggestion in technician_copilot_bootstrap.suggestions|slice:":3" %}
+            <span class="technician-inline-pill">{{ suggestion }}</span>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Assinaturas e aceite</h2></div>
+    <div class="technician-card-list">
+        {% for item in execution.signature_cards %}
+            {% include "admin_shell/components/signature_summary_card.html" %}
+        {% endfor %}
+    </div>
+    {% url 'admin-shell:technician-app-service-sign-technician' order_code=service.code as technician_signature_url %}
+    {% url 'admin-shell:technician-app-service-sign-client' order_code=service.code as client_signature_url %}
+    {% include "technician_pwa/components/signature_capture_pad.html" with pad_id="technician-signature" title="Assinatura do tecnico" subtitle="Confirma autoria do atendimento executado." form=technician_signature_form action=technician_signature_url signature=execution.signatures.technician_signature submit_label="Salvar assinatura do tecnico" canvas_hint="Assine com o dedo ou caneta touch antes de concluir o atendimento." %}
+    {% include "technician_pwa/components/signature_capture_pad.html" with pad_id="client-signature" title="Aceite do cliente" subtitle="Coleta de aceite do cliente ou justificativa de ausencia." form=client_signature_form action=client_signature_url signature=execution.signatures.client_signature submit_label="Salvar aceite do cliente" canvas_hint="Passe o dispositivo ao cliente para assinar ou registre o motivo da ausencia." %}
+</section>
+
+<form class="technician-panel technician-offline-form" data-execution-form data-order-code="{{ service.code }}">
+    <div class="section-heading"><h2>Checklist offline-first</h2></div>
+    <div class="technician-card-list" data-checklist-items-root>
+        {% for item in execution.checklist_execution.items %}
+            <article class="technician-checklist-item {% if item.response == 'NOK' %}is-nok{% endif %}" data-checklist-item data-item-code="{{ item.code|default:item.order }}">
+                <header>
+                    <strong>{{ item.order }}. {{ item.title }}</strong>
+                    <span data-current-response>{{ item.response|default:"Pendente" }}</span>
+                </header>
+                <p>{{ item.description }}</p>
+                <div class="choice-chip-group">
+                    <label class="choice-chip choice-chip-input">
+                        <input type="radio" name="checklist-{{ item.code|default:item.order }}" value="OK" {% if item.response == "OK" %}checked{% endif %}>
+                        <span>OK</span>
+                    </label>
+                    <label class="choice-chip choice-chip-input">
+                        <input type="radio" name="checklist-{{ item.code|default:item.order }}" value="NOK" {% if item.response == "NOK" %}checked{% endif %}>
+                        <span>NOK</span>
+                    </label>
+                    <label class="choice-chip choice-chip-input">
+                        <input type="radio" name="checklist-{{ item.code|default:item.order }}" value="N/A" {% if item.response == "N/A" %}checked{% endif %}>
+                        <span>N/A</span>
+                    </label>
+                </div>
+                <textarea rows="2" placeholder="Observacao do item" data-checklist-notes>{{ item.notes }}</textarea>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhum checklist vinculado a esta ordem.</p>
+        {% endfor %}
+    </div>
+
+    <div class="section-heading"><h2>Diagnostico e acao executada</h2></div>
+    <div class="technician-form-grid">
+        <label class="technician-input-group">
+            <span>Sintomas</span>
+            <textarea rows="3" name="symptoms">{{ execution.diagnosis.symptoms }}</textarea>
+        </label>
+        <label class="technician-input-group">
+            <span>Diagnostico tecnico</span>
+            <textarea rows="4" name="technical_diagnosis">{{ execution.diagnosis.technical_diagnosis }}</textarea>
+        </label>
+        <label class="technician-input-group">
+            <span>Analise realizada</span>
+            <textarea rows="3" name="analysis">{{ execution.diagnosis.analysis }}</textarea>
+        </label>
+        <label class="technician-input-group">
+            <span>Acao executada</span>
+            <textarea rows="4" name="intervention">{{ execution.executed_action.intervention }}</textarea>
+        </label>
+        <label class="technician-input-group">
+            <span>Ajustes</span>
+            <textarea rows="3" name="adjustments">{{ execution.executed_action.adjustments }}</textarea>
+        </label>
+        <label class="technician-input-group">
+            <span>Resultado obtido</span>
+            <textarea rows="3" name="result">{{ execution.executed_action.result }}</textarea>
+        </label>
+    </div>
+
+    <div class="section-heading"><h2>Materiais aplicados</h2></div>
+    <div class="technician-card-list" data-material-list>
+        {% for material in execution.materials %}
+            <article class="technician-mini-card technician-material-editor" data-material-item>
+                <input type="text" value="{{ material.code }}" placeholder="Codigo da peca" data-material-code>
+                <input type="text" value="{{ material.name }}" placeholder="Descricao" data-material-name>
+                <input type="text" value="{{ material.quantity }}" placeholder="Quantidade" data-material-quantity>
+                <textarea rows="2" placeholder="Observacao" data-material-notes>{{ material.notes }}</textarea>
+            </article>
+        {% endfor %}
+    </div>
+    <button type="button" class="quick-action-button secondary" data-add-material>Adicionar material</button>
+
+    <div class="section-heading"><h2>Evidencias</h2></div>
+    <div class="technician-card-list" data-evidence-list>
+        {% for evidence in execution.evidence %}
+            <article class="technician-mini-card technician-evidence-editor" data-evidence-item>
+                <input type="text" value="{{ evidence.type }}" placeholder="Tipo" data-evidence-type>
+                <textarea rows="2" placeholder="Descricao" data-evidence-description>{{ evidence.description }}</textarea>
+                <span>{{ evidence.timestamp }}</span>
+            </article>
+        {% endfor %}
+    </div>
+    <label class="technician-input-group">
+        <span>Adicionar foto / evidencia</span>
+        <input type="file" accept="image/*" data-evidence-file-input>
+    </label>
+
+    <div class="section-heading"><h2>Conclusao planejada</h2></div>
+    <div class="technician-form-grid">
+        <label class="technician-input-group">
+            <span>Status final</span>
+            <select name="final_status">
+                <option value="Em execucao" {% if execution.finalization.final_status == "Em execucao" %}selected{% endif %}>Em execucao</option>
+                <option value="Concluida" {% if execution.finalization.final_status == "Concluida" %}selected{% endif %}>Concluida</option>
+                <option value="Aguardando peca" {% if execution.finalization.final_status == "Aguardando peca" %}selected{% endif %}>Aguardando peca</option>
+            </select>
+        </label>
+        <label class="technician-input-group">
+            <span>Recomendacao</span>
+            <textarea rows="3" name="recommendation">{{ execution.finalization.recommendation }}</textarea>
+        </label>
+        <label class="technician-input-group">
+            <span>Observacao final</span>
+            <textarea rows="3" name="final_notes">{{ execution.finalization.final_notes }}</textarea>
+        </label>
+    </div>
+</form>
+
+<script>
+    (function () {
+        function initPad(root) {
+            const padId = root.dataset.signaturePad;
+            const canvas = root.querySelector('[data-signature-canvas="' + padId + '"]');
+            const clearButton = root.querySelector('[data-signature-clear="' + padId + '"]');
+            const form = root.querySelector('[data-signature-form="' + padId + '"]');
+            if (!canvas || !form) {
+                return;
+            }
+            const hidden = form.querySelector('input[name="signature_data"]');
+            const ctx = canvas.getContext("2d");
+            let drawing = false;
+
+            function pointFromEvent(event) {
+                const rect = canvas.getBoundingClientRect();
+                const source = event.touches ? event.touches[0] : event;
+                return {
+                    x: (source.clientX - rect.left) * (canvas.width / rect.width),
+                    y: (source.clientY - rect.top) * (canvas.height / rect.height),
+                };
+            }
+
+            function start(event) {
+                drawing = true;
+                const point = pointFromEvent(event);
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y);
+                event.preventDefault();
+            }
+
+            function move(event) {
+                if (!drawing) {
+                    return;
+                }
+                const point = pointFromEvent(event);
+                ctx.lineTo(point.x, point.y);
+                ctx.lineWidth = 3;
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "#11304b";
+                ctx.stroke();
+                event.preventDefault();
+            }
+
+            function end() {
+                if (!drawing) {
+                    return;
+                }
+                drawing = false;
+                if (hidden) {
+                    hidden.value = canvas.toDataURL("image/png");
+                }
+            }
+
+            canvas.addEventListener("mousedown", start);
+            canvas.addEventListener("mousemove", move);
+            canvas.addEventListener("mouseup", end);
+            canvas.addEventListener("mouseleave", end);
+            canvas.addEventListener("touchstart", start, {passive: false});
+            canvas.addEventListener("touchmove", move, {passive: false});
+            canvas.addEventListener("touchend", end);
+
+            if (clearButton) {
+                clearButton.addEventListener("click", function () {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    if (hidden) {
+                        hidden.value = "";
+                    }
+                });
+            }
+        }
+
+        document.querySelectorAll("[data-signature-pad]").forEach(initPad);
+    })();
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script id="technician-voiceops-bootstrap" type="application/json">
+{
+  "persona": "technician",
+  "channel": "pwa",
+  "locale": "pt-BR",
+  "processUrl": "/api/v1/ai-voiceops/process/",
+  "refreshOnSuccess": true,
+  "contextSeed": {
+    "order_code": "{{ service.code|escapejs }}",
+    "asset_code": "{{ service.asset_code|escapejs }}"
+  }
+}
+</script>
+<script src="{% static 'smart360/js/voiceops.js' %}"></script>
+{% endblock %}

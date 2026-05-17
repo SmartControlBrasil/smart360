@@ -1,0 +1,19 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title=module.title subtitle=module.description content_template="admin_shell/components/widget_module_placeholder.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Highlights" subtitle="Pontos prontos para evolucao imediata." content_template="admin_shell/components/widget_highlights.html" %}
+        </div>
+    </div>
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Proxima iteracao" subtitle="Area reservada para dashboard, filtros, tabelas, cards e timelines do modulo." content_template="admin_shell/components/widget_module_canvas.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

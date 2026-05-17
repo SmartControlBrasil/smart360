@@ -1,0 +1,539 @@
+# SMART360 — CURSOR RULES
+Versão: 1.2  
+Stack principal: Python + Django + Admin Shell + Attex  
+Objetivo: evoluir o Smart360 com arquitetura limpa, entrega incremental e UI profissional.
+
+---
+
+# 1. REGRA PRINCIPAL
+
+O Smart360 deve evoluir com Django, Python, DDD e Arquitetura Hexagonal progressiva.
+
+Não superengenhar telas simples.  
+Não colocar lógica de negócio em views, serializers, templates ou models.  
+Não quebrar o projeto existente para aplicar arquitetura perfeita.  
+Evoluir por módulos, com clareza, baixo acoplamento, testes e UI profissional.
+
+---
+
+# 2. STACK PRINCIPAL
+
+- Python 3.12+
+- Django 6.x ou versão atual do projeto
+- Django REST Framework quando houver API
+- PostgreSQL preferencialmente
+- Redis para cache/fila quando fizer sentido
+- Celery para tarefas pesadas
+- Django server-side rendering no painel interno
+- Attex como base visual quando fizer sentido
+- ApexCharts para gráficos
+- pytest/pytest-django para testes
+- ruff/black/mypy quando disponíveis
+
+---
+
+# 3. ARQUITETURA PROGRESSIVA
+
+Use DDD/Hexagonal completo para:
+
+- Smart System
+- manutenção/TPM
+- confiabilidade
+- billing
+- marketplace
+- IA
+- integrações externas
+- regras críticas
+- fluxos que crescem muito
+
+Use Django simples e organizado para:
+
+- CRUDs administrativos
+- formulários simples
+- páginas internas
+- listagens
+- filtros
+- dashboards leves
+
+Mesmo em Django simples:
+
+- views devem ser finas
+- queries complexas vão para selectors
+- regras de negócio vão para services/use cases
+- templates não podem conter regra pesada
+- forms validam entrada, mas não viram service
+
+---
+
+# 4. ESTRUTURA PARA MÓDULOS COMPLEXOS
+
+```text
+nome_modulo/
+├── domain/
+│   ├── entities/
+│   ├── value_objects/
+│   ├── repositories/
+│   ├── services/
+│   ├── events/
+│   └── exceptions.py
+├── application/
+│   ├── use_cases/
+│   ├── commands/
+│   ├── queries/
+│   ├── dtos/
+│   └── interfaces/
+├── infrastructure/
+│   ├── django_app/
+│   ├── repositories/
+│   ├── services/
+│   ├── integrations/
+│   └── selectors/
+└── interfaces/
+    ├── api/
+    └── admin/
+5. ESTRUTURA PARA APPS SIMPLES
+nome_app/
+├── models.py
+├── views.py
+├── urls.py
+├── forms.py
+├── services.py
+├── selectors.py
+├── admin.py
+├── templates/
+└── tests/
+6. REGRAS DE CAMADAS
+DOMAIN
+Python puro
+não importa Django
+não importa DRF
+não importa Celery
+não importa infrastructure
+APPLICATION
+orquestra casos de uso
+não acessa ORM diretamente
+depende de interfaces/contratos
+INFRASTRUCTURE
+usa ORM, Celery, APIs externas e integrações
+não deve conter regra essencial de negócio
+INTERFACES
+views, serializers, forms, URLs e templates
+não contém regra de negócio crítica
+chama services/use cases/selectors
+7. CORE PLATFORM
+
+O core_platform concentra recursos compartilhados:
+
+identity
+billing
+notifications
+storage
+analytics
+ai_gateway
+geolocation
+search
+crm
+audit
+
+Nenhum módulo deve recriar algo que já exista no core_platform.
+
+Evitar import direto entre bounded contexts.
+
+8. SMART SYSTEM — DIREÇÃO DE DOMÍNIO
+
+O Smart System é o núcleo de manutenção, TPM, confiabilidade e operação técnica.
+
+Conceitos centrais:
+
+Cliente
+Site/unidade/departamento
+Equipamento modelo
+Equipamento do cliente
+Peças
+OS corretiva
+OS preventiva
+Checklist
+Contrato
+Agenda
+PMOC
+KPIs
+Confiabilidade
+TPM
+
+Regra importante:
+
+EquipmentModel = catálogo técnico
+CustomerEquipment/Asset operacional = equipamento instalado no cliente
+ServiceOrder = container operacional
+Checklist = rotina técnica simples
+
+Não misturar catálogo técnico com ativo operacional.
+
+9. MULTI-TENANT
+
+Todo dado operacional sensível precisa respeitar escopo de empresa/site.
+
+Obrigatório:
+
+filtrar por company/tenant atual
+validar site permitido
+não vazar dados entre empresas
+registrar novos models no serviço de tenant scope quando existir
+não criar query global sem justificativa
+
+Nunca implementar CRUD operacional sem considerar multi-tenant.
+
+10. MODELS DJANGO
+
+Models representam persistência.
+
+Evitar:
+
+regra pesada em models
+chamada externa em save()
+lógica de fluxo em models
+acoplamento com outros módulos
+
+Preferir:
+
+created_at / updated_at
+índices para busca
+constraints de integridade
+nomes claros
+compatibilidade com dados legados
+11. VIEWS
+
+Views devem:
+
+receber request
+aplicar permissão
+chamar form/service/selector
+renderizar resposta
+
+Views não devem:
+
+conter regra pesada
+montar dashboard complexo diretamente
+executar query complexa espalhada
+chamar IA/API externa diretamente
+fazer processamento pesado em request
+12. FORMS
+
+Forms devem:
+
+validar dados
+aplicar labels claros
+usar widgets com classes CSS do projeto
+preencher defaults quando a UI for simplificada
+não expor campos técnicos desnecessários
+
+Se um campo existe no banco mas não deve aparecer na UI, esconder no form e preencher default.
+
+13. TEMPLATES
+
+Templates devem:
+
+ser limpos
+usar includes/parciais quando necessário
+não duplicar HTML em excesso
+não conter lógica pesada
+não criar layout improvisado
+respeitar o layout base do Admin Shell
+
+Templates CRUD simples não devem herdar grids de dashboard.
+
+14. UI / UX — REGRA OBRIGATÓRIA
+
+Toda tela entregue precisa ter aparência profissional.
+
+Não entregar HTML cru.
+
+Todo formulário, listagem, dashboard ou página nova deve ter CSS aplicado e layout validado visualmente.
+
+Antes de finalizar qualquer tela, verificar:
+
+largura correta
+campos alinhados
+botões visíveis
+espaçamento adequado
+sem texto comprimido
+sem coluna estreita indevida
+sem overflow horizontal global
+sem cards quebrados
+sem visual nativo de navegador
+responsividade básica
+
+Se a tela ficar visualmente feia, a tarefa NÃO está concluída.
+
+15. CSS — PADRÃO OBRIGATÓRIO
+
+Usar classes semânticas.
+
+Exemplos:
+
+.page-shell
+.page-header
+.page-actions
+.form-card
+.form-grid
+.form-field
+.form-label
+.form-input
+.form-textarea
+.form-select
+.form-actions
+.table-card
+.table-wrapper
+.kpi-grid
+.content-grid
+
+Evitar CSS genérico perigoso:
+
+div { ... }
+form { width: fit-content; }
+* { overflow: hidden; }
+.grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+
+Nunca usar sem necessidade:
+
+width: fit-content
+max-content
+min-content
+overflow hidden global
+word-break: break-all
+grid auto-fit agressivo em página inteira
+estilos inline espalhados
+16. FORM DESIGN — OBRIGATÓRIO
+
+Todo formulário CRUD deve usar card largo e confortável.
+
+Padrão mínimo:
+
+.form-page {
+    width: 100%;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 860px;
+    padding: 28px;
+    border-radius: 18px;
+}
+
+.form-field {
+    margin-bottom: 18px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-textarea {
+    min-height: 140px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+Campos obrigatórios:
+
+label visível
+input largo
+foco visual
+botão primário claro
+botão cancelar discreto
+
+Nunca entregar:
+
+input nativo cinza sem estilo
+campos estreitos
+formulário colapsado
+botão fora do card
+labels desalinhadas
+página parecendo HTML sem CSS
+17. DASHBOARDS
+
+Dashboards devem ser separados por contexto.
+
+Não colocar tudo em uma única página.
+
+Smart System deve ter:
+
+Visão Geral
+Operação
+Engenharia & TPM
+
+Regra:
+
+Dashboard executivo mostra decisão rápida
+Operação mostra OS, agenda, execução
+Engenharia & TPM mostra MTTR, MTBF, falhas, conformidade
+
+Não misturar todos os KPIs em uma tela só.
+
+18. SIDEBAR E NAVEGAÇÃO
+
+Regra central:
+
+SIDEBAR = navegação
+PÁGINA = conteúdo e ação principal
+
+Não duplicar menus no header da página se já existem no sidebar.
+
+Cada página deve ter:
+
+breadcrumb discreto
+título
+subtítulo curto
+uma ação principal
+ações secundárias em “Mais ações” se necessário
+
+Evitar:
+
+botões demais no topo
+menus horizontais duplicados
+filtros demais abertos
+header poluído
+19. CRUD SIMPLES
+
+CRUD simples deve ser realmente simples.
+
+Exemplo Checklist:
+
+Nome
+Descrição
+Salvar
+Cancelar
+
+Não inventar dashboard, KPI, gráfico ou relatório numa tela que deveria ser cadastro.
+
+Primeiro entregar o cadastro funcionando e bonito.
+Depois evoluir inteligência.
+
+20. PERFORMANCE
+
+Evitar:
+
+queries N+1
+consulta pesada em views
+processamento pesado em request HTTP
+dashboard calculando tudo sem cache
+
+Usar:
+
+select_related
+prefetch_related
+annotations/agregações
+selectors
+cache quando fizer sentido
+paginação em listagens
+Celery para tarefas pesadas
+21. IA — AI GATEWAY
+
+Nenhum módulo deve chamar OpenAI, Claude ou outro LLM diretamente.
+
+Todas as chamadas de IA devem passar por gateway próprio.
+
+Obrigatório:
+
+timeout
+fallback
+tratamento de erro
+logs sem dados sensíveis
+controle de custo
+variáveis de ambiente
+22. SEGURANÇA
+
+Nunca fazer:
+
+secrets no código
+endpoint sem permissão
+upload sem validação
+query sem tenant em dado sensível
+bypass de autenticação
+exposição de traceback em produção
+
+Sempre considerar:
+
+CSRF
+XSS
+autorização
+escopo de empresa/site
+auditoria
+logs
+23. COMPORTAMENTO ESPERADO DO CURSOR
+
+Ao gerar código:
+
+identificar o módulo correto
+respeitar arquitetura existente
+não criar arquivos duplicados sem necessidade
+não quebrar rotas existentes
+não remover código funcional sem motivo
+criar ou atualizar testes quando houver regra nova
+manter compatibilidade com Django atual
+preservar templates Attex quando usados
+evitar SPA/Vue/React salvo decisão explícita
+preferir Django server-side rendering no painel
+aplicar CSS adequado antes de concluir qualquer tela
+validar visualmente layout básico
+informar arquivos alterados
+informar comandos executados
+informar validações feitas
+informar pendências reais
+24. O QUE NUNCA FAZER
+lógica pesada em views
+lógica pesada em serializers/forms
+lógica pesada em models
+secrets no código
+import direto indevido entre bounded contexts
+API externa chamada direto da view
+IA chamada direto de módulo final
+tarefa pesada síncrona em request
+criar app genérico sem contexto
+duplicar core_platform
+ignorar testes em regra crítica
+refatorar o projeto inteiro sem necessidade
+trocar arquitetura sem explicar impacto
+criar tela sem CSS profissional
+entregar formulário com campos crus/nativos
+deixar layout quebrado e chamar de concluído
+25. TOMADA DE DECISÃO
+
+Quando houver dúvida entre arquitetura perfeita e entrega prática:
+
+manter o sistema funcionando
+entregar valor incremental
+isolar regra de negócio
+reduzir acoplamento
+manter UI limpa
+documentar decisão
+criar caminho para evolução posterior
+
+Smart360 é grande.
+A arquitetura deve proteger o projeto, não travar o projeto.
+
+26. CHECKLIST FINAL ANTES DE RESPONDER
+
+Antes de finalizar qualquer tarefa, verificar:
+
+a rota abre?
+não há erro 500?
+o layout está bonito?
+os campos estão alinhados?
+os botões aparecem?
+não há overflow horizontal?
+não há menu duplicado?
+não há lógica pesada em template?
+multi-tenant foi respeitado?
+arquivos alterados foram listados?
+pendências foram informadas?
+
+Se uma tela está feia ou quebrada, não concluir como sucesso.

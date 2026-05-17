@@ -1,0 +1,16 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="page-hero">
+    <h1>{{ page_title }}</h1>
+    <p>{{ page_description }}</p>
+</section>
+
+{% if schedule_summary %}
+<section class="schedule-load-grid">
+    {% include "admin_shell/components/technician_load_card.html" with card=schedule_summary %}
+</section>
+{% endif %}
+
+{% include "admin_shell/components/route_sequence_list.html" with visits=agenda_visits title="Sequencia sugerida da rota" %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-filter-row">
+    <a href="?preset=today">Hoje</a>
+    <a href="?preset=pending">Pendentes</a>
+    <a href="?preset=in_progress">Em andamento</a>
+    <a href="?preset=completed">Concluidos</a>
+</section>
+<section class="technician-card-list">
+    {% for service in service_cards %}
+        {% include "technician_pwa/components/service_card.html" %}
+    {% empty %}
+        <p class="empty-state">Nenhum servico atribuido no contexto atual.</p>
+    {% endfor %}
+</section>
+{% endblock %}

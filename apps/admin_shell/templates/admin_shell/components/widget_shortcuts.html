@@ -1,0 +1,5 @@
+<div class="shortcut-grid">
+    {% for shortcut in module_shortcuts %}
+        {% include "admin_shell/components/module_shortcut_card.html" with shortcut=shortcut %}
+    {% endfor %}
+</div>

@@ -1,0 +1,15 @@
+<div class="timeline-list">
+    {% for item in preventive_plan.timeline %}
+        <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <header>
+                    <strong>{{ item.event_type }}</strong>
+                    <span>{{ item.timestamp }}</span>
+                </header>
+                <p>{{ item.description }}</p>
+                <small>{{ item.actor }} • {{ item.reference }}</small>
+            </div>
+        </article>
+    {% endfor %}
+</div>

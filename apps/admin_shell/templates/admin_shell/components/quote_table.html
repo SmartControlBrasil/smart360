@@ -1,0 +1,37 @@
+<div class="table-responsive">
+    <table class="shell-table">
+        <thead>
+            <tr>
+                <th>Orcamento</th>
+                <th>OS</th>
+                <th>Ativo</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Criado em</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quote in quote_records %}
+                <tr>
+                    <td>
+                        <strong>{{ quote.quote_number }}</strong>
+                        <small>{{ quote.company.name }}</small>
+                    </td>
+                    <td>{{ quote.work_order.order_number }}</td>
+                    <td>{% if quote.asset %}{{ quote.asset.asset_tag }} - {{ quote.asset.name }}{% else %}-{% endif %}</td>
+                    <td>{{ quote.get_status_display }}</td>
+                    <td>R$ {{ quote.total_value }}</td>
+                    <td>{{ quote.created_at|date:"d/m/Y H:i" }}</td>
+                    <td class="report-history-actions">
+                        <a href="{% url 'admin-shell:smart-system-quote-detail' quote_number=quote.quote_number %}">Detalhe</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">Nenhum orcamento encontrado no contexto atual.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,56 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table preventive-plan-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Plano</th>
+                <th>Ativo</th>
+                <th>Cliente / site</th>
+                <th>Frequencia</th>
+                <th>Ultima execucao</th>
+                <th>Proxima execucao</th>
+                <th>Status</th>
+                <th>Aderencia</th>
+                <th>Criticidade</th>
+                <th>Responsavel</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in preventive_plans %}
+                <tr class="{% if plan.overdue or plan.critical_delay %}is-critical-row{% endif %}">
+                    <td><strong>{{ plan.code }}</strong></td>
+                    <td>
+                        <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-preventive-detail' plan_code=plan.code %}">{{ plan.name }}</a>
+                        <small>{{ plan.preventive_type }}</small>
+                    </td>
+                    <td>
+                        <span>{{ plan.asset_code }}</span>
+                        <small>{{ plan.asset.name }}</small>
+                    </td>
+                    <td>
+                        <span>{{ plan.client }}</span>
+                        <small>{{ plan.site }}</small>
+                    </td>
+                    <td>{{ plan.frequency_label }}</td>
+                    <td>{{ plan.last_execution }}</td>
+                    <td>{{ plan.next_execution }}</td>
+                    <td>{% include "admin_shell/components/preventive_status_badge.html" with value=plan.status %}</td>
+                    <td>{% include "admin_shell/components/preventive_adherence_badge.html" with value=plan.adherence %}</td>
+                    <td>{% include "admin_shell/components/asset_criticality_badge.html" with value=plan.asset.criticality %}</td>
+                    <td>{{ plan.responsible|default:"Sem responsavel" }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:smart-system-preventive-detail' plan_code=plan.code %}">Detalhe</a>
+                            <a href="{% url 'admin-shell:smart-system-asset-detail' asset_code=plan.asset_code %}">Ativo</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12" class="empty-state-cell">Nenhum plano preventivo encontrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

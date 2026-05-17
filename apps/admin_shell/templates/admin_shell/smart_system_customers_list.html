@@ -1,0 +1,11 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Clientes / Sites" subtitle="Cadastro operacional de clientes e unidades para planejamento de ativos e manutenção." content_template="admin_shell/components/customer_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

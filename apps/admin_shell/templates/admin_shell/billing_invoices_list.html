@@ -1,0 +1,37 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout billing-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            {% for filter in billing_invoice_filters %}
+                {% include "admin_shell/components/checklist_filter_bar.html" with filter=filter %}
+            {% endfor %}
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:billing-invoices' %}">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="summary-grid">
+        {% for widget in billing_invoice_kpis %}
+            {% include "admin_shell/components/billing_dashboard_widget.html" with widget=widget %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Carteira de faturas</h3>
+                        <p>Controle de cobranca, liquidacao e inadimplencia da plataforma SMART360.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/billing_invoice_table.html" with invoices=billing_invoices compact=False %}
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

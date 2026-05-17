@@ -1,0 +1,8 @@
+<div class="risk-panel">
+    {% for item in failure.impact_panel %}
+        <article>
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+        </article>
+    {% endfor %}
+</div>

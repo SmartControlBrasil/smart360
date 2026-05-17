@@ -1,0 +1,63 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout report-preview-layout {% if print_mode %}is-print-mode{% endif %}">
+    <div class="report-actions-bar">
+        <span class="report-actions-label">{{ report.document_type }}</span>
+        <div class="report-actions-meta">
+            <span>{{ report.report_code }}</span>
+            <span>{{ report.issued_at }}</span>
+            <span>{{ report.status }}</span>
+        </div>
+    </div>
+
+    <article class="report-document-card">
+        {% include "admin_shell/components/report_document_header.html" %}
+
+        <section class="report-highlight-strip">
+            {% for label, value in report.highlights %}
+                <div class="report-highlight">
+                    <span>{{ label }}</span>
+                    <strong>{{ value }}</strong>
+                </div>
+            {% endfor %}
+        </section>
+
+        <section class="report-section">
+            <h3>Metadados do documento</h3>
+            {% include "admin_shell/components/report_meta_table.html" with rows=report.metadata %}
+        </section>
+
+        {% for section in report.sections %}
+            <section class="report-section">
+                <h3>{{ section.title }}</h3>
+                {% if section.type == "fields" %}
+                    {% include "admin_shell/components/report_section_fields.html" with items=section.items %}
+                {% elif section.type == "table" %}
+                    {% include "admin_shell/components/report_section_table.html" with columns=section.columns rows=section.rows %}
+                {% elif section.type == "checklist" %}
+                    {% include "admin_shell/components/report_section_checklist.html" with section=section %}
+                {% elif section.type == "list" or section.type == "timeline" %}
+                    {% include "admin_shell/components/report_section_list.html" with items=section.items %}
+                {% endif %}
+            </section>
+        {% endfor %}
+
+        {% include "admin_shell/components/report_signature_block.html" %}
+    </article>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Historico recente</h3>
+                        <p>Relatorios relacionados para consulta e download rapido.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/report_history_table.html" with report_entries=report_history compact=False %}
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,12 @@
+<div class="asset-hero checklist-execution-hero">
+    <div>
+        <span class="asset-tag">{{ execution.execution_code }}</span>
+        <h2>{{ checklist.name }}</h2>
+        <p>{{ execution.asset.name }} • {{ execution.executor }} • {{ execution.started_at }}</p>
+    </div>
+    <div class="asset-hero-badges">
+        {% include "admin_shell/components/checklist_status_badge.html" with value=execution.status %}
+        {% include "admin_shell/components/asset_criticality_badge.html" with value=checklist.criticality %}
+        <span class="status-badge status-sky">{{ execution.progress }}% concluido</span>
+    </div>
+</div>

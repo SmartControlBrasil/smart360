@@ -1,0 +1,60 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout failure-detail-layout">
+    <div class="asset-hero failure-hero">
+        <div>
+            <span class="asset-tag">{{ failure.code }}</span>
+            <h2>{{ failure.asset.name }}</h2>
+            <p>{{ failure.client }} • {{ failure.site }} • {{ failure.sector }} • {{ failure.failure_mode }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/failure_severity_badge.html" with value=failure.severity %}
+            {% include "admin_shell/components/work_order_status_badge.html" with value=failure.status %}
+            {% include "admin_shell/components/asset_criticality_badge.html" with value=failure.asset.criticality %}
+        </div>
+    </div>
+
+    <div class="asset-summary-grid">
+        {% for card in failure.summary_cards %}
+            {% include "admin_shell/components/failure_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Diagnostico tecnico" subtitle="Sintomas, componentes, hipoteses e evidencias do evento de falha." content_template="admin_shell/components/failure_diagnosis_panel.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Impacto operacional" subtitle="Tempo de parada, impacto na operacao e criticidade do evento." content_template="admin_shell/components/failure_impact_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Causa raiz / RCA" subtitle="Base inicial para engenharia de confiabilidade, 5 whys, ishikawa e FMEA." content_template="admin_shell/components/failure_rca_panel.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Ativo e OS associada" subtitle="Contexto operacional, vinculo com ordem de servico e referencia do ativo." content_template="admin_shell/components/failure_context_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Timeline do evento" subtitle="Sequencia de registro, OS, diagnostico, material, reparo e encerramento." content_template="admin_shell/components/failure_timeline.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas de recorrencia" subtitle="Sinais de aumento de frequencia, gaps de RCA e risco de repeticao." content_template="admin_shell/components/failure_alert_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Historico do ativo" subtitle="Falhas anteriores, OS relacionadas, preventivas recentes e recorrencia tecnica." content_template="admin_shell/components/failure_asset_history.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Rotinas para conduzir diagnostico, RCA e tratativa do evento." content_template="admin_shell/components/failure_action_panel.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+<article class="signature-summary-card">
+    <div class="signature-summary-card__header">
+        <h3>{{ item.label }}</h3>
+        <span class="signature-summary-card__status {% if item.status == 'Registrada' or item.status == 'Registrado' %}is-success{% elif item.status == 'Ausencia justificada' or item.status == 'Justificado' %}is-warning{% else %}is-pending{% endif %}">
+            {{ item.status }}
+        </span>
+    </div>
+    <p class="signature-summary-card__meta">{{ item.meta }}</p>
+    {% if item.signature %}
+        <div class="signature-summary-card__details">
+            <strong>{{ item.signature.signer_name }}</strong>
+            {% if item.signature.signer_title %}<span>{{ item.signature.signer_title }}</span>{% endif %}
+            {% if item.signature.signature_data %}
+                <img src="{{ item.signature.signature_data }}" alt="Assinatura {{ item.label }}" class="signature-summary-card__image">
+            {% elif item.signature.missing_reason %}
+                <span>{{ item.signature.get_missing_reason_display }}</span>
+            {% endif %}
+        </div>
+    {% endif %}
+</article>

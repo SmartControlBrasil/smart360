@@ -1,0 +1,65 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-hero work-order-hero">
+        <div>
+            <span class="asset-tag">{{ quote.quote_number }}</span>
+            <h2>Orcamento da OS {{ quote.work_order.order_number }}</h2>
+            <p>{{ quote.company.name }} • {{ quote.operational_site.name|default:"Sem unidade" }} • {{ quote.asset.name|default:"Sem ativo" }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            <span class="status-chip">{{ quote.get_status_display }}</span>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        {% for card in summary_cards %}
+            {% include "admin_shell/components/quote_summary_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Itens do orcamento</h3>
+                        <p>Pecas, servicos e mao de obra vinculados a execucao da OS.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/quote_item_list.html" with quote_items=quote_items %}
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Status comercial</h3>
+                        <p>Ciclo de envio, aceite e rejeicao do orcamento.</p>
+                    </div>
+                </div>
+                <dl class="detail-grid">
+                    <div><dt>Status</dt><dd>{{ quote.get_status_display }}</dd></div>
+                    <div><dt>Cliente</dt><dd>{{ quote.company.name }}</dd></div>
+                    <div><dt>Unidade</dt><dd>{{ quote.operational_site.name|default:"-" }}</dd></div>
+                    <div><dt>OS</dt><dd>{{ quote.work_order.order_number }}</dd></div>
+                    <div><dt>Enviado em</dt><dd>{% if quote.sent_at %}{{ quote.sent_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+                    <div><dt>Aprovado em</dt><dd>{% if quote.approved_at %}{{ quote.approved_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+                    <div><dt>Rejeitado em</dt><dd>{% if quote.rejected_at %}{{ quote.rejected_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+                    <div><dt>Aceite / decisao</dt><dd>{{ quote.approved_by_name|default:"-" }}</dd></div>
+                </dl>
+                <div class="stack-list">
+                    {% if quote.status == "draft" %}
+                        {% include "admin_shell/components/approve_quote_button.html" with action_url="/app/smart-system/quotes/"|add:quote.quote_number|add:"/send/" label="Enviar para cliente" %}
+                    {% endif %}
+                    {% if quote.status == "sent" %}
+                        {% include "admin_shell/components/approve_quote_button.html" with action_url="/app/smart-system/quotes/"|add:quote.quote_number|add:"/approve/" label="Aprovar internamente" %}
+                        {% include "admin_shell/components/approve_quote_button.html" with action_url="/app/smart-system/quotes/"|add:quote.quote_number|add:"/reject/" label="Rejeitar" rejection_reason="Rejeitado internamente." %}
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

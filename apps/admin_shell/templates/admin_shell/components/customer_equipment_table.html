@@ -1,0 +1,38 @@
+<div class="table-shell">
+    <table class="work-order-table">
+        <thead>
+            <tr>
+                <th>Etiqueta operacional</th>
+                <th>Empresa</th>
+                <th>Site</th>
+                <th>Modelo tecnico</th>
+                <th>Localizacao</th>
+                <th>Grupo preventivo</th>
+                <th>PMOC</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in customer_equipments %}
+                <tr>
+                    <td><strong>{{ item.full_label }}</strong></td>
+                    <td>{{ item.company }}</td>
+                    <td>{{ item.site }}</td>
+                    <td>{{ item.equipment_model }}</td>
+                    <td>{{ item.location }}</td>
+                    <td>{{ item.preventive_group }}</td>
+                    <td>{% if item.is_pmoc_applicable %}Sim{% else %}Nao{% endif %}</td>
+                    <td>{% include "admin_shell/components/work_order_status_badge.html" with value=item.status extra_class=item.status_slug %}</td>
+                    <td>
+                        <a class="quick-action-button" href="{% url 'admin-shell:smart-system-customer-equipment-detail' equipment_code=item.code %}">Detalhes</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9">Nenhum equipamento de inventario encontrado no escopo atual.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

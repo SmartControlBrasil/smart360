@@ -1,0 +1,48 @@
+<div class="table-card">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Solicitacao</th>
+                    <th>Tecnico</th>
+                    <th>Score</th>
+                    <th>Especialidade</th>
+                    <th>Distancia</th>
+                    <th>Avaliacao</th>
+                    <th>Experiencia</th>
+                    <th>Disponibilidade</th>
+                    <th>Motivos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in matching_records %}
+                    <tr>
+                        <td>#{{ record.ranking_position|default:"-" }}</td>
+                        <td>
+                            <strong>{{ record.technician_service_request.title }}</strong>
+                            <span class="table-meta">{{ record.technician_service_request.requester_company.name }}{% if record.technician_service_request.related_site %} · {{ record.technician_service_request.related_site.name }}{% endif %}</span>
+                        </td>
+                        <td>{{ record.technician_profile.display_name }}</td>
+                        <td><strong>{{ record.match_score }}</strong></td>
+                        <td>{{ record.score_specialty }}</td>
+                        <td>
+                            {{ record.score_distance }}
+                            {% if record.distance_km %}
+                                <span class="table-meta">{{ record.distance_km }} km</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.score_rating }}</td>
+                        <td>{{ record.score_experience }}</td>
+                        <td>{{ record.score_availability }}</td>
+                        <td>{{ record.match_reason }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10">Nenhum matching calculado no escopo atual.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

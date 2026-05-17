@@ -1,0 +1,45 @@
+<div class="mini-stack worklog-entry-stack">
+    {% for hour in execution.hours %}
+        <article class="worklog-entry-card">
+            <header class="worklog-entry-head">
+                <span class="worklog-entry-tech">{{ hour.technician }}</span>
+                <span class="worklog-entry-duration">{{ hour.duration }} <span class="worklog-entry-minutes">({{ hour.minutes_label }})</span></span>
+            </header>
+            <p class="muted-block worklog-entry-window">{{ hour.started_at }} — {{ hour.finished_at|default:"—" }}</p>
+            {% if hour.description %}
+                <p class="worklog-entry-notes">{{ hour.description }}</p>
+            {% else %}
+                <p class="muted-block worklog-entry-notes">Sem observacao no apontamento.</p>
+            {% endif %}
+        </article>
+    {% empty %}
+        <p class="empty-inline-state">Nenhuma hora registrada ainda.</p>
+    {% endfor %}
+</div>
+
+{% if not execution.execution_readonly and execution.worklog_url %}
+    <form method="post" action="{{ execution.worklog_url }}" class="mini-stack worklog-form">
+        {% csrf_token %}
+        <input type="hidden" name="return_to" value="execution">
+        <label>
+            <span>Comentario operacional</span>
+            <textarea name="notes" rows="3" required></textarea>
+        </label>
+        <label>
+            <span>Horas</span>
+            <input type="number" name="hours" step="0.25" min="0" value="0">
+        </label>
+        {% if execution.worklog_technicians %}
+            <label>
+                <span>Tecnico</span>
+                <select name="technician_id">
+                    {% for t in execution.worklog_technicians %}
+                        <option value="{{ t.id }}">{{ t.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        {% endif %}
+        <p class="muted-block">Timestamp registrado automaticamente no servidor ao enviar.</p>
+        <button type="submit" class="quick-action-button">Registrar apontamento</button>
+    </form>
+{% endif %}

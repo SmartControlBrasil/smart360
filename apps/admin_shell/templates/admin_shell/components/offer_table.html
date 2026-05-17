@@ -1,0 +1,32 @@
+<div class="table-responsive-shell">
+    <table class="data-table-shell">
+        <thead>
+            <tr>
+                <th>Solicitacao</th>
+                <th>Tecnico</th>
+                <th>Empresa</th>
+                <th>Valor</th>
+                <th>Prazo</th>
+                <th>Status</th>
+                <th>Mensagem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for offer in service_offers %}
+                <tr>
+                    <td>{{ offer.service_request.title }}</td>
+                    <td>{{ offer.technician_profile.display_name }}</td>
+                    <td>{{ offer.service_request.requester_company.name|default:"-" }}</td>
+                    <td>R$ {{ offer.proposed_amount }}</td>
+                    <td>{{ offer.estimated_hours|default:"-" }} h</td>
+                    <td><span class="status-badge status-sky">{{ offer.get_status_display }}</span></td>
+                    <td>{{ offer.message|default:"-"|truncatechars:90 }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">Nenhuma oferta encontrada para o filtro aplicado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

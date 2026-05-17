@@ -1,0 +1,26 @@
+<section class="schedule-panel">
+    <div class="section-heading">
+        <h2>{{ calendar_title }}</h2>
+    </div>
+    <div class="schedule-calendar-grid">
+        {% for day in calendar_days %}
+            <article class="calendar-day-card">
+                <header>
+                    <strong>{{ day.weekday }}</strong>
+                    <span>{{ day.label }}</span>
+                </header>
+                <p class="calendar-day-card__count">{{ day.count }} visitas</p>
+                <div class="calendar-day-card__items">
+                    {% for visit in day.visits %}
+                        <div class="calendar-inline-visit">
+                            <strong>{{ visit.scheduled_start }}</strong>
+                            <span>{{ visit.title }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="empty-state">Sem agenda.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>

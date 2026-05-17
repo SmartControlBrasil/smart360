@@ -1,0 +1,32 @@
+<div class="checklist-item-stack">
+    {% for item in checklist.items %}
+        <article class="checklist-item-card">
+            <header>
+                <div>
+                    <span class="checklist-item-order">#{{ item.order }}</span>
+                    <h3>{{ item.title }}</h3>
+                </div>
+                <div class="checklist-item-meta">
+                    <span class="status-badge status-slate">{{ item.response_type }}</span>
+                    {% if item.required %}<span class="status-badge status-red">Obrigatorio</span>{% endif %}
+                    {% if item.alert_on_nok %}<span class="status-badge status-amber">Alerta em NOK</span>{% endif %}
+                </div>
+            </header>
+            <p>{{ item.description }}</p>
+            <div class="checklist-item-detail-grid">
+                <div>
+                    <strong>Instrucao</strong>
+                    <p>{{ item.instruction }}</p>
+                </div>
+                <div>
+                    <strong>Valor esperado</strong>
+                    <p>{{ item.expected_value|default:"Nao definido" }}</p>
+                </div>
+                <div>
+                    <strong>Observacao padrao</strong>
+                    <p>{{ item.default_note }}</p>
+                </div>
+            </div>
+        </article>
+    {% endfor %}
+</div>

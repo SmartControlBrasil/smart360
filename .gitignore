@@ -1,0 +1,51 @@
+# Python / Django
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Banco local
+db.sqlite3
+db.sqlite3.*
+*.sqlite3
+
+# Ambiente / segredos
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+runserver.log
+migrate.log
+
+# Arquivos gerados
+staticfiles/
+media/
+
+# IDE / Sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Templates brutos / arquivos pesados locais
+*.zip
+eitech.zip
+Eitech/
+eitech_baixado/
+Attex/
+
+# Eitech source/development leftovers
+static/institutional/eitech/index.php
+static/institutional/eitech/.htaccess
+static/institutional/eitech/robots.txt
+static/institutional/eitech/scss/
+static/institutional/eitech/**/*.map

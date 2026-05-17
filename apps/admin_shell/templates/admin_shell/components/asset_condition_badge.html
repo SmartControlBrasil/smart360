@@ -1,0 +1,7 @@
+{% if value == "Saudavel" %}
+    <span class="status-badge status-emerald">{{ value }}</span>
+{% elif value == "Em atencao" %}
+    <span class="status-badge status-amber">{{ value }}</span>
+{% else %}
+    <span class="status-badge status-red">{{ value }}</span>
+{% endif %}

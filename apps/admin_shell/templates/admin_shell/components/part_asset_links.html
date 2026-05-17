@@ -1,0 +1,13 @@
+<div class="detail-list">
+    {% for asset in part.assets %}
+        <article class="detail-list-row">
+            <span>{{ asset.code }}</span>
+            <strong><a class="asset-primary-link" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=asset.code %}">{{ asset.name }}</a></strong>
+        </article>
+    {% empty %}
+        <article class="detail-list-row">
+            <span>Ativos</span>
+            <strong>Sem vinculos operacionais</strong>
+        </article>
+    {% endfor %}
+</div>

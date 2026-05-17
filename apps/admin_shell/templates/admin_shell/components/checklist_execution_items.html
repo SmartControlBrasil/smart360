@@ -1,0 +1,5 @@
+<div class="checklist-execution-items">
+    {% for item in execution.items %}
+        {% include "admin_shell/components/checklist_execution_item.html" with item=item %}
+    {% endfor %}
+</div>

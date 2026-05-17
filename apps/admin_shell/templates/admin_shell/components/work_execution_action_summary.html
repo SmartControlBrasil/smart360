@@ -1,0 +1,22 @@
+<dl class="detail-grid">
+    <div>
+        <dt>Intervencao realizada</dt>
+        <dd>{{ execution.executed_action.intervention|default:"Nao registrada" }}</dd>
+    </div>
+    <div>
+        <dt>Componentes substituidos</dt>
+        <dd>{{ execution.executed_action.components_replaced|default:"Nenhum" }}</dd>
+    </div>
+    <div>
+        <dt>Ajustes realizados</dt>
+        <dd>{{ execution.executed_action.adjustments|default:"Nao informado" }}</dd>
+    </div>
+    <div>
+        <dt>Testes executados</dt>
+        <dd>{{ execution.executed_action.tests|default:"Nao informado" }}</dd>
+    </div>
+    <div class="technical-stat-wide">
+        <dt>Resultado obtido</dt>
+        <dd>{{ execution.executed_action.result|default:"Em andamento" }}</dd>
+    </div>
+</dl>

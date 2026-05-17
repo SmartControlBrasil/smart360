@@ -1,0 +1,126 @@
+{% load static %}
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-grid two-column client-copilot-layout">
+    <div>
+        <article class="content-panel copilot-panel">
+            <div class="section-heading"><h2>Conversa atual</h2></div>
+            <p>Faça perguntas sobre unidades, ativos, ordens, preventivas, relatorios, orcamentos e pendencias do seu portal.</p>
+            <form id="client-portal-copilot-form" class="copilot-input-form">
+                {% csrf_token %}
+                <input
+                    id="client-portal-copilot-query"
+                    type="text"
+                    name="query"
+                    value="{{ copilot_seed_context.question|default:'' }}"
+                    placeholder="Ex.: Como esta a unidade Cumbica hoje?"
+                >
+                <button id="client-portal-copilot-submit" class="quick-action-button" type="submit">Perguntar</button>
+            </form>
+            <div id="client-portal-copilot-status" class="copilot-status" hidden>Consultando contexto seguro do portal...</div>
+        </article>
+
+        <div class="copilot-conversation" id="client-portal-copilot-conversation">
+            {% for message in copilot_messages %}
+                <article class="copilot-message copilot-message--{{ message.role }}">
+                    <header>
+                        <strong>{% if message.role == "assistant" %}SMART360 Portal Copilot{% elif message.role == "user" %}Cliente{% else %}Sistema{% endif %}</strong>
+                        <small>{{ message.created_at|date:"d/m/Y H:i" }}</small>
+                    </header>
+                    <p>{{ message.content }}</p>
+                    {% if message.role == "assistant" and message.structured_payload.bullets %}
+                        <ul class="copilot-inline-list">
+                            {% for item in message.structured_payload.bullets %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <article class="copilot-message copilot-message--assistant">
+                    <header><strong>SMART360 Portal Copilot</strong></header>
+                    <p>Estou pronto para explicar sua operacao, documentos, pendencias e proximos passos no portal.</p>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <article class="content-panel copilot-panel">
+            <div class="section-heading"><h2>Contexto atual</h2></div>
+            <section class="summary-grid">
+                {% for card in copilot_context.available_cards %}
+                    {% include "client_portal/components/client_kpi_card.html" with item=card %}
+                {% endfor %}
+            </section>
+            <div class="stack-list portal-chip-list">
+                <span class="stack-card"><strong>Empresa</strong><small>{{ copilot_context.company_name|default:"-" }}</small></span>
+                <span class="stack-card"><strong>Unidade</strong><small>{{ copilot_context.site_name|default:"Todas" }}</small></span>
+                <span class="stack-card"><strong>Sessao</strong><small>{{ copilot_session.message_count }} mensagens</small></span>
+            </div>
+        </article>
+
+        <article class="content-panel copilot-panel">
+            <div class="section-heading"><h2>Sugestoes uteis</h2></div>
+            <div class="copilot-suggestions" id="client-portal-copilot-suggestions">
+                {% for suggestion in copilot_suggestions %}
+                    <button class="quick-action-button quick-action-button--ghost client-portal-copilot-suggestion" type="button" data-query="{{ suggestion }}">{{ suggestion }}</button>
+                {% empty %}
+                    <span class="empty-state">Nenhuma sugestao disponivel.</span>
+                {% endfor %}
+            </div>
+        </article>
+
+        {% with voiceops_bootstrap_id="client-voiceops-bootstrap" voiceops_title="VoiceOps do Cliente" voiceops_persona="client" voiceops_description="Consulte por voz status, visitas agendadas, preventivas e pendencias do seu portal." voiceops_placeholder="Ex.: qual status do meu chamado? quando sera a manutencao?" voiceops_tts_enabled=True voiceops_empty_message="As respostas por voz do portal aparecem aqui." %}
+            {% include "admin_shell/components/voiceops_widget.html" %}
+        {% endwith %}
+
+        <article class="content-panel copilot-panel">
+            <div class="section-heading"><h2>Pendencias e proximos passos</h2></div>
+            <p>{{ copilot_pending_cards.summary }}</p>
+            <ul class="copilot-inline-list">
+                {% for item in copilot_pending_cards.bullets %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+            <div class="quick-actions">
+                {% for action in copilot_pending_cards.actions %}
+                    <a class="quick-action-button quick-action-button--ghost" href="{{ action.href }}">{{ action.label }}</a>
+                {% endfor %}
+            </div>
+        </article>
+    </div>
+</section>
+
+<script id="client-portal-copilot-bootstrap" type="application/json">
+{
+  "sessionPublicId": "{{ copilot_session.public_id }}",
+  "seedContext": {
+    "asset": "{{ copilot_seed_context.asset|default:''|escapejs }}",
+    "work_order": "{{ copilot_seed_context.work_order|default:''|escapejs }}",
+    "quote": "{{ copilot_seed_context.quote|default:''|escapejs }}",
+    "contract": "{{ copilot_seed_context.contract|default:''|escapejs }}",
+    "preventive": "{{ copilot_seed_context.preventive|default:''|escapejs }}",
+    "request": "{{ copilot_seed_context.request|default:''|escapejs }}",
+    "report_type": "{{ copilot_seed_context.report_type|default:''|escapejs }}",
+    "reference_code": "{{ copilot_seed_context.reference_code|default:''|escapejs }}"
+  },
+  "queryUrl": "{% url 'admin-shell:client-portal-copilot-query' %}"
+}
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script id="client-voiceops-bootstrap" type="application/json">
+{
+  "persona": "client",
+  "channel": "portal",
+  "locale": "pt-BR",
+  "processUrl": "/api/v1/ai-voiceops/process/",
+  "refreshOnSuccess": false
+}
+</script>
+<script src="{% static 'smart360/js/voiceops.js' %}"></script>
+{% endblock %}

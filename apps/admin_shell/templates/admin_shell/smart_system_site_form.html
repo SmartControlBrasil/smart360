@@ -1,0 +1,29 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="form-page">
+        <article class="form-card">
+            <h3>Novo site/unidade</h3>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="form-grid">
+                    {% include "admin_shell/components/forms/field.html" with field=form.maintenance_client %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.name %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.address_line full=True %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.city %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.state %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.contact_name %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.contact_phone %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.is_active %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.notes full=True %}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar site/unidade</button>
+                    <a class="btn-secondary" href="{% url 'admin-shell:smart-system-customers' %}">Cancelar</a>
+                </div>
+            </form>
+        </article>
+    </div>
+</section>
+{% endblock %}

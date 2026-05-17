@@ -1,0 +1,42 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Resumo do contrato</h2>
+            <p>Cobertura, ativos incluidos e historico preventivo associado.</p>
+        </div>
+        <div class="portal-detail-grid">
+            <div><strong>Status</strong><p>{{ contract.get_status_display }}</p></div>
+            <div><strong>Valor</strong><p>R$ {{ contract.contract_value }}</p></div>
+            <div><strong>Inicio</strong><p>{{ contract.start_date|date:"d/m/Y" }}</p></div>
+            <div><strong>Fim</strong><p>{{ contract.end_date|date:"d/m/Y"|default:"Indeterminado" }}</p></div>
+        </div>
+    </section>
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Ativos cobertos</h2>
+            <p>Equipamentos incluidos na cobertura recorrente.</p>
+        </div>
+        <ul class="simple-list">
+            {% for item in contract_assets %}
+                <li>{{ item.asset.asset_tag }} - {{ item.asset.name }} • {{ item.get_maintenance_frequency_display }} • proxima {{ item.next_execution|date:"d/m/Y"|default:"-" }}</li>
+            {% empty %}
+                <li>Nenhum ativo vinculado.</li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Preventivas realizadas</h2>
+            <p>Ordens geradas a partir do contrato.</p>
+        </div>
+        <ul class="simple-list">
+            {% for order in contract_orders %}
+                <li><a href="{% url 'admin-shell:client-portal-work-order-detail' order_code=order.order_number %}">{{ order.order_number }}</a> • {{ order.asset.name|default:"Sem ativo" }} • {{ order.get_status_display }}</li>
+            {% empty %}
+                <li>Nenhuma preventiva vinculada ainda.</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}

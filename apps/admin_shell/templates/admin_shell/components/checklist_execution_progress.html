@@ -1,0 +1,9 @@
+<div class="execution-progress-panel">
+    <div class="execution-progress-top">
+        <strong>{{ execution.progress }}%</strong>
+        <span>{{ execution.responded_count }}/{{ execution.total_items }} itens respondidos</span>
+    </div>
+    <div class="execution-progress-bar">
+        <span style="width: {{ execution.progress }}%;"></span>
+    </div>
+</div>

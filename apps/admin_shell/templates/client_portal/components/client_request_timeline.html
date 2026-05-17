@@ -1,0 +1,13 @@
+<div class="timeline-list">
+    {% for item in request_timeline %}
+        <article class="timeline-item">
+            <span class="timeline-stamp">{{ item.timestamp }}</span>
+            <div>
+                <strong>{{ item.label }}</strong>
+                <p>{{ item.description }}</p>
+            </div>
+        </article>
+    {% empty %}
+        <p class="empty-state">Nenhum evento registrado para esta solicitacao.</p>
+    {% endfor %}
+</div>

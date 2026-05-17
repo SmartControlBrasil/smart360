@@ -1,0 +1,8 @@
+<dl class="detail-grid">
+    {% for field in part.general_info %}
+        <div>
+            <dt>{{ field.label }}</dt>
+            <dd>{{ field.value }}</dd>
+        </div>
+    {% endfor %}
+</dl>

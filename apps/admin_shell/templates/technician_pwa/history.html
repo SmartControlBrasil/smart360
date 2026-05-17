@@ -1,0 +1,22 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-card-list">
+    {% for service in history_records %}
+        <article class="technician-service-card">
+            <div class="service-card-top">
+                <strong>{{ service.code }}</strong>
+                <span class="service-status">{{ service.status }}</span>
+            </div>
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.client }} • {{ service.site }}</p>
+            <ul class="service-meta-list">
+                <li>{{ service.asset_code }}</li>
+                <li>{{ service.executed_hours }}</li>
+            </ul>
+        </article>
+    {% empty %}
+        <p class="empty-state">Nenhum servico concluido recentemente.</p>
+    {% endfor %}
+</section>
+{% endblock %}

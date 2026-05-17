@@ -1,0 +1,278 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-hero">
+        <div>
+            <span class="asset-tag">Projeto #{{ order.id }}</span>
+            <h2>{% if order.company %}{{ order.company.name }}{% else %}{{ order.metadata.client_company_name|default:order.niche.name }}{% endif %}</h2>
+            <p>{{ order.niche.name }} • {% if order.selected_template %}{{ order.selected_template.name }}{% else %}Template por recomendacao{% endif %} • R$ {{ order.final_price|floatformat:2 }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            <span class="status-badge status-{{ order_status_tone }}">{{ order.get_status_display }}</span>
+            {% if proposal_status == 'approved' %}
+                <span class="status-badge status-emerald">Proposta aprovada</span>
+            {% elif proposal_status == 'rejected' %}
+                <span class="status-badge status-red">Proposta rejeitada</span>
+            {% else %}
+                <span class="status-badge status-amber">Proposta pendente</span>
+            {% endif %}
+            {% if order.recommended_template %}<span class="status-badge status-violet">Recomendado: {{ order.recommended_template.name }}</span>{% endif %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Oportunidade comercial (Growth Engine)</h2>
+                        <p>Sincronizacao com Lead — sem migracoes nem Billing.</p>
+                    </div>
+                </header>
+                {% if linked_lead %}
+                    <dl class="detail-grid">
+                        <div><dt>Lead vinculado</dt><dd>#{{ linked_lead.id }} — {{ linked_lead.company_name }}</dd></div>
+                        <div><dt>Status do Lead</dt><dd>{{ linked_lead.get_status_display }}</dd></div>
+                        <div><dt>Status comercial (pedido)</dt><dd>{{ commercial_status|default:"—" }}</dd></div>
+                        <div><dt>Valor estimado</dt><dd>R$ {{ order.final_price|floatformat:2 }}</dd></div>
+                        {% if lead_admin_url %}
+                            <div><dt>Abrir no admin</dt><dd><a class="table-action-link" href="{{ lead_admin_url }}">Lead no Django Admin</a></dd></div>
+                        {% endif %}
+                    </dl>
+                {% else %}
+                    <p>Nenhum Lead vinculado a este pedido ainda.</p>
+                {% endif %}
+                <form method="post" action="{% url 'admin-shell:site-factory-order-commercial' pk=order.pk %}" class="asset-filter-actions" style="margin-top: 1rem;">
+                    {% csrf_token %}
+                    <button class="quick-action-button" type="submit">Gerar oportunidade comercial</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    {% if commercial_package %}
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Pacote comercial</h2>
+                        <p>{% if commercial_package.source == "snapshot" %}Snapshot gravado no pedido{% else %}Derivado do template selecionado{% endif %}{% if commercial_package.package_code %} · codigo {{ commercial_package.package_code }}{% endif %}</p>
+                    </div>
+                </header>
+                <dl class="detail-grid">
+                    <div><dt>Nome comercial</dt><dd>{{ commercial_package.commercial_name|default:"—" }}</dd></div>
+                    <div><dt>Nivel (tier)</dt><dd>{{ commercial_package.tier|default:"—" }}</dd></div>
+                    <div><dt>Preco</dt><dd>R$ {% if commercial_package.price_display %}{{ commercial_package.price_display }}{% else %}{{ order.final_price|floatformat:2 }}{% endif %}</dd></div>
+                </dl>
+                {% if commercial_package.deliverables %}
+                    <p><strong>Entregaveis</strong></p>
+                    <ul>
+                        {% for item in commercial_package.deliverables %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if commercial_package.upsells %}
+                    <p><strong>Upsells</strong></p>
+                    <ul>
+                        {% for item in commercial_package.upsells %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Envio da proposta por e-mail</h2>
+                        <p>Dispara o resumo comercial ao destinatario definido no pedido, Lead ou solicitante.</p>
+                    </div>
+                </header>
+                {% if order.metadata and order.metadata.proposal_email_sent_at %}
+                    <p class="widget-muted">Ultimo envio em {{ order.metadata.proposal_email_sent_at }} para {{ order.metadata.proposal_email_to|default:"—" }} ({{ order.metadata.proposal_email_status|default:"—" }}).</p>
+                {% endif %}
+                <form method="post" action="{% url 'admin-shell:site-factory-order-proposal-send-email' pk=order.pk %}" class="asset-filter-actions">
+                    {% csrf_token %}
+                    <button type="submit" class="quick-action-button">Enviar proposta por e-mail</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Decisao da proposta comercial</h2>
+                        <p>Registro interno em metadata do pedido; nao altera Billing nem e-mails.</p>
+                    </div>
+                    <a class="quick-action-button" href="{% url 'admin-shell:site-factory-order-proposal' pk=order.pk %}">Abrir proposta</a>
+                </header>
+                {% if proposal_status == 'approved' %}
+                    <p><span class="status-badge status-emerald">Aprovada</span></p>
+                    {% if proposal_approved_at %}<p class="widget-muted">Em {{ proposal_approved_at }}{% if proposal_approved_by %} por {{ proposal_approved_by }}{% endif %}.</p>{% endif %}
+                {% elif proposal_status == 'rejected' %}
+                    <p><span class="status-badge status-red">Rejeitada</span></p>
+                    {% if proposal_rejected_at %}<p class="widget-muted">Em {{ proposal_rejected_at }}{% if proposal_rejected_by %} por {{ proposal_rejected_by }}{% endif %}.</p>{% endif %}
+                {% else %}
+                    <p><span class="status-badge status-amber">Pendente de decisao</span></p>
+                    <div class="asset-filter-actions" style="margin-top: 1rem;">
+                        <form method="post" action="{% url 'admin-shell:site-factory-order-proposal-approve' pk=order.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="quick-action-button">Aprovar proposta</button>
+                        </form>
+                        <form method="post" action="{% url 'admin-shell:site-factory-order-proposal-reject' pk=order.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="quick-action-button" style="border-color: #f87171; color: #b91c1c;">Rejeitar proposta</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Dados do pedido</h2>
+                        <p>Contexto comercial e operacional do projeto.</p>
+                    </div>
+                </header>
+                <dl class="detail-grid">
+                    <div><dt>Empresa</dt><dd>{% if order.company %}{{ order.company.name }}{% else %}{{ order.metadata.client_company_name|default:"-" }}{% endif %}</dd></div>
+                    <div><dt>Solicitante</dt><dd>{% if order.requester %}{{ order.requester.get_full_name|default:order.requester.email }}{% else %}{{ order.metadata.client_name|default:"-" }}{% endif %}</dd></div>
+                    <div><dt>Telefone</dt><dd>{{ order.metadata.client_phone|default:"-" }}</dd></div>
+                    <div><dt>Email</dt><dd>{{ order.metadata.client_email|default:"-" }}</dd></div>
+                    <div><dt>Nicho</dt><dd>{{ order.niche.name }}</dd></div>
+                    <div><dt>Template</dt><dd>{% if order.selected_template %}{{ order.selected_template.name }}{% else %}-{% endif %}</dd></div>
+                    <div><dt>Valor</dt><dd>R$ {{ order.final_price|floatformat:2 }}</dd></div>
+                    <div><dt>Data</dt><dd>{{ order.ordered_at|date:"d/m/Y H:i" }}</dd></div>
+                </dl>
+                {% if order.notes %}
+                    <p>{{ order.notes }}</p>
+                {% endif %}
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Entrega</h2>
+                        <p>Registro final do projeto.</p>
+                    </div>
+                </header>
+                {% if delivery %}
+                    <dl class="detail-grid">
+                        <div><dt>URL</dt><dd><a class="table-action-link" href="{{ delivery.delivered_url }}" target="_blank" rel="noopener">{{ delivery.delivered_url }}</a></dd></div>
+                        <div><dt>Aceite</dt><dd>{{ delivery.get_acceptance_status_display }}</dd></div>
+                        <div><dt>Entrega</dt><dd>{{ delivery.delivered_at|date:"d/m/Y H:i" }}</dd></div>
+                        <div><dt>Notas</dt><dd>{{ delivery.notes|default:"-" }}</dd></div>
+                    </dl>
+                {% else %}
+                    <p>Nenhuma entrega registrada ainda.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Briefing</h2>
+                        <p>Resumo do intake usado por copy, design e desenvolvimento.</p>
+                    </div>
+                    <a class="quick-action-button" href="{% url 'admin-shell:site-factory-order-intake' pk=order.pk %}">Editar briefing</a>
+                </header>
+                {% if intake %}
+                    <dl class="detail-grid">
+                        <div><dt>Descricao do negocio</dt><dd>{{ intake.business_description|default:"-" }}</dd></div>
+                        <div><dt>Servicos principais</dt><dd>{{ intake.main_services|join:", "|default:"-" }}</dd></div>
+                        <div><dt>Instagram</dt><dd>{{ intake.instagram|default:"-" }}</dd></div>
+                        <div><dt>Facebook</dt><dd>{{ intake.facebook|default:"-" }}</dd></div>
+                        <div><dt>Logo</dt><dd>{{ intake.logo_url|default:"-" }}</dd></div>
+                        <div><dt>Galeria</dt><dd>{{ intake.photo_gallery|join:", "|default:"-" }}</dd></div>
+                    </dl>
+                    {% if intake.notes %}<p>{{ intake.notes }}</p>{% endif %}
+                {% else %}
+                    <p>Briefing ainda nao preenchido.</p>
+                {% endif %}
+            </section>
+        </div>
+        <div class="column-span-5">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Timeline</h2>
+                        <p>Evolucao simples do projeto.</p>
+                    </div>
+                </header>
+                <ul class="event-log">
+                    {% for item in timeline %}
+                        <li>
+                            <span class="status-badge status-{{ item.tone }}">{{ item.meta|date:"d/m H:i" }}</span>
+                            <div>
+                                <strong>{{ item.label }}</strong>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Tarefas de producao</h2>
+                        <p>Etapas padrao criadas pelo SiteOrderService.</p>
+                    </div>
+                    <a class="quick-action-button" href="{% url 'admin-shell:site-factory-order-tasks' pk=order.pk %}">Gerenciar tarefas</a>
+                </header>
+                <div class="table-shell">
+                    <table class="work-order-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Etapa</th>
+                                <th>Status</th>
+                                <th>Responsavel</th>
+                                <th>Prazo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                                <tr>
+                                    <td>{{ task.get_stage_display }}</td>
+                                    <td>
+                                        <span class="status-badge {% if task.status == 'done' %}status-emerald{% elif task.status == 'blocked' %}status-red{% elif task.status == 'in_progress' %}status-sky{% else %}status-slate{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{% if task.assignee %}{{ task.assignee.get_full_name|default:task.assignee.email }}{% else %}-{% endif %}</td>
+                                    <td>{{ task.due_date|date:"d/m/Y"|default:"-" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4">Nenhuma tarefa criada para este projeto.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

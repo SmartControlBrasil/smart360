@@ -1,0 +1,6 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    {% include "admin_shell/components/agent_marketplace_health_table.html" with marketplace_health_flags=marketplace_health_flags %}
+{% endblock %}

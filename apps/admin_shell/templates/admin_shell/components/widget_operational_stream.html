@@ -1,0 +1,5 @@
+<div class="info-card-stack">
+    {% for block in operational_stream %}
+        {% include "admin_shell/components/info_card.html" with item=block %}
+    {% endfor %}
+</div>

@@ -1,0 +1,51 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout checklist-detail-layout">
+    <div class="asset-hero checklist-hero">
+        <div>
+            <span class="asset-tag">{{ checklist.code }}</span>
+            <h2>{{ checklist.name }}</h2>
+            <p>{{ checklist.category }} • {{ checklist.checklist_type }} • {{ checklist.asset.name }} • {{ checklist.client }} • {{ checklist.site }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/checklist_status_badge.html" with value=checklist.status %}
+            {% include "admin_shell/components/asset_criticality_badge.html" with value=checklist.criticality %}
+            <span class="status-badge status-slate">{{ checklist.version }}</span>
+        </div>
+    </div>
+
+    <div class="asset-summary-grid">
+        {% for card in checklist.summary_cards %}
+            {% include "admin_shell/components/checklist_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Dados gerais do checklist" subtitle="Cadastro base, aplicabilidade, periodicidade sugerida e contexto tecnico." content_template="admin_shell/components/checklist_general_info.html" %}
+        </div>
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Estrutura dos itens" subtitle="Sequencia executavel com instrucoes, obrigatoriedade e regra de alerta para NOK." content_template="admin_shell/components/checklist_item_list.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Vinculos operacionais" subtitle="Relacao com ativo, preventiva, OS e contexto operacional do checklist." content_template="admin_shell/components/checklist_operational_links.html" %}
+        </div>
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Historico resumido de execucoes" subtitle="Ultimas execucoes, resultado consolidado e incidencias de NOK." content_template="admin_shell/components/checklist_history_table.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e excecoes" subtitle="Riscos de cobertura, anomalias recorrentes e pontos que exigem revisao operacional." content_template="admin_shell/components/checklist_alert_panel.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Rotinas imediatas para executar, revisar e expandir o checklist." content_template="admin_shell/components/checklist_action_panel.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

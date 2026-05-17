@@ -1,0 +1,30 @@
+<div class="backlog-hero">
+    <strong>{{ backlog.total }}</strong>
+    <span>Itens em backlog tecnico</span>
+</div>
+<div class="dual-stat-grid">
+    <div>
+        <h4>Por criticidade</h4>
+        <ul class="metric-list">
+            {% for item in backlog.by_criticality %}
+                <li><span>{{ item.label }}</span><strong>{{ item.value }}</strong></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h4>Por tipo</h4>
+        <ul class="metric-list">
+            {% for item in backlog.by_type %}
+                <li><span>{{ item.label }}</span><strong>{{ item.value }}</strong></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="urgent-list">
+    {% for item in backlog.urgent_items %}
+        <article>
+            <strong>{{ item.title }}</strong>
+            <p>{{ item.meta }}</p>
+        </article>
+    {% endfor %}
+</div>

@@ -1,0 +1,44 @@
+<button
+    class="technician-copilot-fab"
+    type="button"
+    data-tech-copilot-open
+    {% if not mobile_copilot.enabled %}hidden{% endif %}
+>
+    Copiloto
+</button>
+
+<aside class="technician-copilot-drawer" data-tech-copilot-drawer hidden>
+    <div class="technician-copilot-backdrop" data-tech-copilot-close></div>
+    <div class="technician-copilot-panel">
+        <header class="technician-copilot-header">
+            <div>
+                <strong>AI Copilot</strong>
+                <span data-tech-copilot-status>{% if mobile_copilot.allow_offline_fallback %}Pronto para online/offline{% else %}Modo online{% endif %}</span>
+            </div>
+            <button type="button" class="technician-copilot-close" data-tech-copilot-close>Fechar</button>
+        </header>
+
+        <section class="technician-copilot-body">
+            <div class="technician-inline-state-row">
+                <span class="technician-inline-pill" data-tech-copilot-order>Sem OS ativa</span>
+                <span class="technician-inline-pill" data-tech-copilot-connectivity>Online</span>
+            </div>
+
+            <div class="technician-copilot-suggestions" data-tech-copilot-suggestions>
+                <span class="empty-state">Sem sugestoes carregadas.</span>
+            </div>
+
+            <div class="technician-copilot-messages" data-tech-copilot-messages>
+                <article class="technician-copilot-message is-assistant">
+                    <strong>SMART360 Copilot</strong>
+                    <p>Pergunte sobre historico, diagnostico, checklist, pecas ou como registrar a OS.</p>
+                </article>
+            </div>
+        </section>
+
+        <form class="technician-copilot-form" data-tech-copilot-form>
+            <input type="text" name="query" data-tech-copilot-query placeholder="Ex.: Qual o proximo passo aqui?">
+            <button type="submit" class="quick-action-button">Perguntar</button>
+        </form>
+    </div>
+</aside>

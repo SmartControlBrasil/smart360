@@ -1,0 +1,20 @@
+<div class="detail-list">
+    {% for link in checklist.operational_links %}
+        <article class="detail-list-row">
+            <span>{{ link.label }}</span>
+            {% if link.route_kwargs and link.route_name %}
+                {% if link.route_kwargs.asset_code %}
+                    <a class="asset-primary-link" href="{% url link.route_name asset_code=link.route_kwargs.asset_code %}">{{ link.value }}</a>
+                {% elif link.route_kwargs.plan_code %}
+                    <a class="asset-primary-link" href="{% url link.route_name plan_code=link.route_kwargs.plan_code %}">{{ link.value }}</a>
+                {% elif link.route_kwargs.order_code %}
+                    <a class="asset-primary-link" href="{% url link.route_name order_code=link.route_kwargs.order_code %}">{{ link.value }}</a>
+                {% else %}
+                    <span>{{ link.value }}</span>
+                {% endif %}
+            {% else %}
+                <strong>{{ link.value }}</strong>
+            {% endif %}
+        </article>
+    {% endfor %}
+</div>

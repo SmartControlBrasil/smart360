@@ -1,0 +1,18 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="smart-system-page smart-system-page--operations">
+    {% include "admin_shell/smart_system/_kpi_cards.html" with kpis=operation_kpis %}
+
+    <div class="smart-two-column">
+        <div class="smart-main-column">
+            {% include "admin_shell/smart_system/_section_card.html" with title="Ordens de servico" subtitle="Fila principal para acompanhamento diario da manutencao." content_template="admin_shell/smart_system/_work_orders_table.html" %}
+            {% include "admin_shell/smart_system/_section_card.html" with title="Agenda simplificada" subtitle="Janelas preventivas e visitas planejadas no curto prazo." content_template="admin_shell/smart_system/_schedule_summary.html" %}
+        </div>
+        <aside class="smart-side-column">
+            {% include "admin_shell/smart_system/_section_card.html" with title="Backlog operacional" subtitle="Pressao imediata por criticidade, tipo e aging." content_template="admin_shell/smart_system/_backlog.html" %}
+            {% include "admin_shell/smart_system/_section_card.html" with title="Alertas operacionais" subtitle="Excecoes de campo e pendencias de atendimento." content_template="admin_shell/smart_system/_alerts.html" alerts=operational_alerts %}
+        </aside>
+    </div>
+</section>
+{% endblock %}

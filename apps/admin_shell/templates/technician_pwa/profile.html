@@ -1,0 +1,33 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-panel">
+    <div class="section-heading"><h2>{{ mobile_user.name }}</h2></div>
+    <p>{{ mobile_user.email }}</p>
+    <p>
+        {% if mobile_tenant_context.company %}{{ mobile_tenant_context.company.name }}{% endif %}
+        {% if mobile_tenant_context.site %} • {{ mobile_tenant_context.site.name }}{% endif %}
+    </p>
+</section>
+<section class="technician-kpi-grid">
+    {% for item in profile_cards %}
+        {% include "technician_pwa/components/mobile_kpi_card.html" %}
+    {% endfor %}
+</section>
+<section class="technician-panel">
+    <div class="section-heading"><h2>Mix de atendimentos</h2></div>
+    <div class="stack-list">
+        {% for item in service_mix %}
+            <article class="stack-card">
+                <strong>{{ item.label }}</strong>
+                <p>{{ item.value }} servico(s)</p>
+            </article>
+        {% empty %}
+            <p class="empty-state">Sem historico suficiente para analise.</p>
+        {% endfor %}
+    </div>
+    <div class="technician-action-grid">
+        <a class="quick-action-button" href="{% url 'admin-shell:technician-app-logout' %}">Sair</a>
+    </div>
+</section>
+{% endblock %}

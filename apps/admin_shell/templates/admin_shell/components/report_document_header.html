@@ -1,0 +1,32 @@
+<header class="report-document-header">
+    <div>
+        <span class="asset-tag">{{ report.report_code }}</span>
+        <h2>{{ report.document_type }}</h2>
+        <p>{{ report.subject_title }}</p>
+        <small>{{ report.subject_subtitle }}</small>
+    </div>
+    <div class="report-document-brand">
+        <strong>{{ report.module_name }}</strong>
+        <span>{{ report.system_name }}</span>
+        <small>Emitido em {{ report.issued_at }}</small>
+    </div>
+</header>
+
+<section class="report-header-grid">
+    <div class="report-header-item">
+        <span>Cliente</span>
+        <strong>{{ report.client_name }}</strong>
+    </div>
+    <div class="report-header-item">
+        <span>Site / unidade</span>
+        <strong>{{ report.site_name }}</strong>
+    </div>
+    <div class="report-header-item">
+        <span>Localizacao</span>
+        <strong>{{ report.location_name }}</strong>
+    </div>
+    <div class="report-header-item">
+        <span>Ativo / referencia</span>
+        <strong>{{ report.asset_label }}</strong>
+    </div>
+</section>

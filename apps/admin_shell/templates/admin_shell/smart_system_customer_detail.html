@@ -1,0 +1,21 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="content-grid">
+        <div class="column-span-5">
+            <article class="stack-card tone-info">
+                <h3>{{ customer.name }}</h3>
+                <p><strong>Documento:</strong> {{ customer.document }}</p>
+                <p><strong>Email:</strong> {{ customer.email }}</p>
+                <p><strong>Telefone:</strong> {{ customer.phone }}</p>
+                <p><strong>Status:</strong> {{ customer.status }}</p>
+                <p><strong>Observações:</strong> {{ customer.notes|default:"—" }}</p>
+            </article>
+        </div>
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Sites/unidades" subtitle="Unidades operacionais vinculadas ao cliente." content_template="admin_shell/components/site_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

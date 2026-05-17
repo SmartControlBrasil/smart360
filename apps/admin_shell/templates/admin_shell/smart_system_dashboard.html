@@ -1,0 +1,56 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout smart-system-dashboard">
+    <div class="smart-filter-bar">
+        {% for filter in filter_groups %}
+            {% include "admin_shell/components/maintenance_filter_bar.html" with filter_group=filter %}
+        {% endfor %}
+    </div>
+
+    <div class="maintenance-kpi-grid">
+        {% for kpi in kpis %}
+            {% include "admin_shell/components/maintenance_kpi_card.html" with kpi=kpi %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid content-grid--primary">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Saude operacional" subtitle="Leitura consolidada de ativos, areas sensiveis e ordens criticas." content_template="admin_shell/components/asset_health_widget.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e excecoes" subtitle="Itens que exigem atencao imediata da gestao de manutencao." content_template="admin_shell/components/alert_widget.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid content-grid--operations">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Ordens de servico" subtitle="Fila resumida das intervencoes com foco em prazo, prioridade e execucao." content_template="admin_shell/components/work_order_list.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Backlog de manutencao" subtitle="Pressao do backlog por criticidade, tipo e aging." content_template="admin_shell/components/backlog_widget.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid content-grid--balanced">
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Falhas e confiabilidade" subtitle="Leitura RCM/TPM de falhas recorrentes, reincidencia e tendencia de confiabilidade." content_template="admin_shell/components/reliability_widget.html" %}
+        </div>
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Plano preventivo" subtitle="Janela preventiva, aderencia ao plano e programacao da semana." content_template="admin_shell/components/preventive_schedule_widget.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid content-grid--bottom">
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Atividade recente" subtitle="Eventos tecnicos recentes do modulo, com rastreabilidade operacional." content_template="admin_shell/components/activity_feed.html" %}
+        </div>
+        <div class="column-span-3">
+            {% include "admin_shell/components/widget_container.html" with title="Atalhos operacionais" subtitle="Rotinas de uso intenso para manutencao e engenharia." content_template="admin_shell/components/action_shortcuts.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Visao por area / site / cliente" subtitle="Comparativo multisite com pendencias, criticidade e conformidade preventiva." content_template="admin_shell/components/site_status_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

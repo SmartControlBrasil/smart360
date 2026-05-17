@@ -1,0 +1,6 @@
+{% include "admin_shell/components/checklist_execution_progress.html" %}
+<div class="asset-summary-grid checklist-summary-grid">
+    {% for card in execution.summary_cards %}
+        {% include "admin_shell/components/checklist_summary_panel.html" with card=card %}
+    {% endfor %}
+</div>

@@ -1,0 +1,15 @@
+<article class="technician-checklist-item {% if item.response == 'NOK' %}is-nok{% endif %}">
+    <header>
+        <strong>{{ item.order }}. {{ item.title }}</strong>
+        <span>{{ item.response|default:"Pendente" }}</span>
+    </header>
+    <p>{{ item.description }}</p>
+    <div class="choice-chip-group">
+        <span class="choice-chip">OK</span>
+        <span class="choice-chip">NOK</span>
+        <span class="choice-chip">N/A</span>
+    </div>
+    {% if item.notes %}
+        <small>{{ item.notes }}</small>
+    {% endif %}
+</article>

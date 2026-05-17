@@ -1,0 +1,18 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="smart-system-page smart-system-page--overview">
+    {% include "admin_shell/smart_system/_filters.html" %}
+
+    {% include "admin_shell/smart_system/_kpi_cards.html" with kpis=overview_kpis %}
+
+    <div class="smart-two-column">
+        <div class="smart-main-column">
+            {% include "admin_shell/smart_system/_section_card.html" with title="Ultimas ordens de servico" subtitle="Resumo rapido das ordens mais relevantes no contexto atual." content_template="admin_shell/smart_system/_work_orders_summary.html" %}
+        </div>
+        <div class="smart-side-column">
+            {% include "admin_shell/smart_system/_section_card.html" with title="Alertas criticos" subtitle="Itens que pedem decisao ou acompanhamento imediato." content_template="admin_shell/smart_system/_alerts.html" alerts=critical_alerts %}
+        </div>
+    </div>
+</section>
+{% endblock %}

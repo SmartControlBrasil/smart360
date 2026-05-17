@@ -1,0 +1,17 @@
+<div class="mini-stack">
+    {% for material in execution.materials %}
+        <article class="detail-list-row">
+            <span>
+                {% if material.code %}
+                    <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-part-detail' part_code=material.code %}">{{ material.code }}</a>
+                {% else %}
+                    {{ material.name }}
+                {% endif %}
+            </span>
+            <strong>{{ material.quantity }}</strong>
+        </article>
+        <p class="muted-block">{{ material.name }} • {{ material.notes }}</p>
+    {% empty %}
+        <p class="empty-inline-state">Nenhum material registrado.</p>
+    {% endfor %}
+</div>

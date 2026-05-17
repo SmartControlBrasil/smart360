@@ -1,0 +1,50 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout part-detail-layout">
+    <div class="asset-hero part-hero">
+        <div>
+            <span class="asset-tag">{{ part.code }}</span>
+            <h2>{{ part.name }}</h2>
+            <p>{{ part.category }} • {{ part.manufacturer }} • {{ part.location }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/stock_alert_badge.html" with value=part.status %}
+            <span class="status-badge status-slate">{{ part.model }}</span>
+        </div>
+    </div>
+
+    <div class="asset-summary-grid">
+        {% for card in part.summary_cards %}
+            {% include "admin_shell/components/work_order_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Dados da peca" subtitle="Cadastro tecnico, fornecedor, custo e contexto de uso." content_template="admin_shell/components/part_general_info.html" %}
+        </div>
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Historico de movimentacao" subtitle="Entradas, saídas e ajustes que impactaram o saldo do item." content_template="admin_shell/components/stock_movement_table.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Ativos associados" subtitle="Ativos e localizacoes em que a peca faz parte da estrategia de manutencao." content_template="admin_shell/components/part_asset_links.html" %}
+        </div>
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Consumo em ordens de servico" subtitle="Historico de aplicacao da peca em OS, ativo, tecnico e quantidade consumida." content_template="admin_shell/components/part_usage_list.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas de estoque" subtitle="Estoque minimo, indisponibilidade e intensidade de consumo recente." content_template="admin_shell/components/part_alert_panel.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Rotinas imediatas para entrada, saida, ajuste e consulta de historico." content_template="admin_shell/components/part_action_panel.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

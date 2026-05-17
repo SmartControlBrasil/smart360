@@ -1,0 +1,37 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout asset-management-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            {% for filter in asset_filters|slice:":4" %}
+                {% include "admin_shell/components/asset_filter_bar.html" with filter=filter %}
+            {% endfor %}
+            <details class="advanced-filters">
+                <summary class="quick-action-button">Filtros avancados</summary>
+                <div class="advanced-filters-grid">
+                    {% for filter in asset_filters|slice:"4:" %}
+                        {% include "admin_shell/components/asset_filter_bar.html" with filter=filter %}
+                    {% endfor %}
+                </div>
+            </details>
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:smart-system-assets' %}">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="asset-kpi-grid">
+        {% for card in asset_kpis %}
+            {% include "admin_shell/components/asset_kpi_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Carteira de ativos" subtitle="Consulta operacional com criticidade, plano preventivo, disponibilidade e ações rápidas." content_template="admin_shell/components/asset_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

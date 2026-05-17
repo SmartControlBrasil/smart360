@@ -1,0 +1,46 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table billing-table">
+        <thead>
+            <tr>
+                <th>Contrato</th>
+                <th>Empresa</th>
+                <th>Plano</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Assinatura</th>
+                <th>Inicio</th>
+                <th>Renovacao</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contract in contracts %}
+                <tr>
+                    <td><strong>{{ contract.contract_code }}</strong></td>
+                    <td>{{ contract.company_name }}</td>
+                    <td>{{ contract.plan_name }}</td>
+                    <td>{{ contract.contracted_amount }}</td>
+                    <td>{% include "admin_shell/components/billing_status_badge.html" with value=contract.status tone=contract.status_tone %}</td>
+                    <td>{% include "admin_shell/components/billing_status_badge.html" with value=contract.subscription_status tone=contract.subscription_status_tone %}</td>
+                    <td>{{ contract.start_date|date:"d/m/Y" }}</td>
+                    <td>{{ contract.renewal_date|date:"d/m/Y" }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:billing-contract-detail' contract_code=contract.contract_code %}">Detalhe</a>
+                            {% if not compact %}
+                                <form method="post" action="{% url 'admin-shell:billing-contract-suspend' contract_code=contract.contract_code %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Suspender</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="empty-state-cell">Nenhum contrato encontrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

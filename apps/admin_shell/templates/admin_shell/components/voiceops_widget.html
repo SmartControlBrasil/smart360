@@ -1,0 +1,33 @@
+<section class="panel-card voiceops-widget" data-voiceops data-voiceops-config-id="{{ voiceops_bootstrap_id }}">
+    <div class="voiceops-header">
+        <div>
+            <h2>{{ voiceops_title|default:"VoiceOps" }}</h2>
+            <p>{{ voiceops_description|default:"Comando e consulta por voz com contexto operacional." }}</p>
+        </div>
+        <div class="voiceops-actions">
+            <button type="button" class="quick-action-button" data-voiceops-record>Falar</button>
+            <button type="button" class="quick-action-button quick-action-button--ghost" data-voiceops-stop hidden>Parar</button>
+        </div>
+    </div>
+    <div class="technician-inline-state-row">
+        <span class="technician-inline-pill" data-voiceops-status>Pronto para ouvir</span>
+        <span class="technician-inline-pill" data-voiceops-persona>{{ voiceops_persona|title }}</span>
+    </div>
+    <label class="technician-input-group">
+        <span>Transcricao</span>
+        <textarea rows="2" placeholder="{{ voiceops_placeholder|default:'Fale ou digite o comando aqui.' }}" data-voiceops-transcript></textarea>
+    </label>
+    <div class="voiceops-actions">
+        <button type="button" class="quick-action-button quick-action-button--ghost" data-voiceops-send>Executar</button>
+        <label class="choice-chip choice-chip-input">
+            <input type="checkbox" data-voiceops-tts {% if voiceops_tts_enabled %}checked{% endif %}>
+            <span>Responder por audio</span>
+        </label>
+    </div>
+    <div class="event-feed" data-voiceops-response-feed>
+        <article class="event-row tone-neutral">
+            <strong>Assistente operacional</strong>
+            <p>{{ voiceops_empty_message|default:"Os resultados da interacao por voz aparecem aqui." }}</p>
+        </article>
+    </div>
+</section>

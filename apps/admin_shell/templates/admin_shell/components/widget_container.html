@@ -1,0 +1,14 @@
+<section class="widget-card">
+    <header class="widget-card-header">
+        <div>
+            <h2>{{ title }}</h2>
+            <p>{{ subtitle }}</p>
+        </div>
+        <span class="status-badge status-slate">Live shell</span>
+    </header>
+    <div class="widget-card-body">
+        {% if content_template %}
+            {% include content_template %}
+        {% endif %}
+    </div>
+</section>

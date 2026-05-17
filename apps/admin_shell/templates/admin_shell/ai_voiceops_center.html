@@ -1,0 +1,37 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="content-grid">
+    <div class="column-span-12">
+        <div class="summary-grid">
+            {% for item in voiceops_summary_cards %}
+                <article class="summary-card tone-{{ item.tone|default:'neutral' }}">
+                    <span>{{ item.label }}</span>
+                    <strong>{{ item.value }}</strong>
+                    <small>{{ item.meta }}</small>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="column-span-12">
+        <div class="panel-card">
+            <h2>VoiceOps recente</h2>
+            <div class="event-feed">
+                {% for item in voiceops_interactions %}
+                    <article class="event-row tone-{{ item.action_status|default:'neutral' }}">
+                        <strong>{{ item.get_persona_display }} • {{ item.detected_intent|default:"intent_unknown" }}</strong>
+                        <p>{{ item.transcript_text|default:"Sem transcricao consolidada." }}</p>
+                        <small>
+                            {{ item.get_channel_display }} • {{ item.action_status }} •
+                            {{ item.company.name|default:"Global" }}{% if item.site %} • {{ item.site.name }}{% endif %}
+                        </small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma interacao de voz registrada no escopo atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,27 @@
+<section class="schedule-panel">
+    <div class="section-heading">
+        <h2>{{ title|default:"Sequencia da rota" }}</h2>
+    </div>
+    <div class="route-sequence-list">
+        {% for visit in visits %}
+            <article class="route-stop {% if visit.conflict_flags %}has-conflict{% endif %}">
+                <div class="route-stop__order">{{ visit.route_order|default:forloop.counter }}</div>
+                <div class="route-stop__body">
+                    <h3>{{ visit.title }}</h3>
+                    <p>{{ visit.site }}{% if visit.asset %} · {{ visit.asset }}{% endif %}</p>
+                    <div class="route-stop__meta">
+                        <span>{{ visit.scheduled_start }} - {{ visit.scheduled_end }}</span>
+                        <span>{{ visit.estimated_duration_minutes }} min</span>
+                        <span>{{ visit.estimated_travel_minutes }} min desloc.</span>
+                        <span>{{ visit.status }}</span>
+                    </div>
+                    {% if visit.conflict_flags %}
+                        <p class="route-stop__conflict">Conflitos: {{ visit.conflict_flags|join:", " }}</p>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhuma visita programada nesta agenda.</p>
+        {% endfor %}
+    </div>
+</section>

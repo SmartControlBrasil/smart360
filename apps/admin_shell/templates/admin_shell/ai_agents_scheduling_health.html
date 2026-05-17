@@ -1,0 +1,6 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    {% include "admin_shell/components/agent_schedule_health_table.html" with schedule_health_flags=schedule_health_flags %}
+{% endblock %}

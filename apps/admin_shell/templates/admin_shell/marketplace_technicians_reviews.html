@@ -1,0 +1,11 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Reviews" subtitle="Feedback pos-servico, reputacao operacional e confianca para novas atribuicoes." content_template="admin_shell/components/marketplace_reviews_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

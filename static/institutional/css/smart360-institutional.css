@@ -1,0 +1,147 @@
+:root {
+    --smart360-primary: #0f766e;
+    --smart360-secondary: #0b1320;
+    --smart360-accent: #f97316;
+    --smart360-surface: #f3f7fa;
+    --smart360-text: #364153;
+}
+
+.institutional-home .banner-area,
+.institutional-solution-hero {
+    position: relative;
+}
+
+.institutional-home .banner-area::before,
+.institutional-solution-hero::before {
+    background: linear-gradient(90deg, rgba(11, 19, 32, 0.92) 0%, rgba(11, 19, 32, 0.72) 52%, rgba(11, 19, 32, 0.3) 100%);
+    content: "";
+    inset: 0;
+    position: absolute;
+}
+
+.institutional-home .banner-inner,
+.institutional-solution-hero .banner-inner,
+.institutional-home .banner-thumb-2,
+.institutional-solution-hero .banner-thumb-2 {
+    position: relative;
+    z-index: 1;
+}
+
+.institutional-home .banner-inner .title,
+.institutional-home .banner-inner .subtitle,
+.institutional-home .banner-inner .content,
+.institutional-solution-hero .banner-inner .title,
+.institutional-solution-hero .banner-inner .subtitle,
+.institutional-solution-hero .banner-inner .content {
+    color: #fff;
+}
+
+.institutional-home .banner-inner .title span,
+.institutional-solution-hero .banner-inner .title span {
+    color: var(--smart360-accent);
+}
+
+.institutional-cta-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 34px;
+}
+
+.institutional-point {
+    margin-bottom: 20px;
+}
+
+.institutional-icon-circle {
+    align-items: center;
+    background: rgba(15, 118, 110, 0.08);
+    border-radius: 18px;
+    color: var(--smart360-primary);
+    display: inline-flex;
+    font-size: 26px;
+    height: 84px;
+    justify-content: center;
+    width: 84px;
+}
+
+.institutional-icon-circle.small {
+    border-radius: 50%;
+    font-size: 18px;
+    height: 56px;
+    width: 56px;
+}
+
+.single-contact-list-static {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    display: flex;
+    gap: 18px;
+    height: 100%;
+    padding: 24px;
+}
+
+.single-contact-list-static .media-body h6 a {
+    color: var(--smart360-secondary);
+}
+
+.institutional-contact-note {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.institutional-contact-note p {
+    color: var(--smart360-text);
+    margin-bottom: 22px;
+}
+
+.footer-subscribe-inner h2,
+.footer-area .widget-title {
+    color: #fff;
+}
+
+.footer-area .widget .details p,
+.footer-area .widget ul li a,
+.footer-bottom p,
+.footer-bottom a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer-area .widget ul li a:hover,
+.footer-bottom a:hover,
+.navbar-area .navbar-nav li a:hover,
+.navbar-top ul li i,
+.sub-title,
+.single-contact-list .media-body h6 a,
+.single-blog-inner .details h4:hover a {
+    color: var(--smart360-primary);
+}
+
+.btn-base {
+    background: var(--smart360-primary);
+    border-color: var(--smart360-primary);
+}
+
+.btn-base:hover,
+.btn-border-base:hover {
+    background: var(--smart360-accent);
+    border-color: var(--smart360-accent);
+}
+
+.btn-border-base {
+    color: var(--smart360-primary);
+}
+
+.bg-gray {
+    background: var(--smart360-surface);
+}
+
+.section-title .title span {
+    color: var(--smart360-primary);
+}
+
+@media (max-width: 991.98px) {
+    .institutional-cta-group {
+        margin-bottom: 40px;
+    }
+}

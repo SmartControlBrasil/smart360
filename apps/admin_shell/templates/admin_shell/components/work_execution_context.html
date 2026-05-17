@@ -1,0 +1,59 @@
+<div class="detail-grid">
+    <div>
+        <dt>Descricao do chamado</dt>
+        <dd>{{ work_order.description }}</dd>
+    </div>
+    <div>
+        <dt>Ativo relacionado</dt>
+        <dd><a class="asset-primary-link" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=work_order.asset.code %}">{{ work_order.asset.name }}</a></dd>
+    </div>
+    <div>
+        <dt>Localizacao</dt>
+        <dd>{{ work_order.site }} • {{ work_order.sector }}</dd>
+    </div>
+    <div>
+        <dt>Preventiva recente</dt>
+        <dd>
+            {% if execution.recent_preventives %}
+                <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-preventive-detail' plan_code=execution.recent_preventives.0.code %}">{{ execution.recent_preventives.0.code }}</a>
+            {% else %}
+                Sem preventiva recente vinculada
+            {% endif %}
+        </dd>
+    </div>
+</div>
+
+<div class="content-grid compact-context-grid">
+    <div class="column-span-6">
+        <div class="mini-stack">
+            <h3>Historico recente do ativo</h3>
+            {% for item in execution.recent_asset_history %}
+                <article class="timeline-row compact-row">
+                    <strong>{{ item.timestamp }}</strong>
+                    <div>
+                        <p>{{ item.type }}</p>
+                        <span>{{ item.description }}</span>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-inline-state">Sem historico recente.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="column-span-6">
+        <div class="mini-stack">
+            <h3>Falhas anteriores</h3>
+            {% for failure in execution.recent_failures %}
+                <article class="timeline-row compact-row">
+                    <strong>{{ failure.code }}</strong>
+                    <div>
+                        <p>{{ failure.date }}</p>
+                        <span>{{ failure.summary }}</span>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-inline-state">Sem falhas recentes registradas.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="summary-grid">
+        {% for card in quote_kpis %}
+            {% include "admin_shell/components/quote_summary_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <section class="widget-card">
+        <div class="widget-head">
+            <div>
+                <h3>Orcamentos tecnicos</h3>
+                <p>Controle comercial e operacional de aprovacao de pecas, servicos e mao de obra.</p>
+            </div>
+        </div>
+        {% include "admin_shell/components/quote_table.html" with quote_records=quote_records %}
+    </section>
+</section>
+{% endblock %}

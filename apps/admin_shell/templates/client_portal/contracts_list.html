@@ -1,0 +1,41 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+    <section class="summary-grid">
+        {% for card in contract_kpis %}
+            {% include "client_portal/components/client_kpi_card.html" with item=card %}
+        {% endfor %}
+    </section>
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Contratos ativos e historico</h2>
+            <p>Visao dos contratos de manutencao vigentes no seu tenant.</p>
+        </div>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Contrato</th>
+                        <th>Unidade</th>
+                        <th>Status</th>
+                        <th>Valor</th>
+                        <th>Inicio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in contract_records %}
+                        <tr>
+                            <td><a href="{% url 'admin-shell:client-portal-contract-detail' contract_number=contract.contract_number %}">{{ contract.contract_number }}</a></td>
+                            <td>{{ contract.operational_site.name|default:"Todas as unidades" }}</td>
+                            <td>{{ contract.get_status_display }}</td>
+                            <td>R$ {{ contract.contract_value }}</td>
+                            <td>{{ contract.start_date|date:"d/m/Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5">Nenhum contrato encontrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

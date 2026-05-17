@@ -1,0 +1,10 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+    <section class="metric-grid">
+        {% for card in contract_kpis %}
+            {% include "admin_shell/components/contract_summary_card.html" with card=card %}
+        {% endfor %}
+    </section>
+    {% include "admin_shell/components/contract_table.html" %}
+{% endblock %}

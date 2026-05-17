@@ -1,0 +1,49 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout work-order-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            {% for filter in work_order_filters|slice:":4" %}
+                {% include "admin_shell/components/work_order_filter_bar.html" with filter=filter %}
+            {% endfor %}
+            <details class="advanced-filters">
+                <summary class="quick-action-button">Filtros avancados</summary>
+                <div class="advanced-filters-grid">
+                    {% for filter in work_order_filters|slice:"4:" %}
+                        {% include "admin_shell/components/work_order_filter_bar.html" with filter=filter %}
+                    {% endfor %}
+                </div>
+            </details>
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:smart-system-work-orders' %}">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="asset-kpi-grid">
+        {% for card in work_order_kpis %}
+            {% include "admin_shell/components/work_order_kpi_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Carteira de ordens" subtitle="Acompanhamento operacional com SLA, criticidade, backlog, pendencia de material e responsavel." content_template="admin_shell/components/work_order_table.html" %}
+        </div>
+    </div>
+
+    {% if work_order_paginator.num_pages > 1 %}
+        <nav class="asset-filter-actions" aria-label="Paginacao de ordens">
+            {% if work_order_page.has_previous %}
+                <a class="quick-action-button" href="?{% if work_order_pagination_query %}{{ work_order_pagination_query }}&amp;{% endif %}page={{ work_order_page.previous_page_number }}">Anterior</a>
+            {% endif %}
+            <span class="muted-block">Pagina {{ work_order_page.number }} de {{ work_order_paginator.num_pages }}</span>
+            {% if work_order_page.has_next %}
+                <a class="quick-action-button" href="?{% if work_order_pagination_query %}{{ work_order_pagination_query }}&amp;{% endif %}page={{ work_order_page.next_page_number }}">Proxima</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

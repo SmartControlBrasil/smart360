@@ -1,0 +1,578 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    <style>
+        .war-room-shell {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .war-room-hero,
+        .war-room-panel {
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at top right, rgba(84, 132, 255, 0.16), transparent 32%),
+                linear-gradient(180deg, rgba(9, 18, 37, 0.98), rgba(14, 24, 45, 0.98));
+            border: 1px solid rgba(130, 159, 255, 0.14);
+            box-shadow: 0 18px 48px rgba(6, 10, 24, 0.22);
+            color: #eef4ff;
+        }
+        .war-room-hero { padding: 1.5rem; }
+        .war-room-panel { padding: 1.2rem; }
+        .war-room-hero__header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .war-room-hero__title h2,
+        .war-room-panel h2 { margin: 0; color: #f8fbff; }
+        .war-room-hero__title p,
+        .war-room-panel p { color: rgba(231, 240, 255, 0.78); }
+        .war-room-briefing {
+            max-width: 54rem;
+            font-size: 1rem;
+            line-height: 1.55;
+            color: rgba(240, 246, 255, 0.92);
+        }
+        .war-room-filterbar,
+        .war-room-kpis,
+        .war-room-grid-2,
+        .war-room-grid-3,
+        .war-room-quick-actions,
+        .war-room-summary-grid {
+            display: grid;
+            gap: 0.9rem;
+        }
+        .war-room-filterbar { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        .war-room-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .war-room-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .war-room-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .war-room-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .war-room-filter {
+            padding: 0.85rem 1rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .war-room-filter strong,
+        .war-room-stat strong { display: block; color: #ffffff; }
+        .war-room-filter span,
+        .war-room-stat span { color: rgba(231, 240, 255, 0.72); font-size: 0.82rem; }
+        .war-room-kpi {
+            padding: 1rem;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .war-room-kpi__label,
+        .war-room-kpi__meta { display: block; }
+        .war-room-kpi__label { color: rgba(231, 240, 255, 0.78); font-size: 0.84rem; }
+        .war-room-kpi__value { display: block; font-size: 2rem; line-height: 1; margin: 0.4rem 0; }
+        .war-room-kpi__meta { color: rgba(231, 240, 255, 0.64); font-size: 0.8rem; }
+        .war-room-kpi--critical { border-color: rgba(255, 92, 92, 0.35); }
+        .war-room-kpi--warning { border-color: rgba(255, 190, 92, 0.35); }
+        .war-room-kpi--neutral { border-color: rgba(160, 185, 255, 0.24); }
+        .war-room-section-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.9rem;
+        }
+        .war-room-section-header a,
+        .war-room-link {
+            color: #a5c4ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .war-room-stack,
+        .war-room-feed { display: grid; gap: 0.75rem; }
+        .war-room-item,
+        .war-room-feed-item,
+        .war-room-list-row,
+        .war-room-stat {
+            padding: 0.95rem 1rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .war-room-item header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.45rem;
+        }
+        .war-room-item header span,
+        .war-room-feed-item p,
+        .war-room-list-row small { color: rgba(231, 240, 255, 0.68); }
+        .war-room-item--critical,
+        .war-room-feed-item--critical { border-color: rgba(255, 92, 92, 0.35); }
+        .war-room-item--high,
+        .war-room-item--warning,
+        .war-room-feed-item--warning { border-color: rgba(255, 190, 92, 0.35); }
+        .war-room-table { width: 100%; border-collapse: collapse; }
+        .war-room-table th,
+        .war-room-table td {
+            padding: 0.7rem 0.55rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+            vertical-align: top;
+        }
+        .war-room-table th { color: rgba(231, 240, 255, 0.66); font-size: 0.8rem; text-transform: uppercase; }
+        .war-room-badge {
+            display: inline-flex;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            background: rgba(255,255,255,0.08);
+        }
+        .war-room-quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .war-room-action {
+            display: block;
+            padding: 0.95rem 1rem;
+            border-radius: 18px;
+            text-decoration: none;
+            color: #eef4ff;
+            background: linear-gradient(180deg, rgba(74, 113, 214, 0.3), rgba(49, 72, 136, 0.18));
+            border: 1px solid rgba(132, 163, 255, 0.3);
+            font-weight: 700;
+        }
+        .war-room-action small { display: block; margin-top: 0.35rem; color: rgba(231,240,255,.7); font-weight: 500; }
+        .war-room-approval-actions { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+        @media (max-width: 1200px) {
+            .war-room-kpis,
+            .war-room-grid-2,
+            .war-room-grid-3,
+            .war-room-filterbar,
+            .war-room-quick-actions,
+            .war-room-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 720px) {
+            .war-room-kpis,
+            .war-room-grid-2,
+            .war-room-grid-3,
+            .war-room-filterbar,
+            .war-room-quick-actions,
+            .war-room-summary-grid { grid-template-columns: 1fr; }
+            .war-room-hero__header { flex-direction: column; }
+        }
+    </style>
+
+    <section class="war-room-shell">
+        <article class="war-room-hero">
+            <div class="war-room-hero__header">
+                <div class="war-room-hero__title">
+                    <h2>Sala de comando executiva</h2>
+                    <p>Operacao, IA, risco, agenda, marketplace, governanca e rentabilidade no mesmo ponto de decisao.</p>
+                </div>
+                <div class="war-room-summary-grid">
+                    <div class="war-room-stat"><span>Empresa</span><strong>{{ war_room_filters.company }}</strong></div>
+                    <div class="war-room-stat"><span>Unidade</span><strong>{{ war_room_filters.site }}</strong></div>
+                    <div class="war-room-stat"><span>Periodo</span><strong>{{ war_room_filters.period.label }}</strong></div>
+                    <div class="war-room-stat"><span>Feed</span><strong data-war-room-feed-count>{{ war_room_intelligence_feed|length }} sinais</strong></div>
+                </div>
+            </div>
+            {% if war_room_briefing %}
+                <div class="war-room-briefing">
+                    <strong>{{ war_room_briefing.title }}</strong>
+                    <p>{{ war_room_briefing.summary }}</p>
+                </div>
+            {% endif %}
+        </article>
+
+        <form method="get" class="war-room-filterbar">
+            <label class="war-room-filter">
+                <span>Periodo</span>
+                <select name="period">
+                    {% for choice in war_room_filters.period.choices %}
+                        <option value="{{ choice.key }}"{% if choice.active %} selected{% endif %}>{{ choice.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="war-room-filter">
+                <span>Risco</span>
+                <select name="risk">
+                    {% for choice in war_room_filters.risk_choices %}
+                        <option value="{{ choice.key }}"{% if choice.active %} selected{% endif %}>{{ choice.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="war-room-filter">
+                <span>Dominio</span>
+                <select name="domain">
+                    {% for choice in war_room_filters.domain_choices %}
+                        <option value="{{ choice.key }}"{% if choice.active %} selected{% endif %}>{{ choice.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <div class="war-room-filter"><span>Empresa</span><strong>{{ war_room_filters.company }}</strong></div>
+            <div class="war-room-filter"><span>Unidade</span><strong>{{ war_room_filters.site }}</strong></div>
+            <div class="war-room-filter">
+                <span>Acao</span>
+                <button class="quick-action-button" type="submit">Atualizar leitura</button>
+            </div>
+        </form>
+
+        <section class="war-room-kpis">
+            {% for item in war_room_kpis %}
+                {% include "admin_shell/components/war_room_kpi_card.html" with item=item %}
+            {% endfor %}
+        </section>
+
+        <section class="war-room-grid-2">
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Alertas criticos</h2>
+                        <p>Fila priorizada por severidade para resposta executiva imediata.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:observability-dashboard' %}">Observabilidade</a>
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_alerts %}
+                        {% include "admin_shell/components/war_room_alert_panel.html" with item=item %}
+                    {% empty %}
+                        <p class="empty-state">Nenhum alerta relevante no escopo atual.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Fila de decisoes</h2>
+                        <p>Propostas aguardando aprovacao ou escalonamento com contexto de impacto e policy. <strong data-war-room-decision-count>{{ war_room_decisions|length }}</strong> em foco.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-decision-center' %}">Abrir Decision Engine</a>
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_decisions %}
+                        <article class="war-room-item war-room-item--{{ item.risk }}">
+                            <header>
+                                <strong>{{ item.action }}</strong>
+                                <span>{{ item.origin_agent }}</span>
+                            </header>
+                            <p>{{ item.impact }}</p>
+                            <small>{{ item.policy }} • aprovador esperado: {{ item.expected_approver }}</small>
+                            <div class="war-room-approval-actions">
+                                <form method="post" action="{% url 'admin-shell:ai-decision-approve' decision_id=item.public_id %}">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button" type="submit">Aprovar</button>
+                                </form>
+                                <form method="post" action="{% url 'admin-shell:ai-decision-reject' decision_id=item.public_id %}">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button quick-action-button--ghost" type="submit">Rejeitar</button>
+                                </form>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhuma decisao pendente agora.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+
+        <section class="war-room-grid-3">
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Recomendacoes dos agentes</h2>
+                        <p>Consolidado de maintenance, scheduling, profitability, marketplace e anomaly agents.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-agents-recommendations' %}">Todas as recomendacoes</a>
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_recommendations %}
+                        <article class="war-room-item war-room-item--{{ item.severity }}">
+                            <header><strong>{{ item.title }}</strong><span>{{ item.agent }}</span></header>
+                            <p>{{ item.context }}</p>
+                            <small>{{ item.suggested_action }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Sem recomendacoes abertas.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Simulacoes relevantes</h2>
+                        <p>Cenarios recentes para suportar aprovacao e leitura executiva de trade-offs.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-simulation-center' %}">Simulation Engine</a>
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_simulations %}
+                        <article class="war-room-item">
+                            <header><strong>{{ item.title }}</strong><span>{{ item.confidence|default:"-" }}</span></header>
+                            <p>{{ item.summary }}</p>
+                            <small>Impacto {{ item.impact_score }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhuma simulacao recente no escopo atual.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Feed de intelligence</h2>
+                        <p>Eventos de alto valor transformados em leitura executiva.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-manager-copilot' %}?question=Explique os alertas do war room">Explicar no Copilot</a>
+                </div>
+                <div class="war-room-feed" data-war-room-feed>
+                    {% for item in war_room_intelligence_feed %}
+                        {% include "admin_shell/components/war_room_feed_item.html" with item=item %}
+                    {% empty %}
+                        <p class="empty-state">Nenhum evento de intelligence no periodo.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Digital Twins em Atencao</h2>
+                        <p>Contexto vivo de unidades e ativos para abrir direto o twin operacional.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-digital-twin-center' %}">Abrir twins</a>
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_twin_hotspots %}
+                        <article class="war-room-item war-room-item--{{ item.risk }}">
+                            <header>
+                                <strong>{{ item.title }}</strong>
+                                <span>{{ item.subtitle }}</span>
+                            </header>
+                            <p>{{ item.summary }}</p>
+                            <a class="war-room-link" href="{{ item.href }}">Abrir contexto vivo</a>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhum twin critico no escopo atual.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+
+        <section class="war-room-grid-2">
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Saude operacional</h2>
+                        <p>Ordens, falhas, ativos e agenda de campo em uma unica leitura.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:smart-system-scheduling' %}">Agenda & campo</a>
+                </div>
+                <div class="war-room-summary-grid">
+                    {% for item in war_room_operational_health.summary %}
+                        <div class="war-room-stat"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                    {% endfor %}
+                </div>
+                <div class="table-responsive">
+                    <table class="war-room-table">
+                        <thead><tr><th>OS</th><th>Ativo</th><th>Prioridade</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for item in war_room_operational_health.top_orders %}
+                                <tr>
+                                    <td>{{ item.order_code }}</td>
+                                    <td>{{ item.asset }}</td>
+                                    <td><span class="war-room-badge">{{ item.priority }}</span></td>
+                                    <td>{{ item.status }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4">Sem ordens no periodo.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Saude financeira</h2>
+                        <p>Rentabilidade, contratos pressionados e leitura executiva de margem.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:analytics-executive-dashboard' %}">Analytics Executivo</a>
+                </div>
+                <div class="war-room-summary-grid">
+                    {% for item in war_room_financial_health.headline %}
+                        <div class="war-room-stat"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                    {% endfor %}
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_financial_health.alerts %}
+                        <article class="war-room-item war-room-item--{{ item.risk }}">
+                            <header><strong>{{ item.title }}</strong><span>{{ item.risk }}</span></header>
+                            <p>{{ item.summary }}</p>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Sem alertas financeiros relevantes.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+
+        <section class="war-room-grid-3">
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Agenda e campo</h2>
+                        <p>Carga, conflitos, ociosidade e visitas em risco.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:smart-system-scheduling' %}">Abrir agenda</a>
+                </div>
+                <div class="war-room-summary-grid">
+                    {% for item in war_room_field_panel.summary %}
+                        <div class="war-room-stat"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                    {% endfor %}
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_field_panel.technicians %}
+                        <article class="war-room-list-row">
+                            <strong>{{ item.technician_name }}</strong>
+                            <small>{{ item.jobs }} jobs • {{ item.conflicts }} conflitos • {{ item.duration_minutes }} min</small>
+                        </article>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Marketplace</h2>
+                        <p>Cobertura, gaps, requests abertos e risco de alocacao.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:marketplace-technicians-dashboard' %}">Abrir marketplace</a>
+                </div>
+                <div class="war-room-summary-grid">
+                    {% for item in war_room_marketplace_panel.summary %}
+                        <div class="war-room-stat"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                    {% endfor %}
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_marketplace_panel.gaps %}
+                        <article class="war-room-item war-room-item--{{ item.risk }}">
+                            <header><strong>{{ item.meta|default:"Gap" }}</strong><span>{{ item.risk }}</span></header>
+                            <p>{{ item.title }}</p>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Sem gaps criticos de cobertura.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Anomalias</h2>
+                        <p>Desvios operacionais, backlog, SLA e sinais fora do padrao.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-agents-anomaly-health' %}">Abrir painel de anomalias</a>
+                </div>
+                <div class="war-room-summary-grid">
+                    {% for item in war_room_anomaly_panel.summary %}
+                        <div class="war-room-stat"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                    {% endfor %}
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_anomaly_panel.items %}
+                        <article class="war-room-item war-room-item--{{ item.risk }}">
+                            <header><strong>{{ item.title }}</strong><span>{{ item.risk }}</span></header>
+                            <p>{{ item.summary }}</p>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Sem anomalias ativas.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+
+        <section class="war-room-grid-2">
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>IA e governanca</h2>
+                        <p>Recomendacoes, automacao, policies, optimization loop e experimentos em andamento.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:ai-policy-studio' %}">Policy Studio</a>
+                </div>
+                <div class="war-room-summary-grid">
+                    {% for item in war_room_ai_governance.summary %}
+                        <div class="war-room-stat"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                    {% endfor %}
+                </div>
+                <div class="war-room-stack">
+                    {% for item in war_room_ai_governance.policies %}
+                        <article class="war-room-list-row">
+                            <strong>{{ item.action_type|default:"policy" }}</strong>
+                            <small>{{ item.result }} • {{ item.evaluated_at }} • {{ item.reason }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Sem avaliacoes recentes de policy.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="war-room-panel">
+                <div class="war-room-section-header">
+                    <div>
+                        <h2>Acoes rapidas</h2>
+                        <p>Saltos operacionais para agir a partir da mesma tela.</p>
+                    </div>
+                    <a href="{% url 'admin-shell:executive-war-room-data' %}?period={{ war_room_filters.period.key }}">API</a>
+                </div>
+                <div class="war-room-quick-actions">
+                    {% for item in war_room_quick_actions %}
+                        <a class="war-room-action" href="{{ item.href }}">
+                            {{ item.label }}
+                            <small>Ir direto ao painel operacional relacionado</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+    </section>
+
+    <script>
+        (function () {
+            const streamUrl = "{% url 'admin-shell:executive-war-room-stream' %}";
+            if (!window.EventSource || !streamUrl) {
+                return;
+            }
+            const feedCountNode = document.querySelector("[data-war-room-feed-count]");
+            const decisionCountNode = document.querySelector("[data-war-room-decision-count]");
+            const feedNode = document.querySelector("[data-war-room-feed]");
+            const source = new EventSource(streamUrl);
+
+            source.addEventListener("war_room.snapshot", function (event) {
+                const payload = JSON.parse(event.data || "{}");
+                const items = payload.events || [];
+                if (feedCountNode) {
+                    feedCountNode.textContent = `${items.length} sinais`;
+                }
+                if (decisionCountNode && payload.pending_decisions_count !== undefined) {
+                    decisionCountNode.textContent = payload.pending_decisions_count;
+                }
+                if (!feedNode || !items.length) {
+                    return;
+                }
+                feedNode.innerHTML = items.map(function (item) {
+                    const tone = item.priority === "critical" ? "critical" : (item.priority === "high" ? "warning" : "neutral");
+                    return `
+                        <article class="war-room-feed-item war-room-feed-item--${tone}">
+                            <strong>${item.event_name}</strong>
+                            <p>${item.summary}</p>
+                            <small>${item.occurred_at}</small>
+                        </article>
+                    `;
+                }).join("");
+            });
+        }());
+    </script>
+{% endblock %}

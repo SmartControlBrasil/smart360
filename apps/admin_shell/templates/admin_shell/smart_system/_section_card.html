@@ -1,0 +1,13 @@
+<section class="smart-section-card">
+    <header class="smart-section-card-header">
+        <div>
+            <h2>{{ title }}</h2>
+            {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+        </div>
+    </header>
+    <div class="smart-section-card-body">
+        {% if content_template %}
+            {% include content_template %}
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,556 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+<!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>Sobre a Smart Control Brasil</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Sobre a Smart Control Brasil</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== WORK AREA STARTS =======-->
+  <div class="work1-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/elements/elements11.png' %}" alt="" class="elements9">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-5">
+          <div class="solution-header heading2">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>best it solution</h5>
+            <div class="space24"></div>
+            <h2 class="text-anime-style-3">End-to-End IT Solutions for Growing Businesses</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="800">We provide comprehensive, end-to-end IT solutions of designed to support businesses at stage of growing.</p>
+            <div class="space24"></div>
+            <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
+              <div class="progress-bar">
+                <label>It Solution <span>98%</span></label>
+                <div class="progress">
+                  <div class="progress-inner" style="width: 98%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-bar">
+                <label>Cyber Security <span>99%</span></label>
+                <div class="progress">
+                  <div class="progress-inner" style="width: 99%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-bar">
+                <label>Cloud Solution <span>99%</span></label>
+                <div class="progress">
+                  <div class="progress-inner" style="width: 99%;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer solucoes <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-5">
+          <div class="soultions-images">
+            <img src="{% static 'institutional/eitech/img/elements/elements10.png' %}" alt="" class="elements10">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/work/work-img1.png' %}" alt="">
+            </div>
+            <div class="img2 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/work/work-img2.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== WORK AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about1-section-area-widget sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover; overflow: hidden;">
+    <img src="{% static 'institutional/eitech/img/elements/elements9.png' %}" alt="" class="elements9">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="about-images-area">
+            <img src="{% static 'institutional/eitech/img/elements/elements10.png' %}" alt="" class="elements10">
+            <div class="row align-items-center">
+              <div class="col-lg-6 col-md-6">
+                <div class="img1 image-anime reveal">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img1.png' %}" alt="">
+                </div>
+                <div class="space30 d-lg-none d-block"></div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="img1 image-anime reveal">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img2.png' %}" alt="">
+                </div>
+                <div class="space30"></div>
+                <div class="img1 image-anime reveal">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img3.png' %}" alt="">
+                </div>
+              </div>
+            </div>
+            <div class="check-icons aniamtion-key-1">
+              <img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">
+              <p>With 15+ years of experience
+                IT solution help community.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+          <div class="about-header-area heading2">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Sobre a Smart Control Brasil</h5>
+            <div class="space24"></div>
+            <h2 class="text-anime-style-3">Tecnologia, automacao e inteligencia artificial para empresas reais</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="800">At Eitech, we understand that every business unique, which is why we offer customized IT solutions designed to meet.</p>
+            <div class="space28"></div>
+            <div class="row" data-aos="fade-left" data-aos-duration="900">
+              <div class="col-lg-6 col-md-6">
+                <div class="progresbar">
+                  <div class="progressbar">
+                    <div class="circle" data-percent="96"><canvas width="80" height="80"></canvas>
+                      <div class="count">96%</div>
+                    </div>
+                  </div>
+                  <div class="content-area">
+                    <h4>IT Solution</h4>
+                    <div class="space8"></div>
+                    <p>Level Is High</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6 col-md-6">
+                <div class="space28 d-md-none d-block"></div>
+                <div class="progresbar">
+                  <div class="progressbar">
+                    <div class="circle" data-percent="97"><canvas width="80" height="80"></canvas>
+                      <div class="count">97%</div>
+                    </div>
+                  </div>
+                  <div class="content-area">
+                    <h4>Cyber Solution</h4>
+                    <div class="space8"></div>
+                    <p>#1 Best Of Solution</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="space28"></div>
+            <div class="pera-box bg1" data-aos="fade-left" data-aos-duration="1000">
+              <p>“The right IT solutions done just support your on business-they transform it, at Eitech, we believe.”</p>
+            </div>
+            <div class="space28"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer solucoes <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about6-section-area-widget sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="about6-header heading2">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>our mission/vision</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Driving Innovation: Our Mission Vision at Eitech</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">At the of innovation, our cutting-edge IT solutions are designed transform your business ETech operations. </p>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1000">
+              <div class="icons">
+                <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
+              </div>
+              <div class="content-area">
+                <a href="{% url 'institutional:service_details' %}">Network Infrastructure Solutions</a>
+                <div class="space16"></div>
+                <p>In today’s fast-paced world, technology is the backbone of success. Our comprehensive IT.</p>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1100">
+              <div class="icons">
+                <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
+              </div>
+              <div class="content-area">
+                <a href="{% url 'institutional:service_details' %}">Performance Tailored IT Services</a>
+                <div class="space16"></div>
+                <p>Our tailored IT services are crafted to meet your unique business needs, ensuring that.</p>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer solucoes<i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6">
+          <div class="images-area">
+            <img src="{% static 'institutional/eitech/img/elements/elements27.png' %}" alt="" class="elements27">
+            <div class="img1 image-anime reveal">
+              <img src="{% static 'institutional/eitech/img/all-images/about/about-img13.png' %}" alt="">
+            </div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="img1 image-anime reveal">
+                  <div class="space30"></div>
+                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img14.png' %}" alt="">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="img1 image-anime reveal">
+                  <div class="space30"></div>
+                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img15.png' %}" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== TEAM AREA STARTS =======-->
+  <div class="team1-section-area sp2">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 m-auto">
+          <div class="team-header space-margin60 heading2 text-center">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>our best team</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Meet Our Expert Team</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
+          <div class="team-author-boxarea">
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/team/team-img1.png' %}" alt="">
+            </div>
+            <div class="content-area">
+              <div class="text">
+                <a href="{% url 'institutional:team' %}">SR. Alex Robertson</a>
+                <div class="space8"></div>
+                <p>Head Of Cybersecurity</p>
+              </div>
+              <div class="icons">
+                <a href="#"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+              </div>
+            </div>
+            <ul>
+              <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="team-author-boxarea">
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/team/team-img2.png' %}" alt="">
+            </div>
+            <div class="content-area">
+              <div class="text">
+                <a href="{% url 'institutional:team' %}">Shelia Abernathy</a>
+                <div class="space8"></div>
+                <p>Sites, Videos e Marketing Digital</p>
+              </div>
+              <div class="icons">
+                <a href="#"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+              </div>
+            </div>
+            <ul>
+              <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
+          <div class="team-author-boxarea">
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/team/team-img3.png' %}" alt="">
+            </div>
+            <div class="content-area">
+              <div class="text">
+                <a href="{% url 'institutional:team' %}">Devin Romaguera</a>
+                <div class="space8"></div>
+                <p>Data Analytics Specialist</p>
+              </div>
+              <div class="icons">
+                <a href="#"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+              </div>
+            </div>
+            <ul>
+              <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== TEAM AREA ENDS =======-->
+
+  <!--===== TESTIMONIAL AREA STARTS =======-->
+  <div class="testimonial1-section-area sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 m-auto">
+          <div class="testimonial-header text-center heading2 space-margin60">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Testimonials</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Experience the Difference Through Our Clients' Eyes</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="img1 image-anime reveal">
+            <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img1.png' %}" alt="">
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="slider-galeria">
+            <div class="testimonial-slider-content-area">
+              <div class="testimonial-author-area">
+                <ul>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                </ul>
+                <div class="space16"></div>
+                <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
+                <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
+                <p>Partnering with ETech has transformed our IT Solution Their tailored solutions help streamline our operations, improve cybersecurity, and drive efficiency across the board. We've experienced fewer disruptions, faster an.”</p>
+              </div>
+              <div class="space60"></div>
+              <div class="testimonial-man-info-area">
+                <div class="man-images-text">
+                  <div class="mans-img">
+                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+                  </div>
+                  <div class="man-text">
+                    <a href="team1">Ben Stokes</a>
+                    <div class="space12"></div>
+                    <p>Owner Taxfirm</p>
+                  </div>
+                </div>
+                <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
+              </div>
+            </div>
+
+            <div class="testimonial-slider-content-area">
+              <div class="testimonial-author-area">
+                <ul>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                </ul>
+                <div class="space16"></div>
+                <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
+                <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
+                <p>Partnering with ETech has transformed our IT Solution Their tailored solutions help streamline our operations, improve cybersecurity, and drive efficiency across the board. We've experienced fewer disruptions, faster an.”</p>
+              </div>
+              <div class="space60"></div>
+              <div class="testimonial-man-info-area">
+                <div class="man-images-text">
+                  <div class="mans-img">
+                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
+                  </div>
+                  <div class="man-text">
+                    <a href="team1">Ben Stokes</a>
+                    <div class="space12"></div>
+                    <p>Owner Taxfirm</p>
+                  </div>
+                </div>
+                <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
+              </div>
+            </div>
+
+            <div class="testimonial-slider-content-area">
+              <div class="testimonial-author-area">
+                <ul>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                </ul>
+                <div class="space16"></div>
+                <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
+                <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
+                <p>Partnering with ETech has transformed our IT Solution Their tailored solutions help streamline our operations, improve cybersecurity, and drive efficiency across the board. We've experienced fewer disruptions, faster an.”</p>
+              </div>
+              <div class="space60"></div>
+              <div class="testimonial-man-info-area">
+                <div class="man-images-text">
+                  <div class="mans-img">
+                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
+                  </div>
+                  <div class="man-text">
+                    <a href="team1">Ben Stokes</a>
+                    <div class="space12"></div>
+                    <p>Owner Taxfirm</p>
+                  </div>
+                </div>
+                <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
+              </div>
+            </div>
+
+            <div class="testimonial-slider-content-area">
+              <div class="testimonial-author-area">
+                <ul>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                </ul>
+                <div class="space16"></div>
+                <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
+                <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
+                <p>Partnering with ETech has transformed our IT Solution Their tailored solutions help streamline our operations, improve cybersecurity, and drive efficiency across the board. We've experienced fewer disruptions, faster an.”</p>
+              </div>
+              <div class="space60"></div>
+              <div class="testimonial-man-info-area">
+                <div class="man-images-text">
+                  <div class="mans-img">
+                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
+                  </div>
+                  <div class="man-text">
+                    <a href="team1">Ben Stokes</a>
+                    <div class="space12"></div>
+                    <p>Owner Taxfirm</p>
+                  </div>
+                </div>
+                <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
+              </div>
+            </div>
+
+            <div class="testimonial-slider-content-area">
+              <div class="testimonial-author-area">
+                <ul>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
+                </ul>
+                <div class="space16"></div>
+                <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
+                <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
+                <p>Partnering with ETech has transformed our IT Solution Their tailored solutions help streamline our operations, improve cybersecurity, and drive efficiency across the board. We've experienced fewer disruptions, faster an.”</p>
+              </div>
+              <div class="space60"></div>
+              <div class="testimonial-man-info-area">
+                <div class="man-images-text">
+                  <div class="mans-img">
+                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+                  </div>
+                  <div class="man-text">
+                    <a href="team1">Ben Stokes</a>
+                    <div class="space12"></div>
+                    <p>Owner Taxfirm</p>
+                  </div>
+                </div>
+                <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-1">
+          <div class="slider-galeria-thumbs text-center d-lg-block d-none">
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+            </div>
+
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+            </div>
+
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
+            </div>
+            <div class="testimonial3-sliders-img">
+              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== TESTIMONIAL AREA ENDS =======-->
+{% endblock %}

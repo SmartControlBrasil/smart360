@@ -1,0 +1,8 @@
+from django.apps import AppConfig
+
+
+class AiKnowledgeGraphConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.ai_knowledge_graph"
+    verbose_name = "AI Knowledge Graph"
+

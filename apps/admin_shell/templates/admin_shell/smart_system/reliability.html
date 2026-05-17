@@ -1,0 +1,21 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="smart-system-page smart-system-page--reliability">
+    {% include "admin_shell/smart_system/_kpi_cards.html" with kpis=technical_kpis %}
+
+    {% include "admin_shell/smart_system/_section_card.html" with title="Indicadores TPM" subtitle="Leitura tecnica de performance, conformidade e qualidade de execucao." content_template="admin_shell/smart_system/_tpm_indicators.html" %}
+
+    <div class="smart-content-grid">
+        {% include "admin_shell/smart_system/_section_card.html" with title="Falhas recorrentes e confiabilidade" subtitle="Eventos reincidentes, ativos com maior incidencia e leitura RCM/TPM." content_template="admin_shell/components/reliability_widget.html" %}
+        {% include "admin_shell/smart_system/_section_card.html" with title="Aderencia ao plano preventivo" subtitle="Programacao preventiva, aderencia e proximas janelas tecnicas." content_template="admin_shell/components/preventive_schedule_widget.html" %}
+    </div>
+
+    <div class="smart-content-grid">
+        {% include "admin_shell/smart_system/_section_card.html" with title="Saude por ativos e areas" subtitle="Distribuicao operacional por criticidade e foco tecnico." content_template="admin_shell/components/asset_health_widget.html" %}
+        {% include "admin_shell/smart_system/_section_card.html" with title="Alertas de engenharia" subtitle="Nao conformidades, falhas criticas e itens de acompanhamento tecnico." content_template="admin_shell/smart_system/_alerts.html" alerts=engineering_alerts %}
+    </div>
+
+    {% include "admin_shell/smart_system/_section_card.html" with title="Visao por area / site / cliente" subtitle="Comparativo multisite com pendencias, criticidade e conformidade preventiva." content_template="admin_shell/components/site_status_table.html" %}
+</section>
+{% endblock %}

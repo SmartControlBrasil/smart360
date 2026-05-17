@@ -1,0 +1,9 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-panel">
+    <div class="section-heading"><h2>{{ page_title }}</h2></div>
+    <p>{{ page_description }}</p>
+    {% include "client_portal/components/client_alert_panel.html" with alerts=portal_notifications %}
+</section>
+{% endblock %}

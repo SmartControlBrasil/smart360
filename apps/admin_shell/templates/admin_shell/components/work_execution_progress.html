@@ -1,0 +1,50 @@
+{% if execution.operational_banner %}
+    <div class="technician-inline-alert {{ execution.operational_banner.tone }}">
+        <strong>{{ execution.operational_banner.title }}</strong>
+        <p>{{ execution.operational_banner.body }}</p>
+    </div>
+{% endif %}
+
+<div class="execution-operational-strip">
+    <div class="execution-strip-cell execution-strip-status">
+        <span class="execution-strip-label">Status atual</span>
+        <strong>{{ execution.status }}</strong>
+    </div>
+    <div class="execution-strip-cell execution-strip-hours">
+        <span class="execution-strip-label">Tempo trabalhado (registrado)</span>
+        <strong class="execution-hours-value">{{ execution.hours_total }}</strong>
+        <span class="execution-strip-hint">{{ execution.hours|length }} apontamento(s)</span>
+    </div>
+    <div class="execution-strip-cell execution-strip-checklist">
+        <span class="execution-strip-label">Checklist</span>
+        <strong>
+            {% if execution.checklist_execution.total_items %}
+                {{ execution.checklist_execution.responded_count }}/{{ execution.checklist_execution.total_items }} itens
+                ({{ execution.checklist_execution.pending_count }} pendente(s))
+            {% else %}
+                Sem itens
+            {% endif %}
+        </strong>
+        <span class="execution-strip-hint">{{ execution.checklist_execution.progress }}% concluido</span>
+    </div>
+    <div class="execution-strip-cell execution-strip-notes">
+        <span class="execution-strip-label">Observacoes de andamento</span>
+        <p class="execution-strip-notes-body">{% if execution.diagnosis.operational_notes %}{{ execution.diagnosis.operational_notes|truncatechars:220 }}{% else %}Nenhuma nota de andamento registrada.{% endif %}</p>
+    </div>
+</div>
+
+<div class="execution-progress-panel">
+    <div class="execution-progress-top">
+        <strong>{{ execution.progress }}%</strong>
+        <span>{{ execution.status }}</span>
+    </div>
+    <div class="execution-progress-bar">
+        <span style="width: {{ execution.progress }}%;"></span>
+    </div>
+</div>
+
+<div class="asset-summary-grid checklist-summary-grid">
+    {% for card in execution.progress_cards %}
+        {% include "admin_shell/components/work_order_summary_panel.html" with card=card %}
+    {% endfor %}
+</div>

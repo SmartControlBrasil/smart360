@@ -1,0 +1,11 @@
+<div class="risk-panel">
+    <article><span>Checklist</span><strong>{{ preventive_plan.checklist_panel.name }}</strong></article>
+    <article><span>Itens</span><strong>{{ preventive_plan.checklist_panel.items }}</strong></article>
+    <article><span>Status</span><strong>{{ preventive_plan.checklist_panel.status }}</strong></article>
+    <article><span>Ultima atualizacao</span><strong>{{ preventive_plan.checklist_panel.updated_at }}</strong></article>
+</div>
+<div class="action-shortcuts-grid single-column">
+    {% for action in preventive_plan.checklist_panel.actions %}
+        {% include "admin_shell/components/quick_action_button.html" with action=action %}
+    {% endfor %}
+</div>

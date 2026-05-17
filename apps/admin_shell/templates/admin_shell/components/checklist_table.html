@@ -1,0 +1,38 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table checklist-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Aplicação</th>
+                <th>Categoria</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for checklist in checklists|slice:":120" %}
+                <tr>
+                    <td>
+                        <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-checklist-detail' checklist_code=checklist.code %}">{{ checklist.name }}</a>
+                    </td>
+                    <td>{{ checklist.description|default:"—" }}</td>
+                    <td>{{ checklist.application_label }}</td>
+                    <td>{{ checklist.category|default:"—" }}</td>
+                    <td>{% include "admin_shell/components/checklist_status_badge.html" with value=checklist.status_slug %}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:smart-system-checklist-detail' checklist_code=checklist.code %}">Detalhar</a>
+                            <a href="{% url 'admin-shell:smart-system-checklist-update' checklist_code=checklist.code %}">Editar</a>
+                            <a href="{% url 'admin-shell:smart-system-checklist-deactivate' checklist_code=checklist.code %}">Desativar</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state-cell">Nenhum checklist encontrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

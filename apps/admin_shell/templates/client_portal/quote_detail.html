@@ -1,0 +1,83 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Resumo do orcamento</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Codigo</dt><dd>{{ quote.quote_number }}</dd></div>
+            <div><dt>Status</dt><dd>{{ quote.get_status_display }}</dd></div>
+            <div><dt>OS</dt><dd>{{ quote.work_order.order_number }}</dd></div>
+            <div><dt>Ativo</dt><dd>{% if quote.asset %}{{ quote.asset.asset_tag }} - {{ quote.asset.name }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Unidade</dt><dd>{{ quote.operational_site.name|default:"-" }}</dd></div>
+            <div><dt>Total pecas</dt><dd>R$ {{ quote.total_parts }}</dd></div>
+            <div><dt>Total servico</dt><dd>R$ {{ quote.total_labor }}</dd></div>
+            <div><dt>Total geral</dt><dd>R$ {{ quote.total_value }}</dd></div>
+        </dl>
+        {% if quote.customer_message %}
+            <p>{{ quote.customer_message }}</p>
+        {% endif %}
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Decisao do cliente</h2></div>
+        {% if quote.status == "sent" %}
+            <form method="post" action="{% url 'admin-shell:client-portal-quote-approve' quote_number=quote.quote_number %}" class="stack-list">
+                {% csrf_token %}
+                {{ quote_decision_form.signer_name.label_tag }}
+                {{ quote_decision_form.signer_name }}
+                {{ quote_decision_form.notes.label_tag }}
+                {{ quote_decision_form.notes }}
+                <button type="submit" class="quick-action-button">Aprovar orcamento</button>
+            </form>
+            <hr>
+            <form method="post" action="{% url 'admin-shell:client-portal-quote-reject' quote_number=quote.quote_number %}" class="stack-list">
+                {% csrf_token %}
+                {{ quote_decision_form.signer_name.label_tag }}
+                {{ quote_decision_form.signer_name }}
+                {{ quote_decision_form.rejection_reason.label_tag }}
+                {{ quote_decision_form.rejection_reason }}
+                <button type="submit" class="quick-action-button">Rejeitar orcamento</button>
+            </form>
+        {% else %}
+            <dl class="detail-grid">
+                <div><dt>Responsavel</dt><dd>{{ quote.approved_by_name|default:"-" }}</dd></div>
+                <div><dt>Aprovado em</dt><dd>{% if quote.approved_at %}{{ quote.approved_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+                <div><dt>Rejeitado em</dt><dd>{% if quote.rejected_at %}{{ quote.rejected_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+                <div><dt>Observacoes</dt><dd>{{ quote.approval_notes|default:quote.rejection_reason|default:"-" }}</dd></div>
+            </dl>
+        {% endif %}
+    </article>
+</section>
+
+<section class="content-panel">
+    <div class="section-heading"><h2>Itens do orcamento</h2></div>
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Descricao</th>
+                    <th>Referencia</th>
+                    <th>Quantidade</th>
+                    <th>Valor unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in quote_items %}
+                    <tr>
+                        <td>{{ item.get_item_type_display }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.part_reference|default:"-" }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>R$ {{ item.unit_price }}</td>
+                        <td>R$ {{ item.total_price }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6">Nenhum item registrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

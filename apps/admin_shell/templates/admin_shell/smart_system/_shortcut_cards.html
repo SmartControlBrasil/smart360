@@ -1,0 +1,15 @@
+<div class="smart-shortcut-grid">
+    {% for item in shortcuts %}
+        {% if item.route_name %}
+            <a class="action-shortcut tone-{{ item.tone }}" href="{% url item.route_name %}">
+                <strong>{{ item.label }}</strong>
+                <p>{{ item.context }}</p>
+            </a>
+        {% else %}
+            <a class="action-shortcut tone-{{ item.tone }}" href="{{ item.href }}">
+                <strong>{{ item.label }}</strong>
+                <p>{{ item.context }}</p>
+            </a>
+        {% endif %}
+    {% endfor %}
+</div>

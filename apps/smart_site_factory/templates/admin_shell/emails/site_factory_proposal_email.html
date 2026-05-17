@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Proposta comercial — projeto #{{ order.id }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f6fb;font-family:Segoe UI,Helvetica Neue,sans-serif;color:#172033;line-height:1.5;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f6fb;padding:24px 12px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;border:1px solid #dbe4f0;overflow:hidden;">
+                    <tr>
+                        <td style="padding:28px 28px 12px;">
+                            <p style="margin:0 0 12px;font-size:15px;">Ola{% if greeting_name %}, {{ greeting_name }}{% endif %}.</p>
+                            <p style="margin:0 0 16px;font-size:15px;">
+                                Segue o resumo da <strong>proposta comercial</strong> do <strong>Smart Site Factory</strong>
+                                para <strong>{{ client_company_display }}</strong> (projeto #{{ order.id }}).
+                            </p>
+                            {% if commercial_package %}
+                                <h2 style="margin:20px 0 8px;font-size:17px;">Pacote</h2>
+                                <p style="margin:0 0 6px;font-size:15px;"><strong>{{ commercial_package.commercial_name|default:"Pacote" }}</strong></p>
+                                {% if commercial_package.tier %}<p style="margin:0 0 12px;font-size:14px;color:#637089;">Nivel: {{ commercial_package.tier }}</p>{% endif %}
+                                {% if commercial_package.deliverables %}
+                                    <p style="margin:12px 0 6px;font-size:14px;font-weight:bold;">Entregaveis</p>
+                                    <ul style="margin:0 0 12px;padding-left:20px;font-size:14px;">
+                                        {% for item in commercial_package.deliverables %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% if commercial_package.upsells %}
+                                    <p style="margin:12px 0 6px;font-size:14px;font-weight:bold;">Opcionais / upsells</p>
+                                    <ul style="margin:12px 0;padding-left:20px;font-size:14px;">
+                                        {% for item in commercial_package.upsells %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% else %}
+                                <p style="margin:12px 0;font-size:15px;">Pacote conforme template e escopo acordados no pedido.</p>
+                            {% endif %}
+
+                            <h2 style="margin:20px 0 8px;font-size:17px;">Investimento</h2>
+                            <p style="margin:0 0 8px;font-size:18px;font-weight:bold;">Total: R$ {{ proposal_price|floatformat:2 }}</p>
+                            <p style="margin:0 0 16px;font-size:14px;color:#637089;">
+                                Entrada (50%): R$ {{ deposit_amount|floatformat:2 }} · Saldo na entrega (50%): R$ {{ balance_amount|floatformat:2 }}
+                            </p>
+
+                            <h2 style="margin:20px 0 8px;font-size:17px;">Condicoes principais</h2>
+                            <ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#374151;">
+                                <li>Validade da proposta: <strong>7 dias</strong> ate {{ proposal_valid_until|date:"d/m/Y" }}.</li>
+                                <li>Pagamento: <strong>50%</strong> na aceitacao e <strong>50%</strong> na entrega homologada.</li>
+                                <li>Hospedagem e dominio nao inclusos, salvo contrato especifico.</li>
+                                <li>Manutencao mensal opcional.</li>
+                            </ul>
+
+                            <p style="margin:20px 0 12px;font-size:15px;">
+                                <a href="{{ proposal_absolute_url }}" style="color:#1d4ed8;font-weight:bold;">Ver proposta online no sistema</a>
+                                (acesso conforme suas credenciais SMART360).
+                            </p>
+
+                            <p style="margin:24px 0 0;font-size:13px;color:#637089;">
+                                SMART360 · Smart Site Factory<br>
+                                Smart Control Brasil
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

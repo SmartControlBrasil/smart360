@@ -1,0 +1,8 @@
+<div class="asset-technical-grid">
+    {% for item in failure.diagnosis_panel %}
+        <article class="technical-stat {% if item.label == 'Descricao do diagnostico' or item.label == 'Hipoteses avaliadas' or item.label == 'Evidencias' %}technical-stat-wide{% endif %}">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+        </article>
+    {% endfor %}
+</div>

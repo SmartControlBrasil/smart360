@@ -1,0 +1,23 @@
+<form method="post" class="portal-form">
+    {% csrf_token %}
+    <div class="portal-form-grid">
+        {% for field in form %}
+            <div class="portal-form-field {% if field.name == 'description' %}is-full{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    {% for error in form.non_field_errors %}
+        <p class="form-error">{{ error }}</p>
+    {% endfor %}
+    <div class="page-actions">
+        <button type="submit" class="quick-action-button">Enviar solicitacao</button>
+    </div>
+</form>

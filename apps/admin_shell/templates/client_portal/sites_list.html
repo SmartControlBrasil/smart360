@@ -1,0 +1,23 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-panel">
+    <div class="section-heading"><h2>Unidades monitoradas</h2></div>
+    <div class="card-grid two-column">
+        {% for row in site_cards %}
+            <article class="feature-card">
+                <span class="eyebrow">{{ row.site.code|default:"SITE" }}</span>
+                <h3>{{ row.site.name }}</h3>
+                <p>{{ row.site.city }}{% if row.site.state %} / {{ row.site.state }}{% endif %}</p>
+                <ul class="feature-list">
+                    <li>{{ row.asset_count }} ativos</li>
+                    <li>{{ row.open_orders }} OS abertas</li>
+                    <li>{{ row.due_preventives }} preventivas vencidas</li>
+                </ul>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhuma unidade encontrada no escopo atual.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

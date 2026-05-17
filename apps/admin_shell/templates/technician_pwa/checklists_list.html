@@ -1,0 +1,18 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-card-list">
+    {% for item in checklist_cards %}
+        <article class="technician-service-card">
+            <div class="service-card-top">
+                <strong>{{ item.checklist_code }}</strong>
+                <span class="service-status">{{ item.progress }}%</span>
+            </div>
+            <h3><a href="{{ item.execute_url }}">{{ item.title }}</a></h3>
+            <p>{{ item.asset_code }} • {{ item.status }}</p>
+        </article>
+    {% empty %}
+        <p class="empty-state">Nenhum checklist pendente para este tecnico.</p>
+    {% endfor %}
+</section>
+{% endblock %}

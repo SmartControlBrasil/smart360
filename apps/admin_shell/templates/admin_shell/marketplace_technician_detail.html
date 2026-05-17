@@ -1,0 +1,20 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="content-grid">
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title=technician.display_name subtitle=technician.company.name|default:"Tecnico independente" content_template="admin_shell/components/marketplace_technician_profile_panel.html" %}
+        </div>
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Historico de atribuicoes" subtitle="Demandas executadas, aceites recentes e vinculo com OS operacionais." content_template="admin_shell/components/marketplace_technician_assignment_history.html" %}
+        </div>
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Especialidades e cobertura" subtitle="Competencias tecnicas, regioes e disponibilidade de atendimento." content_template="admin_shell/components/marketplace_technician_specialties.html" %}
+        </div>
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Avaliacoes recentes" subtitle="Reputacao pos-servico e comentarios das empresas." content_template="admin_shell/components/marketplace_technician_reviews.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

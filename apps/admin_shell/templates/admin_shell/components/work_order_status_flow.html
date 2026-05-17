@@ -1,0 +1,8 @@
+<div class="status-flow">
+    {% for step in work_order.status_flow_steps %}
+        <div class="status-flow-step is-{{ step.state }}">
+            <div class="status-flow-node"></div>
+            <strong>{{ step.label }}</strong>
+        </div>
+    {% endfor %}
+</div>

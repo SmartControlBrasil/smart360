@@ -1,0 +1,96 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="summary-grid">
+    {% for item in dashboard_kpis %}
+        {% include "client_portal/components/client_kpi_card.html" %}
+    {% endfor %}
+</section>
+
+{% include "client_portal/components/client_alert_panel.html" with alerts=portal_alerts title="Contexto e alertas do portal" %}
+
+<section class="content-panel">
+    <div class="section-heading"><h2>Briefing do dia</h2></div>
+    {% if latest_briefing %}
+        <article class="stack-card">
+            <strong>{{ latest_briefing.title }}</strong>
+            <p>{{ latest_briefing.summary }}</p>
+            <a href="{% url 'admin-shell:client-portal-briefing-detail' briefing_id=latest_briefing.public_id %}">Abrir briefing</a>
+        </article>
+    {% else %}
+        <p class="empty-state">Nenhum briefing diario disponivel para o portal neste momento.</p>
+    {% endif %}
+</section>
+
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Ordens de servico recentes</h2></div>
+        <div class="stack-list">
+            {% for order in dashboard_recent_orders %}
+                <article class="stack-card">
+                    <strong>{{ order.code }} - {{ order.title }}</strong>
+                    <p>{{ order.asset }} • {{ order.site }} • {{ order.status }}</p>
+                    <span>{{ order.opened_at }}</span>
+                </article>
+            {% empty %}
+                <p class="empty-state">Nenhuma ordem recente para o contexto atual.</p>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Solicitacoes recentes</h2></div>
+        <div class="stack-list">
+            {% for item in dashboard_recent_requests %}
+                <article class="stack-card">
+                    <strong><a href="{% url 'admin-shell:client-portal-request-detail' protocol_number=item.protocol_number %}">{{ item.protocol_number }}</a></strong>
+                    <p>{{ item.title }} • {{ item.get_status_display }}</p>
+                    <span>{{ item.created_at|date:"d/m/Y H:i" }}</span>
+                </article>
+            {% empty %}
+                <p class="empty-state">Nenhuma solicitacao aberta recentemente.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Relatorios recentes</h2></div>
+        {% include "client_portal/components/client_report_table.html" with report_records=dashboard_recent_reports %}
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Visao por unidade</h2></div>
+        <div class="stack-list">
+            {% for row in dashboard_sites %}
+                <article class="stack-card">
+                    <strong>{{ row.name }}</strong>
+                    <p>{{ row.assets }} ativos • {{ row.open_orders }} OS abertas • {{ row.due_preventives }} preventivas vencidas</p>
+                    <span>{{ row.city }}</span>
+                </article>
+            {% empty %}
+                <p class="empty-state">Nenhuma unidade vinculada ao contexto atual.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+<section class="content-panel">
+    <div class="section-heading"><h2>Orcamentos aguardando decisao</h2></div>
+    {% include "client_portal/components/client_quote_table.html" with quote_records=dashboard_pending_quotes %}
+</section>
+
+<section class="content-panel">
+    <div class="section-heading"><h2>Contratos ativos</h2></div>
+    <div class="stack-list">
+        {% for contract in dashboard_contracts %}
+            <article class="stack-card">
+                <strong><a href="{% url 'admin-shell:client-portal-contract-detail' contract_number=contract.contract_number %}">{{ contract.contract_number }}</a></strong>
+                <p>{{ contract.get_status_display }} • R$ {{ contract.contract_value }} • {{ contract.operational_site.name|default:"todas as unidades" }}</p>
+                <span>Próxima cobrança: {{ contract.next_billing_date|date:"d/m/Y"|default:"-" }}</span>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhum contrato ativo no contexto atual.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

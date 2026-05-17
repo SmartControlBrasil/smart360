@@ -1,0 +1,28 @@
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Agente</th>
+                <th>Trigger</th>
+                <th>Tenant</th>
+                <th>Status</th>
+                <th>Inicio</th>
+                <th>Duracao</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for run in runs %}
+                <tr>
+                    <td>{{ run.agent.name }}</td>
+                    <td>{{ run.get_trigger_type_display }}</td>
+                    <td>{{ run.company.name|default:"Plataforma" }}</td>
+                    <td>{{ run.get_status_display }}</td>
+                    <td>{{ run.started_at|default:run.created_at }}</td>
+                    <td>{{ run.duration_ms|default:"-" }} ms</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Nenhuma execucao registrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

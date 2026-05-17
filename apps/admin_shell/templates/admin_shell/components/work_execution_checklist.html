@@ -1,0 +1,72 @@
+{% if execution.checklist %}
+    {% if execution.checklist_execution.total_items %}
+        <div class="checklist-progress-summary" role="status">
+            <strong>{{ execution.checklist_execution.progress }}%</strong>
+            <span class="checklist-progress-detail">
+                {{ execution.checklist_execution.responded_count }} de {{ execution.checklist_execution.total_items }} itens respondidos
+                · {{ execution.checklist_execution.pending_count }} pendente(s)
+                · {{ execution.checklist_execution.ok_count }} OK / {{ execution.checklist_execution.nok_count }} NOK / {{ execution.checklist_execution.na_count }} N/A
+            </span>
+        </div>
+    {% endif %}
+    {% if execution.execution_readonly %}
+        <div class="checklist-execution-items">
+            {% for item in execution.checklist_execution.items %}
+                {% include "admin_shell/components/checklist_execution_item.html" with item=item %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <form method="post" action="{{ execution.checklist_save_url }}" class="checklist-execution-form">
+            {% csrf_token %}
+            <input type="hidden" name="checklist_id" value="{{ execution.checklist.id }}">
+            <div class="checklist-execution-items">
+                {% for item in execution.checklist_execution.items %}
+                    <article class="checklist-execution-item {% if item.response == 'NOK' %}is-nok{% elif item.response == 'OK' %}is-ok{% endif %}">
+                        <header>
+                            <div>
+                                <span class="checklist-item-order">#{{ item.order }}</span>
+                                <h3>{{ item.title }}</h3>
+                                <p>{{ item.description }}</p>
+                            </div>
+                            <div class="checklist-item-meta">
+                                {% if item.required %}<span class="status-badge status-red">Obrigatorio</span>{% endif %}
+                            </div>
+                        </header>
+                        <div class="checklist-item-detail-grid">
+                            <div>
+                                <strong>Instrucao</strong>
+                                <p>{{ item.instruction }}</p>
+                            </div>
+                            <div>
+                                <strong>Resposta</strong>
+                                {% if item.item_type == "boolean" %}
+                                    <div class="response-pill-row">
+                                        <label><input type="radio" name="item_{{ item.id }}_response" value="OK" {% if item.response == "OK" %}checked{% endif %}> OK</label>
+                                        <label><input type="radio" name="item_{{ item.id }}_response" value="NOK" {% if item.response == "NOK" %}checked{% endif %}> NOK</label>
+                                        <label><input type="radio" name="item_{{ item.id }}_response" value="NA" {% if item.response == "N/A" or item.response == "NA" %}checked{% endif %}> N/A</label>
+                                    </div>
+                                {% elif item.item_type == "number" %}
+                                    <input type="number" step="any" name="item_{{ item.id }}_number" value="{% if item.response_number is not None %}{{ item.response_number }}{% endif %}">
+                                {% elif item.item_type == "choice" %}
+                                    <input type="text" name="item_{{ item.id }}_choice" value="{{ item.response_choice }}">
+                                {% else %}
+                                    <textarea name="item_{{ item.id }}_text" rows="2" placeholder="Resposta em texto">{{ item.response_text }}</textarea>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <strong>Observacao</strong>
+                                <textarea name="item_{{ item.id }}_note" rows="2" placeholder="Observacao do item">{{ item.note }}</textarea>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+            <button type="submit" class="quick-action-button">Salvar checklist</button>
+        </form>
+    {% endif %}
+{% else %}
+    <div class="placeholder-panel">
+        <h3>Sem checklist vinculado</h3>
+        <p>Esta OS ainda nao possui checklist executavel associado ao plano de manutencao.</p>
+    </div>
+{% endif %}

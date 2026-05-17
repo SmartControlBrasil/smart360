@@ -1,0 +1,9 @@
+<span class="status-badge checklist-status status-{{ value|slugify }}">
+    {% if value == "active" or value == "ativo" %}
+        Ativo
+    {% elif value == "inactive" or value == "inativo" %}
+        Inativo
+    {% else %}
+        {{ value }}
+    {% endif %}
+</span>

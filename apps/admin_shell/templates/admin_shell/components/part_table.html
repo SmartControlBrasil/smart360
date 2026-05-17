@@ -1,0 +1,45 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table part-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Peca</th>
+                <th>Categoria</th>
+                <th>Estoque atual</th>
+                <th>Estoque minimo</th>
+                <th>Localizacao</th>
+                <th>Fornecedor</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for part in parts %}
+                <tr class="{% if part.is_critical_stock %}is-critical-row{% endif %}">
+                    <td><strong>{{ part.code }}</strong></td>
+                    <td>
+                        <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-part-detail' part_code=part.code %}">{{ part.name }}</a>
+                        <small>{{ part.description }}</small>
+                    </td>
+                    <td>{{ part.category }}</td>
+                    <td>{{ part.stock_current }} {{ part.unit }}</td>
+                    <td>{{ part.stock_min }} {{ part.unit }}</td>
+                    <td>{{ part.location }}</td>
+                    <td>{{ part.supplier }}</td>
+                    <td>{% include "admin_shell/components/stock_alert_badge.html" with value=part.status %}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:smart-system-part-detail' part_code=part.code %}">Detalhe</a>
+                            <a href="{% url 'admin-shell:smart-system-part-update' part_code=part.code %}">Editar</a>
+                            <a href="{% url 'admin-shell:smart-system-part-deactivate' part_code=part.code %}">Desativar</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="empty-state-cell">Nenhuma peca encontrada.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

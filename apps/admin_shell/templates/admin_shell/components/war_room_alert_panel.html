@@ -1,0 +1,10 @@
+<article class="war-room-item war-room-item--{{ item.severity|default:'info' }}">
+    <header>
+        <strong>{{ item.title }}</strong>
+        <span>{{ item.meta }}</span>
+    </header>
+    <p>{{ item.summary }}</p>
+    {% if item.href %}
+        <a class="war-room-link" href="{{ item.href }}">Abrir contexto</a>
+    {% endif %}
+</article>

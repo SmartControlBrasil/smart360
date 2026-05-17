@@ -1,0 +1,22 @@
+<div class="marketplace-card-list">
+    <article class="marketplace-card">
+        <h3>Especialidades</h3>
+        <div class="marketplace-tag-row">
+            {% for skill in specialties %}
+                <span class="status-badge status-emerald">{{ skill.skill.name }}</span>
+            {% empty %}
+                <span class="status-badge status-slate">Sem especialidades cadastradas</span>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="marketplace-card">
+        <h3>Regioes de atendimento</h3>
+        <ul class="marketplace-metadata">
+            {% for region in service_regions %}
+                <li>{{ region.service_region.name }} • {{ region.get_coverage_type_display }}</li>
+            {% empty %}
+                <li>Sem regioes vinculadas.</li>
+            {% endfor %}
+        </ul>
+    </article>
+</div>

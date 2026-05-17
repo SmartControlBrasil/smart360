@@ -1,0 +1,337 @@
+{% load static %}
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="content-grid two-column copilot-layout">
+    <div>
+        <div class="panel-card copilot-panel">
+            <h2>Conversa atual</h2>
+            <p>Pergunte sobre operacao, agenda, margem, marketplace, anomalias e recomendacoes no escopo ativo.</p>
+            <form id="manager-copilot-form" class="copilot-input-form">
+                {% csrf_token %}
+                <input
+                    id="manager-copilot-query"
+                    type="text"
+                    name="query"
+                    value="{{ copilot_seed_context.question|default:'' }}"
+                    placeholder="Ex.: Quais sao os maiores riscos operacionais hoje?"
+                >
+                <button id="manager-copilot-submit" class="quick-action-button" type="submit">Perguntar</button>
+            </form>
+            <div id="manager-copilot-status" class="copilot-status" hidden>Consultando contexto operacional...</div>
+        </div>
+
+        <div class="copilot-conversation" id="manager-copilot-conversation">
+            {% for message in copilot_messages %}
+                <article class="copilot-message copilot-message--{{ message.role }}">
+                    <header>
+                        <strong>{% if message.role == "assistant" %}SMART360 Copilot{% elif message.role == "user" %}Gestor{% else %}Sistema{% endif %}</strong>
+                        <small>{{ message.created_at|date:"d/m/Y H:i" }}</small>
+                    </header>
+                    <p>{{ message.content }}</p>
+                    {% if message.role == "assistant" and message.structured_payload.priorities %}
+                        <ul class="copilot-inline-list">
+                            {% for item in message.structured_payload.priorities %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <article class="copilot-message copilot-message--assistant">
+                    <header>
+                        <strong>SMART360 Copilot</strong>
+                    </header>
+                    <p>Estou pronto para resumir riscos, explicar recomendacoes e priorizar a operacao dentro do seu tenant.</p>
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Sugestoes contextuais</h2>
+            <div class="copilot-suggestions" id="manager-copilot-suggestions">
+                {% for suggestion in copilot_suggestions %}
+                    <button class="quick-action-button quick-action-button--ghost copilot-suggestion" type="button" data-query="{{ suggestion }}">{{ suggestion }}</button>
+                {% empty %}
+                    <span class="empty-state">Nenhuma sugestao disponivel.</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Recomendacoes quentes</h2>
+            <div class="event-feed">
+                {% for recommendation in copilot_recommendation_cards %}
+                    <article class="event-row tone-{{ recommendation.severity }}">
+                        <strong>{{ recommendation.title }}</strong>
+                        <p>{{ recommendation.summary }}</p>
+                        <small>{{ recommendation.agent_name }} • {{ recommendation.priority|title }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma recomendacao relevante no escopo atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% with voiceops_bootstrap_id="manager-voiceops-bootstrap" voiceops_title="VoiceOps Executivo" voiceops_persona="manager" voiceops_description="Pergunte por voz sobre risco, backlog, decisoes pendentes, agenda e saude da operacao." voiceops_placeholder="Ex.: o que esta critico hoje? tem decisao pendente?" voiceops_tts_enabled=True voiceops_empty_message="As respostas executivas por voz aparecem aqui." %}
+            {% include "admin_shell/components/voiceops_widget.html" %}
+        {% endwith %}
+    </div>
+
+    <div>
+        <div class="content-grid">
+            <div class="column-span-6">
+                <div class="panel-card copilot-panel">
+                    <h2>Contexto atual</h2>
+                    <div class="summary-grid">
+                        <article class="summary-card tone-neutral">
+                            <span>Empresa</span>
+                            <strong>{{ company.name|default:"Selecione uma empresa" }}</strong>
+                            <small>Escopo seguro do copiloto</small>
+                        </article>
+                        <article class="summary-card tone-neutral">
+                            <span>Unidade</span>
+                            <strong>{{ copilot_context.site_name|default:"Todas" }}</strong>
+                            <small>{{ copilot_context.period.label|default:"Periodo atual" }}</small>
+                        </article>
+                        <article class="summary-card tone-warning">
+                            <span>Intencao</span>
+                            <strong>{{ copilot_context.intent|default:"executive_summary" }}</strong>
+                            <small>Classificador simples e auditavel</small>
+                        </article>
+                        <article class="summary-card tone-neutral">
+                            <span>Sessao</span>
+                            <strong>{{ copilot_session.message_count }}</strong>
+                            <small>Mensagens nesta conversa</small>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <div class="column-span-6">
+                <div class="panel-card copilot-panel">
+                    <h2>Sessoes recentes</h2>
+                    <div class="event-feed">
+                        {% for session in copilot_recent_sessions %}
+                            <article class="event-row tone-neutral">
+                                <strong><a href="{% url 'admin-shell:ai-manager-copilot' %}?session={{ session.public_id }}">{{ session.title|default:"Copilot" }}</a></strong>
+                                <p>{{ session.last_query|default:"Sem pergunta registrada." }}</p>
+                                <small>{{ session.last_activity_at|date:"d/m/Y H:i" }} • {{ session.get_status_display }}</small>
+                            </article>
+                        {% empty %}
+                            <p class="empty-state">Nenhuma sessao anterior encontrada.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Decisoes pendentes</h2>
+            <div class="event-feed">
+                {% for proposal in copilot_pending_proposals %}
+                    <article class="event-row tone-warning">
+                        <strong>{{ proposal.agent_action_proposal.title|default:proposal.normalized_action_type }}</strong>
+                        <p>{{ proposal.agent_action_proposal.summary|default:proposal.decision_reason }}</p>
+                        <small>{{ proposal.agent_action_proposal.agent_run.agent.name }} • {{ proposal.risk_level|title }} • {{ proposal.policy_applied.name|default:"Sem policy" }}</small>
+                        {% if proposal.decision_status == "awaiting_approval" or proposal.decision_status == "escalated" %}
+                            <div class="copilot-approval-actions">
+                                <form method="post" action="{% url 'admin-shell:ai-decision-approve' decision_id=proposal.public_id %}">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button" type="submit">Aprovar</button>
+                                </form>
+                                <form method="post" action="{% url 'admin-shell:ai-decision-reject' decision_id=proposal.public_id %}">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button quick-action-button--ghost" type="submit">Rejeitar</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma decisao pendente no contexto atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Simulacoes recentes</h2>
+            <div class="event-feed">
+                {% for simulation in copilot_recent_simulations %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ simulation.scenario.simulation_type.name }}</strong>
+                        <p>{{ simulation.result.summary|default:"Sem resumo consolidado." }}</p>
+                        <small>{{ simulation.result.confidence_level|default:"-" }} • impacto {{ simulation.result.impact_score|default:"0" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma simulacao recente no contexto atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Digital Twins recentes</h2>
+            <div class="event-feed">
+                {% for twin in copilot_twin_cards %}
+                    <article class="event-row tone-{{ twin.risk_level|default:'neutral' }}">
+                        <strong>
+                            <a href="{% url 'admin-shell:ai-digital-twin-center' %}?twin={{ twin.public_id }}">
+                                {% if twin.site %}{{ twin.site.name }}{% else %}{{ twin.asset.name }}{% endif %}
+                            </a>
+                        </strong>
+                        <p>{{ twin.current_state_summary|default:"Twin pronto para consulta contextual." }}</p>
+                        <small>{{ twin.get_twin_type_display }} • risco {{ twin.risk_level }} • {{ twin.last_projected_at|date:"d/m/Y H:i" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum twin recente no contexto atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Graph Insights</h2>
+            <div class="event-feed">
+                {% for item in copilot_graph_cards %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ item.node.label }}</strong>
+                        <p>{{ item.summary }}</p>
+                        <small>{{ item.node.node_type }} • {{ item.context_count }} relacoes</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum insight relacional no contexto atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Otimizacoes recentes</h2>
+            <div class="event-feed">
+                {% for proposal in copilot_recent_optimization_proposals %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ proposal.proposal_type }}</strong>
+                        <p>{{ proposal.expected_impact_summary|default:proposal.rationale }}</p>
+                        <small>{{ proposal.status }} • {{ proposal.risk_level }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma proposal de otimização recente no contexto atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-card copilot-panel">
+            <h2>Experimentos recentes</h2>
+            <div class="event-feed">
+                {% for experiment in copilot_recent_experiments %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ experiment.name }}</strong>
+                        <p>{{ experiment.result.summary|default:experiment.description|default:"Experimento em andamento." }}</p>
+                        <small>{{ experiment.status }} • vencedor {{ experiment.winner_variant.name|default:"-" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum experimento recente no contexto atual.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(() => {
+    const form = document.getElementById("manager-copilot-form");
+    const queryInput = document.getElementById("manager-copilot-query");
+    const statusEl = document.getElementById("manager-copilot-status");
+    const submitButton = document.getElementById("manager-copilot-submit");
+    const suggestionButtons = document.querySelectorAll(".copilot-suggestion");
+    const seedQuestion = "{{ copilot_seed_context.question|default:''|escapejs }}";
+    const sessionPublicId = "{{ copilot_session.public_id|default:'' }}";
+    const assetSeed = "{{ copilot_seed_context.asset|default:''|escapejs }}";
+    const clientSeed = "{{ copilot_seed_context.client|default:''|escapejs }}";
+    const contractSeed = "{{ copilot_seed_context.contract|default:''|escapejs }}";
+    const technicianSeed = "{{ copilot_seed_context.technician|default:''|escapejs }}";
+    const siteSeed = "{{ copilot_seed_context.site|default:''|escapejs }}";
+    const companyId = "{{ company.id|default:'' }}";
+    const siteId = "{{ site.id|default:'' }}";
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(";").shift();
+        }
+        return "";
+    }
+
+    async function sendQuery(query) {
+        if (!query) {
+            return;
+        }
+        statusEl.hidden = false;
+        submitButton.disabled = true;
+        const payload = {
+            query,
+            session_public_id: sessionPublicId || null,
+            context_seed: {
+                asset: assetSeed,
+                client: clientSeed,
+                contract: contractSeed,
+                technician: technicianSeed,
+                site: siteSeed,
+            },
+        };
+        if (companyId) {
+            payload.company = companyId;
+        }
+        if (siteId) {
+            payload.site = siteId;
+        }
+        const response = await fetch("{% url 'ai-agent-copilot-query' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify(payload),
+        });
+        statusEl.hidden = true;
+        submitButton.disabled = false;
+        if (!response.ok) {
+            statusEl.hidden = false;
+            statusEl.textContent = "Nao foi possivel consultar o copiloto agora.";
+            return;
+        }
+        const data = await response.json();
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("session", data.session.public_id);
+        window.location.href = nextUrl.toString();
+    }
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        sendQuery(queryInput.value.trim());
+    });
+
+    suggestionButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            queryInput.value = button.dataset.query;
+            sendQuery(button.dataset.query);
+        });
+    });
+
+    if (seedQuestion && !window.location.search.includes("session=")) {
+        sendQuery(seedQuestion);
+    }
+})();
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script id="manager-voiceops-bootstrap" type="application/json">
+{
+  "persona": "manager",
+  "channel": "desktop",
+  "locale": "pt-BR",
+  "processUrl": "/api/v1/ai-voiceops/process/",
+  "refreshOnSuccess": false
+}
+</script>
+<script src="{% static 'smart360/js/voiceops.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,28 @@
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Plano</th>
+                <th>Ativo</th>
+                <th>Unidade</th>
+                <th>Frequencia</th>
+                <th>Proxima execucao</th>
+                <th>Checklist</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in preventive_records %}
+                <tr>
+                    <td><a href="{% url 'admin-shell:client-portal-preventive-detail' public_id=plan.public_id %}">{{ plan.name }}</a></td>
+                    <td>{% if plan.asset %}{{ plan.asset.asset_tag }} - {{ plan.asset.name }}{% else %}Categoria {{ plan.category.name }}{% endif %}</td>
+                    <td>{% if plan.operational_site %}{{ plan.operational_site.name }}{% else %}-{% endif %}</td>
+                    <td>{{ plan.get_frequency_type_display }} / {{ plan.frequency_value }}</td>
+                    <td>{% if plan.next_due_date %}{{ plan.next_due_date|date:"d/m/Y" }}{% else %}-{% endif %}</td>
+                    <td>{% if plan.checklist %}{{ plan.checklist.name }}{% else %}Nao vinculado{% endif %}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Nenhum plano preventivo disponivel.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

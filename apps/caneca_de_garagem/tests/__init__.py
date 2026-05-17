@@ -1,0 +1,1 @@
+# Caneca de Garagem tests.

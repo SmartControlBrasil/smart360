@@ -1,0 +1,31 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout checklist-execution-layout">
+    {% include "admin_shell/components/checklist_execution_header.html" %}
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Contexto operacional da execucao" subtitle="Ativo, ordem, preventiva e referencias do ciclo executado." content_template="admin_shell/components/checklist_execution_context.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Resumo final" subtitle="Resultado consolidado, progresso concluido e distribuicao das respostas registradas." content_template="admin_shell/components/checklist_execution_summary.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Respostas por item" subtitle="Visualizacao consolidada da execucao com destaque para anomalias e observacoes tecnicas." content_template="admin_shell/components/checklist_execution_items.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e excecoes" subtitle="Itens NOK, ativo critico e gaps que merecem acao corretiva ou revisao de rotina." content_template="admin_shell/components/checklist_alert_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Conclusao registrada" subtitle="Resultado final, observacoes e recomendacoes associadas a execucao concluida." content_template="admin_shell/components/checklist_execution_conclusion.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

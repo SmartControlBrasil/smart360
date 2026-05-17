@@ -1,0 +1,12 @@
+<div class="asset-technical-grid">
+    {% for item in preventive_plan.asset_info %}
+        <article class="technical-stat">
+            <span>{{ item.label }}</span>
+            {% if item.label == "Ativo" %}
+                <strong><a class="asset-primary-link" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=preventive_plan.asset.code %}">{{ item.value }}</a></strong>
+            {% else %}
+                <strong>{{ item.value }}</strong>
+            {% endif %}
+        </article>
+    {% endfor %}
+</div>

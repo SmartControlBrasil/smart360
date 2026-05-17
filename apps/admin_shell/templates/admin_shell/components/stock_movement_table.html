@@ -1,0 +1,39 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table stock-movement-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Peca</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Referencia</th>
+                <th>Responsavel</th>
+                <th>Observacoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movement in part.movements|default:movements %}
+                <tr>
+                    <td>{{ movement.date }}</td>
+                    <td>
+                        {% if movement.part_code %}
+                            <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-part-detail' part_code=movement.part_code %}">{{ movement.part_code }}</a>
+                            <small>{{ movement.part_name }}</small>
+                        {% else %}
+                            <strong>{{ part.code }}</strong>
+                        {% endif %}
+                    </td>
+                    <td>{{ movement.type }}</td>
+                    <td>{{ movement.quantity }}</td>
+                    <td>{{ movement.reference }}</td>
+                    <td>{{ movement.responsible }}</td>
+                    <td>{{ movement.notes }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state-cell">Nenhuma movimentacao registrada.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

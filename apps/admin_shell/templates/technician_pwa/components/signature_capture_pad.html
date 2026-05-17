@@ -1,0 +1,59 @@
+<div class="signature-pad-card" data-signature-pad="{{ pad_id }}">
+    <div class="signature-pad-card__header">
+        <div>
+            <h3>{{ title }}</h3>
+            <p>{{ subtitle }}</p>
+        </div>
+        <span class="signature-pad-card__status {% if signature and signature.signature_data %}is-complete{% elif signature and signature.missing_reason %}is-justified{% endif %}">
+            {% if signature and signature.signature_data %}
+                Assinada
+            {% elif signature and signature.missing_reason %}
+                Justificada
+            {% else %}
+                Pendente
+            {% endif %}
+        </span>
+    </div>
+
+    {% if signature %}
+        <div class="signature-pad-card__existing">
+            <div>
+                <strong>{{ signature.signer_name }}</strong>
+                <p>{{ signature.signed_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            {% if signature.signature_data %}
+                <img src="{{ signature.signature_data }}" alt="Assinatura registrada" class="signature-pad-card__preview-image">
+            {% elif signature.missing_reason %}
+                <p class="signature-pad-card__missing-reason">
+                    {{ signature.get_missing_reason_display }}{% if signature.missing_reason_notes %} • {{ signature.missing_reason_notes }}{% endif %}
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{{ action }}" class="signature-pad-form" data-signature-form="{{ pad_id }}" data-offline-form="capture_signature" data-signature-kind="{% if 'client' in pad_id %}client{% else %}technician{% endif %}">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+        <div class="signature-pad-card__fields">
+            {% for field in form.visible_fields %}
+                {% if field.name != "signature_data" %}
+                    <label class="signature-pad-card__field">
+                        <span>{{ field.label }}</span>
+                        {{ field }}
+                        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                    </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="signature-pad-card__canvas-wrap">
+            <canvas class="signature-pad-card__canvas" width="640" height="220" data-signature-canvas="{{ pad_id }}"></canvas>
+            <p class="signature-pad-card__hint">{{ canvas_hint|default:"Desenhe a assinatura na area acima." }}</p>
+        </div>
+        <div class="signature-pad-card__actions">
+            <button type="button" class="quick-action-button secondary" data-signature-clear="{{ pad_id }}">Limpar</button>
+            <button type="submit" class="quick-action-button">{{ submit_label|default:"Confirmar assinatura" }}</button>
+        </div>
+    </form>
+</div>

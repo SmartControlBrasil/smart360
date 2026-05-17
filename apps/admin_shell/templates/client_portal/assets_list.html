@@ -1,0 +1,13 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="summary-grid">
+    {% for item in asset_highlights %}
+        {% include "client_portal/components/client_kpi_card.html" %}
+    {% endfor %}
+</section>
+<section class="content-panel">
+    <div class="section-heading"><h2>Carteira de ativos</h2></div>
+    {% include "client_portal/components/client_asset_table.html" %}
+</section>
+{% endblock %}

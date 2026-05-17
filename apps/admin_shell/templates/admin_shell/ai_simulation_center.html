@@ -1,0 +1,76 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Simulacoes recentes</h2>
+                    <p>Comparacao atual vs proposto com baseline persistido, impactos e confianca.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Cenario</th>
+                            <th>Status</th>
+                            <th>Impacto</th>
+                            <th>Confianca</th>
+                            <th>Tenant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for run in simulation_runs %}
+                            <tr>
+                                <td>{{ run.scenario.simulation_type.name }}</td>
+                                <td>
+                                    <strong>{{ run.scenario.title }}</strong>
+                                    <small>{{ run.result.summary|default:run.scenario.description }}</small>
+                                </td>
+                                <td>{% include "admin_shell/components/decision_status_badge.html" with status=run.status %}</td>
+                                <td>{{ run.result.impact_score|default:"0" }}</td>
+                                <td>{{ run.result.confidence_level|default:"-" }}</td>
+                                <td>{{ run.scenario.company.name|default:"-" }} / {{ run.scenario.site.name|default:"Todas" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6">Nenhuma simulacao registrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Tipos suportados</h2>
+                    <p>Catalogo inicial de cenarios de simulacao e obrigatoriedade.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Slug</th>
+                            <th>Policy</th>
+                            <th>Descricao</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for simulation_type in simulation_types %}
+                            <tr>
+                                <td>{{ simulation_type.slug }}</td>
+                                <td>{{ simulation_type.policy_mode }}</td>
+                                <td>{{ simulation_type.description }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3">Nenhum tipo cadastrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+{% endblock %}

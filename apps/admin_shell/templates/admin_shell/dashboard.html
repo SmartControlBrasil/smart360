@@ -1,0 +1,29 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="dashboard-grid dashboard-ecosystem">
+    <div class="stats-grid">
+        {% for stat in summary_cards %}
+            {% include "admin_shell/components/stat_card.html" with card=stat %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Saude da plataforma" subtitle="Leitura operacional consolidada por dominio." content_template="admin_shell/components/widget_health.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Atividade recente" subtitle="Eventos importantes do ecossistema nas ultimas horas." content_template="admin_shell/components/widget_recent_activity.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Modulos em foco" subtitle="Atalhos visuais para os dominios mais acessados." content_template="admin_shell/components/widget_shortcuts.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Status operacional" subtitle="Resumo rapido de filas, eventos e quick actions." content_template="admin_shell/components/widget_operational_stream.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

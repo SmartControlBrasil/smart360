@@ -1,0 +1,48 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+<section class="dashboard-grid dashboard-grid--tight">
+    <article class="widget-card widget-card--hero">
+        <div class="hero-copy">
+            <span class="widget-eyebrow">Smart System Security</span>
+            <h1>Acesso negado</h1>
+            <p>
+                Seu perfil atual nao possui permissao suficiente para abrir esta tela ou executar esta acao.
+                Se isso estiver incorreto, solicite ajuste de perfil ao administrador da empresa.
+            </p>
+        </div>
+        <div class="hero-actions">
+            <a class="quick-action-button tone-indigo" href="{% url 'admin-shell:module-page' module_slug='smart-system' %}">
+                <span class="quick-action-title">Voltar ao Smart System</span>
+                <span class="quick-action-meta">Retorna ao cockpit operacional do modulo</span>
+            </a>
+            <a class="quick-action-button tone-slate" href="{% url 'admin-shell:dashboard' %}">
+                <span class="quick-action-title">Ir para o dashboard</span>
+                <span class="quick-action-meta">Retorna ao shell principal</span>
+            </a>
+        </div>
+    </article>
+    <article class="widget-card">
+        <div class="widget-heading">
+            <div>
+                <span class="widget-eyebrow">Politica de acesso</span>
+                <h3>Como a autorizacao funciona</h3>
+            </div>
+        </div>
+        <ul class="status-list">
+            <li>
+                <strong>Backend decide</strong>
+                <span>Mesmo com URL direta, a permissao e validada antes da acao ser executada.</span>
+            </li>
+            <li>
+                <strong>Frontend reflete</strong>
+                <span>Menus, atalhos e botoes sensiveis sao ocultados conforme o perfil do usuario.</span>
+            </li>
+            <li>
+                <strong>Rastreabilidade</strong>
+                <span>Acoes e tentativas sensiveis podem ser auditadas para trilha operacional.</span>
+            </li>
+        </ul>
+    </article>
+</section>
+{% endblock %}

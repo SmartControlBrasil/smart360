@@ -1,0 +1,19 @@
+<label class="asset-filter-field">
+    <span>{{ filter.label }}</span>
+    {% if filter.type == "search" %}
+        <input type="search" name="{{ filter.name }}" value="{{ filter.value }}" placeholder="{{ filter.placeholder }}">
+    {% elif filter.type == "select" %}
+        <select name="{{ filter.name }}">
+            <option value="">Todos</option>
+            {% for option in filter.options %}
+                {% if option.value %}
+                    <option value="{{ option.value }}" {% if option.value == filter.value %}selected{% endif %}>{{ option.label }}</option>
+                {% else %}
+                    <option value="{{ option }}" {% if option == filter.value %}selected{% endif %}>{{ option }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    {% else %}
+        <input type="text" name="{{ filter.name }}" value="{{ filter.value }}" placeholder="{{ filter.placeholder }}">
+    {% endif %}
+</label>

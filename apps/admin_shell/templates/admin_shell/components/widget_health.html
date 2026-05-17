@@ -1,0 +1,14 @@
+<div class="health-grid">
+    {% for health in platform_health %}
+        <article class="health-row tone-{{ health.tone|default:'slate' }}">
+            <div>
+                <h4>{{ health.label|default:"" }}</h4>
+                <p>{{ health.status|default:"" }}</p>
+            </div>
+            <div class="meter">
+                <span style="width: {{ health.value|default:0 }}%"></span>
+            </div>
+            <strong>{{ health.value|default:0 }}%</strong>
+        </article>
+    {% endfor %}
+</div>

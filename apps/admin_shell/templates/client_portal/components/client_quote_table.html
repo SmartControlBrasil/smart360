@@ -1,0 +1,30 @@
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Orcamento</th>
+                <th>OS</th>
+                <th>Ativo</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quote in quote_records %}
+                <tr>
+                    <td>{{ quote.quote_number }}</td>
+                    <td>{{ quote.work_order.order_number }}</td>
+                    <td>{% if quote.asset %}{{ quote.asset.asset_tag }} - {{ quote.asset.name }}{% else %}-{% endif %}</td>
+                    <td>R$ {{ quote.total_value }}</td>
+                    <td>{{ quote.get_status_display }}</td>
+                    <td class="inline-actions">
+                        <a href="{% url 'admin-shell:client-portal-quote-detail' quote_number=quote.quote_number %}">Detalhe</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Nenhum orcamento disponivel para o contexto atual.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

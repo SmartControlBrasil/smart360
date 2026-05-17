@@ -1,0 +1,13 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="summary-grid">
+    {% for item in quote_kpis %}
+        {% include "client_portal/components/client_kpi_card.html" %}
+    {% endfor %}
+</section>
+<section class="content-panel">
+    <div class="section-heading"><h2>Orcamentos</h2></div>
+    {% include "client_portal/components/client_quote_table.html" with quote_records=quote_records %}
+</section>
+{% endblock %}

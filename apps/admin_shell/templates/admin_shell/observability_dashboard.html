@@ -1,0 +1,216 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout observability-layout">
+    <div class="summary-grid">
+        {% for widget in observability_health_widgets %}
+            <article class="summary-card tone-{{ widget.tone }}">
+                <span>{{ widget.label }}</span>
+                <strong>{{ widget.value }}</strong>
+                <small>{{ widget.meta }}</small>
+            </article>
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-4">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Saude dos componentes</h3>
+                        <p>Liveness, readiness e dependencias criticas da plataforma.</p>
+                    </div>
+                </div>
+                <div class="status-list">
+                    {% for item in observability_component_status %}
+                        <article class="status-row status-{{ item.status }}">
+                            <div>
+                                <strong>{{ item.name }}</strong>
+                                <p>{{ item.details|default:"Sem detalhes adicionais." }}</p>
+                            </div>
+                            <span class="status-pill">{{ item.status|upper }}</span>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Eventos criticos recentes</h3>
+                        <p>Falhas, estados criticos e eventos relevantes de plataforma.</p>
+                    </div>
+                </div>
+                <div class="event-feed">
+                    {% for event in observability_critical_events %}
+                        <article class="event-row tone-{{ event.severity }}">
+                            <strong>{{ event.event_type }}</strong>
+                            <p>{{ event.message }}</p>
+                            <small>{{ event.source_module }} • {{ event.created_at }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhum evento critico recente.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Risco financeiro e acesso</h3>
+                        <p>Tenants com impacto operacional ou financeiro recente.</p>
+                    </div>
+                </div>
+                <div class="event-feed">
+                    {% for item in observability_billing_risk %}
+                        <article class="event-row tone-amber">
+                            <strong>{{ item.company }}</strong>
+                            <p>{{ item.invoice }} • {{ item.subscription_status }}</p>
+                            <small>{{ item.due_date }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhum tenant em risco relevante.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-6">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Requests recentes</h3>
+                        <p>Rastreamento HTTP com request id, contexto de tenant e status.</p>
+                    </div>
+                </div>
+                <div class="table-shell">
+                    <table class="data-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Metodo</th>
+                                <th>Path</th>
+                                <th>Status</th>
+                                <th>Duracao</th>
+                                <th>Tenant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trace in observability_request_traces %}
+                                <tr>
+                                    <td>{{ trace.request_id|truncatechars:10 }}</td>
+                                    <td>{{ trace.method }}</td>
+                                    <td>{{ trace.path }}</td>
+                                    <td>{{ trace.status_code }}</td>
+                                    <td>{{ trace.duration_ms }} ms</td>
+                                    <td>{{ trace.company.name|default:"Global" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">Nenhum request trace registrado.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <div class="column-span-6">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Auditoria funcional</h3>
+                        <p>Acoes sensiveis recentes com usuario, tenant e entidade afetada.</p>
+                    </div>
+                </div>
+                <div class="table-shell">
+                    <table class="data-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Acao</th>
+                                <th>Dominio</th>
+                                <th>Entidade</th>
+                                <th>Empresa</th>
+                                <th>Quando</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in observability_audit_events %}
+                                <tr>
+                                    <td>{{ item.user.email|default:"sistema" }}</td>
+                                    <td>{{ item.action }}</td>
+                                    <td>{{ item.domain }}</td>
+                                    <td>{{ item.resource_type }} {{ item.resource_id }}</td>
+                                    <td>{{ item.company.name|default:"Global" }}</td>
+                                    <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">Nenhum evento de auditoria recente.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-6">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Jobs e processos</h3>
+                        <p>Ultimas execucoes de jobs e tarefas monitoradas.</p>
+                    </div>
+                </div>
+                <div class="event-feed">
+                    {% for job in observability_job_traces %}
+                        <article class="event-row tone-{% if job.status == 'failed' %}red{% else %}emerald{% endif %}">
+                            <strong>{{ job.job_name }}</strong>
+                            <p>{{ job.source_module }} • {{ job.status }}</p>
+                            <small>{{ job.started_at }}{% if job.duration_ms %} • {{ job.duration_ms }} ms{% endif %}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhum job recente monitorado.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        <div class="column-span-6">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Volumes observados</h3>
+                        <p>Contadores internos para leitura rapida de rastreabilidade.</p>
+                    </div>
+                </div>
+                <div class="status-list">
+                    <article class="status-row status-healthy">
+                        <div><strong>System events</strong><p>Eventos tecnicos persistidos</p></div>
+                        <span class="status-pill">{{ observability_event_totals.system_events }}</span>
+                    </article>
+                    <article class="status-row status-healthy">
+                        <div><strong>Audit logs</strong><p>Acoes sensiveis registradas</p></div>
+                        <span class="status-pill">{{ observability_event_totals.audit_logs }}</span>
+                    </article>
+                    <article class="status-row status-healthy">
+                        <div><strong>Request traces</strong><p>Requests rastreados</p></div>
+                        <span class="status-pill">{{ observability_event_totals.request_traces }}</span>
+                    </article>
+                    <article class="status-row status-healthy">
+                        <div><strong>Job traces</strong><p>Execucoes monitoradas</p></div>
+                        <span class="status-pill">{{ observability_event_totals.jobs }}</span>
+                    </article>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

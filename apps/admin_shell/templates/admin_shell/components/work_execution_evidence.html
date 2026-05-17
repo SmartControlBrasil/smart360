@@ -1,0 +1,11 @@
+<div class="mini-stack">
+    {% for evidence in execution.evidence %}
+        <article class="detail-list-row">
+            <span>{{ evidence.type }}</span>
+            <strong>{{ evidence.timestamp }}</strong>
+        </article>
+        <p class="muted-block">{{ evidence.description }}</p>
+    {% empty %}
+        <p class="empty-inline-state">Nenhuma evidencia anexada.</p>
+    {% endfor %}
+</div>

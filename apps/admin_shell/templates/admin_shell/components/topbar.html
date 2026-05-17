@@ -1,0 +1,62 @@
+<header class="shell-topbar">
+    <div class="shell-topbar-inner">
+
+        <div class="shell-topbar-left">
+            <button class="shell-icon-button" type="button" data-sidebar-toggle aria-label="Alternar sidebar">
+                <span></span><span></span><span></span>
+            </button>
+
+            <div class="topbar-search">
+                <span class="search-icon"></span>
+                <input type="text" placeholder="Buscar">
+            </div>
+        </div>
+
+        <form class="tenant-context-switcher" method="post" action="{% url 'admin-shell:set-active-context' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+            <div class="tenant-context-group">
+                <label for="active-company-id">Empresa</label>
+                <select id="active-company-id" name="company_id" onchange="this.form.submit()">
+                    {% for option in shell_tenant_context.company_options %}
+                        <option value="{{ option.id }}" {% if shell_tenant_context.company and shell_tenant_context.company.id == option.id %}selected{% endif %}>
+                            {{ option.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="tenant-context-group">
+                <label for="active-site-id">Site</label>
+                <select id="active-site-id" name="site_id" onchange="this.form.submit()">
+                    <option value="">Todos os sites permitidos</option>
+                    {% for option in shell_tenant_context.site_options %}
+                        <option value="{{ option.id }}" {% if shell_tenant_context.site and shell_tenant_context.site.id == option.id %}selected{% endif %}>
+                            {{ option.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        <div class="shell-topbar-actions">
+            <button id="shell-theme-toggle" class="shell-theme-toggle" type="button" aria-pressed="false" aria-label="Alternar tema">
+                <span class="theme-toggle-glyph" aria-hidden="true">☾</span>
+            </button>
+
+            <button class="shell-icon-button is-bell" type="button" aria-label="Notificações">
+                <span class="notification-dot"></span>
+            </button>
+
+            <div class="user-menu">
+                <div class="avatar">{{ shell_user.initials }}</div>
+                <div class="user-meta">
+                    <strong>{{ shell_user.name }}</strong>
+                    <span>{{ shell_user.email }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</header>

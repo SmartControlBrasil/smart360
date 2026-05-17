@@ -1,0 +1,18 @@
+<dl class="detail-grid">
+    <div>
+        <dt>Sintomas encontrados</dt>
+        <dd>{{ execution.diagnosis.symptoms|default:"Nao registrado" }}</dd>
+    </div>
+    <div>
+        <dt>Diagnostico tecnico</dt>
+        <dd>{{ execution.diagnosis.technical_diagnosis|default:"Pendente" }}</dd>
+    </div>
+    <div>
+        <dt>Componentes envolvidos</dt>
+        <dd>{{ execution.diagnosis.components|default:"Nao informado" }}</dd>
+    </div>
+    <div>
+        <dt>Analise realizada / notas de andamento</dt>
+        <dd class="execution-diagnosis-highlight">{% if execution.diagnosis.analysis %}{{ execution.diagnosis.analysis }}{% else %}Analise nao registrada{% endif %}</dd>
+    </div>
+</dl>

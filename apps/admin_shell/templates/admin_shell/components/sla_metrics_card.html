@@ -1,0 +1,34 @@
+<section class="widget-card">
+    <div class="widget-head">
+        <div>
+            <h3>SLA e tempo de atendimento</h3>
+            <p>Leitura rapida de resposta, execucao e backlog preventivo.</p>
+        </div>
+    </div>
+    <div class="status-list">
+        <article class="status-row status-healthy">
+            <div><strong>SLA cumprido</strong><p>Atendimentos dentro da meta</p></div>
+            <span class="status-pill">{{ sla_summary.compliant }}</span>
+        </article>
+        <article class="status-row status-warning">
+            <div><strong>SLA violado</strong><p>Atendimentos fora da meta</p></div>
+            <span class="status-pill">{{ sla_summary.violated }}</span>
+        </article>
+        <article class="status-row status-healthy">
+            <div><strong>Compliance</strong><p>Percentual total do periodo</p></div>
+            <span class="status-pill">{{ sla_summary.compliance_rate }}%</span>
+        </article>
+        <article class="status-row status-healthy">
+            <div><strong>Resposta media</strong><p>Tempo medio ate inicio do atendimento</p></div>
+            <span class="status-pill">{{ sla_summary.avg_response_time }} min</span>
+        </article>
+        <article class="status-row status-healthy">
+            <div><strong>Execucao media</strong><p>Tempo medio de conclusao</p></div>
+            <span class="status-pill">{{ sla_summary.avg_execution_time }} min</span>
+        </article>
+        <article class="status-row status-warning">
+            <div><strong>Preventivas atrasadas</strong><p>OS preventivas fora da janela prevista</p></div>
+            <span class="status-pill">{{ sla_summary.overdue_preventives }}</span>
+        </article>
+    </div>
+</section>

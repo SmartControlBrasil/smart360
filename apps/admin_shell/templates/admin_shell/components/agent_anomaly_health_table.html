@@ -1,0 +1,30 @@
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Foco</th>
+                <th>Entidade</th>
+                <th>Site</th>
+                <th>Risco</th>
+                <th>Score</th>
+                <th>Resumo</th>
+                <th>Recomendacao</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flag in anomaly_health_flags %}
+                <tr>
+                    <td>{{ flag.get_focus_type_display }}</td>
+                    <td>{{ flag.display_label }}</td>
+                    <td>{{ flag.site.name|default:"Escopo global" }}</td>
+                    <td>{{ flag.risk_level|title }}</td>
+                    <td>{{ flag.attention_score }}</td>
+                    <td>{{ flag.summary }}</td>
+                    <td>{{ flag.latest_recommendation.title|default:"Sem recomendacao vinculada" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Nenhuma anomalia persistida sob atencao.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

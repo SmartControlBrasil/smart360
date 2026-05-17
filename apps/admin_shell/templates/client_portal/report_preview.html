@@ -1,0 +1,19 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-panel report-preview-panel">
+    {% include "admin_shell/components/report_document_header.html" with report=report %}
+    {% for section in report.sections %}
+        {% if section.type == "fields" %}
+            {% include "admin_shell/components/report_section_fields.html" with section=section %}
+        {% elif section.type == "table" %}
+            {% include "admin_shell/components/report_section_table.html" with section=section %}
+        {% elif section.type == "checklist" %}
+            {% include "admin_shell/components/report_section_checklist.html" with section=section %}
+        {% else %}
+            {% include "admin_shell/components/report_section_list.html" with section=section %}
+        {% endif %}
+    {% endfor %}
+    {% include "admin_shell/components/report_signature_block.html" with report=report %}
+</section>
+{% endblock %}

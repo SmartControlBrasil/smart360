@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title|default:"SMART360" }}</title>
+    <style>
+        :root {
+            color-scheme: light;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #0f172a;
+        }
+        .page-shell {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 32px 16px 56px;
+        }
+        .page-header {
+            margin-bottom: 18px;
+        }
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 1.75rem;
+        }
+        .page-header p {
+            margin: 0;
+            color: #334155;
+        }
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 18px 0 22px;
+        }
+        .nav a {
+            padding: 8px 12px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: #1d4ed8;
+            background: #dbeafe;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        }
+        .card p {
+            margin-top: 0;
+            margin-bottom: 10px;
+            line-height: 1.55;
+        }
+        .card p:last-child {
+            margin-bottom: 0;
+        }
+        .footer-note {
+            margin-top: 22px;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <main class="page-shell">
+        <header class="page-header">
+            <h1>{{ heading|default:"SMART360" }}</h1>
+            {% if lead %}<p>{{ lead }}</p>{% endif %}
+        </header>
+
+        <nav class="nav" aria-label="Navegacao institucional">
+            <a href="{% url 'institutional:home' %}">Home</a>
+            <a href="{% url 'institutional:about' %}">Sobre</a>
+            <a href="{% url 'institutional:services' %}">Servicos</a>
+            <a href="{% url 'institutional:contact' %}">Contato</a>
+        </nav>
+
+        <section class="card">
+            {% block content %}{% endblock %}
+        </section>
+
+        <p class="footer-note">
+            Placeholder institucional temporario para migracao do novo template.
+        </p>
+    </main>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,29 @@
+<div class="report-checklist-summary">
+    {% for label, value in section.summary %}
+        <div class="report-checklist-pill">
+            <span>{{ label }}</span>
+            <strong>{{ value }}</strong>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="table-responsive">
+    <table class="shell-table report-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Status</th>
+                <th>Observacao</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in section.rows %}
+                <tr class="{% if row.status == 'NOK' %}row-critical{% endif %}">
+                    <td>{{ row.item }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.note }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

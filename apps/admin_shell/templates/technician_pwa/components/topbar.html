@@ -1,0 +1,26 @@
+<header class="technician-topbar">
+    <div>
+        <strong>{{ page_title }}</strong>
+        <span>
+            {% if mobile_tenant_context.site %}
+                {{ mobile_tenant_context.site.name }}
+            {% elif mobile_tenant_context.company %}
+                {{ mobile_tenant_context.company.name }}
+            {% else %}
+                Contexto tecnico
+            {% endif %}
+        </span>
+    </div>
+    <div class="technician-topbar-actions">
+        {% if mobile_copilot.enabled %}
+            <button class="technician-sync-chip" type="button" data-tech-copilot-open>
+                <span>Copiloto</span>
+            </button>
+        {% endif %}
+        <a class="technician-sync-chip" href="{% url 'admin-shell:technician-app-sync' %}" data-sync-center-link>
+            <span data-offline-state-label>Online</span>
+            <strong data-sync-pending-count>0</strong>
+        </a>
+        <div class="technician-topbar-user">{{ mobile_user.initials }}</div>
+    </div>
+</header>

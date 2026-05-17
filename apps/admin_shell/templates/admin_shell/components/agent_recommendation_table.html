@@ -1,0 +1,34 @@
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Agente</th>
+                <th>Ativo</th>
+                <th>Tipo</th>
+                <th>Severidade</th>
+                <th>Prioridade</th>
+                <th>Titulo</th>
+                <th>Explicacao</th>
+                <th>Acao sugerida</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recommendation in recommendations %}
+                <tr>
+                    <td>{{ recommendation.agent_run.agent.name }}</td>
+                    <td>{{ recommendation.payload.asset.asset_tag|default:recommendation.entity_id }}</td>
+                    <td>{{ recommendation.get_recommendation_type_display }}</td>
+                    <td>{{ recommendation.get_severity_display }}</td>
+                    <td>{{ recommendation.get_priority_display }}</td>
+                    <td>{{ recommendation.title }}</td>
+                    <td>{{ recommendation.explanation|default:recommendation.summary }}</td>
+                    <td>{{ recommendation.suggested_action|default:"Monitorar" }}</td>
+                    <td>{{ recommendation.get_status_display }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8">Nenhuma recomendacao registrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

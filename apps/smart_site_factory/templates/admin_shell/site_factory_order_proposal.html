@@ -1,0 +1,256 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout proposal-commercial">
+    <div class="asset-filter-actions no-print" style="margin-bottom: 1rem;">
+        <button type="button" class="quick-action-button" onclick="window.print();">Imprimir / Salvar PDF</button>
+        <form method="post" action="{% url 'admin-shell:site-factory-order-proposal-send-email' pk=order.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="quick-action-button">Enviar proposta por e-mail</button>
+        </form>
+        {% if proposal_status != 'approved' and proposal_status != 'rejected' %}
+            <form method="post" action="{% url 'admin-shell:site-factory-order-proposal-approve' pk=order.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="quick-action-button">Aprovar proposta</button>
+            </form>
+            <form method="post" action="{% url 'admin-shell:site-factory-order-proposal-reject' pk=order.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="quick-action-button" style="border-color: #f87171; color: #b91c1c;">Rejeitar proposta</button>
+            </form>
+        {% endif %}
+        <a class="quick-action-button" href="{% url 'admin-shell:site-factory-order-detail' pk=order.pk %}">Voltar ao projeto</a>
+    </div>
+
+    <div class="asset-hero">
+        <div>
+            <span class="asset-tag">Proposta comercial</span>
+            <h2>Smart Site Factory</h2>
+            <p>Projeto #{{ order.id }} · Emitida em {{ proposal_generated_at|date:"d/m/Y H:i" }} · Validade ate {{ proposal_valid_until|date:"d/m/Y" }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            <span class="status-badge status-indigo">MVP interno</span>
+            {% if proposal_status == 'approved' %}
+                <span class="status-badge status-emerald">Proposta aprovada</span>
+            {% elif proposal_status == 'rejected' %}
+                <span class="status-badge status-red">Proposta rejeitada</span>
+            {% else %}
+                <span class="status-badge status-amber">Proposta pendente</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Cliente e contato</h2>
+                        <p>Dados para faturamento e alinhamento.</p>
+                    </div>
+                </header>
+                <dl class="detail-grid">
+                    <div><dt>Empresa</dt><dd>{% if order.company %}{{ order.company.name }}{% elif linked_lead %}{{ linked_lead.company_name }}{% else %}{{ order.metadata.client_company_name|default:"—" }}{% endif %}</dd></div>
+                    <div><dt>Contato</dt><dd>{% if linked_lead and linked_lead.contact_name %}{{ linked_lead.contact_name }}{% elif order.metadata.client_name %}{{ order.metadata.client_name }}{% elif order.requester %}{{ order.requester.get_full_name|default:order.requester.email }}{% else %}—{% endif %}</dd></div>
+                    <div><dt>Email</dt><dd>{% if linked_lead and linked_lead.email %}{{ linked_lead.email }}{% else %}{{ order.metadata.client_email|default:"—" }}{% endif %}</dd></div>
+                    <div><dt>Telefone</dt><dd>{% if linked_lead and linked_lead.phone %}{{ linked_lead.phone }}{% else %}{{ order.metadata.client_phone|default:"—" }}{% endif %}</dd></div>
+                    <div><dt>Nicho</dt><dd>{{ order.niche.name }}</dd></div>
+                </dl>
+                {% if linked_lead %}
+                    <p class="widget-muted">Oportunidade vinculada no Growth Engine: Lead #{{ linked_lead.id }} ({{ linked_lead.get_status_display }}).</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Pacote comercial</h2>
+                        <p>Escopo acordado para o site.</p>
+                    </div>
+                </header>
+                {% if commercial_package %}
+                    <dl class="detail-grid">
+                        <div><dt>Nome</dt><dd>{{ commercial_package.commercial_name|default:"—" }}</dd></div>
+                        {% if commercial_package.package_code %}<div><dt>Codigo</dt><dd>{{ commercial_package.package_code }}</dd></div>{% endif %}
+                        <div><dt>Nivel</dt><dd>{{ commercial_package.tier|default:"—" }}</dd></div>
+                    </dl>
+                    {% if commercial_package.deliverables %}
+                        <p><strong>Entregaveis</strong></p>
+                        <ul>
+                            {% for item in commercial_package.deliverables %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% elif order.selected_template %}
+                        <p class="widget-muted">Entregaveis padrao conforme template <strong>{{ order.selected_template.name }}</strong>{% if order.selected_template.description %}: {{ order.selected_template.description|truncatewords:40 }}{% endif %}.</p>
+                    {% else %}
+                        <p class="widget-muted">Detalhes do pacote conforme template recomendado ou definido na producao.</p>
+                    {% endif %}
+                    {% if commercial_package.upsells %}
+                        <p><strong>Opcionais / upsells</strong></p>
+                        <ul>
+                            {% for item in commercial_package.upsells %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% else %}
+                    <p class="widget-muted">Pacote vinculado ao pedido e ao template escolhido na producao.</p>
+                    {% if order.selected_template %}
+                        <p><strong>Template:</strong> {{ order.selected_template.name }}</p>
+                    {% endif %}
+                {% endif %}
+            </section>
+        </div>
+        <div class="column-span-5">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Investimento</h2>
+                        <p>Valores em reais (BRL).</p>
+                    </div>
+                </header>
+                <p style="font-size: 1.35rem; font-weight: 600;">Total: R$ {{ proposal_price|floatformat:2 }}</p>
+                {% if commercial_package.price_display %}
+                    <p class="widget-muted">Referencia de pacote: R$ {{ commercial_package.price_display }} (valor efetivo do pedido acima).</p>
+                {% endif %}
+                <dl class="detail-grid" style="margin-top: 1rem;">
+                    <div><dt>Entrada (50%)</dt><dd>R$ {{ deposit_amount|floatformat:2 }}</dd></div>
+                    <div><dt>Saldo na entrega (50%)</dt><dd>R$ {{ balance_amount|floatformat:2 }}</dd></div>
+                </dl>
+            </section>
+        </div>
+    </div>
+
+    {% if intake %}
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Briefing resumido</h2>
+                        <p>Informacoes ja coletadas para o projeto.</p>
+                    </div>
+                    <a class="quick-action-button no-print" href="{% url 'admin-shell:site-factory-order-intake' pk=order.pk %}">Editar briefing</a>
+                </header>
+                <dl class="detail-grid">
+                    {% if intake.business_description %}<div class="column-span-12"><dt>Negocio</dt><dd>{{ intake.business_description|truncatewords:80 }}</dd></div>{% endif %}
+                    {% if intake.main_services %}<div><dt>Servicos</dt><dd>{{ intake.main_services|join:", "|truncatewords:40 }}</dd></div>{% endif %}
+                    {% if intake.city or intake.state %}<div><dt>Local</dt><dd>{{ intake.city }} {% if intake.state %}/ {{ intake.state }}{% endif %}</dd></div>{% endif %}
+                </dl>
+            </section>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Prazo e etapas de producao</h2>
+                        <p>Fluxo operacional padrao do Smart Site Factory.</p>
+                    </div>
+                </header>
+                {% if production_tasks %}
+                    <ol class="proposal-stage-list">
+                        {% for task in production_tasks %}
+                            <li><strong>{{ task.get_stage_display }}</strong> — {{ task.get_status_display }}{% if task.due_date %} (prazo sugerido {{ task.due_date|date:"d/m/Y" }}){% endif %}</li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <ol class="proposal-stage-list">
+                        {% for label in production_stage_fallback %}
+                            <li>{{ label }}</li>
+                        {% endfor %}
+                    </ol>
+                    <p class="widget-muted">Calendario detalhado sera acordado apos aprovacao da proposta e conclusao do briefing.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Condicoes comerciais</h2>
+                        <p>Termos simples para esta proposta MVP.</p>
+                    </div>
+                </header>
+                <ul class="proposal-terms">
+                    <li><strong>Validade:</strong> esta proposta e valida por <strong>7 dias</strong> a partir da data de emissao ({{ proposal_generated_at|date:"d/m/Y" }}), ate {{ proposal_valid_until|date:"d/m/Y" }}.</li>
+                    <li><strong>Pagamento:</strong> <strong>50%</strong> na aceitacao da proposta (entrada) e <strong>50%</strong> na entrega do site homologado.</li>
+                    <li><strong>Hospedagem e dominio:</strong> nao inclusos neste valor, salvo contrato especifico.</li>
+                    <li><strong>Manutencao:</strong> plano mensal opcional; pode ser contratado separadamente.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card" style="border-color: #6366f1;">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Aprovacao</h2>
+                        <p>Proximo passo para iniciar o projeto.</p>
+                    </div>
+                </header>
+                <p>Para <strong>aprovar esta proposta</strong>, confirme por escrito (e-mail ou WhatsApp) referenciando o <strong>projeto #{{ order.id }}</strong> e o valor total de <strong>R$ {{ proposal_price|floatformat:2 }}</strong>. A equipe confirmara o recebimento e dará sequencia ao briefing e à producao.</p>
+                <p class="widget-muted no-print">O envio automatico por e-mail sera habilitado em uma versao futura; por ora utilize este documento impresso ou exportado em PDF.</p>
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid proposal-internal-block">
+        <div class="column-span-12">
+            <section class="widget-card" style="border-style: dashed; opacity: 0.95;">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Uso interno — dados do pedido</h2>
+                        <p>Visivel ao operador no shell; incluido na impressao para controle.</p>
+                    </div>
+                </header>
+                <dl class="detail-grid">
+                    <div><dt>Pedido</dt><dd>#{{ order.id }} · {{ order.public_id }}</dd></div>
+                    <div><dt>Status</dt><dd>{{ order.get_status_display }}</dd></div>
+                    <div><dt>Criado em</dt><dd>{{ order.ordered_at|date:"d/m/Y H:i" }}</dd></div>
+                    <div><dt>Template selecionado</dt><dd>{% if order.selected_template %}{{ order.selected_template.name }} ({{ order.selected_template.slug }}){% else %}—{% endif %}</dd></div>
+                    <div><dt>Template recomendado</dt><dd>{% if order.recommended_template %}{{ order.recommended_template.name }}{% else %}—{% endif %}</dd></div>
+                    <div><dt>Status comercial (metadata)</dt><dd>{{ commercial_status|default:"—" }}</dd></div>
+                    <div><dt>Decisao da proposta</dt><dd>{% if proposal_status == 'approved' %}Aprovada{% elif proposal_status == 'rejected' %}Rejeitada{% else %}Pendente{% endif %}</dd></div>
+                    {% if proposal_approved_at %}<div><dt>Aprovada em</dt><dd>{{ proposal_approved_at }}{% if proposal_approved_by %} ({{ proposal_approved_by }}){% endif %}</dd></div>{% endif %}
+                    {% if proposal_rejected_at %}<div><dt>Rejeitada em</dt><dd>{{ proposal_rejected_at }}{% if proposal_rejected_by %} ({{ proposal_rejected_by }}){% endif %}</dd></div>{% endif %}
+                    {% if linked_lead %}<div><dt>Lead ID</dt><dd>#{{ linked_lead.id }}</dd></div>{% endif %}
+                    <div><dt>Solicitante</dt><dd>{% if order.requester %}{{ order.requester.email }}{% else %}—{% endif %}</dd></div>
+                </dl>
+                {% if order.notes %}
+                    <p><strong>Observacoes internas</strong></p>
+                    <p>{{ order.notes }}</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</section>
+
+<style>
+@media print {
+    .no-print { display: none !important; }
+    .shell-sidebar, .shell-topbar, .shell-footer { display: none !important; }
+    .shell-app { display: block !important; }
+    .shell-main { margin: 0 !important; max-width: 100% !important; }
+    .shell-content { padding: 1rem !important; }
+    body.admin-shell { background: #fff !important; }
+    .proposal-commercial .widget-card { break-inside: avoid; }
+}
+.proposal-stage-list { margin: 0 0 0 1.1rem; padding: 0; }
+.proposal-stage-list li { margin-bottom: 0.35rem; }
+.proposal-terms { margin: 0 0 0 1.1rem; }
+.proposal-terms li { margin-bottom: 0.5rem; }
+</style>
+{% endblock %}

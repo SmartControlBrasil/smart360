@@ -1,0 +1,32 @@
+<div class="table-responsive-shell">
+    <table class="data-table-shell">
+        <thead>
+            <tr>
+                <th>Empresa</th>
+                <th>Categoria</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>Ofertas</th>
+                <th>Data</th>
+                <th>Ativo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in service_requests %}
+                <tr>
+                    <td>{{ request.requester_company.name|default:"-" }}</td>
+                    <td>{{ request.category|default:request.get_service_type_display }}</td>
+                    <td><span class="status-badge status-amber">{{ request.get_priority_display }}</span></td>
+                    <td><span class="status-badge status-indigo">{{ request.get_status_display }}</span></td>
+                    <td>{{ request.offers_received|default:request.offers.count }}</td>
+                    <td>{{ request.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>{{ request.related_asset.name|default:"Nao vinculado" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">Nenhuma solicitacao encontrada.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

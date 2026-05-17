@@ -1,0 +1,16 @@
+<article class="marketplace-card">
+    <div class="marketplace-card-header">
+        <div>
+            <h3>{{ request.title }}</h3>
+            <p>{{ request.requester_company.name|default:"Empresa nao informada" }}{% if request.related_site %} • {{ request.related_site.name }}{% endif %}</p>
+        </div>
+        <span class="status-badge status-indigo">{{ request.get_status_display }}</span>
+    </div>
+    <ul class="marketplace-metadata">
+        <li>Categoria: {{ request.category|default:request.get_service_type_display }}</li>
+        <li>Prioridade: {{ request.get_priority_display }}</li>
+        <li>Ativo: {{ request.related_asset.name|default:"Nao vinculado" }}</li>
+        <li>Ofertas: {{ request.offers.count|default:request.offers_received|default:"0" }}</li>
+    </ul>
+    <p class="marketplace-description">{{ request.description|truncatechars:150 }}</p>
+</article>

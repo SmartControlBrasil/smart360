@@ -1,0 +1,7 @@
+{% if value == "Critica" %}
+    <span class="status-badge status-red">{{ value }}</span>
+{% elif value == "Alta" %}
+    <span class="status-badge status-orange">{{ value }}</span>
+{% else %}
+    <span class="status-badge status-violet">{{ value }}</span>
+{% endif %}

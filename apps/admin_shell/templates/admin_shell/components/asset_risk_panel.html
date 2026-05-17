@@ -1,0 +1,10 @@
+<div class="risk-stack">
+    {% include "admin_shell/components/asset_criticality_badge.html" with value=asset.criticality %}
+    {% include "admin_shell/components/asset_condition_badge.html" with value=asset.condition %}
+    {% for item in asset.risk_panel %}
+        <article class="info-card">
+            <span class="info-card-label">{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+        </article>
+    {% endfor %}
+</div>

@@ -1,0 +1,17 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="asset-kpi-grid">
+        {% for widget in matching_kpis %}
+            {% include "admin_shell/components/marketplace_dashboard_widget.html" with widget=widget %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Ranking tecnico" subtitle="Motor deterministico de matching por especialidade, regiao, reputacao e disponibilidade." content_template="admin_shell/components/marketplace_match_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

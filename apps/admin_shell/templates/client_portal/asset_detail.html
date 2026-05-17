@@ -1,0 +1,58 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Identificacao do ativo</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Codigo</dt><dd>{{ asset.asset_tag }}</dd></div>
+            <div><dt>Status</dt><dd>{{ asset.get_status_display }}</dd></div>
+            <div><dt>Criticidade</dt><dd>{{ asset.get_criticality_display }}</dd></div>
+            <div><dt>Categoria</dt><dd>{{ asset.category.name }}</dd></div>
+            <div><dt>Fabricante</dt><dd>{{ asset.manufacturer|default:"-" }}</dd></div>
+            <div><dt>Modelo</dt><dd>{{ asset.model|default:"-" }}</dd></div>
+            <div><dt>Serial</dt><dd>{{ asset.serial_number|default:"-" }}</dd></div>
+            <div><dt>Unidade</dt><dd>{{ asset.operational_site.name }}</dd></div>
+        </dl>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Manutencao resumida</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Proxima preventiva</dt><dd>{% if next_plan and next_plan.next_due_date %}{{ next_plan.next_due_date|date:"d/m/Y" }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Checklist</dt><dd>{% if next_plan and next_plan.checklist %}{{ next_plan.checklist.name }}{% else %}Nao vinculado{% endif %}</dd></div>
+            <div><dt>Falhas recentes</dt><dd>{{ recent_failures|length }}</dd></div>
+            <div><dt>OS recentes</dt><dd>{{ recent_orders|length }}</dd></div>
+        </dl>
+    </article>
+</section>
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Falhas recentes</h2></div>
+        <div class="stack-list">
+            {% for failure in recent_failures %}
+                <article class="stack-card">
+                    <strong>{{ failure.get_severity_display }} • {{ failure.get_status_display }}</strong>
+                    <p>{{ failure.symptom }}</p>
+                    <span>{{ failure.detected_at|date:"d/m/Y H:i" }}</span>
+                </article>
+            {% empty %}
+                <p class="empty-state">Nenhuma falha recente registrada.</p>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Ordens recentes</h2></div>
+        <div class="stack-list">
+            {% for order in recent_orders %}
+                <article class="stack-card">
+                    <strong><a href="{% url 'admin-shell:client-portal-work-order-detail' order_code=order.order_number %}">{{ order.order_number }}</a></strong>
+                    <p>{{ order.title }} • {{ order.get_status_display }}</p>
+                    <span>{{ order.opened_at|date:"d/m/Y H:i" }}</span>
+                </article>
+            {% empty %}
+                <p class="empty-state">Nenhuma ordem de servico recente.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

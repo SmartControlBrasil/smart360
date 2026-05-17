@@ -1,0 +1,43 @@
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Agente</th>
+                <th>Prioridade</th>
+                <th>Acao</th>
+                <th>Resumo</th>
+                <th>Alvo</th>
+                <th>Status</th>
+                <th>Aprovacao</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proposal in proposals %}
+                <tr>
+                    <td>{{ proposal.agent_run.agent.name }}</td>
+                    <td>{{ proposal.priority|title }}</td>
+                    <td>{{ proposal.action_type }}</td>
+                    <td>{{ proposal.summary|default:proposal.title }}</td>
+                    <td>{{ proposal.target_entity }} / {{ proposal.target_entity_id }}</td>
+                    <td>{{ proposal.get_status_display }}</td>
+                    <td>
+                        {% if proposal.status == "pending_approval" %}
+                            <form method="post" action="{% url 'admin-shell:ai-agents-proposal-approve' proposal_id=proposal.public_id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button class="quick-action-button" type="submit">Aprovar</button>
+                            </form>
+                            <form method="post" action="{% url 'admin-shell:ai-agents-proposal-reject' proposal_id=proposal.public_id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button class="quick-action-button quick-action-button--ghost" type="submit">Rejeitar</button>
+                            </form>
+                        {% else %}
+                            {{ proposal.get_status_display }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Nenhuma proposta de acao registrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,172 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+<section class="space-y-6">
+    <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-6 shadow-2xl shadow-slate-950/40">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="text-xs uppercase tracking-[0.35em] text-cyan-300">Operational Digital Twin</p>
+                <h2 class="mt-2 text-3xl font-semibold text-white">Contexto vivo por unidade e ativo</h2>
+                <p class="mt-2 max-w-3xl text-sm text-slate-300">Estado operacional, risco, sinais ativos, timeline e links para acao dentro do contexto atual do tenant.</p>
+            </div>
+            <div class="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
+                    <span class="text-slate-400">Empresa</span>
+                    <strong class="mt-1 block text-white">{{ company.name|default:"Todas" }}</strong>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
+                    <span class="text-slate-400">Unidade</span>
+                    <strong class="mt-1 block text-white">{{ site.name|default:"Todas" }}</strong>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
+                    <span class="text-slate-400">Twins em alta atencao</span>
+                    <strong class="mt-1 block text-white">{{ digital_twin_high_attention|length }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid gap-6 xl:grid-cols-[1.1fr,1.9fr]">
+        <article class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+            <div class="mb-4 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Mapa de Twins</h3>
+                    <p class="text-sm text-slate-400">Selecione um twin para inspecionar o estado projetado.</p>
+                </div>
+                <span class="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-200">{{ digital_twins|length }} ativos</span>
+            </div>
+            <div class="grid gap-3">
+                {% for twin in digital_twins %}
+                    <a href="?twin={{ twin.public_id }}" class="rounded-2xl border {% if selected_twin and selected_twin.public_id == twin.public_id %}border-cyan-400/60 bg-cyan-500/10{% else %}border-slate-800 bg-slate-900/70{% endif %} p-4 transition hover:border-cyan-400/40 hover:bg-slate-900">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <strong class="block text-white">{% if twin.site %}{{ twin.site.name }}{% else %}{{ twin.asset.name }}{% endif %}</strong>
+                                <span class="mt-1 block text-xs uppercase tracking-[0.28em] text-slate-400">{{ twin.get_twin_type_display }}</span>
+                                <p class="mt-2 text-sm text-slate-300">{{ twin.current_state_summary|default:"Aguardando projecao." }}</p>
+                            </div>
+                            <span class="rounded-full px-3 py-1 text-xs font-medium {% if twin.risk_level == 'critical' %}bg-rose-500/15 text-rose-200{% elif twin.risk_level == 'high' %}bg-amber-500/15 text-amber-200{% elif twin.risk_level == 'medium' %}bg-yellow-500/15 text-yellow-200{% else %}bg-emerald-500/15 text-emerald-200{% endif %}">{{ twin.risk_level }}</span>
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="rounded-2xl border border-dashed border-slate-700 p-6 text-sm text-slate-400">Nenhum twin disponivel no escopo atual.</div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+            {% if selected_twin %}
+                <div class="flex flex-col gap-4 border-b border-slate-800 pb-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.3em] text-cyan-300">{{ selected_twin.get_twin_type_display }}</p>
+                        <h3 class="mt-2 text-2xl font-semibold text-white">{% if selected_twin.site %}{{ selected_twin.site.name }}{% else %}{{ selected_twin.asset.name }}{% endif %}</h3>
+                        <p class="mt-2 max-w-3xl text-sm text-slate-300">{{ selected_twin.current_state_summary }}</p>
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
+                            <span class="text-slate-400">Risco</span>
+                            <strong class="mt-1 block text-white">{{ selected_twin.risk_level }}</strong>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
+                            <span class="text-slate-400">Status</span>
+                            <strong class="mt-1 block text-white">{{ selected_twin.status }}</strong>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3">
+                            <span class="text-slate-400">Ultima projecao</span>
+                            <strong class="mt-1 block text-white">{{ selected_twin.last_projected_at|date:"d/m H:i" }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Saude Operacional</h4>
+                        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                            {% for key, value in selected_twin.state_payload.items %}
+                                {% if key != "next_expected_events" and key != "asset_identity" %}
+                                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3">
+                                        <span class="text-xs uppercase tracking-[0.24em] text-slate-500">{{ key|cut:"_" }}</span>
+                                        <strong class="mt-1 block text-white">{{ value }}</strong>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Sinais Ativos</h4>
+                        <div class="mt-4 grid gap-3">
+                            {% for signal in selected_twin_signals %}
+                                <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <strong class="block text-white">{{ signal.title }}</strong>
+                                            <p class="mt-1 text-sm text-slate-300">{{ signal.summary }}</p>
+                                            <small class="mt-2 block text-slate-500">{{ signal.source_type }} • {{ signal.occurred_at|date:"d/m H:i" }}</small>
+                                        </div>
+                                        <span class="rounded-full px-3 py-1 text-xs font-medium {% if signal.severity == 'critical' %}bg-rose-500/15 text-rose-200{% elif signal.severity == 'high' %}bg-amber-500/15 text-amber-200{% elif signal.severity == 'medium' %}bg-yellow-500/15 text-yellow-200{% else %}bg-emerald-500/15 text-emerald-200{% endif %}">{{ signal.severity }}</span>
+                                    </div>
+                                </article>
+                            {% empty %}
+                                <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Sem sinais ativos no momento.</div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+
+                <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Timeline Recente</h4>
+                        <div class="mt-4 grid gap-3">
+                            {% for item in selected_twin.timeline_payload %}
+                                <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                    <strong class="block text-white">{{ item.title }}</strong>
+                                    <p class="mt-1 text-sm text-slate-300">{{ item.summary }}</p>
+                                    <small class="mt-2 block text-slate-500">{{ item.type }} • {{ item.occurred_at|slice:":16"|default:"-" }}</small>
+                                </article>
+                            {% empty %}
+                                <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Sem eventos recentes na timeline.</div>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Snapshots Historicos</h4>
+                        <div class="mt-4 grid gap-3">
+                            {% for snapshot in selected_twin_snapshots %}
+                                <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                    <strong class="block text-white">{{ snapshot.snapshot_time|date:"d/m/Y H:i" }}</strong>
+                                    <p class="mt-1 text-sm text-slate-300">{{ snapshot.summary.title|default:selected_twin.current_state_summary }}</p>
+                                    <small class="mt-2 block text-slate-500">Risco: {{ snapshot.risk_payload.risk_level|default:selected_twin.risk_level }}</small>
+                                </article>
+                            {% empty %}
+                                <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Ainda nao ha snapshots persistidos.</div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+
+                <section class="mt-5 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                    <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Graph Insight</h4>
+                    {% if selected_twin_graph_context.node %}
+                        <p class="mt-3 text-sm text-slate-300">{{ selected_twin_graph_context.summary }}</p>
+                        <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                            {% for item in selected_twin_graph_context.top_relations %}
+                                <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                    <strong class="block text-white">{{ item.label }}</strong>
+                                    <p class="mt-1 text-sm text-slate-300">{{ item.edge_type }}</p>
+                                    <small class="mt-2 block text-slate-500">{{ item.node_type }} • peso {{ item.weight }}</small>
+                                </article>
+                            {% endfor %}
+                        </div>
+                        <a class="mt-4 inline-block text-sm font-medium text-cyan-300" href="{% url 'admin-shell:ai-knowledge-graph-center' %}">Abrir Knowledge Graph</a>
+                    {% else %}
+                        <div class="mt-3 rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Sem contexto relacional enriquecido para este twin ainda.</div>
+                    {% endif %}
+                </section>
+            {% else %}
+                <div class="rounded-2xl border border-dashed border-slate-700 p-8 text-center text-sm text-slate-400">Selecione um twin no painel lateral para visualizar a projeção operacional.</div>
+            {% endif %}
+        </article>
+    </div>
+</section>
+{% endblock %}

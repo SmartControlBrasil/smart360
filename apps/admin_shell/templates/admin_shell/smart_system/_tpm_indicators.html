@@ -1,0 +1,5 @@
+<div class="smart-kpi-grid smart-kpi-grid--compact">
+    {% for item in tpm_indicators %}
+        {% include "admin_shell/components/maintenance_kpi_card.html" with kpi=item %}
+    {% endfor %}
+</div>

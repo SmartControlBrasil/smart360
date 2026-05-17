@@ -1,0 +1,142 @@
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <header class="section-header">
+            <div>
+                <h2>Fila de aprovacao</h2>
+                <p>Decisoes aguardando aprovador humano com contexto, policy e trilha auditavel.</p>
+            </div>
+        </header>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Acao</th>
+                        <th>Risco</th>
+                        <th>Tenant</th>
+                        <th>Policy</th>
+                        <th>Simulacao</th>
+                        <th>Status</th>
+                        <th>Executar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for decision in pending_decisions %}
+                        <tr>
+                            <td>{{ decision.agent_action_proposal.agent_run.agent.name }}</td>
+                            <td>
+                                <strong>{{ decision.agent_action_proposal.title|default:decision.normalized_action_type }}</strong>
+                                <small>{{ decision.agent_action_proposal.summary|default:decision.decision_reason }}</small>
+                            </td>
+                            <td>{{ decision.risk_level|upper }}</td>
+                            <td>{{ decision.company.name|default:"-" }} / {{ decision.site.name|default:"Todas" }}</td>
+                            <td>{{ decision.policy_applied.name|default:"Sem policy" }}</td>
+                            <td>
+                                {% with latest_simulation=decision.simulation_runs.first %}
+                                    {% if latest_simulation and latest_simulation.result %}
+                                        <strong>{{ latest_simulation.scenario.simulation_type.name }}</strong>
+                                        <small>{{ latest_simulation.result.summary }}</small>
+                                    {% else %}
+                                        <small>Sem simulacao anexada</small>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>{% include "admin_shell/components/decision_status_badge.html" with status=decision.decision_status %}</td>
+                            <td>
+                                <form method="post" action="{% url 'admin-shell:ai-decision-approve' decision_id=decision.public_id %}">
+                                    {% csrf_token %}
+                                    <input type="text" name="comment" placeholder="Comentario de aprovacao">
+                                    <button class="quick-action-button" type="submit">Aprovar</button>
+                                </form>
+                                <form method="post" action="{% url 'admin-shell:ai-decision-reject' decision_id=decision.public_id %}">
+                                    {% csrf_token %}
+                                    <input type="text" name="comment" placeholder="Motivo da rejeicao">
+                                    <button class="quick-action-button quick-action-button--ghost" type="submit">Rejeitar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8">Nenhuma decisao pendente no momento.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+    <article class="content-panel">
+        <header class="section-header">
+            <div>
+                <h2>Historico</h2>
+                <p>Ultimas decisoes consolidadas com aprovador, execucao e explicabilidade.</p>
+            </div>
+        </header>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Origem</th>
+                        <th>Decisao</th>
+                        <th>Status</th>
+                        <th>Aprovador</th>
+                        <th>Simulacao</th>
+                        <th>Execucao</th>
+                        <th>Criada em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for decision in recent_decisions %}
+                        <tr>
+                            <td>{{ decision.agent_action_proposal.agent_run.agent.slug }}</td>
+                            <td>
+                                <strong>{{ decision.normalized_action_type }}</strong>
+                                <small>{{ decision.decision_reason }}</small>
+                            </td>
+                            <td>{% include "admin_shell/components/decision_status_badge.html" with status=decision.decision_status %}</td>
+                            <td>{{ decision.decided_by_user.email|default:"sistema" }}</td>
+                            <td>{{ decision.simulation_runs.first.result.confidence_level|default:"-" }}</td>
+                            <td>{{ decision.executions.first.execution_status|default:"-" }}</td>
+                            <td>{{ decision.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7">Ainda nao ha decisoes registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+<section class="content-panel">
+    <header class="section-header">
+        <div>
+            <h2>Policies ativas</h2>
+            <p>Catalogo inicial de autonomia progressiva configurado para manutencao, agenda, marketplace, rentabilidade e anomalias.</p>
+        </div>
+    </header>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Slug</th>
+                    <th>Action Type</th>
+                    <th>Risco</th>
+                    <th>Autonomia</th>
+                    <th>Aprovacao</th>
+                    <th>Perfis</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in policies %}
+                    <tr>
+                        <td>{{ policy.slug }}</td>
+                        <td>{{ policy.action_type }}</td>
+                        <td>{{ policy.risk_level }}</td>
+                        <td>L{{ policy.autonomy_level }}</td>
+                        <td>{{ policy.requires_human_approval|yesno:"humana,auto" }}</td>
+                        <td>{{ policy.approver_role_slugs|join:", " }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6">Nenhuma policy cadastrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -1,0 +1,11 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Assignments" subtitle="Atribuicoes criadas a partir das ofertas aceitas e integradas com ordens de servico." content_template="admin_shell/components/marketplace_assignment_listing_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

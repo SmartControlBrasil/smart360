@@ -1,0 +1,11 @@
+<ul class="event-log dense">
+    {% for item in activity_feed %}
+        <li>
+            <strong>{{ item.time }}</strong>
+            <div>
+                <span><b>{{ item.actor }}</b> {{ item.event }}</span>
+                <p>{{ item.reference }}</p>
+            </div>
+        </li>
+    {% endfor %}
+</ul>

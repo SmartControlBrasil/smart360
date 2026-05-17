@@ -1,0 +1,11 @@
+<div class="alert-stack">
+    {% for item in alerts %}
+        <article class="alert-row severity-{{ item.severity }}">
+            <span class="alert-marker"></span>
+            <div>
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.description }}</p>
+            </div>
+        </article>
+    {% endfor %}
+</div>

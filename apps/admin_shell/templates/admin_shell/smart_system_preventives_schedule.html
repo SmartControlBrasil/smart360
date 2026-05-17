@@ -1,0 +1,17 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout preventive-schedule-layout">
+    <div class="asset-summary-grid">
+        {% for card in schedule_headline %}
+            {% include "admin_shell/components/preventive_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Agenda operacional" subtitle="Visao cronologica das preventivas do dia, semana e backlog planejado." content_template="admin_shell/components/preventive_schedule_list.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

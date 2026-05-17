@@ -1,0 +1,43 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout work-order-create-layout">
+    {% if no_assets %}
+        <div class="technician-inline-alert warning">
+            Nao ha ativos ativos no escopo atual (empresa / site). Ajuste o contexto no topo da pagina ou cadastre ativos antes de abrir uma OS corretiva.
+        </div>
+    {% endif %}
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Nova OS corretiva</h2>
+                        <p>Cliente e site sao definidos pelo ativo selecionado. Campos obrigatorios estao marcados no formulario.</p>
+                    </div>
+                </header>
+                <div class="widget-card-body">
+                    <form method="post" class="asset-filter-form" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="technician-inline-alert critical">{{ form.non_field_errors }}</div>
+                        {% endif %}
+                        {% for field in form %}
+                            <div class="asset-filter-field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                                {{ field.errors }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+                        <div class="asset-filter-actions">
+                            <button type="submit" class="quick-action-button" {% if no_assets %}disabled aria-disabled="true"{% endif %}>Criar OS</button>
+                            <a class="quick-action-button" href="{% url 'admin-shell:smart-system-work-orders' %}">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

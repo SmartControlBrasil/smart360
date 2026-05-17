@@ -1,0 +1,46 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-panel">
+    <div class="section-heading">
+        <h2>Sincronizacao de campo</h2>
+    </div>
+    <p>Veja o que esta salvo localmente, o que ja foi enviado e o que ainda precisa de reprocessamento.</p>
+    <div class="technician-kpi-grid compact">
+        <article class="technician-mini-card">
+            <strong data-sync-summary-pending>0</strong>
+            <p>Pendencias locais</p>
+        </article>
+        <article class="technician-mini-card">
+            <strong data-sync-summary-errors>0</strong>
+            <p>Erros recentes</p>
+        </article>
+        <article class="technician-mini-card">
+            <strong data-sync-summary-last-sync>--</strong>
+            <p>Ultimo sync</p>
+        </article>
+    </div>
+    <div class="technician-action-grid">
+        <button type="button" class="quick-action-button" data-sync-now>Sincronizar agora</button>
+        <button type="button" class="quick-action-button secondary" data-refresh-offline-bundle>Atualizar dados offline</button>
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading">
+        <h2>Pendencias por atendimento</h2>
+    </div>
+    <div class="technician-card-list" data-sync-queue-list>
+        <p class="empty-state">Nenhuma pendencia local identificada.</p>
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading">
+        <h2>Conflitos e falhas</h2>
+    </div>
+    <div class="stack-list" data-sync-conflict-list>
+        <p class="empty-state">Nenhum conflito registrado.</p>
+    </div>
+</section>
+{% endblock %}

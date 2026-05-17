@@ -1,0 +1,187 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Overview de qualidade</h2>
+                    <p>Fechamento do ciclo recommendation → decision → execution → outcome → optimization.</p>
+                </div>
+            </header>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Recomendações</span>
+                    <strong class="stat-value">{{ optimization_overview.recommendation_avg|default:"0"|floatformat:2 }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Decisões</span>
+                    <strong class="stat-value">{{ optimization_overview.decision_avg|default:"0"|floatformat:2 }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Simulações</span>
+                    <strong class="stat-value">{{ optimization_overview.simulation_avg|default:"0"|floatformat:2 }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Feedbacks</span>
+                    <strong class="stat-value">{{ optimization_overview.feedback_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Proposals pendentes</span>
+                    <strong class="stat-value">{{ optimization_overview.pending_proposals }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Proposals aplicadas</span>
+                    <strong class="stat-value">{{ optimization_overview.applied_proposals }}</strong>
+                </div>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Propostas de ajuste</h2>
+                    <p>Ajutes supervisionados sobre policies, heurísticas e comportamento dos agentes.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Alvo</th>
+                            <th>Tipo</th>
+                            <th>Risco</th>
+                            <th>Status</th>
+                            <th>Impacto esperado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for proposal in pending_optimization_proposals %}
+                            <tr>
+                                <td>{{ proposal.target_type }}<br><small>{{ proposal.target_reference }}</small></td>
+                                <td>{{ proposal.proposal_type }}</td>
+                                <td>{{ proposal.risk_level|title }}</td>
+                                <td>{% include "admin_shell/components/decision_status_badge.html" with status=proposal.status %}</td>
+                                <td>{{ proposal.expected_impact_summary|default:proposal.rationale }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5">Nenhuma proposal pendente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Qualidade por agente</h2>
+                    <p>Precisão percebida e efetividade operacional por agente.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Agente</th>
+                            <th>Runs</th>
+                            <th>Recommendations</th>
+                            <th>Decisions</th>
+                            <th>Score composto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in agent_quality_rows %}
+                            <tr>
+                                <td>{{ row.agent_name }}</td>
+                                <td>{{ row.runs_count }}</td>
+                                <td>{{ row.recommendations_count }}</td>
+                                <td>{{ row.decisions_count }}</td>
+                                <td>{{ row.composite_score|floatformat:2 }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5">Sem dados suficientes.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Qualidade do copilot</h2>
+                    <p>Feedback explícito sobre mensagens assistidas e utilidade percebida.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mensagem</th>
+                            <th>Intent</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in copilot_quality_rows %}
+                            <tr>
+                                <td>{{ row.summary }}</td>
+                                <td>{{ row.detected_intent|default:"-" }}</td>
+                                <td>{{ row.score|floatformat:2 }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3">Nenhum feedback de copilot registrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+
+    <section class="content-grid three-column">
+        <article class="content-panel">
+            <header class="section-header"><div><h2>Decision outcomes</h2></div></header>
+            <div class="event-feed">
+                {% for outcome in decision_outcomes %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ outcome.decision.normalized_action_type }}</strong>
+                        <p>{{ outcome.evaluation_summary }}</p>
+                        <small>{{ outcome.effectiveness_level }} • {{ outcome.effectiveness_score }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum outcome de decisão.</p>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header"><div><h2>Simulation outcomes</h2></div></header>
+            <div class="event-feed">
+                {% for outcome in simulation_outcomes %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ outcome.simulation_run.scenario.simulation_type.name }}</strong>
+                        <p>{{ outcome.evaluation_summary }}</p>
+                        <small>{{ outcome.effectiveness_level }} • {{ outcome.effectiveness_score }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum outcome de simulação.</p>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header"><div><h2>Feedbacks recentes</h2></div></header>
+            <div class="event-feed">
+                {% for feedback in feedback_signals %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ feedback.source_type }} / {{ feedback.signal_type }}</strong>
+                        <p>{{ feedback.comment|default:"Feedback sem comentário." }}</p>
+                        <small>score {{ feedback.score }} • {{ feedback.created_at|date:"d/m/Y H:i" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum feedback recente.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

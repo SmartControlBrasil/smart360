@@ -1,0 +1,26 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="asset-kpi-grid">
+        {% for widget in marketplace_kpis %}
+            {% include "admin_shell/components/marketplace_dashboard_widget.html" with widget=widget %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Solicitacoes recentes" subtitle="Demandas abertas, em matching e com ofertas recebidas." content_template="admin_shell/components/service_request_card_list.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Tecnicos mais bem avaliados" subtitle="Perfis com melhor reputacao e maior historico de execucao." content_template="admin_shell/components/technician_card_list.html" %}
+        </div>
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Atribuicoes recentes" subtitle="Servicos aceitos e evolucao operacional do marketplace." content_template="admin_shell/components/marketplace_assignment_table.html" %}
+        </div>
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Matching calculado" subtitle="Melhores recomendacoes recentes geradas pelo motor de matching." content_template="admin_shell/components/marketplace_match_table.html" matching_records=matching_highlights %}
+        </div>
+    </div>
+</section>
+{% endblock %}

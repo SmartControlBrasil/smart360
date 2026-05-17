@@ -1,0 +1,39 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="checklist-page">
+            <div class="checklist-header">
+                <h1>{% if form_mode == "update" %}Editar checklist{% else %}Novo checklist{% endif %}</h1>
+                <p class="muted-block">Cadastre uma rotina técnica simples.</p>
+            </div>
+
+            <div class="checklist-form-wrapper">
+                <div class="checklist-form-card">
+                    <form method="post" class="smart-form-card checklist-simple-form" novalidate>
+                        {% csrf_token %}
+                        <div class="smart-form-grid">
+                            <div class="smart-field smart-field--full">
+                                <label class="smart-label">{{ form.name.label }}</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="smart-field smart-field--full">
+                                <label class="smart-label">{{ form.description.label }}</label>
+                                {{ form.description }}
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <div class="form-actions-inner">
+                                <button type="submit" class="quick-action-button primary">Salvar checklist</button>
+                                <a class="quick-action-button" href="{% url 'admin-shell:smart-system-checklists' %}">Cancelar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

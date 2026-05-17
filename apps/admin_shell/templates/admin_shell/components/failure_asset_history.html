@@ -1,0 +1,15 @@
+<div class="timeline-list compact-timeline">
+    {% for item in failure.asset_history %}
+        <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <header>
+                    <strong>{{ item.type }}</strong>
+                    <span>{{ item.timestamp }}</span>
+                </header>
+                <p>{{ item.description }}</p>
+                <small>{{ item.reference }}</small>
+            </div>
+        </article>
+    {% endfor %}
+</div>

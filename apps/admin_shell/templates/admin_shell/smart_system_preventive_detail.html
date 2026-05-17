@@ -1,0 +1,60 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout preventive-detail-layout">
+    <div class="asset-hero preventive-hero">
+        <div>
+            <span class="asset-tag">{{ preventive_plan.code }}</span>
+            <h2>{{ preventive_plan.name }}</h2>
+            <p>{{ preventive_plan.asset.name }} • {{ preventive_plan.client }} • {{ preventive_plan.site }} • {{ preventive_plan.sector }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/preventive_status_badge.html" with value=preventive_plan.status %}
+            {% include "admin_shell/components/asset_criticality_badge.html" with value=preventive_plan.asset.criticality %}
+            {% include "admin_shell/components/preventive_adherence_badge.html" with value=preventive_plan.adherence %}
+        </div>
+    </div>
+
+    <div class="asset-summary-grid">
+        {% for card in preventive_plan.summary_cards %}
+            {% include "admin_shell/components/preventive_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Dados do plano" subtitle="Contexto de planejamento, estrategia preventiva, frequencia e tolerancias." content_template="admin_shell/components/preventive_plan_info.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Recorrencia" subtitle="Leitura da regra de repeticao, janela e proxima logica de execucao." content_template="admin_shell/components/preventive_recurrence_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Ativo e contexto operacional" subtitle="Ativo, localizacao, criticidade e referencia operacional do plano." content_template="admin_shell/components/preventive_asset_context.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Status, aderencia e cobertura" subtitle="Disciplina preventiva, cobertura do ativo e risco operacional." content_template="admin_shell/components/preventive_coverage_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Historico e agenda resumida" subtitle="Programacoes, execucoes, reprogramacoes e eventos-chave do plano." content_template="admin_shell/components/preventive_timeline.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Checklist vinculado" subtitle="Checklist associado ao plano e base para execucao padronizada." content_template="admin_shell/components/preventive_checklist_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e pendencias" subtitle="Excecoes operacionais do plano e gaps de cobertura preventiva." content_template="admin_shell/components/preventive_alert_panel.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Rotinas imediatas para manter o plano sob controle." content_template="admin_shell/components/preventive_action_panel.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

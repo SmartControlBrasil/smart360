@@ -1,0 +1,25 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="page-hero">
+    <h1>{{ page_title }}</h1>
+    <p>{{ page_description }}</p>
+</section>
+
+<section class="dashboard-kpi-grid">
+    {% for item in schedule_kpis %}
+        {% include "admin_shell/components/maintenance_kpi_card.html" with item=item %}
+    {% endfor %}
+</section>
+
+<section class="schedule-load-grid">
+    {% for card in technician_load_cards %}
+        {% include "admin_shell/components/technician_load_card.html" %}
+    {% empty %}
+        <p class="empty-state">Nenhuma carga planejada para a data selecionada.</p>
+    {% endfor %}
+</section>
+
+{% include "admin_shell/components/route_sequence_list.html" with visits=today_visits title="Visitas do dia" %}
+{% include "admin_shell/components/unassigned_visits_table.html" with rows=unassigned_visits %}
+{% endblock %}

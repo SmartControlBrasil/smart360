@@ -1,0 +1,5 @@
+<div class="smart-kpi-grid">
+    {% for kpi in kpis %}
+        {% include "admin_shell/components/maintenance_kpi_card.html" with kpi=kpi %}
+    {% endfor %}
+</div>

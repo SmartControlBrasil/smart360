@@ -1,0 +1,8 @@
+<div class="action-shortcut-grid">
+    {% for item in asset.quick_actions %}
+        <a class="action-shortcut tone-{{ item.tone }}" href="{{ item.href }}">
+            <strong>{{ item.label }}</strong>
+            <p>{{ item.context }}</p>
+        </a>
+    {% endfor %}
+</div>

@@ -1,0 +1,5 @@
+<article class="war-room-feed-item war-room-feed-item--{{ item.severity|default:'info' }}">
+    <strong>{{ item.title }}</strong>
+    <p>{{ item.meta }}</p>
+    <small>{{ item.event_type }}{% if item.entity %} • {{ item.entity }}{% endif %}</small>
+</article>

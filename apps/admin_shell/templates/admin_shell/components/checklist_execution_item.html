@@ -1,0 +1,34 @@
+<article class="checklist-execution-item {% if item.response == 'NOK' %}is-nok{% elif item.response == 'OK' %}is-ok{% endif %}">
+    <header>
+        <div>
+            <span class="checklist-item-order">#{{ item.order }}</span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+        </div>
+        <div class="checklist-item-meta">
+            {% if item.required %}<span class="status-badge status-red">Obrigatorio</span>{% endif %}
+            {% if item.alert_on_nok %}<span class="status-badge status-amber">Gera alerta</span>{% endif %}
+        </div>
+    </header>
+    <div class="checklist-item-detail-grid">
+        <div>
+            <strong>Instrucao</strong>
+            <p>{{ item.instruction }}</p>
+        </div>
+        <div>
+            <strong>Resposta</strong>
+            <div class="response-pill-row">
+                <span class="response-pill {% if item.response == 'OK' %}is-selected is-ok{% endif %}">OK</span>
+                <span class="response-pill {% if item.response == 'NOK' %}is-selected is-nok{% endif %}">NOK</span>
+                <span class="response-pill {% if item.response == 'N/A' %}is-selected is-na{% endif %}">N/A</span>
+            </div>
+        </div>
+        <div>
+            <strong>Observacao</strong>
+            <p>{{ item.note|default:item.default_note|default:"Sem observacao registrada." }}</p>
+        </div>
+    </div>
+    {% if item.timestamp %}
+        <footer>{{ item.timestamp }}</footer>
+    {% endif %}
+</article>

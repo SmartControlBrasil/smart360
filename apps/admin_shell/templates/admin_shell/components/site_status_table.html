@@ -1,0 +1,26 @@
+<div class="table-shell">
+    <table class="work-order-table compact-table">
+        <thead>
+            <tr>
+                <th>Unidade</th>
+                <th>OS abertas</th>
+                <th>Atrasos</th>
+                <th>Criticos</th>
+                <th>Conformidade</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for site in site_status %}
+                <tr>
+                    <td><strong>{{ site.site }}</strong></td>
+                    <td>{{ site.open_orders }}</td>
+                    <td>{{ site.delays }}</td>
+                    <td>{{ site.critical_assets }}</td>
+                    <td>{{ site.compliance }}</td>
+                    <td><span class="status-badge status-{{ site.tone }}">{{ site.status }}</span></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

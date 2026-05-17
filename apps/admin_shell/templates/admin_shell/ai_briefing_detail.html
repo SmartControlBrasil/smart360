@@ -1,0 +1,61 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="content-panel">
+    <div class="section-heading"><h2>{{ briefing.title }}</h2></div>
+    <p>{{ briefing.summary }}</p>
+    <div class="summary-grid">
+        <article class="summary-card tone-neutral"><span>Periodo</span><strong>{{ briefing.period_label }}</strong><small>{{ briefing.get_briefing_type_display }}</small></article>
+        <article class="summary-card tone-neutral"><span>Audience</span><strong>{{ briefing.get_audience_display }}</strong><small>{{ briefing.company.name|default:"-" }}</small></article>
+        <article class="summary-card tone-warning"><span>Status</span><strong>{{ briefing.get_status_display }}</strong><small>{{ briefing.generated_at|date:"d/m/Y H:i" }}</small></article>
+    </div>
+</section>
+
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Prioridades</h2></div>
+        <ul class="copilot-inline-list">
+            {% for item in briefing.content.priorities %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Alertas</h2></div>
+        <ul class="copilot-inline-list">
+            {% for item in briefing.content.alerts %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </article>
+</section>
+
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Recomendacoes</h2></div>
+        <div class="stack-list">
+            {% for item in briefing.content.recommendations %}
+                <article class="stack-card">
+                    <strong>{{ item.title|default:"Recomendacao" }}</strong>
+                    <p>{{ item.summary }}</p>
+                </article>
+            {% empty %}
+                <p class="empty-state">Sem recomendacoes registradas.</p>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Acoes sugeridas</h2></div>
+        <ul class="copilot-inline-list">
+            {% for item in briefing.content.suggested_actions %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+        <div class="quick-actions">
+            {% for link in briefing.content.links %}
+                <a class="quick-action-button quick-action-button--ghost" href="{{ link.href }}">{{ link.label }}</a>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

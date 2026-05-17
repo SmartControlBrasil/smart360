@@ -1,0 +1,88 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+    <section class="metric-grid">
+        {% for card in summary_cards %}
+            {% include "admin_shell/components/contract_summary_card.html" with card=card %}
+        {% endfor %}
+    </section>
+
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Acoes do contrato</h2>
+            <p>Operacoes recorrentes de ativacao, cobranca e geracao preventiva.</p>
+        </div>
+        <div class="page-actions">
+            <form method="post" action="{% url 'admin-shell:smart-system-contract-activate' contract_number=contract.contract_number %}">{% csrf_token %}<button class="quick-action-button" type="submit">Ativar</button></form>
+            <form method="post" action="{% url 'admin-shell:smart-system-contract-suspend' contract_number=contract.contract_number %}">{% csrf_token %}<button class="quick-action-button" type="submit">Suspender</button></form>
+            <form method="post" action="{% url 'admin-shell:smart-system-contract-generate-preventives' contract_number=contract.contract_number %}">{% csrf_token %}<button class="quick-action-button" type="submit">Gerar preventivas</button></form>
+            <form method="post" action="{% url 'admin-shell:smart-system-contract-generate-billing' contract_number=contract.contract_number %}">{% csrf_token %}<button class="quick-action-button" type="submit">Gerar cobranca</button></form>
+        </div>
+    </section>
+
+    {% include "admin_shell/components/contract_asset_list.html" %}
+
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Preventivas geradas</h2>
+            <p>Ordens preventivas abertas a partir da recorrencia contratual.</p>
+        </div>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>OS</th>
+                        <th>Ativo</th>
+                        <th>Status</th>
+                        <th>Abertura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in contract_orders %}
+                        <tr>
+                            <td><a href="{% url 'admin-shell:smart-system-work-order-detail' order_code=order.order_number %}">{{ order.order_number }}</a></td>
+                            <td>{{ order.asset.asset_tag|default:"-" }} - {{ order.asset.name|default:"Sem ativo" }}</td>
+                            <td>{{ order.get_status_display }}</td>
+                            <td>{{ order.opened_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">Nenhuma preventiva gerada ainda.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="content-card">
+        <div class="section-heading">
+            <h2>Faturamento recorrente</h2>
+            <p>Faturas geradas a partir do ciclo do contrato.</p>
+        </div>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fatura</th>
+                        <th>Status</th>
+                        <th>Emissao</th>
+                        <th>Vencimento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in contract_invoices %}
+                        <tr>
+                            <td>{{ invoice.invoice_number }}</td>
+                            <td>{{ invoice.get_status_display }}</td>
+                            <td>{{ invoice.issued_at|date:"d/m/Y" }}</td>
+                            <td>{{ invoice.due_at|date:"d/m/Y"|default:"-" }}</td>
+                            <td>R$ {{ invoice.total_amount }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5">Nenhuma cobranca recorrente gerada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="form-page">
+        <article class="form-card">
+            <h3>{% if form_mode == "update" %}Editar equipamento do cliente{% else %}Novo equipamento do cliente{% endif %}</h3>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="form-grid">
+                    {% include "admin_shell/components/forms/field.html" with field=form.company %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.site %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.equipment_model %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.display_name %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.customer_tag %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.internal_code %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.serial_number %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.location %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.preventive_group %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.installed_at %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.status %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.is_pmoc_applicable %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.notes full=True %}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar inventário</button>
+                    <a class="btn-secondary" href="{% url 'admin-shell:smart-system-customer-equipments' %}">Cancelar</a>
+                </div>
+            </form>
+        </article>
+    </div>
+</section>
+{% endblock %}

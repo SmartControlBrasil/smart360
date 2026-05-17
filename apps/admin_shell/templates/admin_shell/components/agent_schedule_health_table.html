@@ -1,0 +1,30 @@
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Tecnico</th>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Risco</th>
+                <th>Score</th>
+                <th>Resumo</th>
+                <th>Recomendacao atual</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flag in schedule_health_flags %}
+                <tr>
+                    <td>{{ flag.technician.display_name|default:flag.technician.email|default:"Operacao" }}</td>
+                    <td>{{ flag.schedule_date|default:"-" }}</td>
+                    <td>{{ flag.get_flag_type_display }}</td>
+                    <td>{{ flag.risk_level|title }}</td>
+                    <td>{{ flag.attention_score }}</td>
+                    <td>{{ flag.summary }}</td>
+                    <td>{{ flag.latest_recommendation.title|default:"Sem recomendacao vinculada" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Nenhum alerta operacional de agenda.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

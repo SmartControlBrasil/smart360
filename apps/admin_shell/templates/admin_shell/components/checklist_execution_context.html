@@ -1,0 +1,38 @@
+<dl class="detail-grid">
+    <div>
+        <dt>Ativo</dt>
+        <dd><a class="asset-primary-link" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=execution.asset_code %}">{{ execution.asset.name }}</a></dd>
+    </div>
+    <div>
+        <dt>Cliente / site</dt>
+        <dd>{{ checklist.client }} • {{ checklist.site }}</dd>
+    </div>
+    <div>
+        <dt>Setor / localizacao</dt>
+        <dd>{{ execution.asset.sector }}</dd>
+    </div>
+    <div>
+        <dt>OS vinculada</dt>
+        <dd>
+            {% if execution.work_order_code %}
+                <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-work-order-detail' order_code=execution.work_order_code %}">{{ execution.work_order_code }}</a>
+            {% else %}
+                Nao vinculada
+            {% endif %}
+        </dd>
+    </div>
+    <div>
+        <dt>Plano preventivo</dt>
+        <dd>
+            {% if execution.preventive_plan_code %}
+                <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-preventive-detail' plan_code=execution.preventive_plan_code %}">{{ execution.preventive_plan_code }}</a>
+            {% else %}
+                Nao vinculado
+            {% endif %}
+        </dd>
+    </div>
+    <div>
+        <dt>Criticidade do ativo</dt>
+        <dd>{{ checklist.criticality }}</dd>
+    </div>
+</dl>

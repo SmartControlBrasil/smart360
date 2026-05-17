@@ -1,0 +1,29 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout preventive-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            {% for filter in preventive_filters %}
+                {% include "admin_shell/components/preventive_filter_bar.html" with filter=filter %}
+            {% endfor %}
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:smart-system-preventives' %}">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="asset-kpi-grid">
+        {% for card in preventive_kpis %}
+            {% include "admin_shell/components/preventive_kpi_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Carteira preventiva" subtitle="Cobertura, recorrencia, aderencia e situacao operacional dos planos ativos." content_template="admin_shell/components/preventive_plan_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

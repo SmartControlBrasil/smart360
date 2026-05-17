@@ -1,0 +1,20 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout stock-movements-layout">
+    <div class="asset-kpi-grid">
+        {% for card in movement_kpis %}
+            {% include "admin_shell/components/part_stock_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Entrada de estoque" subtitle="Recebimentos e reposicoes de itens MRO." content_template="admin_shell/components/stock_movement_forms.html" %}
+        </div>
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Historico consolidado" subtitle="Movimentacoes recentes de entrada, saida e ajuste manual." content_template="admin_shell/components/stock_movement_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,5 @@
+<article class="stat-card tone-{{ card.tone|default:'slate' }}">
+    <span class="stat-card-label">{{ card.label|default:"" }}</span>
+    <strong>{{ card.value }}</strong>
+    <p>{{ card.delta|default:"" }}</p>
+</article>

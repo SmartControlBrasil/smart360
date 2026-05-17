@@ -1,0 +1,51 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table billing-table">
+        <thead>
+            <tr>
+                <th>Fatura</th>
+                <th>Empresa</th>
+                <th>Contrato</th>
+                <th>Valor</th>
+                <th>Emissao</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Pagamento</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <td><strong>{{ invoice.invoice_number }}</strong></td>
+                    <td>{{ invoice.company_name }}</td>
+                    <td>{{ invoice.contract_code|default:"-" }}</td>
+                    <td>{{ invoice.total_amount }}</td>
+                    <td>{{ invoice.issued_at|date:"d/m/Y" }}</td>
+                    <td>{{ invoice.due_at|date:"d/m/Y" }}</td>
+                    <td>{% include "admin_shell/components/billing_status_badge.html" with value=invoice.status tone=invoice.status_tone %}</td>
+                    <td>{{ invoice.payment_method }}</td>
+                    <td>
+                        <div class="table-actions">
+                            {% if not compact %}
+                                <form method="post" action="{% url 'admin-shell:billing-invoice-mark-paid' invoice_number=invoice.invoice_number %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Marcar pago</button>
+                                </form>
+                                <form method="post" action="{% url 'admin-shell:billing-invoice-cancel' invoice_number=invoice.invoice_number %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Cancelar</button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'admin-shell:billing-invoices' %}">Gerir</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="empty-state-cell">Nenhuma fatura encontrada.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

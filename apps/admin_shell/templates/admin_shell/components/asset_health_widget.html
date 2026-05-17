@@ -1,0 +1,27 @@
+<div class="maintenance-health-grid">
+    <div class="health-distribution">
+        {% for item in operational_health.distribution %}
+            <article class="distribution-card tone-{{ item.tone }}">
+                <strong>{{ item.value }}</strong>
+                <span>{{ item.label }}</span>
+                <div class="meter compact"><span style="width: {{ item.percentage }}%"></span></div>
+            </article>
+        {% endfor %}
+    </div>
+    <div class="maintenance-focus-list">
+        {% for area in operational_health.focus_areas %}
+            <article class="focus-row">
+                <span class="status-badge status-{{ area.tone }}">{{ area.area }}</span>
+                <p>{{ area.summary }}</p>
+            </article>
+        {% endfor %}
+    </div>
+    <div class="mini-summary-grid">
+        {% for item in operational_health.critical_orders %}
+            <div class="mini-summary-card">
+                <span>{{ item.label }}</span>
+                <strong>{{ item.value }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+</div>

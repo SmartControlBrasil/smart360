@@ -1,0 +1,31 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="form-page">
+        <article class="form-card">
+            <h3>{% if form_mode == "update" %}Editar modelo técnico{% else %}Novo modelo técnico{% endif %}</h3>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="form-grid">
+                    {% include "admin_shell/components/forms/field.html" with field=form.company %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.name %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.category %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.manufacturer %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.manufacturer_code %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.equipment_type %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.status %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.is_pmoc_applicable %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.pmoc_frequency %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.description full=True %}
+                    {% include "admin_shell/components/forms/field.html" with field=form.notes full=True %}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar modelo</button>
+                    <a class="btn-secondary" href="{% url 'admin-shell:smart-system-equipment-models' %}">Cancelar</a>
+                </div>
+            </form>
+        </article>
+    </div>
+</section>
+{% endblock %}

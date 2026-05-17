@@ -1,0 +1,35 @@
+<header class="shell-topbar client-portal-topbar">
+    <div class="topbar-left">
+        <button class="shell-icon-button" type="button" data-sidebar-toggle aria-label="Alternar menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="portal-context-copy">
+            <strong>{{ portal_tenant_context.company.name|default:"Empresa nao selecionada" }}</strong>
+            <span>
+                {% if portal_tenant_context.site %}
+                    {{ portal_tenant_context.site.name }}
+                {% else %}
+                    Todas as unidades autorizadas
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        {% include "client_portal/components/client_site_switcher.html" %}
+        <div class="quick-actions">
+            <a class="quick-action-button quick-action-button--ghost" href="{{ portal_copilot_entrypoint|default_if_none:'#' }}">Copiloto</a>
+            {% for action in portal_quick_actions|slice:":2" %}
+                {% if action.route_name %}
+                    <a class="quick-action-button" href="{% url action.route_name %}">{{ action.label }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="user-menu">
+            <div class="avatar">{{ portal_user.initials }}</div>
+            <div class="user-meta">
+                <strong>{{ portal_user.name }}</strong>
+                <span>{{ portal_user.email }}</span>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,37 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Documento</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Sites/unidades</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+                <tr>
+                    <td><strong>{{ customer.name }}</strong></td>
+                    <td>{{ customer.document }}</td>
+                    <td>{{ customer.email }}</td>
+                    <td>{{ customer.phone }}</td>
+                    <td>{{ customer.sites_count }}</td>
+                    <td><span class="status-badge status-{{ customer.status_slug }}">{{ customer.status }}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:smart-system-customer-detail' customer_code=customer.code %}">Detalhar</a>
+                            <a href="{% url 'admin-shell:smart-system-customer-update' customer_code=customer.code %}">Editar</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state-cell">Nenhum cliente encontrado no escopo atual.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

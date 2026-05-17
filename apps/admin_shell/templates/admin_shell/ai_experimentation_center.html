@@ -1,0 +1,116 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Experimentos ativos</h2>
+                    <p>Distribuicao controlada de trafego entre variantes de agentes, decision engine, simulation engine, policies e heuristicas.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Experimento</th>
+                            <th>Alvo</th>
+                            <th>Status</th>
+                            <th>Metrica principal</th>
+                            <th>Vencedor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for experiment in experiments %}
+                            <tr>
+                                <td><strong>{{ experiment.name }}</strong><br><small>{{ experiment.slug }}</small></td>
+                                <td>{{ experiment.target_component }}<br><small>{{ experiment.target_reference|default:"global" }}</small></td>
+                                <td>{% include "admin_shell/components/decision_status_badge.html" with status=experiment.status %}</td>
+                                <td>{{ experiment.primary_metric }}</td>
+                                <td>{{ experiment.winner_variant.name|default:"-" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5">Nenhum experimento registrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Resultados comparativos</h2>
+                    <p>Comparacao consolidada entre variantes e indicacao de promocao.</p>
+                </div>
+            </header>
+            <div class="event-feed">
+                {% for experiment in completed_experiments %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ experiment.name }}</strong>
+                        <p>{{ experiment.result.summary|default:"Analise ainda nao consolidada." }}</p>
+                        <small>{{ experiment.result.confidence_level|default:"-" }} • {{ experiment.result.recommendation|default:"Sem recomendacao." }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum experimento concluido ainda.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Assignments recentes</h2>
+                    <p>Consistencia de variante por entidade/caso, com trilha de auditoria.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Experimento</th>
+                            <th>Entidade</th>
+                            <th>Variante</th>
+                            <th>Motivo</th>
+                            <th>Quando</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment in recent_assignments %}
+                            <tr>
+                                <td>{{ assignment.experiment.name }}</td>
+                                <td>{{ assignment.entity_type|default:"case" }}<br><small>{{ assignment.entity_key }}</small></td>
+                                <td>{{ assignment.variant.name }}</td>
+                                <td>{{ assignment.assignment_reason|default:"weighted" }}</td>
+                                <td>{{ assignment.assigned_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5">Nenhum assignment recente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Metricas observadas</h2>
+                    <p>SLA, custo, tempo, efetividade e sinais experimentais coletados no runtime real.</p>
+                </div>
+            </header>
+            <div class="event-feed">
+                {% for metric in recent_metrics %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ metric.experiment.name }} / {{ metric.variant.name }}</strong>
+                        <p>{{ metric.metric_type }} = {{ metric.value }} {{ metric.unit }}</p>
+                        <small>{{ metric.source_component|default:"runtime" }} • {{ metric.recorded_at|date:"d/m/Y H:i" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma metrica registrada ainda.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

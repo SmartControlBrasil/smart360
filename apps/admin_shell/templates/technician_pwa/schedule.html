@@ -1,0 +1,46 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-hero">
+    <h1>Agenda do dia</h1>
+    <p>{{ page_description }}</p>
+</section>
+
+{% if next_visit %}
+<section class="technician-panel">
+    <div class="section-heading"><h2>Proxima visita</h2></div>
+    <article class="service-card is-primary">
+        <header>
+            <strong>{{ next_visit.scheduled_start }}</strong>
+            <span>{{ next_visit.order_code|default:"Visita" }}</span>
+        </header>
+        <h3>{{ next_visit.title }}</h3>
+        <p>{{ next_visit.site }}{% if next_visit.asset %} · {{ next_visit.asset }}{% endif %}</p>
+        <a class="service-card__link" href="{{ next_visit.detail_url }}">Abrir atendimento</a>
+    </article>
+</section>
+{% endif %}
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Sequencia da rota</h2></div>
+    <div class="technician-card-list">
+        {% for visit in today_route_cards %}
+            <article class="service-card">
+                <header>
+                    <strong>{% if visit.route_order %}#{{ visit.route_order }}{% else %}{{ visit.scheduled_start }}{% endif %}</strong>
+                    <span>{{ visit.status }}</span>
+                </header>
+                <h3>{{ visit.title }}</h3>
+                <p>{{ visit.site }}{% if visit.asset %} · {{ visit.asset }}{% endif %}</p>
+                <div class="service-card__meta">
+                    <span>{{ visit.scheduled_start }}</span>
+                    {% if visit.order_code %}<span>{{ visit.order_code }}</span>{% endif %}
+                </div>
+                <a class="service-card__link" href="{{ visit.detail_url }}">Abrir</a>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhuma visita roteirizada para hoje.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

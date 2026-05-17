@@ -1,0 +1,36 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{% if form_mode == "update" %}Editar cliente{% else %}Novo cliente{% endif %}</h1>
+            <p class="muted-block">Cadastro operacional de empresa contratante.</p>
+        </div>
+
+        <form method="post" class="form-card-body" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for err in form.non_field_errors %}
+                    <div class="form-error">{{ err }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-grid">
+                {% include "admin_shell/components/forms/field.html" with field=form.display_name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.document_number %}
+                {% include "admin_shell/components/forms/field.html" with field=form.contact_email %}
+                {% include "admin_shell/components/forms/field.html" with field=form.contact_phone %}
+                {% include "admin_shell/components/forms/field.html" with field=form.is_active full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.notes full=True %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar cliente</button>
+                <a class="btn-secondary" href="{% url 'admin-shell:smart-system-customers' %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

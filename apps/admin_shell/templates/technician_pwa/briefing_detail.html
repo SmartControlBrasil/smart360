@@ -1,0 +1,29 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-panel">
+    <div class="section-heading"><h2>{{ briefing.title }}</h2></div>
+    <p>{{ briefing.summary }}</p>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Prioridades</h2></div>
+    <div class="stack-list">
+        {% for item in briefing.content.priorities %}
+            <article class="stack-card"><strong>{{ item }}</strong></article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Alertas e acoes</h2></div>
+    <div class="stack-list">
+        {% for item in briefing.content.alerts %}
+            <article class="stack-card tone-amber"><strong>{{ item }}</strong></article>
+        {% endfor %}
+        {% for item in briefing.content.suggested_actions %}
+            <article class="stack-card tone-sky"><strong>{{ item }}</strong></article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

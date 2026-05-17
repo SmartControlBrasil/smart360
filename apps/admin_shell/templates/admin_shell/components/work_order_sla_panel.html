@@ -1,0 +1,29 @@
+<div class="risk-panel">
+    <article>
+        <span>Prazo de SLA</span>
+        <strong>{{ work_order.sla_panel.deadline }}</strong>
+    </article>
+    <article>
+        <span>Tempo decorrido</span>
+        <strong>{{ work_order.sla_panel.elapsed }}</strong>
+    </article>
+    <article>
+        <span>Risco</span>
+        <strong>{{ work_order.sla_panel.risk }}</strong>
+    </article>
+    <article>
+        <span>Prioridade</span>
+        <strong>{{ work_order.sla_panel.priority }}</strong>
+    </article>
+    <article>
+        <span>Criticidade</span>
+        <strong>{{ work_order.sla_panel.criticality }}</strong>
+    </article>
+    <article>
+        <span>Impacto operacional</span>
+        <strong>{{ work_order.sla_panel.impact }}</strong>
+    </article>
+</div>
+<div class="traffic-light traffic-{{ work_order.sla_panel.traffic_light }}">
+    <span></span><span></span><span></span>
+</div>

@@ -1,0 +1,8 @@
+<div class="asset-technical-grid">
+    {% for item in work_order.caller_info %}
+        <article class="technical-stat">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+        </article>
+    {% endfor %}
+</div>

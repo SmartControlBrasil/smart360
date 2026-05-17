@@ -1,0 +1,11 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Rede de tecnicos" subtitle="Perfis elegiveis, especialidades, cobertura regional e reputacao." content_template="admin_shell/components/technician_full_card_list.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

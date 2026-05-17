@@ -1,0 +1,36 @@
+<footer class="report-signature-block">
+    <div class="report-signature-line">
+        <span>Preparado por</span>
+        <strong>{{ report.signature_block.prepared_by }}</strong>
+    </div>
+    <div class="report-signature-note">
+        <span>Observacao documental</span>
+        <p>{{ report.signature_block.review_note }}</p>
+    </div>
+    {% if report.signature_block.technician_signature %}
+        <div class="report-signature-line report-signature-visual">
+            <span>Assinatura do tecnico</span>
+            <div>
+                <strong>{{ report.signature_block.technician_signature.signer_name }}</strong>
+                <small>{{ report.signature_block.technician_signature.signed_at|date:"d/m/Y H:i" }}</small>
+                {% if report.signature_block.technician_signature.signature_data %}
+                    <img src="{{ report.signature_block.technician_signature.signature_data }}" alt="Assinatura do tecnico">
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if report.signature_block.client_signature %}
+        <div class="report-signature-line report-signature-visual">
+            <span>Aceite do cliente</span>
+            <div>
+                <strong>{{ report.signature_block.client_signature.signer_name }}</strong>
+                <small>{{ report.signature_block.client_signature.signed_at|date:"d/m/Y H:i" }}</small>
+                {% if report.signature_block.client_signature.signature_data %}
+                    <img src="{{ report.signature_block.client_signature.signature_data }}" alt="Assinatura do cliente">
+                {% else %}
+                    <p>{{ report.signature_block.client_signature.get_missing_reason_display }}{% if report.signature_block.client_signature.missing_reason_notes %} • {{ report.signature_block.client_signature.missing_reason_notes }}{% endif %}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</footer>

@@ -1,0 +1,59 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="content-panel">
+    <div class="section-heading"><h2>Gerar briefing sob demanda</h2></div>
+    <form method="post" action="{% url 'admin-shell:ai-briefing-generate' %}" class="copilot-input-form">
+        {% csrf_token %}
+        <select name="briefing_type">
+            <option value="on_demand">On-demand</option>
+            <option value="daily_executive">Daily Executive</option>
+            <option value="daily_field">Daily Field</option>
+            <option value="daily_client">Daily Client</option>
+            <option value="weekly_executive">Weekly Executive</option>
+        </select>
+        <select name="audience">
+            <option value="manager">Gestor</option>
+            <option value="technician">Tecnico</option>
+            <option value="client">Cliente</option>
+        </select>
+        <input type="date" name="start">
+        <input type="date" name="end">
+        <button class="quick-action-button" type="submit">Gerar briefing</button>
+    </form>
+</section>
+
+<section class="content-panel">
+    <div class="section-heading"><h2>Historico de briefings</h2></div>
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Titulo</th>
+                    <th>Tipo</th>
+                    <th>Audience</th>
+                    <th>Empresa</th>
+                    <th>Usuario</th>
+                    <th>Periodo</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for briefing in briefings %}
+                    <tr>
+                        <td><a href="{% url 'admin-shell:ai-briefing-detail' briefing_id=briefing.public_id %}">{{ briefing.title }}</a></td>
+                        <td>{{ briefing.get_briefing_type_display }}</td>
+                        <td>{{ briefing.get_audience_display }}</td>
+                        <td>{{ briefing.company.name|default:"-" }}</td>
+                        <td>{{ briefing.user.display_name|default:briefing.user.email|default:"-" }}</td>
+                        <td>{{ briefing.period_label|default:"-" }}</td>
+                        <td>{{ briefing.get_status_display }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7">Nenhum briefing gerado ainda.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

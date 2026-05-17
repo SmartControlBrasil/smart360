@@ -1,0 +1,6 @@
+<div class="risk-panel">
+    <article><span>Status</span><strong>{{ execution.status }}</strong></article>
+    <article><span>Resultado geral</span><strong>{{ execution.result }}</strong></article>
+    <article><span>Observacoes finais</span><strong>{{ execution.final_notes|default:"Sem observacoes finais registradas." }}</strong></article>
+    <article><span>Recomendacao</span><strong>{{ execution.recommendation|default:"Sem recomendacao formal." }}</strong></article>
+</div>

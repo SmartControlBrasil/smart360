@@ -1,0 +1,13 @@
+<div class="alert-stack">
+    {% for alert in execution.alerts %}
+        <article class="alert-row tone-{{ alert.severity }}">
+            <strong>{{ alert.title }}</strong>
+            <p>{{ alert.description }}</p>
+        </article>
+    {% empty %}
+        <article class="alert-row tone-info">
+            <strong>Sem alertas relevantes</strong>
+            <p>A execucao segue sem desvios operacionais importantes neste momento.</p>
+        </article>
+    {% endfor %}
+</div>

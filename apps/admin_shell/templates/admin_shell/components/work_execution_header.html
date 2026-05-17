@@ -1,0 +1,19 @@
+<div class="asset-hero work-execution-hero">
+    <div>
+        <span class="asset-tag">{{ work_order.code }}</span>
+        <h2>{{ work_order.title }}</h2>
+        <p>{{ work_order.asset.name }} • {{ work_order.client }} • {{ work_order.site }} • {{ work_order.maintenance_type }}</p>
+    </div>
+    <div class="asset-hero-badges">
+        {% include "admin_shell/components/work_order_status_badge.html" with value=execution.status extra_class=execution.status_slug %}
+        {% include "admin_shell/components/work_order_priority_badge.html" with value=work_order.priority %}
+        {% include "admin_shell/components/asset_criticality_badge.html" with value=work_order.criticality %}
+        <span class="status-badge status-sky">{{ execution.executor }}</span>
+    </div>
+</div>
+
+{% if not execution.execution_readonly %}
+<div class="execution-command-bar muted-block">
+    <p class="empty-inline-state">Use os botoes de acao no topo da pagina ou o painel de acoes rapidas abaixo (POST com CSRF).</p>
+</div>
+{% endif %}

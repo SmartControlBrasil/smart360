@@ -1,0 +1,71 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-hero">
+    <h1>O que precisa ser atendido agora?</h1>
+    <p>{{ page_description }}</p>
+</section>
+
+<section class="technician-kpi-grid">
+    {% for item in dashboard_cards %}
+        {% include "technician_pwa/components/mobile_kpi_card.html" %}
+    {% endfor %}
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Briefing do dia</h2></div>
+    {% if latest_briefing %}
+        <article class="stack-card tone-indigo">
+            <strong>{{ latest_briefing.title }}</strong>
+            <p>{{ latest_briefing.summary }}</p>
+            <a class="service-card__link" href="{% url 'admin-shell:technician-app-briefing-detail' briefing_id=latest_briefing.public_id %}">Abrir briefing</a>
+        </article>
+    {% else %}
+        <p class="empty-state">Nenhum briefing diario disponivel ainda.</p>
+    {% endif %}
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Servicos de hoje</h2></div>
+    <div class="technician-card-list">
+        {% for service in today_services %}
+            {% include "technician_pwa/components/service_card.html" with service=service %}
+        {% empty %}
+            <p class="empty-state">Nenhum atendimento programado para hoje.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Rota do dia</h2></div>
+    <div class="technician-card-list">
+        {% for visit in today_route_cards %}
+            <article class="service-card">
+                <header>
+                    <strong>{% if visit.route_order %}#{{ visit.route_order }}{% else %}{{ visit.scheduled_start }}{% endif %}</strong>
+                    <span>{{ visit.status }}</span>
+                </header>
+                <h3>{{ visit.title }}</h3>
+                <p>{{ visit.site }}{% if visit.asset %} · {{ visit.asset }}{% endif %}</p>
+                <a class="service-card__link" href="{{ visit.detail_url }}">Abrir</a>
+            </article>
+        {% empty %}
+            <p class="empty-state">Agenda ainda nao roteirizada.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Alertas operacionais</h2></div>
+    <div class="stack-list">
+        {% for alert in operational_alerts %}
+            <article class="stack-card tone-{{ alert.tone }}">
+                <strong>{{ alert.title }}</strong>
+                <p>{{ alert.description }}</p>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhum alerta novo para o turno atual.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

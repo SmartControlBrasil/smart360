@@ -1,0 +1,28 @@
+<article class="widget-card billing-plan-card tone-{{ plan.tone }}">
+    <div class="widget-head">
+        <div>
+            <h3>{{ plan.name }}</h3>
+            <p>{{ plan.description }}</p>
+        </div>
+        {% include "admin_shell/components/billing_status_badge.html" with value=plan.status tone=plan.tone %}
+    </div>
+    <div class="billing-plan-prices">
+        <strong>{{ plan.price_monthly }}</strong>
+        <span>mensal</span>
+        <small>{{ plan.price_yearly }} anual</small>
+    </div>
+    <ul class="billing-plan-limits">
+        <li>{{ plan.user_limit }} usuarios</li>
+        <li>{{ plan.asset_limit }} ativos</li>
+        <li>{{ plan.site_limit }} sites</li>
+        <li>{{ plan.work_order_limit }} OS</li>
+        {% if plan.contract_count %}<li>{{ plan.contract_count }} contratos</li>{% endif %}
+    </ul>
+    <div class="billing-feature-tags">
+        {% for feature in plan.features %}
+            <span>{{ feature }}</span>
+        {% empty %}
+            <span>Sem recursos destacados</span>
+        {% endfor %}
+    </div>
+</article>

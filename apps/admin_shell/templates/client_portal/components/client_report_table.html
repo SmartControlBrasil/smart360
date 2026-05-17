@@ -1,0 +1,31 @@
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Tipo</th>
+                <th>Referencia</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in report_records %}
+                <tr>
+                    <td>{{ report.report_code }}</td>
+                    <td>{{ report.report_type }}</td>
+                    <td>{{ report.reference_title }}</td>
+                    <td>{{ report.generated_at }}</td>
+                    <td>{{ report.status }}</td>
+                    <td class="inline-actions">
+                        <a href="{{ report.portal_preview_url }}">Visualizar</a>
+                        <a href="{{ report.portal_download_url }}">Baixar</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Nenhum relatorio liberado para o contexto atual.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

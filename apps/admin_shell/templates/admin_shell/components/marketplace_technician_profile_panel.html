@@ -1,0 +1,10 @@
+<div class="marketplace-profile-panel">
+    {% include "admin_shell/components/technician_rating.html" with rating=technician.rating_average %}
+    <ul class="marketplace-metadata">
+        <li>Status: {{ technician.get_marketplace_status_display }}</li>
+        <li>Verificacao: {{ technician.get_verification_status_display }}</li>
+        <li>Servicos concluidos: {{ technician.completed_jobs_count }}</li>
+        <li>Raio de atendimento: {{ technician.service_radius_km }} km</li>
+        <li>Certificacoes: {{ technician.certifications|join:", "|default:"-" }}</li>
+    </ul>
+</div>

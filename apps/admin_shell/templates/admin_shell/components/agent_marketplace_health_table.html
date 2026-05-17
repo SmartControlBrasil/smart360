@@ -1,0 +1,30 @@
+<div class="table-card">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Request</th>
+                <th>Site</th>
+                <th>Prioridade</th>
+                <th>Risco</th>
+                <th>Score</th>
+                <th>Resumo</th>
+                <th>Recomendacao atual</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flag in marketplace_health_flags %}
+                <tr>
+                    <td>{{ flag.service_request.title }}</td>
+                    <td>{{ flag.site.name|default:"-" }}</td>
+                    <td>{{ flag.service_request.get_priority_display }}</td>
+                    <td>{{ flag.risk_level|title }}</td>
+                    <td>{{ flag.attention_score }}</td>
+                    <td>{{ flag.summary }}</td>
+                    <td>{{ flag.latest_recommendation.title|default:"Sem recomendacao vinculada" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Nenhum request do marketplace sob atencao.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

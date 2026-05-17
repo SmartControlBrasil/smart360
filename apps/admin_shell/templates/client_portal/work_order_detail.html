@@ -1,0 +1,57 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Resumo da ordem</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Codigo</dt><dd>{{ work_order.order_number }}</dd></div>
+            <div><dt>Status</dt><dd>{{ work_order.get_status_display }}</dd></div>
+            <div><dt>Prioridade</dt><dd>{{ work_order.get_priority_display }}</dd></div>
+            <div><dt>Ativo</dt><dd>{% if work_order.asset %}{{ work_order.asset.asset_tag }} - {{ work_order.asset.name }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Unidade</dt><dd>{{ work_order.operational_site.name }}</dd></div>
+            <div><dt>Abertura</dt><dd>{{ work_order.opened_at|date:"d/m/Y H:i" }}</dd></div>
+            <div><dt>Inicio</dt><dd>{% if work_order.started_at %}{{ work_order.started_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Conclusao</dt><dd>{% if work_order.completed_at %}{{ work_order.completed_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd></div>
+        </dl>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Descricao e atendimento</h2></div>
+        <p>{{ work_order.description|default:"Sem descricao adicional." }}</p>
+        <dl class="detail-grid">
+            <div><dt>Responsavel</dt><dd>{% if work_order.assigned_to %}{{ work_order.assigned_to.display_name|default:work_order.assigned_to.email }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Plano preventivo</dt><dd>{% if work_order.maintenance_plan %}{{ work_order.maintenance_plan.name }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Observacoes finais</dt><dd>{{ work_order.final_observations|default:"Aguardando encerramento tecnico." }}</dd></div>
+        </dl>
+    </article>
+</section>
+{% if related_quote %}
+    <section class="content-panel">
+        <div class="section-heading"><h2>Orcamento vinculado</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Codigo</dt><dd><a href="{% url 'admin-shell:client-portal-quote-detail' quote_number=related_quote.quote_number %}">{{ related_quote.quote_number }}</a></dd></div>
+            <div><dt>Status</dt><dd>{{ related_quote.get_status_display }}</dd></div>
+            <div><dt>Total</dt><dd>R$ {{ related_quote.total_value }}</dd></div>
+        </dl>
+    </section>
+{% endif %}
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Anexos e evidencias</h2></div>
+        <div class="stack-list">
+            {% for item in attachments %}
+                <article class="stack-card">
+                    <strong>{{ item.title }}</strong>
+                    <p>{{ item.get_document_type_display }}</p>
+                </article>
+            {% empty %}
+                <p class="empty-state">Nenhuma evidencia publicada para esta ordem.</p>
+            {% endfor %}
+        </div>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Relatorios relacionados</h2></div>
+        {% include "client_portal/components/client_report_table.html" with report_records=reports %}
+    </article>
+</section>
+{% endblock %}

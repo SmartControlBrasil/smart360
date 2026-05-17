@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title|default:"Portal do Cliente | SMART360" }}</title>
+    <link rel="stylesheet" href="{% static 'smart360/css/admin-shell.css' %}">
+</head>
+<body class="admin-shell client-portal-shell">
+    <div class="shell-app client-portal-app" data-shell>
+        {% include "client_portal/components/sidebar.html" %}
+        <div class="shell-main client-portal-main">
+            {% include "client_portal/components/topbar.html" %}
+            <main class="shell-content client-portal-content">
+                {% include "client_portal/components/page_header.html" %}
+                {% block portal_content %}{% endblock %}
+            </main>
+            <footer class="shell-footer client-portal-footer">
+                <span>SMART360 Client Portal</span>
+                <span>Transparencia operacional para o seu contrato</span>
+            </footer>
+        </div>
+    </div>
+    {{ copilot_seed_context|default:"{}"|json_script:"client-portal-copilot-seed" }}
+    <script src="{% static 'smart360/js/admin-shell.js' %}"></script>
+    <script src="{% static 'smart360/js/client-portal-copilot.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

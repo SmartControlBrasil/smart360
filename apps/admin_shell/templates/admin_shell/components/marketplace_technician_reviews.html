@@ -1,0 +1,13 @@
+<div class="marketplace-card-list">
+    {% for review in reviews %}
+        <article class="marketplace-card">
+            <div class="marketplace-card-header">
+                <strong>{{ review.reviewer_company.name|default:"Empresa" }}</strong>
+                {% include "admin_shell/components/technician_rating.html" with rating=review.rating %}
+            </div>
+            <p class="marketplace-description">{{ review.comment|default:"Sem comentario." }}</p>
+        </article>
+    {% empty %}
+        <p>Nenhuma avaliacao publicada para este tecnico.</p>
+    {% endfor %}
+</div>

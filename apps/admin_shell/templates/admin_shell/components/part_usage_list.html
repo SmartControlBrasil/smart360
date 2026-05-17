@@ -1,0 +1,14 @@
+<div class="detail-list">
+    {% for usage in part.usage %}
+        <article class="detail-list-row">
+            <span>{{ usage.order_code }}</span>
+            <strong>{{ usage.quantity }}</strong>
+        </article>
+        <p class="muted-block">
+            <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-work-order-detail' order_code=usage.order_code %}">{{ usage.asset_code }}</a>
+            • {{ usage.technician }} • {{ usage.date }}
+        </p>
+    {% empty %}
+        <p class="empty-inline-state">Sem consumo em OS registrado.</p>
+    {% endfor %}
+</div>

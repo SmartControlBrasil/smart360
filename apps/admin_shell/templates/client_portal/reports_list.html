@@ -1,0 +1,13 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="summary-grid">
+    {% for item in report_kpis %}
+        {% include "client_portal/components/client_kpi_card.html" %}
+    {% endfor %}
+</section>
+<section class="content-panel">
+    <div class="section-heading"><h2>Documentos tecnicos</h2></div>
+    {% include "client_portal/components/client_report_table.html" %}
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout billing-layout">
+    <div class="summary-grid">
+        {% for widget in billing_dashboard_widgets %}
+            {% include "admin_shell/components/billing_dashboard_widget.html" with widget=widget %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-4">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Planos comerciais</h3>
+                        <p>Oferta base de comercializacao SaaS e licenciamento gerenciado.</p>
+                    </div>
+                </div>
+                <div class="billing-plan-grid">
+                    {% for plan in billing_plan_cards %}
+                        {% include "admin_shell/components/billing_plan_card.html" with plan=plan %}
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        <div class="column-span-8">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Contratos em destaque</h3>
+                        <p>Carteira ativa, renovacoes proximas e contratos sob atencao financeira.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/billing_contract_table.html" with contracts=billing_contracts_preview compact=True %}
+            </section>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Faturamento recente</h3>
+                        <p>Ultimas faturas emitidas e leitura rapida de cobranca da plataforma.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/billing_invoice_table.html" with invoices=billing_invoices_preview compact=True %}
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

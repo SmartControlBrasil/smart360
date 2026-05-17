@@ -1,0 +1,70 @@
+name: smart360-prod
+
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: /app/deployment/scripts/start-web.sh
+    env_file:
+      - ../env/.env.prod.example
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: /app/deployment/scripts/start-worker.sh
+    env_file:
+      - ../env/.env.prod.example
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  beat:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    command: /app/deployment/scripts/start-beat.sh
+    env_file:
+      - ../env/.env.prod.example
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - ../env/.env.prod.example
+    restart: unless-stopped
+    volumes:
+      - smart360_prod_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - smart360_prod_redis:/data
+
+volumes:
+  smart360_prod_postgres:
+  smart360_prod_redis:

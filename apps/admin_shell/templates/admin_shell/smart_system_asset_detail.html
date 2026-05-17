@@ -1,0 +1,51 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout asset-detail-layout">
+    <div class="asset-hero">
+        <div>
+            <span class="asset-tag">{{ asset.code }}</span>
+            <h2>{{ asset.name }}</h2>
+            <p>{{ asset.category }} • {{ asset.subcategory }} • {{ asset.client }} • {{ asset.site }} • {{ asset.sector }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/asset_status_badge.html" with value=asset.operational_status %}
+            {% include "admin_shell/components/asset_condition_badge.html" with value=asset.condition %}
+            {% include "admin_shell/components/asset_criticality_badge.html" with value=asset.criticality %}
+        </div>
+    </div>
+
+    <div class="asset-summary-grid">
+        {% for card in asset.summary_cards %}
+            {% include "admin_shell/components/asset_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Dados tecnicos do ativo" subtitle="Base cadastral e tecnica para operacao, manutencao e engenharia." content_template="admin_shell/components/asset_technical_info.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Condicao, criticidade e risco" subtitle="Leitura de impacto operacional, risco e necessidade de intervencao." content_template="admin_shell/components/asset_risk_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Manutencao e confiabilidade" subtitle="MTBF, MTTR, disponibilidade, intervencoes e tendencia do ativo." content_template="admin_shell/components/asset_maintenance_reliability.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e excecoes" subtitle="Pendencias, degradacoes e excecoes do ativo." content_template="admin_shell/components/asset_alert_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Historico recente do ativo" subtitle="Linha do tempo resumida das intervencoes e eventos tecnicos." content_template="admin_shell/components/asset_history_timeline.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Rotinas imediatas para manutencao, engenharia e documentacao." content_template="admin_shell/components/asset_action_panel.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

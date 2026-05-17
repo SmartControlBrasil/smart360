@@ -1,0 +1,11 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Ofertas recebidas" subtitle="Comparativo de valor, prazo e disponibilidade dos tecnicos para cada solicitacao." content_template="admin_shell/components/offer_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

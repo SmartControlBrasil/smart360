@@ -1,0 +1,29 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_shell %}
+<main class="technician-login-shell">
+    <section class="technician-login-card">
+        <span class="eyebrow">SMART360 Field App</span>
+        <h1>{{ page_title }}</h1>
+        <p>{{ page_description }}</p>
+        <form method="post" class="portal-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="portal-form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            <button type="submit" class="quick-action-button">Entrar no app</button>
+        </form>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{{ page_title|default:"SMART360 Field App" }}</title>
+    <meta name="theme-color" content="#0d2536">
+    <link rel="manifest" href="{% static 'smart360/pwa/technician.webmanifest' %}">
+    <link rel="icon" href="{% static 'smart360/pwa/icon-technician-192.svg' %}">
+    <link rel="stylesheet" href="{% static 'smart360/css/admin-shell.css' %}">
+</head>
+<body class="technician-app">
+    <div class="technician-shell">
+        {% block app_shell %}
+            {% include "technician_pwa/components/topbar.html" %}
+            <div class="technician-connection-banner" data-connection-banner hidden>
+                <strong data-connection-title>Modo offline ativo</strong>
+                <span data-connection-description>Suas alteracoes serao salvas localmente e sincronizadas depois.</span>
+            </div>
+            <main class="technician-main">
+                {% block app_content %}{% endblock %}
+            </main>
+            {% include "technician_pwa/components/copilot_drawer.html" %}
+            {% include "technician_pwa/components/bottom_nav.html" %}
+        {% endblock %}
+    </div>
+    {{ offline_bootstrap|default:None|json_script:"technician-offline-bootstrap" }}
+    {{ technician_copilot_bootstrap|default:None|json_script:"technician-copilot-bootstrap" }}
+    {{ mobile_user|default:None|json_script:"technician-mobile-user" }}
+    {{ mobile_runtime_context|default:None|json_script:"technician-mobile-tenant" }}
+    {{ mobile_sync_endpoints|default:None|json_script:"technician-mobile-sync-endpoints" }}
+    {{ mobile_copilot|default:None|json_script:"technician-mobile-copilot" }}
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("/field/sw.js").catch(function () {});
+            });
+        }
+    </script>
+    <script src="{% static 'smart360/js/technician-offline.js' %}"></script>
+    <script src="{% static 'smart360/js/technician-copilot.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

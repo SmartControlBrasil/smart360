@@ -1,0 +1,13 @@
+<article class="schedule-load-card tone-{{ card.tone }}">
+    <div class="schedule-load-card__header">
+        <h3>{{ card.technician_name }}</h3>
+        <span>{{ card.date }}</span>
+    </div>
+    <div class="schedule-load-card__grid">
+        <div><strong>{{ card.jobs }}</strong><span>visitas</span></div>
+        <div><strong>{{ card.duration_minutes }} min</strong><span>duracao</span></div>
+        <div><strong>{{ card.travel_minutes }} min</strong><span>deslocamento</span></div>
+        <div><strong>{{ card.conflicts }}</strong><span>conflitos</span></div>
+    </div>
+    <a class="inline-link" href="{{ card.agenda_url }}">Abrir agenda</a>
+</article>

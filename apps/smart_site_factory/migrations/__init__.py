@@ -1,0 +1,1 @@
+# Smart Site Factory migrations.

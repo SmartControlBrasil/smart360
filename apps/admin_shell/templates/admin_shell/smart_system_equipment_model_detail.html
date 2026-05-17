@@ -1,0 +1,70 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-hero">
+        <div>
+            <span class="asset-tag">{{ equipment_model.code }}</span>
+            <h2>{{ equipment_model.name }}</h2>
+            <p>{{ equipment_model.category }} • {{ equipment_model.company }} • {{ equipment_model.manufacturer }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/work_order_status_badge.html" with value=equipment_model.status extra_class=equipment_model.status_slug %}
+            <span class="status-badge status-sky">{% if equipment_model.is_pmoc_applicable %}PMOC{% else %}Sem PMOC{% endif %}</span>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            <article class="stack-card tone-info">
+                <h3>Dados técnicos</h3>
+                <p><strong>Tipo:</strong> {{ equipment_model.equipment_type }}</p>
+                <p><strong>Código fabricante:</strong> {{ equipment_model.manufacturer_code }}</p>
+                <p><strong>Frequência PMOC:</strong> {{ equipment_model.pmoc_frequency }}</p>
+                <p><strong>Descrição:</strong> {{ equipment_model.description|default:"—" }}</p>
+                <p><strong>Observações:</strong> {{ equipment_model.notes|default:"—" }}</p>
+            </article>
+        </div>
+        <div class="column-span-5">
+            <article class="stack-card tone-warning">
+                <h3>TODOs estratégicos</h3>
+                <ul class="module-highlights">
+                    {% for todo in equipment_model.todo_notes %}
+                        <li>{{ todo }}</li>
+                    {% endfor %}
+                </ul>
+            </article>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <article class="stack-card tone-sky">
+                <h3>Peças compatíveis do modelo</h3>
+                <div class="table-shell">
+                    <table class="work-order-table">
+                        <thead>
+                            <tr>
+                                <th>Peça</th>
+                                <th>Quantidade padrão</th>
+                                <th>Observações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for part in equipment_model.parts %}
+                                <tr>
+                                    <td>{{ part.part_code }} — {{ part.part_name }}</td>
+                                    <td>{{ part.quantity_default }}</td>
+                                    <td>{{ part.notes }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="3">Nenhuma peça vinculada para este modelo.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

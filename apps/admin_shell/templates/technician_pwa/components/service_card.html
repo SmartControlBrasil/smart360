@@ -1,0 +1,16 @@
+<article class="technician-service-card">
+    <div class="service-card-top">
+        <strong>{{ service.code }}</strong>
+        <span class="service-status">{{ service.status }}</span>
+    </div>
+    <h3><a href="{{ service.detail_url }}">{{ service.title }}</a></h3>
+    <p>{{ service.client }} • {{ service.site }}</p>
+    <ul class="service-meta-list">
+        <li>{{ service.asset_code }}</li>
+        <li>{{ service.priority }}</li>
+        <li>{{ service.criticality }}</li>
+    </ul>
+    {% if service.marketplace %}
+        <div class="service-source-chip">{{ service.marketplace.badge }}</div>
+    {% endif %}
+</article>

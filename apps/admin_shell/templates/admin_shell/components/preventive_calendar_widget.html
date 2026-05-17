@@ -1,0 +1,20 @@
+<div class="calendar-legend">
+    {% for item in calendar_legend %}
+        <span class="calendar-legend-item tone-{{ item.tone }}">{{ item.label }}</span>
+    {% endfor %}
+</div>
+<div class="calendar-grid">
+    {% for day in calendar_days %}
+        <article class="calendar-day tone-{{ day.tone }}">
+            <strong>{{ day.day }}</strong>
+            <span>{{ day.count }} itens</span>
+            <ul>
+                {% for item in day.items %}
+                    <li>{{ item }}</li>
+                {% empty %}
+                    <li>Sem atividades</li>
+                {% endfor %}
+            </ul>
+        </article>
+    {% endfor %}
+</div>

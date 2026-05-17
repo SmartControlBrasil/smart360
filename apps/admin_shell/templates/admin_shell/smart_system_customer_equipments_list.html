@@ -1,0 +1,16 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-kpi-grid">
+        {% for card in customer_equipment_kpis %}
+            {% include "admin_shell/components/asset_kpi_card.html" with card=card %}
+        {% endfor %}
+    </div>
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Inventario operacional do cliente" subtitle="Equipamentos reais vinculados por site, tag e localizacao operacional." content_template="admin_shell/components/customer_equipment_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

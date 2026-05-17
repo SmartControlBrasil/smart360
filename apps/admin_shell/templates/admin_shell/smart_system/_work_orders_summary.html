@@ -1,0 +1,11 @@
+<div class="smart-summary-list">
+    {% for order in recent_work_orders %}
+        <article class="smart-summary-row">
+            <div>
+                <strong>{{ order.code }} · {{ order.asset }}</strong>
+                <p>{{ order.type }} · {{ order.owner }} · {{ order.deadline }}</p>
+            </div>
+            <span class="status-badge status-{{ order.tone }}">{{ order.status }}</span>
+        </article>
+    {% endfor %}
+</div>

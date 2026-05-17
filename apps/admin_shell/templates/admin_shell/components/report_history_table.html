@@ -1,0 +1,38 @@
+<div class="table-responsive">
+    <table class="shell-table report-history-table {% if compact %}is-compact{% endif %}">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Tipo</th>
+                <th>Referencia</th>
+                <th>Gerado em</th>
+                <th>Usuario</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in report_entries %}
+                <tr>
+                    <td>{{ entry.report_code }}</td>
+                    <td>{{ entry.report_type }}</td>
+                    <td>
+                        <strong>{{ entry.reference_code }}</strong>
+                        <small>{{ entry.reference_title }}</small>
+                    </td>
+                    <td>{{ entry.generated_at }}</td>
+                    <td>{{ entry.generated_by }}</td>
+                    <td>{{ entry.status }}</td>
+                    <td class="report-history-actions">
+                        <a href="{{ entry.preview_url }}">Visualizar</a>
+                        <a href="{{ entry.download_url }}">PDF</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">Nenhum relatorio tecnico gerado nesta carteira.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

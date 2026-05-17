@@ -1,0 +1,137 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+
+    <section class="stat-grid">
+        {% for card in summary_cards %}
+            {% include "admin_shell/components/agent_summary_card.html" with card=card %}
+        {% endfor %}
+    </section>
+
+    <section class="content-grid two-column">
+        <div>
+            <div class="panel-card">
+                <h2>AI Copilot para Gestor</h2>
+                <p>Entrada conversacional para resumir riscos, explicar recomendacoes e navegar pelos agentes com contexto do tenant.</p>
+                <a class="quick-action-button" href="{% url 'admin-shell:ai-manager-copilot' %}">Abrir copiloto</a>
+            </div>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Sessao</th>
+                            <th>Status</th>
+                            <th>Ultima intencao</th>
+                            <th>Mensagens</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in recent_copilot_sessions %}
+                            <tr>
+                                <td><a href="{% url 'admin-shell:ai-manager-copilot' %}?session={{ session.public_id }}">{{ session.title|default:"Copilot" }}</a></td>
+                                <td>{{ session.get_status_display }}</td>
+                                <td>{{ session.last_intent|default:"-" }}</td>
+                                <td>{{ session.message_count }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Nenhuma sessao registrada ainda.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div>
+            <div class="panel-card">
+                <h2>Agentes cadastrados</h2>
+                <p>Registry ativo com configuracao, autonomia e estado operacional.</p>
+            </div>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Agente</th>
+                            <th>Dominio</th>
+                            <th>Autonomia</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in agents %}
+                            <tr>
+                                <td>{{ agent.name }}</td>
+                                <td>{{ agent.get_domain_display }}</td>
+                                <td>{{ agent.get_autonomy_level_display }}</td>
+                                <td>{{ agent.get_status_display }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Nenhum agente cadastrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div>
+            <div class="panel-card">
+                <h2>Propostas pendentes</h2>
+                <p>Human-in-the-loop para acoes sensiveis e operacao segura.</p>
+            </div>
+            {% include "admin_shell/components/agent_action_proposal_table.html" with proposals=pending_proposals %}
+        </div>
+    </section>
+
+    <section class="content-grid two-column">
+        <div>
+            <div class="panel-card">
+                <h2>Runs recentes</h2>
+            </div>
+            {% include "admin_shell/components/agent_run_table.html" with runs=recent_runs %}
+        </div>
+        <div>
+            <div class="panel-card">
+                <h2>Recomendacoes recentes</h2>
+            </div>
+            {% include "admin_shell/components/agent_recommendation_table.html" with recommendations=recent_recommendations %}
+        </div>
+    </section>
+
+    <section>
+        <div class="panel-card">
+            <h2>Ativos em observacao</h2>
+            <p>Watchlist persistida pelo Maintenance Intelligence Agent com score, risco e recomendacao vigente.</p>
+        </div>
+        {% include "admin_shell/components/agent_attention_asset_table.html" with attention_assets=attention_assets %}
+    </section>
+
+    <section>
+        <div class="panel-card">
+            <h2>Saude da agenda</h2>
+            <p>Alertas persistidos pelo Scheduling Optimization Agent com sobrecarga, conflitos e risco de SLA.</p>
+        </div>
+        {% include "admin_shell/components/agent_schedule_health_table.html" with schedule_health_flags=schedule_health %}
+    </section>
+
+    <section>
+        <div class="panel-card">
+            <h2>Saude economica</h2>
+            <p>Clientes, contratos, rotas e atendimentos com erosao de margem detectados pelo Profitability Agent.</p>
+        </div>
+        {% include "admin_shell/components/agent_profitability_health_table.html" with profitability_health_flags=profitability_health %}
+    </section>
+
+    <section>
+        <div class="panel-card">
+            <h2>Saude do marketplace</h2>
+            <p>Requests sob atencao, risco de SLA e sugestoes de alocacao do Marketplace Allocation Agent.</p>
+        </div>
+        {% include "admin_shell/components/agent_marketplace_health_table.html" with marketplace_health_flags=marketplace_health %}
+    </section>
+
+    <section>
+        <div class="panel-card">
+            <h2>Radar de anomalias</h2>
+            <p>Desvios operacionais, financeiros e comerciais persistidos pelo Anomaly Detection Agent.</p>
+        </div>
+        {% include "admin_shell/components/agent_anomaly_health_table.html" with anomaly_health_flags=anomaly_health %}
+    </section>
+{% endblock %}

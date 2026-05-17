@@ -1,0 +1,30 @@
+<dl class="detail-grid">
+    <div>
+        <dt>Status final</dt>
+        <dd>{{ execution.finalization.final_status }}</dd>
+    </div>
+    <div>
+        <dt>Observacoes finais (encerramento)</dt>
+        <dd>{% if execution.finalization.final_observations %}{{ execution.finalization.final_observations }}{% else %}Pendente de encerramento{% endif %}</dd>
+    </div>
+    <div>
+        <dt>Diagnostico / consolidacao tecnica</dt>
+        <dd>{{ execution.finalization.final_diagnosis|default:"Pendente de encerramento" }}</dd>
+    </div>
+    <div>
+        <dt>Acao executada</dt>
+        <dd>{{ execution.finalization.final_action|default:"Pendente de encerramento" }}</dd>
+    </div>
+    <div>
+        <dt>Recomendacao</dt>
+        <dd>{{ execution.finalization.recommendation|default:"Sem recomendacao registrada" }}</dd>
+    </div>
+    <div>
+        <dt>Necessidade de retorno</dt>
+        <dd>{{ execution.finalization.return_needed|default:"A definir" }}</dd>
+    </div>
+    <div>
+        <dt>Notas de andamento (campo observacoes da OS)</dt>
+        <dd>{{ execution.finalization.final_notes|default:"Sem notas de andamento." }}</dd>
+    </div>
+</dl>

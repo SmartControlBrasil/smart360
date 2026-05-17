@@ -1,0 +1,42 @@
+<section class="content-card">
+    <div class="section-heading">
+        <h2>Carteira de contratos</h2>
+        <p>Contratos recorrentes com escopo operacional e financeiro.</p>
+    </div>
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Contrato</th>
+                    <th>Cliente</th>
+                    <th>Unidade</th>
+                    <th>Status</th>
+                    <th>Valor</th>
+                    <th>Inicio</th>
+                    <th>Proxima cobranca</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contract_records %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'admin-shell:smart-system-contract-detail' contract_number=contract.contract_number %}">
+                                {{ contract.contract_number }}
+                            </a>
+                        </td>
+                        <td>{{ contract.client.display_name }}</td>
+                        <td>{{ contract.operational_site.name|default:"Todas as unidades" }}</td>
+                        <td>{{ contract.get_status_display }}</td>
+                        <td>R$ {{ contract.contract_value }}</td>
+                        <td>{{ contract.start_date|date:"d/m/Y" }}</td>
+                        <td>{{ contract.next_billing_date|date:"d/m/Y"|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">Nenhum contrato encontrado para o escopo atual.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

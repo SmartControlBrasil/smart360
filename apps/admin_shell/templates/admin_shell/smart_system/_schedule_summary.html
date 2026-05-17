@@ -1,0 +1,11 @@
+<div class="smart-summary-list">
+    {% for item in preventive_plan.schedule %}
+        <article class="smart-summary-row">
+            <div>
+                <strong>{{ item.date }} · {{ item.asset }}</strong>
+                <p>{{ item.activity }} · {{ item.owner }}</p>
+            </div>
+            <span class="status-badge status-slate">{{ item.status }}</span>
+        </article>
+    {% endfor %}
+</div>

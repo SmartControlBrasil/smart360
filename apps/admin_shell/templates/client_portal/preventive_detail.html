@@ -1,0 +1,39 @@
+{% extends "client_portal/base.html" %}
+
+{% block portal_content %}
+<section class="content-grid two-column">
+    <article class="content-panel">
+        <div class="section-heading"><h2>Plano preventivo</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Nome</dt><dd>{{ plan.name }}</dd></div>
+            <div><dt>Descricao</dt><dd>{{ plan.description|default:"-" }}</dd></div>
+            <div><dt>Frequencia</dt><dd>{{ plan.get_frequency_type_display }} / {{ plan.frequency_value }}</dd></div>
+            <div><dt>Duracao estimada</dt><dd>{{ plan.estimated_duration_minutes }} min</dd></div>
+            <div><dt>Proxima execucao</dt><dd>{% if plan.next_due_date %}{{ plan.next_due_date|date:"d/m/Y" }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Checklist</dt><dd>{% if plan.checklist %}{{ plan.checklist.name }}{% else %}Nao vinculado{% endif %}</dd></div>
+        </dl>
+    </article>
+    <article class="content-panel">
+        <div class="section-heading"><h2>Ativo e unidade</h2></div>
+        <dl class="detail-grid">
+            <div><dt>Ativo</dt><dd>{% if plan.asset %}{{ plan.asset.asset_tag }} - {{ plan.asset.name }}{% else %}Plano por categoria{% endif %}</dd></div>
+            <div><dt>Categoria</dt><dd>{% if plan.category %}{{ plan.category.name }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Unidade</dt><dd>{% if plan.operational_site %}{{ plan.operational_site.name }}{% else %}-{% endif %}</dd></div>
+            <div><dt>Status</dt><dd>{% if plan.is_active %}Ativo{% else %}Inativo{% endif %}</dd></div>
+        </dl>
+    </article>
+</section>
+<section class="content-panel">
+    <div class="section-heading"><h2>Ordens associadas</h2></div>
+    <div class="stack-list">
+        {% for order in related_orders %}
+            <article class="stack-card">
+                <strong><a href="{% url 'admin-shell:client-portal-work-order-detail' order_code=order.order_number %}">{{ order.order_number }}</a></strong>
+                <p>{{ order.title }} • {{ order.get_status_display }}</p>
+            </article>
+        {% empty %}
+            <p class="empty-state">Nenhuma ordem recente vinculada a este plano.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

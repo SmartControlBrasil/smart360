@@ -1,0 +1,21 @@
+<section class="widget-card">
+    <div class="widget-head">
+        <div>
+            <h3>Lucro operacional</h3>
+            <p>Margem operacional consolidada por periodo.</p>
+        </div>
+    </div>
+    <div class="chart-bar-list">
+        {% for point in profit_series %}
+            <article class="chart-bar-row">
+                <div class="chart-bar-meta">
+                    <strong>{{ point.label }}</strong>
+                    <span>Lucro R$ {{ point.profit }} • Custo R$ {{ point.cost }}</span>
+                </div>
+                <div class="chart-bar-track">
+                    <span class="chart-bar-fill tone-sky" style="width: {% widthratio point.profit max_profit 100 %}%"></span>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>

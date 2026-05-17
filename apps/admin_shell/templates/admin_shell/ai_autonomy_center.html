@@ -1,0 +1,133 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Cockpit de autonomia</h2>
+                    <p>Modo autonomo supervisionado por tenant, com envelope de seguranca, confidence threshold, simulacao previa e rollback auditado.</p>
+                </div>
+            </header>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Autoexecucoes</span>
+                    <strong class="stat-value">{{ autonomy_health.total }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Sucesso</span>
+                    <strong class="stat-value">{{ autonomy_health.success }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Bloqueadas</span>
+                    <strong class="stat-value">{{ autonomy_health.blocked }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Rollback</span>
+                    <strong class="stat-value">{{ autonomy_health.rollback }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Confianca media</span>
+                    <strong class="stat-value">{{ autonomy_health.avg_confidence|floatformat:2 }}</strong>
+                </div>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Configuracoes ativas</h2>
+                    <p>Habilitacao por tenant, mode level, risco maximo, action types elegiveis e kill switch.</p>
+                </div>
+            </header>
+            <div class="event-feed">
+                {% for config in autonomy_configs %}
+                    <article class="event-row {% if config.kill_switch_enabled %}tone-critical{% else %}tone-neutral{% endif %}">
+                        <strong>{{ config.company.name|default:"Global" }}</strong>
+                        <p>mode {{ config.mode_level }} • risco max {{ config.max_risk_level }} • simulation for {{ config.requires_simulation_for|join:", "|default:"-" }}</p>
+                        <small>
+                            enabled={{ config.is_enabled|yesno:"true,false" }} • kill_switch={{ config.kill_switch_enabled|yesno:"true,false" }} • actions={{ config.allowed_action_types|join:", "|default:"-" }}
+                        </small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma configuracao de autonomia cadastrada.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Autoexecucoes recentes</h2>
+                    <p>Status, agente de origem, confianca, policy snapshot, simulacao e possibilidade de rollback.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Tenant</th>
+                            <th>Status</th>
+                            <th>Confianca</th>
+                            <th>Agente</th>
+                            <th>Rollback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for execution in autonomy_executions %}
+                            <tr>
+                                <td>
+                                    <strong>{{ execution.action_type }}</strong>
+                                    <small>{{ execution.execution_summary|default:"Sem resumo." }}</small>
+                                </td>
+                                <td>{{ execution.company.name|default:"Global" }} / {{ execution.site.name|default:"Todas" }}</td>
+                                <td>{% include "admin_shell/components/decision_status_badge.html" with status=execution.execution_status %}</td>
+                                <td>{{ execution.confidence_score|default:"0" }} <small>{{ execution.confidence_level|default:"-" }}</small></td>
+                                <td>{{ execution.source_agent|default:"-" }}</td>
+                                <td>{{ execution.rollback_status }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6">Nenhuma autoexecucao registrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Guards e incidentes</h2>
+                    <p>Volume, falha, rollback, confianca, kill switch e sinais de autonomia em investigacao.</p>
+                </div>
+            </header>
+            <div class="content-grid two-column compact-grid">
+                <div class="event-feed">
+                    {% for guard in autonomy_guards %}
+                        <article class="event-row tone-neutral">
+                            <strong>{{ guard.guard_type }}</strong>
+                            <p>{{ guard.threshold_key }} = {{ guard.threshold_value }}</p>
+                            <small>{{ guard.company.name|default:"Global" }} • enabled={{ guard.enabled|yesno:"true,false" }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhum guard configurado.</p>
+                    {% endfor %}
+                </div>
+                <div class="event-feed">
+                    {% for incident in autonomy_recent_incidents %}
+                        <article class="event-row {% if incident.severity == "critical" or incident.severity == "high" %}tone-critical{% else %}tone-warning{% endif %}">
+                            <strong>{{ incident.incident_type }}</strong>
+                            <p>{{ incident.summary }}</p>
+                            <small>{{ incident.company.name|default:"Global" }} • {{ incident.status }} • {{ incident.created_at|date:"d/m/Y H:i" }}</small>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">Nenhum incidente recente.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </article>
+    </section>
+{% endblock %}

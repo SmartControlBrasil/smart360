@@ -1,0 +1,184 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout analytics-layout">
+    {% if not has_company_context %}
+        <section class="widget-card">
+            <div class="widget-head">
+                <div>
+                    <h3>Nenhuma empresa no escopo</h3>
+                    <p>Selecione uma empresa ativa para consolidar receita, custo, contrato e produtividade.</p>
+                </div>
+            </div>
+        </section>
+    {% else %}
+        <div class="summary-grid">
+            {% for widget in dashboard_cards %}
+                <article class="summary-card tone-{{ widget.tone }}">
+                    <span>{{ widget.label }}</span>
+                    <strong>
+                        {% if widget.format == "currency" %}R$ {{ widget.value }}
+                        {% elif widget.format == "percentage" %}{{ widget.value }}%
+                        {% elif widget.format == "duration" %}{{ widget.value }} min
+                        {% else %}{{ widget.value }}{% endif %}
+                    </strong>
+                    <small>{{ widget.helper }}</small>
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="content-grid">
+            <div class="column-span-6">
+                {% include "admin_shell/components/revenue_chart.html" with max_revenue=max_revenue_value %}
+            </div>
+            <div class="column-span-6">
+                {% include "admin_shell/components/profit_chart.html" with max_profit=max_profit_value %}
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="column-span-4">
+                {% include "admin_shell/components/sla_metrics_card.html" %}
+            </div>
+            <div class="column-span-8">
+                {% include "admin_shell/components/technician_leaderboard.html" %}
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="column-span-6">
+                <section class="widget-card">
+                    <div class="widget-head">
+                        <div>
+                            <h3>Clientes mais lucrativos</h3>
+                            <p>Margem e custo consolidado por cliente no periodo.</p>
+                        </div>
+                    </div>
+                    <div class="table-shell">
+                        <table class="data-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Receita</th>
+                                    <th>Custo</th>
+                                    <th>Lucro</th>
+                                    <th>Margem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in top_clients %}
+                                    <tr>
+                                        <td>{{ row.name }}</td>
+                                        <td>R$ {{ row.revenue }}</td>
+                                        <td>R$ {{ row.cost }}</td>
+                                        <td>R$ {{ row.profit }}</td>
+                                        <td>{{ row.margin }}%</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="5">Nenhum cliente consolidado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="column-span-6">
+                <section class="widget-card">
+                    <div class="widget-head">
+                        <div>
+                            <h3>Contratos mais lucrativos</h3>
+                            <p>Rentabilidade operacional por contrato recorrente.</p>
+                        </div>
+                    </div>
+                    <div class="table-shell">
+                        <table class="data-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Contrato</th>
+                                    <th>Cliente</th>
+                                    <th>Receita</th>
+                                    <th>Lucro</th>
+                                    <th>Margem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in top_contracts %}
+                                    <tr>
+                                        <td>{{ row.contract_number }}</td>
+                                        <td>{{ row.client_name }}</td>
+                                        <td>R$ {{ row.revenue }}</td>
+                                        <td>R$ {{ row.profit }}</td>
+                                        <td>{{ row.margin }}%</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="5">Nenhum contrato consolidado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="column-span-6">
+                <section class="widget-card">
+                    <div class="widget-head">
+                        <div>
+                            <h3>Ativos mais problemáticos</h3>
+                            <p>Falha recorrente e custo acumulado por ativo.</p>
+                        </div>
+                    </div>
+                    <div class="table-shell">
+                        <table class="data-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Ativo</th>
+                                    <th>Unidade</th>
+                                    <th>Falhas</th>
+                                    <th>Custo</th>
+                                    <th>OS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in asset_analysis %}
+                                    <tr>
+                                        <td>{{ row.asset_tag }} — {{ row.asset_name }}</td>
+                                        <td>{{ row.site_name }}</td>
+                                        <td>{{ row.failure_count }}</td>
+                                        <td>R$ {{ row.maintenance_cost }}</td>
+                                        <td>{{ row.total_orders }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="5">Nenhum ativo critico no periodo.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="column-span-6">
+                <section class="widget-card">
+                    <div class="widget-head">
+                        <div>
+                            <h3>Alertas analíticos</h3>
+                            <p>Riscos de rentabilidade, carga e ativos com atenção executiva.</p>
+                        </div>
+                    </div>
+                    <div class="event-feed">
+                        {% for alert in analytics_alerts %}
+                            <article class="event-row tone-{{ alert.level }}">
+                                <strong>{{ alert.title }}</strong>
+                                <p>{{ alert.description }}</p>
+                                <small>{{ company.name }} • {{ analytics_period.label }}</small>
+                            </article>
+                        {% empty %}
+                            <p class="empty-state">Nenhum alerta crítico no periodo consolidado.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

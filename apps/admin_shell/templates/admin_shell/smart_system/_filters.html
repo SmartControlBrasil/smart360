@@ -1,0 +1,5 @@
+<div class="smart-system-filters">
+    {% for filter in filter_groups %}
+        {% include "admin_shell/components/maintenance_filter_bar.html" with filter_group=filter %}
+    {% endfor %}
+</div>

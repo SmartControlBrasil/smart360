@@ -1,0 +1,19 @@
+<div class="alert-stack">
+    {% for item in asset.alerts %}
+        <article class="alert-row severity-{{ item.severity }}">
+            <span class="alert-marker"></span>
+            <div>
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.description }}</p>
+            </div>
+        </article>
+    {% empty %}
+        <article class="alert-row severity-info">
+            <span class="alert-marker"></span>
+            <div>
+                <strong>Nenhuma excecao relevante</strong>
+                <p>O ativo segue sem alertas críticos ou pendências fora do padrão esperado.</p>
+            </div>
+        </article>
+    {% endfor %}
+</div>

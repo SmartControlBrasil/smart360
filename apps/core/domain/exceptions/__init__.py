@@ -1,0 +1,1 @@
+# Domain exceptions (framework-agnostic).

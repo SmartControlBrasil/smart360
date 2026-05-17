@@ -1,0 +1,8 @@
+<div class="asset-technical-grid">
+    {% for item in failure.rca_panel %}
+        <article class="technical-stat {% if item.label == 'Causa raiz' or item.label == 'Acao corretiva' or item.label == 'Recomendacao preventiva' or item.label == 'Impacto sistemico' %}technical-stat-wide{% endif %}">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+        </article>
+    {% endfor %}
+</div>

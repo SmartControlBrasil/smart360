@@ -1,0 +1,30 @@
+<div class="checklist-item-stack execution-stack">
+    {% for item in execution.items %}
+        <article class="checklist-item-card {% if item.response == 'NOK' %}is-nok{% endif %}">
+            <header>
+                <span>#{{ item.order }}</span>
+                <strong>{{ item.title }}</strong>
+                <div class="execution-response-group">
+                    <span class="status-badge {% if item.response == 'OK' %}status-emerald{% elif item.response == 'NOK' %}status-red{% elif item.response == 'N/A' %}status-slate{% else %}status-amber{% endif %}">
+                        {{ item.response|default:"Pendente" }}
+                    </span>
+                    {% if item.required %}<small class="status-badge status-amber">Obrigatorio</small>{% endif %}
+                </div>
+            </header>
+            <p>{{ item.description }}</p>
+            <div class="checklist-item-meta">
+                <span><strong>Instrucao:</strong> {{ item.instruction }}</span>
+                <span><strong>Esperado:</strong> {{ item.expected_value }}</span>
+            </div>
+            <div class="execution-controls">
+                <label><input type="radio" disabled {% if item.response == 'OK' %}checked{% endif %}> OK</label>
+                <label><input type="radio" disabled {% if item.response == 'NOK' %}checked{% endif %}> NOK</label>
+                <label><input type="radio" disabled {% if item.response == 'N/A' %}checked{% endif %}> N/A</label>
+            </div>
+            <div class="execution-note">
+                <span>Observacao</span>
+                <p>{{ item.note|default:item.default_note }}</p>
+            </div>
+        </article>
+    {% endfor %}
+</div>

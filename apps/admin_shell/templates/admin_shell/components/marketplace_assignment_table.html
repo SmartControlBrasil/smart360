@@ -1,0 +1,30 @@
+<div class="table-responsive-shell">
+    <table class="data-table-shell">
+        <thead>
+            <tr>
+                <th>Solicitacao</th>
+                <th>Tecnico</th>
+                <th>Empresa</th>
+                <th>Status</th>
+                <th>Oferta</th>
+                <th>OS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assignment in recent_assignments %}
+                <tr>
+                    <td>{{ assignment.technician_service_request.title }}</td>
+                    <td>{{ assignment.technician_profile.display_name }}</td>
+                    <td>{{ assignment.technician_service_request.requester_company.name|default:"-" }}</td>
+                    <td><span class="status-badge status-emerald">{{ assignment.get_assignment_status_display }}</span></td>
+                    <td>{% if assignment.service_offer %}R$ {{ assignment.service_offer.proposed_amount }}{% else %}-{% endif %}</td>
+                    <td>{{ assignment.technician_service_request.related_service_order.order_number|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Nenhuma atribuicao recente.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

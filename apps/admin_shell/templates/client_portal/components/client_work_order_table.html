@@ -1,0 +1,30 @@
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>OS</th>
+                <th>Titulo</th>
+                <th>Ativo</th>
+                <th>Unidade</th>
+                <th>Status</th>
+                <th>Prioridade</th>
+                <th>Abertura</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work_order in work_order_records %}
+                <tr>
+                    <td><a href="{% url 'admin-shell:client-portal-work-order-detail' order_code=work_order.order_number %}">{{ work_order.order_number }}</a></td>
+                    <td>{{ work_order.title }}</td>
+                    <td>{% if work_order.asset %}{{ work_order.asset.asset_tag }}{% else %}-{% endif %}</td>
+                    <td>{{ work_order.operational_site.name }}</td>
+                    <td>{{ work_order.get_status_display }}</td>
+                    <td>{{ work_order.get_priority_display }}</td>
+                    <td>{{ work_order.opened_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Nenhuma ordem de servico encontrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

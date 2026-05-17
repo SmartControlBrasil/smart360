@@ -1,0 +1,16 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout marketplace-layout">
+    <div class="asset-kpi-grid">
+        {% for widget in request_kpis %}
+            {% include "admin_shell/components/marketplace_dashboard_widget.html" with widget=widget %}
+        {% endfor %}
+    </div>
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Carteira de solicitacoes" subtitle="Demandas de servico publicadas pelas empresas com prioridade, status e numero de ofertas." content_template="admin_shell/components/marketplace_request_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

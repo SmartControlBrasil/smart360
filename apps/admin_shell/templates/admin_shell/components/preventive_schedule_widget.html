@@ -1,0 +1,39 @@
+<div class="headline-metrics">
+    {% for item in preventive_plan.headline %}
+        <article class="mini-summary-card">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+        </article>
+    {% endfor %}
+</div>
+<div class="preventive-adherence">
+    <div>
+        <span>Aderencia ao plano</span>
+        <strong>{{ preventive_plan.adherence }}%</strong>
+    </div>
+    <div class="meter"><span style="width: {{ preventive_plan.adherence }}%"></span></div>
+</div>
+<div class="table-shell">
+    <table class="work-order-table compact-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ativo</th>
+                <th>Atividade</th>
+                <th>Responsavel</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in preventive_plan.schedule %}
+                <tr>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.asset }}</td>
+                    <td>{{ item.activity }}</td>
+                    <td>{{ item.owner }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,52 @@
+{% extends "technician_pwa/base.html" %}
+
+{% block app_content %}
+<section class="technician-panel">
+    <div class="section-heading"><h2>{{ service.code }}</h2></div>
+    <p>{{ service.title }}</p>
+    <div class="technician-inline-state-row">
+        <span class="technician-inline-pill" data-order-sync-state>online</span>
+        <span class="technician-inline-pill" data-order-pending-summary>Pendencias locais: 0</span>
+    </div>
+    <ul class="service-meta-list">
+        <li>{{ service.client }}</li>
+        <li>{{ service.site }}</li>
+        <li>{{ service.asset_code }}</li>
+        <li>{{ service.priority }}</li>
+    </ul>
+    <p>{{ service.description }}</p>
+    <div class="technician-action-grid">
+        <form method="post" action="{% url 'admin-shell:technician-app-service-start' order_code=service.code %}" data-offline-form="start_execution" data-order-code="{{ service.code }}">
+            {% csrf_token %}
+            <button type="submit" class="quick-action-button">Iniciar execucao</button>
+        </form>
+        <a class="quick-action-button" href="{% url 'admin-shell:technician-app-service-execution' order_code=service.code %}">Checklist e execucao</a>
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Copiloto tecnico</h2></div>
+    <p>Use o botao "Copiloto" para consultar historico, diagnostico, checklist e sugestao de registro desta OS.</p>
+    <div class="technician-inline-state-row">
+        {% for suggestion in technician_copilot_bootstrap.suggestions|slice:":3" %}
+            <span class="technician-inline-pill">{{ suggestion }}</span>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Resumo tecnico</h2></div>
+    <div class="technician-kpi-grid compact">
+        {% for item in execution.summary_cards %}
+            {% include "technician_pwa/components/mobile_kpi_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+
+<section class="technician-panel">
+    <div class="section-heading"><h2>Historico</h2></div>
+    {% for item in execution.timeline %}
+        {% include "technician_pwa/components/timeline_card.html" %}
+    {% endfor %}
+</section>
+{% endblock %}

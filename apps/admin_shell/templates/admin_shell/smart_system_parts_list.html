@@ -1,0 +1,29 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout parts-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            {% for filter in part_filters %}
+                {% include "admin_shell/components/checklist_filter_bar.html" with filter=filter %}
+            {% endfor %}
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:smart-system-parts' %}">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="asset-kpi-grid">
+        {% for card in part_kpis %}
+            {% include "admin_shell/components/part_stock_card.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Carteira de pecas e sobressalentes" subtitle="Itens MRO, niveis de estoque, status de reposicao e relacao com ativos da manutencao." content_template="admin_shell/components/part_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

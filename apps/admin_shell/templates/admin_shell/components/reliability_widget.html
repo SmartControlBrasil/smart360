@@ -1,0 +1,39 @@
+<div class="reliability-layout">
+    <div>
+        <h4>Falhas recorrentes</h4>
+        <div class="urgent-list compact">
+            {% for item in reliability.recurring_failures %}
+                <article>
+                    <strong>{{ item.title }}</strong>
+                    <p>{{ item.meta }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+    <div>
+        <h4>Top ativos com maior incidencia</h4>
+        <ul class="metric-list">
+            {% for item in reliability.top_assets %}
+                <li><span>{{ item.asset }}</span><strong>{{ item.failures }} • {{ item.trend }}</strong></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h4>Eventos recentes de falha</h4>
+        <ul class="event-log">
+            {% for item in reliability.recent_events %}
+                <li>
+                    <strong>{{ item.timestamp }}</strong>
+                    <div>
+                        <span>{{ item.event }}</span>
+                        <p>{{ item.reference }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="insight-banner">
+        <span>Leitura de confiabilidade</span>
+        <strong>{{ reliability.trend_text }}</strong>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Ativo</th>
+                <th>Categoria</th>
+                <th>Unidade</th>
+                <th>Status</th>
+                <th>Criticidade</th>
+                <th>Ultima manutencao</th>
+                <th>Proxima preventiva</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in asset_records %}
+                <tr>
+                    <td><a href="{{ asset.detail_url }}">{{ asset.code }} - {{ asset.name }}</a></td>
+                    <td>{{ asset.category }}</td>
+                    <td>{{ asset.site }}</td>
+                    <td>{{ asset.status }}</td>
+                    <td>{{ asset.criticality }}</td>
+                    <td>{{ asset.last_maintenance }}</td>
+                    <td>{{ asset.next_preventive }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Nenhum ativo disponivel no contexto atual.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

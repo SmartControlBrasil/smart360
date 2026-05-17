@@ -1,0 +1,45 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout reports-layout">
+    <div class="summary-grid">
+        {% for card in report_kpis %}
+            <article class="summary-card tone-{{ card.tone }}">
+                <span>{{ card.label }}</span>
+                <strong>{{ card.value }}</strong>
+                <small>{{ card.meta }}</small>
+            </article>
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        {% for group in report_groups %}
+            <div class="column-span-6">
+                <section class="widget-card report-group-card">
+                    <div class="widget-head">
+                        <div>
+                            <h3>{{ group.title }}</h3>
+                            <p>{{ group.description }}</p>
+                        </div>
+                    </div>
+                    {% include "admin_shell/components/report_history_table.html" with report_entries=group.items compact=True %}
+                </section>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Historico de relatorios gerados</h3>
+                        <p>Documentos tecnicos emitidos a partir de OS, preventivas, falhas e fichas de ativo.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/report_history_table.html" with report_entries=report_history compact=False %}
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+<div class="mini-stack">
+    {% for form in movement_forms %}
+        <article class="checklist-item-card">
+            <header>
+                <div>
+                    <h3>{{ form.title }}</h3>
+                </div>
+                <span class="status-badge status-slate">Placeholder operacional</span>
+            </header>
+            <div class="detail-list">
+                {% for field in form.fields %}
+                    <article class="detail-list-row">
+                        <span>Campo</span>
+                        <strong>{{ field }}</strong>
+                    </article>
+                {% endfor %}
+            </div>
+        </article>
+    {% endfor %}
+</div>

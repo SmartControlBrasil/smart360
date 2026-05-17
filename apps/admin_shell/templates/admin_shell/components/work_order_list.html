@@ -1,0 +1,28 @@
+<div class="table-shell">
+    <table class="work-order-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Ativo</th>
+                <th>Tipo</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>Responsavel</th>
+                <th>Prazo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in work_orders %}
+                <tr>
+                    <td><strong>{{ order.code }}</strong></td>
+                    <td>{{ order.asset }}</td>
+                    <td>{{ order.type }}</td>
+                    <td>{{ order.priority }}</td>
+                    <td><span class="status-badge status-{{ order.tone }}">{{ order.status }}</span></td>
+                    <td>{{ order.owner }}</td>
+                    <td>{{ order.deadline }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

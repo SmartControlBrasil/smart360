@@ -1,0 +1,24 @@
+<section class="page-header">
+    <div>
+        {% include "admin_shell/components/breadcrumb.html" %}
+        <h1>{{ page_title }}</h1>
+        <p>{{ page_description }}</p>
+    </div>
+    <div class="page-actions">
+        {% with actions=page_actions|default:shell_quick_actions %}
+            {% if actions %}
+                {% include "admin_shell/components/quick_action_button.html" with action=actions.0 %}
+                {% if actions|length > 1 %}
+                    <details class="page-actions-more">
+                        <summary class="quick-action-button">Mais acoes</summary>
+                        <div class="page-actions-more-panel">
+                            {% for action in actions|slice:"1:5" %}
+                                {% include "admin_shell/components/quick_action_button.html" with action=action %}
+                            {% endfor %}
+                        </div>
+                    </details>
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>

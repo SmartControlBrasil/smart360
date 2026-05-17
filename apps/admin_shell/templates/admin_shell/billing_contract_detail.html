@@ -1,0 +1,103 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout billing-layout">
+    <div class="summary-grid">
+        <article class="summary-card tone-{{ contract.status_tone }}">
+            <span>Status do contrato</span>
+            <strong>{{ contract.status|upper }}</strong>
+            <small>{{ contract.contracted_amount }} • {{ contract.billing_periodicity }}</small>
+        </article>
+        <article class="summary-card tone-{{ billing_subscription_summary.status_tone }}">
+            <span>Status da assinatura</span>
+            <strong>{{ billing_subscription_summary.status|upper }}</strong>
+            <small>{{ billing_subscription_summary.amount }} • {{ billing_subscription_summary.billing_method }}</small>
+        </article>
+        <article class="summary-card tone-indigo">
+            <span>Empresa</span>
+            <strong>{{ contract.company_name }}</strong>
+            <small>{{ contract.plan_name }}</small>
+        </article>
+        <article class="summary-card tone-amber">
+            <span>Renovacao</span>
+            <strong>{{ contract.renewal_date|date:"d/m/Y" }}</strong>
+            <small>Inicio {{ contract.start_date|date:"d/m/Y" }}</small>
+        </article>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Dados do contrato</h3>
+                        <p>Escopo comercial, empresa vinculada, assinatura e historico financeiro.</p>
+                    </div>
+                </div>
+                <div class="billing-detail-grid">
+                    <div class="billing-detail-block">
+                        <h4>Contexto comercial</h4>
+                        <dl>
+                            <div><dt>Empresa</dt><dd>{{ contract.company_name }}</dd></div>
+                            <div><dt>Plano</dt><dd>{{ contract.plan_name }}</dd></div>
+                            <div><dt>Responsavel comercial</dt><dd>{{ contract.sales_owner }}</dd></div>
+                            <div><dt>Email financeiro</dt><dd>{{ contract.billing_email }}</dd></div>
+                        </dl>
+                    </div>
+                    <div class="billing-detail-block">
+                        <h4>Assinatura</h4>
+                        <dl>
+                            <div><dt>Metodo de cobranca</dt><dd>{{ billing_subscription_summary.billing_method }}</dd></div>
+                            <div><dt>Proxima cobranca</dt><dd>{{ billing_subscription_summary.next_billing_at|date:"d/m/Y H:i" }}</dd></div>
+                            <div><dt>Periodo atual</dt><dd>{{ billing_subscription_summary.current_period_start|date:"d/m/Y" }} - {{ billing_subscription_summary.current_period_end|date:"d/m/Y" }}</dd></div>
+                            <div><dt>Valor</dt><dd>{{ billing_subscription_summary.amount }}</dd></div>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Historico de faturas</h3>
+                        <p>Faturamento emitido para o contrato e status da cobranca.</p>
+                    </div>
+                </div>
+                {% include "admin_shell/components/billing_invoice_table.html" with invoices=billing_invoice_rows compact=True %}
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <div class="widget-head">
+                    <div>
+                        <h3>Acoes do contrato</h3>
+                        <p>Operacoes administrativas sensiveis da comercializacao.</p>
+                    </div>
+                </div>
+                <div class="billing-action-stack">
+                    <form method="post" action="{% url 'admin-shell:billing-contract-suspend' contract_code=contract.contract_code %}">
+                        {% csrf_token %}
+                        <button class="quick-action-button is-danger" type="submit">Suspender contrato</button>
+                    </form>
+                    <form method="post" action="{% url 'admin-shell:billing-contract-cancel' contract_code=contract.contract_code %}">
+                        {% csrf_token %}
+                        <button class="quick-action-button is-muted" type="submit">Cancelar contrato</button>
+                    </form>
+                    <a class="quick-action-button" href="{% url 'admin-shell:billing-invoices' %}">Abrir faturas</a>
+                </div>
+                <div class="billing-note-list">
+                    {% for note in billing_contract_notes %}
+                        <article>{{ note }}</article>
+                    {% endfor %}
+                </div>
+                {% if contract.notes %}
+                    <div class="billing-notes-box">
+                        <strong>Observacoes</strong>
+                        <p>{{ contract.notes|linebreaksbr }}</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

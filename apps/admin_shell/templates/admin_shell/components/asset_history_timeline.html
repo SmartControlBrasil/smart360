@@ -1,0 +1,11 @@
+<ul class="event-log dense">
+    {% for item in asset.history %}
+        <li>
+            <strong>{{ item.timestamp }}</strong>
+            <div>
+                <span><b>{{ item.type }}</b> • {{ item.description }}</span>
+                <p>{{ item.owner }} • {{ item.reference }}</p>
+            </div>
+        </li>
+    {% endfor %}
+</ul>

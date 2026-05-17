@@ -1,0 +1,46 @@
+<section class="page-header client-portal-page-header">
+    <div>
+        <div class="breadcrumb">
+            {% for item in breadcrumbs %}
+                {% if item.href %}
+                    <a href="{{ item.href }}">{{ item.label }}</a>
+                {% elif item.url %}
+                    <a href="{% url item.url %}">{{ item.label }}</a>
+                {% else %}
+                    <span>{{ item.label }}</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <h1>{{ page_title }}</h1>
+        <p>{{ page_description }}</p>
+    </div>
+    {% if page_actions %}
+        <div class="page-actions">
+            {% for action in page_actions %}
+                {% if action.href %}
+                    <a class="quick-action-button" href="{{ action.href }}">{{ action.label }}</a>
+                {% elif action.route_name %}
+                    {% if action.route_kwargs %}
+                        {% if action.route_kwargs.asset_code %}
+                            <a class="quick-action-button" href="{% url action.route_name asset_code=action.route_kwargs.asset_code %}">{{ action.label }}</a>
+                        {% elif action.route_kwargs.order_code %}
+                            <a class="quick-action-button" href="{% url action.route_name order_code=action.route_kwargs.order_code %}">{{ action.label }}</a>
+                        {% elif action.route_kwargs.public_id %}
+                            <a class="quick-action-button" href="{% url action.route_name public_id=action.route_kwargs.public_id %}">{{ action.label }}</a>
+                        {% elif action.route_kwargs.quote_number %}
+                            <a class="quick-action-button" href="{% url action.route_name quote_number=action.route_kwargs.quote_number %}">{{ action.label }}</a>
+                        {% elif action.route_kwargs.protocol_number %}
+                            <a class="quick-action-button" href="{% url action.route_name protocol_number=action.route_kwargs.protocol_number %}">{{ action.label }}</a>
+                        {% elif action.route_kwargs.report_type and action.route_kwargs.reference_code %}
+                            <a class="quick-action-button" href="{% url action.route_name report_type=action.route_kwargs.report_type reference_code=action.route_kwargs.reference_code %}">{{ action.label }}</a>
+                        {% else %}
+                            <a class="quick-action-button" href="{% url action.route_name %}">{{ action.label }}</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="quick-action-button" href="{% url action.route_name %}">{{ action.label }}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>

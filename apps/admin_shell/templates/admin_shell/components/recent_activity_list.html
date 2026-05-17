@@ -1,0 +1,11 @@
+<ul class="activity-list">
+    {% for item in items %}
+        <li>
+            <span class="activity-bullet"></span>
+            <div>
+                <strong>{{ item.title|default:"" }}</strong>
+                <p>{{ item.meta|default:"" }}</p>
+            </div>
+        </li>
+    {% endfor %}
+</ul>

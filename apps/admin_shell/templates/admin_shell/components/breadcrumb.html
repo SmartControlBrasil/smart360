@@ -1,0 +1,33 @@
+<nav class="breadcrumb">
+    {% for item in breadcrumbs %}
+        <span class="breadcrumb-item">
+            {% if item.url %}
+                {% if item.route_kwargs %}
+                    {% if item.route_kwargs.module_slug %}
+                        <a href="{% url item.url module_slug=item.route_kwargs.module_slug %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.asset_code %}
+                        <a href="{% url item.url asset_code=item.route_kwargs.asset_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.order_code %}
+                        <a href="{% url item.url order_code=item.route_kwargs.order_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.plan_code %}
+                        <a href="{% url item.url plan_code=item.route_kwargs.plan_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.failure_code %}
+                        <a href="{% url item.url failure_code=item.route_kwargs.failure_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.part_code %}
+                        <a href="{% url item.url part_code=item.route_kwargs.part_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.checklist_code and item.route_kwargs.execution_code %}
+                        <a href="{% url item.url checklist_code=item.route_kwargs.checklist_code execution_code=item.route_kwargs.execution_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.checklist_code %}
+                        <a href="{% url item.url checklist_code=item.route_kwargs.checklist_code %}">{{ item.label }}</a>
+                    {% else %}
+                        <a href="{% url item.url %}">{{ item.label }}</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url item.url %}">{{ item.label }}</a>
+                {% endif %}
+            {% else %}
+                <span>{{ item.label }}</span>
+            {% endif %}
+        </span>
+    {% endfor %}
+</nav>

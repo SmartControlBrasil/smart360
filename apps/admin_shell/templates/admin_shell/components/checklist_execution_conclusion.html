@@ -1,0 +1,26 @@
+<dl class="detail-grid">
+    <div>
+        <dt>Status da execucao</dt>
+        <dd>{{ execution.status }}</dd>
+    </div>
+    <div>
+        <dt>Resultado geral</dt>
+        <dd>{{ execution.result }}</dd>
+    </div>
+    <div>
+        <dt>Observacoes finais</dt>
+        <dd>{{ execution.final_notes|default:"Sem observacoes finais registradas." }}</dd>
+    </div>
+    <div>
+        <dt>Recomendacao</dt>
+        <dd>{{ execution.recommendation|default:"Nenhuma recomendacao informada." }}</dd>
+    </div>
+    <div>
+        <dt>Inicio</dt>
+        <dd>{{ execution.started_at }}</dd>
+    </div>
+    <div>
+        <dt>Conclusao</dt>
+        <dd>{{ execution.completed_at|default:"Em andamento" }}</dd>
+    </div>
+</dl>

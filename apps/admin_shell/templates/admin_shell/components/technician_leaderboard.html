@@ -1,0 +1,38 @@
+<section class="widget-card">
+    <div class="widget-head">
+        <div>
+            <h3>Leaderboard tecnico</h3>
+            <p>Produtividade, execucao e rentabilidade por tecnico.</p>
+        </div>
+    </div>
+    <div class="table-shell">
+        <table class="data-table compact-table">
+            <thead>
+                <tr>
+                    <th>Tecnico</th>
+                    <th>Concluidos</th>
+                    <th>Em andamento</th>
+                    <th>Execucao media</th>
+                    <th>Avaliacao</th>
+                    <th>Lucro gerado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in technician_leaderboard %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.jobs_completed }}</td>
+                        <td>{{ row.jobs_in_progress }}</td>
+                        <td>{{ row.avg_execution_time }} min</td>
+                        <td>{{ row.customer_rating }}</td>
+                        <td>R$ {{ row.profit_generated }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">Nenhum tecnico com snapshot no periodo.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

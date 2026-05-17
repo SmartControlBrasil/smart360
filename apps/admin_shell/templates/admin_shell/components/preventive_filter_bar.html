@@ -1,0 +1,27 @@
+<label class="asset-filter-field">
+    <span>{{ filter.label }}</span>
+    {% if filter.type == "search" %}
+        <input type="search" name="{{ filter.name }}" value="{{ filter.value }}" placeholder="{{ filter.placeholder }}">
+    {% elif filter.type == "select" %}
+        <select name="{{ filter.name }}">
+            <option value="">Todos</option>
+            {% for option in filter.options %}
+                <option value="{{ option }}" {% if option == filter.value %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    {% elif filter.type == "toggle" %}
+        <label class="toggle-chip">
+            <input type="checkbox" name="{{ filter.name }}" value="yes" {% if filter.value == "yes" %}checked{% endif %}>
+            <span>{{ filter.toggle_label }}</span>
+        </label>
+    {% elif filter.type == "chips" %}
+        <div class="chip-group">
+            {% for option in filter.options %}
+                <label class="chip chip-input {% if option == filter.value %}is-active{% endif %}">
+                    <input type="radio" name="{{ filter.name }}" value="{{ option }}" {% if option == filter.value %}checked{% endif %}>
+                    <span>{{ option }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    {% endif %}
+</label>

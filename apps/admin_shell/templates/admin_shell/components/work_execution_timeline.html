@@ -1,0 +1,23 @@
+<div class="alert-stack compact-timeline execution-timeline">
+    {% for event in execution.timeline %}
+        <article class="alert-row tone-{{ event.timeline_tone|default:'info' }} execution-timeline-row">
+            <span class="execution-timeline-marker" aria-hidden="true"></span>
+            <div class="execution-timeline-body">
+                <div class="execution-timeline-top">
+                    <strong class="execution-timeline-time">{{ event.timestamp }}</strong>
+                    <span class="status-badge status-slate execution-timeline-type">{{ event.event_type }}</span>
+                </div>
+                <p class="execution-timeline-actor"><span class="execution-timeline-actor-label">Responsavel</span> {{ event.actor }}</p>
+                {% if event.duration_label %}
+                    <p class="execution-timeline-duration"><span class="execution-timeline-actor-label">Tempo</span> {{ event.duration_label }}</p>
+                {% endif %}
+                <p class="execution-timeline-desc">{{ event.description }}</p>
+            </div>
+        </article>
+    {% empty %}
+        <article class="alert-row tone-info">
+            <strong>Sem timeline registrada</strong>
+            <p>A execucao ainda nao possui eventos operacionais lançados.</p>
+        </article>
+    {% endfor %}
+</div>

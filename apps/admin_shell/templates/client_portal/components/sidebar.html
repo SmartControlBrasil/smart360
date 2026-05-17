@@ -1,0 +1,21 @@
+<aside class="shell-sidebar client-portal-sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-mark">S</div>
+        <div class="brand-copy">
+            <strong>SMART360</strong>
+            <span>Client Portal</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        {% for section in portal_navigation %}
+            <div class="nav-section">
+                <span class="nav-section-label">{{ section.label }}</span>
+                {% for item in section.items %}
+                    <a class="nav-link {% if item.is_active %}is-active{% endif %}" href="{% url item.url_name %}">
+                        <span>{{ item.label }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </nav>
+</aside>

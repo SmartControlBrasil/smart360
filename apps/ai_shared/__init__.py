@@ -1,0 +1,1 @@
+"""Shared AI integration interfaces."""

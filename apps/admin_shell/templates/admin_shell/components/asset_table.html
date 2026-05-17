@@ -1,0 +1,49 @@
+<div class="asset-table-toolbar">
+    <span>{{ filtered_count }} de {{ total_count }} ativos exibidos</span>
+    <span>Leitura por criticidade, plano e indisponibilidade</span>
+</div>
+<div class="table-shell">
+    <table class="work-order-table asset-table">
+        <thead>
+            <tr>
+                <th>Codigo / tag</th>
+                <th>Ativo</th>
+                <th>Categoria</th>
+                <th>Site</th>
+                <th>Criticidade</th>
+                <th>Status</th>
+                <th>Condicao</th>
+                <th>Ultima manutencao</th>
+                <th>Proxima manutencao</th>
+                <th>OS abertas</th>
+                <th>Disponibilidade</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+                <tr class="{% if asset.operational_status == 'Parado' %}is-row-critical{% endif %}">
+                    <td><strong>{{ asset.code }}</strong></td>
+                    <td>
+                        <a href="{% url 'admin-shell:smart-system-asset-detail' asset_code=asset.code %}">{{ asset.name }}</a>
+                        <p>{{ asset.description }}</p>
+                    </td>
+                    <td>{{ asset.category }}</td>
+                    <td>{{ asset.site }}</td>
+                    <td>{% include "admin_shell/components/asset_criticality_badge.html" with value=asset.criticality %}</td>
+                    <td>{% include "admin_shell/components/asset_status_badge.html" with value=asset.operational_status %}</td>
+                    <td>{% include "admin_shell/components/asset_condition_badge.html" with value=asset.condition %}</td>
+                    <td>{{ asset.last_maintenance }}</td>
+                    <td>{{ asset.next_maintenance }}</td>
+                    <td>{{ asset.open_work_orders }}</td>
+                    <td>{{ asset.availability }}</td>
+                    <td><a class="table-action-link" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=asset.code %}">Abrir ficha</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12">Nenhum ativo corresponde aos filtros aplicados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

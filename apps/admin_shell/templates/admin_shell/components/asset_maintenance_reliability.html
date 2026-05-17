@@ -1,0 +1,44 @@
+<div class="maintenance-reliability-grid">
+    <article class="metric-panel">
+        <span>MTBF</span>
+        <strong>{{ asset.mtbf }}</strong>
+    </article>
+    <article class="metric-panel">
+        <span>MTTR</span>
+        <strong>{{ asset.mttr }}</strong>
+    </article>
+    <article class="metric-panel">
+        <span>Disponibilidade</span>
+        <strong>{{ asset.availability }}</strong>
+    </article>
+    <article class="metric-panel">
+        <span>Ultima preventiva</span>
+        <strong>{{ asset.last_preventive }}</strong>
+    </article>
+    <article class="metric-panel">
+        <span>Proxima preventiva</span>
+        <strong>{{ asset.next_preventive }}</strong>
+    </article>
+    <article class="metric-panel">
+        <span>Ultima corretiva</span>
+        <strong>{{ asset.last_corrective }}</strong>
+    </article>
+</div>
+<div class="dual-stat-grid">
+    <div class="info-card">
+        <span class="info-card-label">Intervencoes recentes</span>
+        <strong>{{ asset.maintenance_summary.interventions }}</strong>
+    </div>
+    <div class="info-card">
+        <span class="info-card-label">Horas paradas estimadas</span>
+        <strong>{{ asset.maintenance_summary.downtime }}</strong>
+    </div>
+    <div class="info-card">
+        <span class="info-card-label">Aderencia ao plano</span>
+        <strong>{{ asset.maintenance_summary.plan_adherence }}</strong>
+    </div>
+    <div class="info-card">
+        <span class="info-card-label">Tendencia</span>
+        <strong>{{ asset.maintenance_summary.trend }}</strong>
+    </div>
+</div>

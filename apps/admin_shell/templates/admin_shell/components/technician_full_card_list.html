@@ -1,0 +1,7 @@
+<div class="marketplace-card-grid">
+    {% for technician in technicians %}
+        {% include "admin_shell/components/technician_card.html" with technician=technician %}
+    {% empty %}
+        <p>Nenhum tecnico encontrado para o filtro aplicado.</p>
+    {% endfor %}
+</div>

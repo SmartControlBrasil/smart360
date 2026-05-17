@@ -1,0 +1,44 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout work-order-create-layout">
+    {% if no_plans %}
+        <div class="technician-inline-alert warning">
+            Nao ha planos preventivos ativos no escopo atual (empresa / site). Ajuste o contexto no topo, cadastre planos no Smart System ou verifique vinculo de empresa ao plano.
+        </div>
+    {% endif %}
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Nova OS preventiva</h2>
+                        <p>Cliente e site sao obtidos do plano (via site operacional ou ativo vinculado). A data agendada define se a OS inicia como agendada ou aberta.</p>
+                    </div>
+                </header>
+                <div class="widget-card-body">
+                    <form method="post" class="asset-filter-form" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="technician-inline-alert critical">{{ form.non_field_errors }}</div>
+                        {% endif %}
+                        {% for field in form %}
+                            <div class="asset-filter-field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                                {% if field.help_text %}<p class="muted-block">{{ field.help_text }}</p>{% endif %}
+                                {{ field.errors }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+                        <div class="asset-filter-actions">
+                            <button type="submit" class="quick-action-button" {% if no_plans %}disabled aria-disabled="true"{% endif %}>Gerar OS</button>
+                            <a class="quick-action-button" href="{% url 'admin-shell:smart-system-work-orders' %}">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

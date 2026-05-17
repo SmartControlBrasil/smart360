@@ -1,0 +1,80 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="content-grid">
+        <div class="column-span-8">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Dados do projeto</h2>
+                        <p>Nicho, template e informacoes iniciais do cliente.</p>
+                    </div>
+                    <span class="status-badge status-violet">Smart Site Factory</span>
+                </header>
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <p class="form-error">{{ form.non_field_errors|striptags }}</p>
+                    {% endif %}
+                    <div class="content-grid">
+                        {% for field in form %}
+                            <label class="portal-form-field {% if field.name == 'notes' %}is-full{% endif %} column-span-{% if field.name == 'notes' %}12{% else %}4{% endif %}">
+                                <span>{{ field.label }}</span>
+                                {{ field }}
+                                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                                {% for error in field.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                            </label>
+                            {% if field.name == "selected_template" %}
+                                <div class="portal-form-field column-span-12">
+                                    <span class="widget-muted">Detalhes do pacote selecionado</span>
+                                    <p id="package-hint-text" class="widget-muted" style="white-space: pre-wrap; margin-top: 0.35rem;"></p>
+                                </div>
+                                {{ template_choice_hints|json_script:"ssf-template-hints" }}
+                                <script>
+                                (function () {
+                                  var raw = document.getElementById("ssf-template-hints");
+                                  var hints = {};
+                                  try { hints = raw ? JSON.parse(raw.textContent) : {}; } catch (e) {}
+                                  var sel = document.getElementById("id_selected_template");
+                                  var out = document.getElementById("package-hint-text");
+                                  function refresh() {
+                                    if (!sel || !out) return;
+                                    var id = sel.value;
+                                    out.textContent = hints[id] || "";
+                                  }
+                                  if (sel) {
+                                    sel.addEventListener("change", refresh);
+                                    refresh();
+                                  }
+                                })();
+                                </script>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="asset-filter-actions">
+                        <button class="quick-action-button" type="submit">Criar projeto</button>
+                        <a class="quick-action-button" href="{% url 'admin-shell:site-factory-orders' %}">Cancelar</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+        <div class="column-span-4">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Recomendacao automatica</h2>
+                        <p>Quando o template fica vazio, o servico existente escolhe a melhor opcao ativa para o nicho.</p>
+                    </div>
+                </header>
+                <dl class="detail-grid">
+                    <div><dt>Servico usado</dt><dd>SiteOrderService</dd></div>
+                    <div><dt>Tarefas</dt><dd>Bootstrap automatico</dd></div>
+                    <div><dt>Status inicial</dt><dd>Intake Pending</dd></div>
+                    <div><dt>Compatibilidade</dt><dd>APIs preservadas</dd></div>
+                </dl>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+<section class="space-y-6">
+    <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-6 shadow-2xl shadow-slate-950/40">
+        <p class="text-xs uppercase tracking-[0.35em] text-cyan-300">Knowledge Graph Industrial</p>
+        <h2 class="mt-2 text-3xl font-semibold text-white">Memoria relacional do ecossistema</h2>
+        <p class="mt-2 max-w-4xl text-sm text-slate-300">Navegue entre ativos, falhas, tecnicos, pecas, contratos, recomendacoes e decisoes com contexto relacional auditavel.</p>
+    </div>
+
+    <div class="grid gap-6 xl:grid-cols-[1.1fr,1.9fr]">
+        <article class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+            <div class="mb-4 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Nos Projetados</h3>
+                    <p class="text-sm text-slate-400">Selecione a entidade central para inspecionar o contexto relacional.</p>
+                </div>
+                <a class="text-sm font-medium text-cyan-300" href="{% url 'admin-shell:ai-digital-twin-center' %}">Ir para twins</a>
+            </div>
+            <div class="grid gap-3">
+                {% for node in graph_nodes %}
+                    <a href="?node={{ node.public_id }}" class="rounded-2xl border {% if selected_graph_node and selected_graph_node.public_id == node.public_id %}border-cyan-400/60 bg-cyan-500/10{% else %}border-slate-800 bg-slate-900/70{% endif %} p-4 transition hover:border-cyan-400/40">
+                        <strong class="block text-white">{{ node.label }}</strong>
+                        <span class="mt-1 block text-xs uppercase tracking-[0.28em] text-slate-400">{{ node.node_type }}</span>
+                        <small class="mt-2 block text-slate-500">{{ node.source_type }}</small>
+                    </a>
+                {% empty %}
+                    <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Nenhum no projetado no escopo atual.</div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+            {% if selected_graph_node %}
+                <div class="border-b border-slate-800 pb-5">
+                    <p class="text-xs uppercase tracking-[0.3em] text-cyan-300">{{ selected_graph_node.node_type }}</p>
+                    <h3 class="mt-2 text-2xl font-semibold text-white">{{ selected_graph_node.label }}</h3>
+                    <p class="mt-2 text-sm text-slate-300">{{ selected_graph_insights.summary|default:"Sem insight consolidado." }}</p>
+                </div>
+
+                <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Top Relacoes</h4>
+                        <div class="mt-4 grid gap-3">
+                            {% for item in selected_graph_insights.top_relations %}
+                                <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                    <strong class="block text-white">{{ item.label }}</strong>
+                                    <p class="mt-1 text-sm text-slate-300">{{ item.edge_type }}</p>
+                                    <small class="mt-2 block text-slate-500">{{ item.node_type }} • peso {{ item.weight }}</small>
+                                </article>
+                            {% empty %}
+                                <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Sem relacoes fortes mapeadas.</div>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Vizinhanca</h4>
+                        <div class="mt-4 grid gap-3">
+                            {% for item in selected_graph_neighbors %}
+                                <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                    <strong class="block text-white">{{ item.node.label }}</strong>
+                                    <p class="mt-1 text-sm text-slate-300">{{ item.edge_type }}</p>
+                                    <small class="mt-2 block text-slate-500">{{ item.node.node_type }} • peso {{ item.weight }}</small>
+                                </article>
+                            {% empty %}
+                                <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Sem vizinhos no raio consultado.</div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+
+                <section class="mt-5 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                    <h4 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-200">Clusters Simples</h4>
+                    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                        {% for cluster in selected_graph_insights.clusters %}
+                            <article class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                                <span class="text-xs uppercase tracking-[0.24em] text-slate-500">{{ cluster.relation_type }}</span>
+                                <strong class="mt-1 block text-white">{{ cluster.count }}</strong>
+                            </article>
+                        {% empty %}
+                            <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Sem clusters relevantes no momento.</div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% else %}
+                <div class="rounded-2xl border border-dashed border-slate-700 p-8 text-center text-sm text-slate-400">Selecione um no para abrir o contexto relacional.</div>
+            {% endif %}
+        </article>
+    </div>
+
+    <section class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+        <h3 class="text-lg font-semibold text-white">Runs de Projecao</h3>
+        <div class="mt-4 grid gap-3">
+            {% for run in graph_projection_runs %}
+                <article class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                    <strong class="block text-white">{{ run.projection_type }}</strong>
+                    <p class="mt-1 text-sm text-slate-300">{{ run.summary|default:"Sem resumo." }}</p>
+                    <small class="mt-2 block text-slate-500">{{ run.status }} • {{ run.started_at|date:"d/m/Y H:i" }}</small>
+                </article>
+            {% empty %}
+                <div class="rounded-2xl border border-dashed border-slate-700 p-5 text-sm text-slate-400">Nenhum run de projeção encontrado.</div>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,7 @@
+<a class="module-shortcut tone-{{ shortcut.tone|default:'slate' }}" href="{% if shortcut.route_name %}{% url shortcut.route_name %}{% else %}{% url 'admin-shell:module-page' module_slug=shortcut.slug %}{% endif %}">
+    <div>
+        <strong>{{ shortcut.title|default:"" }}</strong>
+        <p>{{ shortcut.metric|default:"" }}</p>
+    </div>
+    <span class="status-badge status-dark">Abrir</span>
+</a>

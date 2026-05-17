@@ -1,0 +1,40 @@
+<div class="table-responsive">
+    <table class="shell-table">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Descricao</th>
+                <th>Referencia</th>
+                <th>Quantidade</th>
+                <th>Valor unitario</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in quote_items %}
+                <tr>
+                    <td>{{ item.get_item_type_display }}</td>
+                    <td>
+                        <strong>{{ item.description }}</strong>
+                        {% if item.notes %}<small>{{ item.notes }}</small>{% endif %}
+                    </td>
+                    <td>
+                        {% if item.stock_item %}
+                            {{ item.stock_item.code }}
+                            <small>Saldo: {{ item.available_quantity|default:"-" }}</small>
+                        {% else %}
+                            {{ item.part_reference|default:"-" }}
+                        {% endif %}
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>R$ {{ item.unit_price }}</td>
+                    <td>R$ {{ item.total_price }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum item adicionado ao orcamento.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

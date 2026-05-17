@@ -1,0 +1,57 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table work-order-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Titulo / resumo</th>
+                <th>Ativo</th>
+                <th>Cliente / site</th>
+                <th>Tipo</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th>SLA</th>
+                <th>Responsavel</th>
+                <th>Abertura</th>
+                <th>Prazo</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in work_orders %}
+                <tr class="{% if order.sla_status == 'Critico' or order.status == 'Aguardando peca' %}is-critical-row{% endif %}">
+                    <td><strong>{{ order.code }}</strong></td>
+                    <td>
+                        <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-work-order-detail' order_code=order.code %}">{{ order.title }}</a>
+                        <small>{{ order.description }}</small>
+                    </td>
+                    <td>
+                        <span>{{ order.asset_code }}</span>
+                        <small>{{ order.asset_name }}</small>
+                    </td>
+                    <td>
+                        <span>{{ order.client }}</span>
+                        <small>{{ order.site }}</small>
+                    </td>
+                    <td>{{ order.maintenance_type }}</td>
+                    <td>{% include "admin_shell/components/work_order_priority_badge.html" with value=order.priority %}</td>
+                    <td>{% include "admin_shell/components/work_order_status_badge.html" with value=order.status %}</td>
+                    <td>{% include "admin_shell/components/work_order_sla_badge.html" with value=order.sla_status deadline=order.sla_deadline %}</td>
+                    <td>{{ order.responsible|default:"Sem responsavel" }}</td>
+                    <td>{{ order.opened_at }}</td>
+                    <td>{{ order.due_at }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'admin-shell:smart-system-work-order-detail' order_code=order.code %}">Detalhe</a>
+                            <a href="{% url 'admin-shell:smart-system-work-order-execution' order_code=order.code %}">Execucao</a>
+                            <a href="{% url 'admin-shell:smart-system-asset-detail' asset_code=order.asset_code %}">Ativo</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12" class="empty-state-cell">Nenhuma ordem encontrada para os filtros selecionados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

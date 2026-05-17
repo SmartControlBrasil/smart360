@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title|default:"SMART360 Admin Shell" }}</title>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem("admin-shell-theme") !== "light") {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="{% static 'smart360/css/admin-shell.css' %}">
+</head>
+<body class="admin-shell">
+    <div class="shell-app" data-shell>
+        {% include "admin_shell/components/sidebar.html" %}
+        <div class="shell-main">
+            {% include "admin_shell/components/topbar.html" %}
+            <main class="shell-content">
+                {% include "admin_shell/components/page_header.html" %}
+                {% if messages %}
+                    <section class="flash-stack" aria-live="polite">
+                        {% for message in messages %}
+                            <article class="flash-message flash-{{ message.tags|default:'info' }}">
+                                {{ message }}
+                            </article>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+                {% block shell_content %}
+                    {% block content %}{% endblock %}
+                {% endblock %}
+            </main>
+            <footer class="shell-footer">
+                <span>SMART360 Ecosystem</span>
+                <span>Admin Shell enterprise base</span>
+            </footer>
+        </div>
+    </div>
+    <script src="{% static 'smart360/js/admin-shell.js' %}"></script>
+    <script src="{% static 'smart360/js/form-behavior.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

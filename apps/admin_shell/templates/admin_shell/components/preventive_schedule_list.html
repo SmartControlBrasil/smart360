@@ -1,0 +1,25 @@
+<div class="schedule-stack">
+    {% for group in schedule_groups %}
+        <section class="schedule-group">
+            <header>
+                <strong>{{ group.date }}</strong>
+                <span>{{ group.label }}</span>
+            </header>
+            <div class="schedule-items">
+                {% for item in group.items %}
+                    <article class="schedule-item">
+                        <div class="schedule-time">{{ item.time }}</div>
+                        <div class="schedule-body">
+                            <a class="asset-primary-link" href="{% url 'admin-shell:smart-system-preventive-detail' plan_code=item.plan_code %}">{{ item.title }}</a>
+                            <p>{{ item.asset_code }} • {{ item.site }} • {{ item.responsible }}</p>
+                        </div>
+                        <div class="schedule-meta">
+                            {% include "admin_shell/components/preventive_status_badge.html" with value=item.status %}
+                            {% include "admin_shell/components/asset_criticality_badge.html" with value=item.criticality %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+</div>

@@ -1,0 +1,13 @@
+<div class="alert-stack">
+    {% for alert in preventive_plan.alerts %}
+        <article class="alert-row tone-{{ alert.severity }}">
+            <strong>{{ alert.title }}</strong>
+            <p>{{ alert.description }}</p>
+        </article>
+    {% empty %}
+        <article class="alert-row tone-info">
+            <strong>Sem alertas preventivos relevantes</strong>
+            <p>O plano esta dentro da disciplina esperada para a janela atual.</p>
+        </article>
+    {% endfor %}
+</div>

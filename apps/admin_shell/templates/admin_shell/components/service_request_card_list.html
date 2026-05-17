@@ -1,0 +1,7 @@
+<div class="marketplace-card-list">
+    {% for request in request_cards %}
+        {% include "admin_shell/components/service_request_card.html" with request=request %}
+    {% empty %}
+        <p>Nenhuma solicitacao recente no marketplace.</p>
+    {% endfor %}
+</div>

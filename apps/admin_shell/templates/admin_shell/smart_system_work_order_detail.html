@@ -1,0 +1,80 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout work-order-detail-layout">
+    <div class="asset-hero work-order-hero">
+        <div>
+            <span class="asset-tag">{{ work_order.code }}</span>
+            <h2>{{ work_order.title }}</h2>
+            <p>{{ work_order.maintenance_type }} • {{ work_order.asset.name }} • {{ work_order.client }} • {{ work_order.site }} • {{ work_order.sector }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            {% include "admin_shell/components/work_order_status_badge.html" with value=work_order.status %}
+            {% include "admin_shell/components/work_order_priority_badge.html" with value=work_order.priority %}
+            {% include "admin_shell/components/asset_criticality_badge.html" with value=work_order.criticality %}
+        </div>
+    </div>
+
+    <div class="asset-summary-grid">
+        {% for card in work_order.summary_cards %}
+            {% include "admin_shell/components/work_order_summary_panel.html" with card=card %}
+        {% endfor %}
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Dados do chamado" subtitle="Contexto operacional da abertura, origem, solicitante e observacoes iniciais." content_template="admin_shell/components/work_order_request_info.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="SLA, prioridade e criticidade" subtitle="Leitura de urgencia operacional, impacto e risco de violacao." content_template="admin_shell/components/work_order_sla_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-7">
+            {% include "admin_shell/components/widget_container.html" with title="Contexto do ativo e localizacao" subtitle="Ativo, cliente, site, localizacao e referencia operacional vinculada a ordem." content_template="admin_shell/components/work_order_asset_context.html" %}
+        </div>
+        <div class="column-span-5">
+            {% include "admin_shell/components/widget_container.html" with title="Fluxo operacional da OS" subtitle="Evolucao do status da ordem com etapas anteriores, atual e proximas." content_template="admin_shell/components/work_order_status_flow.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Diagnostico e execucao" subtitle="Estrutura tecnica da intervencao, causa aparente, diagnostico, acao e recomendacao." content_template="admin_shell/components/work_order_diagnosis_panel.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e pendencias" subtitle="Excecoes operacionais, dependencias e riscos da ordem de servico." content_template="admin_shell/components/work_order_alert_panel.html" %}
+        </div>
+    </div>
+
+    {% if work_order.quote %}
+        <div class="content-grid">
+            <div class="column-span-12">
+                <section class="widget-card">
+                    <div class="widget-head">
+                        <div>
+                            <h3>Orcamento vinculado</h3>
+                            <p>Status comercial e liberacao de pecas/execucao associados a esta ordem.</p>
+                        </div>
+                    </div>
+                    <dl class="detail-grid">
+                        <div><dt>Codigo</dt><dd><a href="{% url 'admin-shell:smart-system-quote-detail' quote_number=work_order.quote.quote_number %}">{{ work_order.quote.quote_number }}</a></dd></div>
+                        <div><dt>Status</dt><dd>{{ work_order.quote.status }}</dd></div>
+                        <div><dt>Valor</dt><dd>{{ work_order.quote.total_value }}</dd></div>
+                    </dl>
+                </section>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Timeline da ordem" subtitle="Sequencia de eventos, atribuicoes, diagnosticos e checkpoints da execucao." content_template="admin_shell/components/work_order_timeline.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Rotinas operacionais para conduzir a OS ao encerramento tecnico." content_template="admin_shell/components/work_order_action_panel.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

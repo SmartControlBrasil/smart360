@@ -1,0 +1,15 @@
+<div class="asset-filter-item">
+    <label for="filter-{{ filter.name }}">{{ filter.label }}</label>
+    {% if filter.type == "search" %}
+        <input id="filter-{{ filter.name }}" type="text" name="{{ filter.name }}" value="{{ filter.value }}" placeholder="{{ filter.placeholder }}">
+    {% else %}
+        <select id="filter-{{ filter.name }}" name="{{ filter.name }}">
+            <option value="">Todos</option>
+            {% for option in filter.options %}
+                <option value="{{ option }}" {% if option == filter.value %}selected{% endif %}>
+                    {% if option == "with" %}Com{% elif option == "without" %}Sem{% else %}{{ option }}{% endif %}
+                </option>
+            {% endfor %}
+        </select>
+    {% endif %}
+</div>

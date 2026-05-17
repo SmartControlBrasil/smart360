@@ -1,0 +1,26 @@
+<article class="marketplace-card">
+    <div class="marketplace-card-header">
+        <div>
+            <h3>
+                <a href="{% url 'admin-shell:marketplace-technicians-technician-detail' public_id=technician.public_id %}">
+                    {{ technician.display_name }}
+                </a>
+            </h3>
+            <p>{{ technician.company.name|default:"Tecnico independente" }}</p>
+        </div>
+        {% include "admin_shell/components/technician_rating.html" with rating=technician.rating_average %}
+    </div>
+    <ul class="marketplace-metadata">
+        <li>Status: {{ technician.get_marketplace_status_display }}</li>
+        <li>Servicos: {{ technician.completed_jobs_count }}</li>
+        <li>Raio: {{ technician.service_radius_km }} km</li>
+        <li>Certificacoes: {{ technician.certifications|length }}</li>
+    </ul>
+    <div class="marketplace-tag-row">
+        {% for skill in technician.skill_assignments.all|slice:":4" %}
+            <span class="status-badge status-emerald">{{ skill.skill.name }}</span>
+        {% empty %}
+            <span class="status-badge status-slate">Sem especialidades vinculadas</span>
+        {% endfor %}
+    </div>
+</article>

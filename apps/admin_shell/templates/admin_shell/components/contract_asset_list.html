@@ -1,0 +1,37 @@
+<section class="content-card">
+    <div class="section-heading">
+        <h2>Ativos cobertos</h2>
+        <p>Escopo contratual e proximas execucoes planejadas.</p>
+    </div>
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th>Frequencia</th>
+                    <th>Proxima execucao</th>
+                    <th>Ultima execucao</th>
+                    <th>Duracao estimada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in contract_assets %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.asset.asset_tag }}</strong><br>
+                            <span>{{ item.asset.name }}</span>
+                        </td>
+                        <td>{{ item.get_maintenance_frequency_display }}</td>
+                        <td>{{ item.next_execution|date:"d/m/Y"|default:"-" }}</td>
+                        <td>{{ item.last_execution|date:"d/m/Y"|default:"-" }}</td>
+                        <td>{{ item.estimated_duration_minutes }} min</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">Nenhum ativo coberto neste contrato.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

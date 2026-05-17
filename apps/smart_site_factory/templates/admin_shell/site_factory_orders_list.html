@@ -1,0 +1,126 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-filter-grid">
+        <form method="get" class="asset-filter-form">
+            <label class="asset-filter-item">
+                <span>Status</span>
+                <select name="status">
+                    <option value="">Todos</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="asset-filter-item">
+                <span>Nicho</span>
+                <select name="niche">
+                    <option value="">Todos</option>
+                    {% for n in niches %}
+                        <option value="{{ n.id }}" {% if selected_niche == n.id|stringformat:"s" %}selected{% endif %}>{{ n.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="asset-filter-item">
+                <span>Template</span>
+                <select name="template">
+                    <option value="">Todos</option>
+                    {% for t in templates %}
+                        <option value="{{ t.id }}" {% if selected_template == t.id|stringformat:"s" %}selected{% endif %}>{{ t.niche.name }} — {{ t.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="asset-filter-item">
+                <span>Ciclo</span>
+                <select name="lifecycle">
+                    <option value="">Todos</option>
+                    <option value="active" {% if selected_lifecycle == "active" %}selected{% endif %}>Somente ativos</option>
+                </select>
+            </label>
+            <label class="asset-filter-item">
+                <span>Briefing</span>
+                <select name="briefing">
+                    <option value="">Todos</option>
+                    <option value="pending" {% if selected_briefing == "pending" %}selected{% endif %}>Sem briefing salvo</option>
+                </select>
+            </label>
+            <div class="asset-filter-actions">
+                <button class="quick-action-button" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:site-factory-orders' %}">Limpar</a>
+                <a class="quick-action-button" href="{% url 'admin-shell:site-factory-dashboard' %}">Dashboard</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Projetos e pedidos</h2>
+                        <p>Fila operacional com empresa, solicitante, nicho, template, status, valor e data.</p>
+                    </div>
+                    <span class="status-badge status-violet">{{ page_obj.paginator.count }} pedidos</span>
+                </header>
+                <div class="table-shell">
+                    <table class="work-order-table asset-table">
+                        <thead>
+                            <tr>
+                                <th>Empresa</th>
+                                <th>Solicitante</th>
+                                <th>Nicho</th>
+                                <th>Pacote</th>
+                                <th>Template</th>
+                                <th>Status</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                                <th>Acoes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>
+                                        <strong>{% if order.company %}{{ order.company.name }}{% else %}{{ order.metadata.client_company_name|default:"Sem empresa" }}{% endif %}</strong>
+                                        {% if order.metadata.client_email %}<small>{{ order.metadata.client_email }}</small>{% endif %}
+                                    </td>
+                                    <td>{% if order.requester %}{{ order.requester.get_full_name|default:order.requester.email }}{% else %}{{ order.metadata.client_name|default:"-" }}{% endif %}</td>
+                                    <td>{{ order.niche.name }}</td>
+                                    <td>
+                                        {% if order.metadata.package_snapshot %}
+                                            {% if order.metadata.package_snapshot.commercial_name %}
+                                                {{ order.metadata.package_snapshot.commercial_name }}
+                                            {% elif order.metadata.package_snapshot.template_name %}
+                                                {{ order.metadata.package_snapshot.template_name }}
+                                            {% else %}—{% endif %}
+                                        {% elif order.selected_template %}
+                                            {{ order.selected_template.name }}
+                                        {% else %}—{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if order.selected_template %}{{ order.selected_template.name }}{% else %}Recomendacao automatica{% endif %}
+                                        {% if order.recommended_template %}<small>Recomendada: {{ order.recommended_template.name }}</small>{% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {% if order.status == 'delivered' %}status-emerald{% elif order.status == 'cancelled' %}status-red{% elif order.status == 'review' %}status-violet{% elif order.status == 'in_production' %}status-sky{% elif order.status == 'intake_pending' %}status-amber{% else %}status-slate{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>R$ {{ order.final_price|floatformat:2 }}</td>
+                                    <td>{{ order.ordered_at|date:"d/m/Y H:i" }}</td>
+                                    <td><a class="table-action-link" href="{% url 'admin-shell:site-factory-order-detail' pk=order.pk %}">Abrir</a></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="9">Nenhum projeto cadastrado ainda.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

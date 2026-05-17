@@ -1,0 +1,72 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout work-execution-layout">
+    {% include "admin_shell/components/work_execution_header.html" %}
+    {% if signature_error == "technician" %}
+        <div class="technician-inline-alert critical">A conclusao da OS exige assinatura do tecnico executor.</div>
+    {% elif signature_error == "client" %}
+        <div class="technician-inline-alert warning">Registre o aceite do cliente ou o motivo da ausencia antes de concluir.</div>
+    {% endif %}
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Contexto operacional" subtitle="Chamado, ativo, localizacao e referencias recentes que suportam a decisao tecnica em campo." content_template="admin_shell/components/work_execution_context.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Progresso da execucao" subtitle="Avanco da OS, checklist, tempo aplicado e leitura rapida da intervencao." content_template="admin_shell/components/work_execution_progress.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Checklist executavel" subtitle="Rotina vinculada a ordem com respostas item a item e destaque imediato de NOK." content_template="admin_shell/components/work_execution_checklist.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Alertas e excecoes" subtitle="Riscos de execucao, gaps tecnicos e pontos que exigem atencao imediata." content_template="admin_shell/components/work_execution_alert_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Diagnostico tecnico" subtitle="Sintomas, componentes envolvidos, analise executada e consolidacao do diagnostico." content_template="admin_shell/components/work_execution_diagnosis.html" %}
+        </div>
+        <div class="column-span-6">
+            {% include "admin_shell/components/widget_container.html" with title="Acao executada" subtitle="Intervencao, ajustes, testes realizados e resultado tecnico obtido." content_template="admin_shell/components/work_execution_action_summary.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Horas trabalhadas" subtitle="Apontamento tecnico de tempo aplicado na OS." content_template="admin_shell/components/work_execution_hours.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Materiais utilizados" subtitle="Pecas, insumos e observacoes com base pronta para estoque." content_template="admin_shell/components/work_execution_materials.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Evidencias" subtitle="Fotos, videos e documentos tecnicos registrados durante a execucao." content_template="admin_shell/components/work_execution_evidence.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Assinaturas operacionais" subtitle="Assinatura do tecnico executor e aceite do cliente com rastreabilidade de contexto." content_template="admin_shell/components/work_execution_signatures.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-8">
+            {% include "admin_shell/components/widget_container.html" with title="Historico da execucao" subtitle="Linha do tempo do atendimento, checklist, diagnostico, materiais e encerramento." content_template="admin_shell/components/work_execution_timeline.html" %}
+        </div>
+        <div class="column-span-4">
+            {% include "admin_shell/components/widget_container.html" with title="Acoes rapidas" subtitle="Comandos operacionais para conduzir a OS ate o encerramento tecnico." content_template="admin_shell/components/work_execution_action_panel.html" %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Conclusao da OS" subtitle="Fechamento tecnico, recomendacoes e base para futura assinatura e aprovacao." content_template="admin_shell/components/work_execution_conclusion.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

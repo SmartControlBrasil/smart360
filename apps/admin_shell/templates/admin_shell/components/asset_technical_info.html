@@ -1,0 +1,22 @@
+<div class="technical-grid">
+    <div class="technical-column">
+        <div class="technical-row"><span>Fabricante</span><strong>{{ asset.manufacturer }}</strong></div>
+        <div class="technical-row"><span>Modelo</span><strong>{{ asset.model }}</strong></div>
+        <div class="technical-row"><span>Serial</span><strong>{{ asset.serial_number }}</strong></div>
+        <div class="technical-row"><span>Patrimonio / tag</span><strong>{{ asset.code }}</strong></div>
+        <div class="technical-row"><span>Categoria</span><strong>{{ asset.category }} / {{ asset.subcategory }}</strong></div>
+    </div>
+    <div class="technical-column">
+        <div class="technical-row"><span>Tensao</span><strong>{{ asset.technical_specs.tensao }}</strong></div>
+        <div class="technical-row"><span>Potencia</span><strong>{{ asset.technical_specs.potencia }}</strong></div>
+        <div class="technical-row"><span>Capacidade</span><strong>{{ asset.technical_specs.capacidade }}</strong></div>
+        <div class="technical-row"><span>Instalacao</span><strong>{{ asset.installation_date }}</strong></div>
+        <div class="technical-row"><span>Comissionamento</span><strong>{{ asset.commissioning_date }}</strong></div>
+        <div class="technical-row"><span>Garantia</span><strong>{{ asset.warranty }}</strong></div>
+        <div class="technical-row"><span>Responsavel tecnico</span><strong>{{ asset.owner }}</strong></div>
+    </div>
+    <div class="technical-notes">
+        <span>Observacoes tecnicas</span>
+        <p>{{ asset.technical_notes }}</p>
+    </div>
+</div>

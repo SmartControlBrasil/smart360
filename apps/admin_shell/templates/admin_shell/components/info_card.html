@@ -1,0 +1,5 @@
+<article class="info-card">
+    <span class="info-card-label">{{ item.label|default:"" }}</span>
+    <strong>{% if item.items %}{{ item.items }}{% elif item.value %}{{ item.value }}{% endif %}</strong>
+    <p>{{ item.description|default:"" }}</p>
+</article>

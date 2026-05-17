@@ -1,0 +1,25 @@
+<form class="tenant-context-switcher client-tenant-context-switcher" method="post" action="{% url 'admin-shell:set-active-context' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <div class="tenant-context-group">
+        <label for="client-active-company-id">Empresa</label>
+        <select id="client-active-company-id" name="company_id" onchange="this.form.submit()">
+            {% for option in portal_tenant_context.company_options %}
+                <option value="{{ option.id }}" {% if portal_tenant_context.company and portal_tenant_context.company.id == option.id %}selected{% endif %}>
+                    {{ option.label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="tenant-context-group">
+        <label for="client-active-site-id">Unidade</label>
+        <select id="client-active-site-id" name="site_id" onchange="this.form.submit()">
+            <option value="">Todas as unidades permitidas</option>
+            {% for option in portal_tenant_context.site_options %}
+                <option value="{{ option.id }}" {% if portal_tenant_context.site and portal_tenant_context.site.id == option.id %}selected{% endif %}>
+                    {{ option.label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>

@@ -1,0 +1,10 @@
+<div class="action-shortcuts-grid compact-actions">
+    {% for action in execution.page_actions|slice:":8" %}
+        {% include "admin_shell/components/quick_action_button.html" with action=action %}
+    {% empty %}
+        <p class="empty-inline-state">Nenhuma acao disponivel.</p>
+    {% endfor %}
+    {% if work_order.asset.code %}
+        <a class="quick-action-button" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=work_order.asset.code %}">Abrir ativo</a>
+    {% endif %}
+</div>

@@ -1,0 +1,32 @@
+<div class="asset-table-wrapper">
+    <table class="asset-table">
+        <thead>
+            <tr>
+                <th>Site/unidade</th>
+                <th>Endereço</th>
+                <th>Cidade</th>
+                <th>Estado</th>
+                <th>Contato</th>
+                <th>Telefone</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for site in sites %}
+                <tr>
+                    <td><strong>{{ site.name }}</strong></td>
+                    <td>{{ site.address }}</td>
+                    <td>{{ site.city }}</td>
+                    <td>{{ site.state }}</td>
+                    <td>{{ site.contact_name }}</td>
+                    <td>{{ site.contact_phone }}</td>
+                    <td>{{ site.status }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state-cell">Nenhum site/unidade cadastrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

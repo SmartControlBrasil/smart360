@@ -1,0 +1,26 @@
+<div class="asset-technical-grid">
+    <article class="technical-stat">
+        <span>Ativo</span>
+        <strong><a class="asset-primary-link" href="{% url 'admin-shell:smart-system-asset-detail' asset_code=failure.asset.code %}">{{ failure.asset.name }}</a></strong>
+    </article>
+    <article class="technical-stat">
+        <span>Tag / codigo</span>
+        <strong>{{ failure.asset.code }}</strong>
+    </article>
+    <article class="technical-stat">
+        <span>Cliente</span>
+        <strong>{{ failure.client }}</strong>
+    </article>
+    <article class="technical-stat">
+        <span>Site / localizacao</span>
+        <strong>{{ failure.site }} • {{ failure.sector }}</strong>
+    </article>
+    <article class="technical-stat">
+        <span>OS associada</span>
+        <strong><a class="asset-primary-link" href="{% url 'admin-shell:smart-system-work-order-detail' order_code=failure.work_order_code %}">{{ failure.work_order_code }}</a></strong>
+    </article>
+    <article class="technical-stat">
+        <span>Criticidade do ativo</span>
+        <strong>{{ failure.asset.criticality }}</strong>
+    </article>
+</div>

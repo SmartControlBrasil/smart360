@@ -1,0 +1,166 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+    {% include "admin_shell/components/page_header.html" %}
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Policies ativas</h2>
+                    <p>Governança central por tenant, módulo, ação, agente e nível de risco.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Policy</th>
+                            <th>Escopo</th>
+                            <th>Status</th>
+                            <th>Versão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for policy in policies %}
+                            <tr>
+                                <td><strong>{{ policy.name }}</strong><br><small>{{ policy.slug }}</small></td>
+                                <td>{{ policy.tenant_scope }}{% if policy.is_global %} / global{% endif %}</td>
+                                <td>{% include "admin_shell/components/decision_status_badge.html" with status=policy.status %}</td>
+                                <td>{{ policy.version }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Nenhuma policy cadastrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Scopes e regras</h2>
+                    <p>Combinação de escopo, prioridade e regra efetiva aplicada pelo engine.</p>
+                </div>
+            </header>
+            <div class="event-feed">
+                {% for scope in policy_scopes %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ scope.policy.name }}</strong>
+                        <p>module={{ scope.module_slug|default:"*" }} • action={{ scope.action_type|default:"*" }} • agent={{ scope.agent_slug|default:"*" }}</p>
+                        <small>priority {{ scope.priority }} • tenant {{ scope.company.name|default:"global" }}{% if scope.site %} / {{ scope.site.name }}{% endif %}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhum escopo configurado.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Histórico de versões</h2>
+                    <p>Versionamento e rollback de políticas com trilha de auditoria.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Policy</th>
+                            <th>Versão</th>
+                            <th>Resumo</th>
+                            <th>Criado em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for version in policy_versions %}
+                            <tr>
+                                <td>{{ version.policy.name }}</td>
+                                <td>{{ version.version_number }}</td>
+                                <td>{{ version.change_summary|default:"Snapshot gerado." }}</td>
+                                <td>{{ version.created_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Nenhuma versão registrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Policy simulations</h2>
+                    <p>Impacto estimado antes de aplicar mudanças de policy.</p>
+                </div>
+            </header>
+            <div class="event-feed">
+                {% for simulation in policy_simulations %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ simulation.policy.name }}</strong>
+                        <p>Ações afetadas: {{ simulation.result_payload.would_affect_actions|default:"0" }} • risco operacional: {{ simulation.result_payload.risk_operational_index|default:"0" }}</p>
+                        <small>{{ simulation.created_at|date:"d/m/Y H:i" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma simulação de policy registrada.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="content-grid two-column">
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Logs de avaliação</h2>
+                    <p>Auditoria completa de regras efetivamente avaliadas no runtime.</p>
+                </div>
+            </header>
+            <div class="event-feed">
+                {% for evaluation in policy_evaluations %}
+                    <article class="event-row tone-neutral">
+                        <strong>{{ evaluation.module_slug }} / {{ evaluation.action_type }}</strong>
+                        <p>{{ evaluation.reason }}</p>
+                        <small>{{ evaluation.result }} • {{ evaluation.evaluated_at|date:"d/m/Y H:i" }}</small>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Nenhuma avaliação registrada.</p>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="content-panel">
+            <header class="section-header">
+                <div>
+                    <h2>Regras cadastradas</h2>
+                    <p>Resultado efetivo, autonomia, exigência de aprovação e approver roles.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Policy</th>
+                            <th>Ação</th>
+                            <th>Resultado</th>
+                            <th>Risco</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rule in policy_rules %}
+                            <tr>
+                                <td>{{ rule.policy.slug }}</td>
+                                <td>{{ rule.action_type|default:"*" }}</td>
+                                <td>{{ rule.result }}</td>
+                                <td>{{ rule.risk_level }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Nenhuma regra cadastrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+{% endblock %}

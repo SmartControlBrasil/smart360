@@ -1,0 +1,12 @@
+<div class="filter-pill">
+    <span class="filter-label">{{ filter_group.label }}</span>
+    {% if filter_group.type == "chips" %}
+        <div class="chip-group">
+            {% for option in filter_group.options %}
+                <span class="chip {% if option == filter_group.active %}is-active{% endif %}">{{ option }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        <button type="button" class="filter-select">{{ filter_group.value }}</button>
+    {% endif %}
+</div>

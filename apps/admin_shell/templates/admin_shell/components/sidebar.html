@@ -1,0 +1,42 @@
+<aside class="shell-sidebar" data-sidebar>
+    <div class="shell-brand">
+        <div class="brand-mark">S360</div>
+        <div>
+            <strong>SMART360</strong>
+            <span>Ecosystem Admin</span>
+        </div>
+    </div>
+    <nav class="shell-nav">
+        {% for section in shell_navigation %}
+            <section class="nav-section">
+                <h6>{{ section.label }}</h6>
+                <ul>
+                    {% for item in section.items %}
+                        <li>
+                            {% if item.children %}
+                                <div class="nav-link has-children {% if item.active %}is-active{% endif %}">
+                                    <span class="nav-icon icon-{{ item.icon }}"></span>
+                                    <span>{{ item.label }}</span>
+                                </div>
+                                <ul class="nav-submenu {% if item.expanded %}is-expanded{% endif %}">
+                                    {% for child in item.children %}
+                                        <li>
+                                            <a class="nav-sublink {% if child.active %}is-active{% endif %}" href="{% if child.slug %}{% url child.url_name module_slug=child.slug %}{% else %}{% url child.url_name %}{% endif %}">
+                                                {{ child.label }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <a class="nav-link {% if item.active %}is-active{% endif %}" href="{% if item.slug %}{% url item.url_name module_slug=item.slug %}{% else %}{% url item.url_name %}{% endif %}">
+                                    <span class="nav-icon icon-{{ item.icon }}"></span>
+                                    <span>{{ item.label }}</span>
+                                </a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    </nav>
+</aside>

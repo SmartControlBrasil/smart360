@@ -1,0 +1,16 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-kpi-grid">
+        {% for card in equipment_model_kpis %}
+            {% include "admin_shell/components/asset_kpi_card.html" with card=card %}
+        {% endfor %}
+    </div>
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Catalogo tecnico de modelos" subtitle="Separacao entre modelo de equipamento e inventario instalado no cliente." content_template="admin_shell/components/equipment_model_table.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

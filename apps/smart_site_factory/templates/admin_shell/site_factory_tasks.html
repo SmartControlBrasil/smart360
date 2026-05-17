@@ -1,0 +1,80 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout">
+    <div class="asset-hero">
+        <div>
+            <span class="asset-tag">Projeto #{{ order.id }}</span>
+            <h2>Producao</h2>
+            <p>{% if order.company %}{{ order.company.name }}{% else %}{{ order.metadata.client_company_name|default:order.niche.name }}{% endif %} • {{ order.niche.name }}</p>
+        </div>
+        <div class="asset-hero-badges">
+            <span class="status-badge status-sky">{{ order.get_status_display }}</span>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            <section class="widget-card">
+                <header class="widget-card-header">
+                    <div>
+                        <h2>Tarefas de producao</h2>
+                        <p>Inicie ou conclua etapas mantendo o fluxo server-side render.</p>
+                    </div>
+                </header>
+                <div class="table-shell">
+                    <table class="work-order-table">
+                        <thead>
+                            <tr>
+                                <th>Ordem</th>
+                                <th>Etapa</th>
+                                <th>Status</th>
+                                <th>Responsavel</th>
+                                <th>Prazo</th>
+                                <th>Notas</th>
+                                <th>Acoes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                                <tr>
+                                    <td>{{ task.order }}</td>
+                                    <td><strong>{{ task.get_stage_display }}</strong></td>
+                                    <td>
+                                        <span class="status-badge {% if task.status == 'done' %}status-emerald{% elif task.status == 'blocked' %}status-red{% elif task.status == 'in_progress' %}status-sky{% else %}status-slate{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{% if task.assignee %}{{ task.assignee.get_full_name|default:task.assignee.email }}{% else %}-{% endif %}</td>
+                                    <td>{{ task.due_date|date:"d/m/Y"|default:"-" }}</td>
+                                    <td>{{ task.notes|default:"-" }}</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            {% if task.status != 'in_progress' and task.status != 'done' %}
+                                                <form method="post" action="{% url 'admin-shell:site-factory-task-status' pk=order.pk task_pk=task.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="start">
+                                                    <button class="quick-action-button" type="submit">Iniciar</button>
+                                                </form>
+                                            {% endif %}
+                                            {% if task.status == 'in_progress' %}
+                                                <form method="post" action="{% url 'admin-shell:site-factory-task-status' pk=order.pk task_pk=task.pk %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="complete">
+                                                    <button class="quick-action-button" type="submit">Concluir</button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="7">Nenhuma tarefa criada para este projeto.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

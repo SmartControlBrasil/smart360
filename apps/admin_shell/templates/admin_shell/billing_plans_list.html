@@ -1,0 +1,17 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<section class="module-layout billing-layout">
+    <div class="summary-grid">
+        {% for widget in billing_plan_kpis %}
+            {% include "admin_shell/components/billing_dashboard_widget.html" with widget=widget %}
+        {% endfor %}
+    </div>
+
+    <div class="billing-plan-grid is-full">
+        {% for plan in billing_plan_cards %}
+            {% include "admin_shell/components/billing_plan_card.html" with plan=plan %}
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

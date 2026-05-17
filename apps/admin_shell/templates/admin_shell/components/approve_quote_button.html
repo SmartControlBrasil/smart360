@@ -1,0 +1,13 @@
+<form method="post" action="{{ action_url }}">
+    {% csrf_token %}
+    {% if signer_name %}
+        <input type="hidden" name="signer_name" value="{{ signer_name }}">
+    {% endif %}
+    {% if notes %}
+        <input type="hidden" name="notes" value="{{ notes }}">
+    {% endif %}
+    {% if rejection_reason %}
+        <input type="hidden" name="rejection_reason" value="{{ rejection_reason }}">
+    {% endif %}
+    <button type="submit" class="quick-action-button">{{ label }}</button>
+</form>

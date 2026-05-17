@@ -1,6 +1,22 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block body_extra %} class="home-page"{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Respiro sob o header absoluto; só aplica com body.home-page (esta template). */
+  body.home-page .hero1-section-area {
+    padding-top: 176px;
+  }
+  @media (max-width: 767px) {
+    body.home-page .hero1-section-area {
+      padding-top: 132px;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="hero1-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">

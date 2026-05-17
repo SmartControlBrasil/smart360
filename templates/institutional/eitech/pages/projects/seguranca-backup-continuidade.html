@@ -1,0 +1,62 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
+  <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
+  <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+  <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+  <div class="container">
+    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Segurança, Backup e Continuidade Digital</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Segurança, Backup e Continuidade Digital</span></a></div></div></div>
+  </div>
+</div>
+
+<div class="case-single-section-area sp1">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="case-sider-widget-area" style="padding: 0 !important;">
+          <div class="img1 image-anime reveal"><img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt=""></div>
+          <div class="space32"></div>
+          <h3>Segurança, Backup e Continuidade Digital</h3>
+          <div class="space20"></div>
+          <p><strong>Categoria:</strong> Segurança e continuidade</p>
+          <p><strong>Cliente:</strong> Projeto Smart Control Brasil</p>
+          <p><strong>Status:</strong> Frente de atuação</p>
+          <p><strong>Foco:</strong> Tecnologia aplicada, processos, dados e operação</p>
+          <div class="space20"></div>
+          <p>Estruturação de práticas de backup, controle de acesso, recuperação de dados e continuidade operacional para reduzir riscos digitais.</p>
+          <div class="space20"></div>
+          <p>Priorizamos medidas simples e consistentes para reduzir impacto de incidentes e manter a operação com maior previsibilidade.</p>
+          <div class="space50"></div>
+          <h3>Práticas de continuidade</h3>
+          <div class="space20"></div>
+          <p>A frente cobre backup, acesso, recuperação, políticas simples, continuidade, proteção de dados e segurança operacional no dia a dia.</p>
+          <div class="space12"></div>
+          <div class="row">
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Rotina de backup</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Plano de recuperação</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Controle de acesso</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Revisão de permissões</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Continuidade operacional</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Proteção de dados</li></ul></div>
+          </div>
+          <div class="space32"></div>
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="{% url 'institutional:projects' %}" class="vl-btn2">Ver projetos <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="case-inner-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="container">
+    <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 space-margin60 text-center"><h2>Projetos relacionados</h2></div></div></div>
+    <div class="row">
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Cybersecurity para Empresas</p><div class="space16"></div><a href="{% url 'institutional:project_cybersecurity_empresas' %}">Conhecer soluções</a><div class="arrow"><a href="{% url 'institutional:project_cybersecurity_empresas' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>Integração de Dados e Sistemas</p><div class="space16"></div><a href="{% url 'institutional:project_integracao_dados_sistemas' %}">Falar com especialista</a><div class="arrow"><a href="{% url 'institutional:project_integracao_dados_sistemas' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

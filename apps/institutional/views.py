@@ -29,12 +29,72 @@ def projects(request):
     return render(request, "institutional/eitech/pages/projects.html")
 
 
+def projects_page_2(request):
+    return render(request, "institutional/eitech/pages/projects-page-2.html")
+
+
+def projects_page_3(request):
+    return render(request, "institutional/eitech/pages/projects-page-3.html")
+
+
 def project_details(request):
     return render(request, "institutional/eitech/pages/project-details.html")
 
 
+def project_smart360(request):
+    return render(request, "institutional/eitech/pages/projects/smart360.html")
+
+
+def project_diagnostico_ia_dados_automacao(request):
+    return render(request, "institutional/eitech/pages/projects/diagnostico-ia-dados-automacao.html")
+
+
+def project_automacao_industrial_clps(request):
+    return render(request, "institutional/eitech/pages/projects/automacao-industrial-clps.html")
+
+
+def project_manutencao_confiabilidade(request):
+    return render(request, "institutional/eitech/pages/projects/manutencao-confiabilidade.html")
+
+
+def project_cybersecurity_empresas(request):
+    return render(request, "institutional/eitech/pages/projects/cybersecurity-empresas.html")
+
+
+def project_sites_marketing_conteudo(request):
+    return render(request, "institutional/eitech/pages/projects/sites-marketing-conteudo.html")
+
+
+def project_sistemas_web_django_python(request):
+    return render(request, "institutional/eitech/pages/projects/sistemas-web-django-python.html")
+
+
+def project_ia_atendimento_operacao(request):
+    return render(request, "institutional/eitech/pages/projects/ia-atendimento-operacao.html")
+
+
+def project_dashboards_indicadores_operacionais(request):
+    return render(request, "institutional/eitech/pages/projects/dashboards-indicadores-operacionais.html")
+
+
+def project_gestao_os_ativos(request):
+    return render(request, "institutional/eitech/pages/projects/gestao-os-ativos.html")
+
+
+def project_integracao_dados_sistemas(request):
+    return render(request, "institutional/eitech/pages/projects/integracao-dados-sistemas.html")
+
+
+def project_seguranca_backup_continuidade(request):
+    return render(request, "institutional/eitech/pages/projects/seguranca-backup-continuidade.html")
+
+
 def blog(request):
     return render(request, "institutional/eitech/pages/blog.html")
+
+
+def blog_page_2(request):
+    return render(request, "institutional/eitech/pages/blog-page-2.html")
 
 
 def blog_details(request):

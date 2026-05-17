@@ -273,6 +273,59 @@ $(window).on("load", function (event) {
 
 });
 //========== PROGRESS BAR AREA ============= //
+const linearProgressWrappers = document.querySelectorAll('.bg-progress .progress-bar');
+if (linearProgressWrappers.length > 0) {
+  const preparedBars = [];
+
+  linearProgressWrappers.forEach((wrapper) => {
+    const bar = wrapper.querySelector('.progress-inner');
+    if (!bar) {
+      return;
+    }
+
+    const inlineWidth = bar.style.width ? bar.style.width.trim() : "";
+    const labelPercent = wrapper.querySelector('label span');
+    const labelWidth = labelPercent ? labelPercent.textContent.replace('%', '').trim() : "";
+    const ariaWidth = bar.getAttribute('aria-valuenow') || "";
+    const target = bar.dataset.progress || ariaWidth || inlineWidth.replace('%', '') || labelWidth;
+
+    if (!target) {
+      return;
+    }
+
+    bar.dataset.progress = target;
+    bar.setAttribute('aria-valuenow', target);
+    bar.style.width = "0%";
+    bar.style.transition = "width 1.2s ease";
+    preparedBars.push({ wrapper, bar });
+  });
+
+  if ("IntersectionObserver" in window) {
+    const progressObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        const pair = preparedBars.find((item) => item.wrapper === entry.target);
+        if (pair && pair.bar.dataset.progress) {
+          pair.bar.style.width = `${pair.bar.dataset.progress}%`;
+        }
+        observer.unobserve(entry.target);
+      });
+    }, {
+      threshold: 0.25
+    });
+
+    preparedBars.forEach((item) => progressObserver.observe(item.wrapper));
+  } else {
+    preparedBars.forEach((item) => {
+      if (item.bar.dataset.progress) {
+        item.bar.style.width = `${item.bar.dataset.progress}%`;
+      }
+    });
+  }
+}
 
 //========== PARALLAX AREA ============= //
 })(jQuery);

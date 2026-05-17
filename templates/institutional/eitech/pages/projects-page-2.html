@@ -30,14 +30,46 @@
         <div class="col-lg-6 col-md-6">
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case-img10.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Smart360</p>
+              <p>Cybersecurity para Empresas</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_smart360' %}">Plataforma em desenvolvimento para gestão operacional e IA</a>
+              <a href="{% url 'institutional:project_cybersecurity_empresas' %}">Diagnóstico e boas práticas de segurança digital</a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_cybersecurity_empresas' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+          <div class="case-slider-boxarea">
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case-img11.png' %}" alt="">
+            </div>
+            <div class="content-area">
+              <p>Sites, Marketing e Conteúdo</p>
+              <div class="space16"></div>
+              <a href="{% url 'institutional:project_sites_marketing_conteudo' %}">Criação de presença digital e conteúdo</a>
+              <div class="arrow">
+                <a href="{% url 'institutional:project_sites_marketing_conteudo' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+          <div class="case-slider-boxarea">
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
+            </div>
+            <div class="content-area">
+              <p>Sistemas Web em Django/Python</p>
+              <div class="space16"></div>
+              <a href="{% url 'institutional:project_sistemas_web_django_python' %}">Sistemas sob medida para organização operacional</a>
+              <div class="arrow">
+                <a href="{% url 'institutional:project_sistemas_web_django_python' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -49,42 +81,11 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Diagnóstico de IA, Dados e Automação</p>
+              <p>IA Aplicada ao Atendimento e Operação</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}">Análise prática para identificar oportunidades de automação</a>
+              <a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Assistentes e fluxos inteligentes para apoiar decisões</a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 col-md-6">
-          <div class="case-slider-boxarea">
-            <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
-            </div>
-            <div class="content-area">
-              <p>Automação Industrial e CLPs</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_automacao_industrial_clps' %}">Projetos e integração para operação industrial</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6">
-          <div class="case-slider-boxarea">
-            <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case-img9.png' %}" alt="">
-            </div>
-            <div class="content-area">
-              <p>Manutenção e Confiabilidade</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_manutencao_confiabilidade' %}">Estratégias de manutenção e TPM</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_manutencao_confiabilidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_ia_atendimento_operacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -100,11 +101,11 @@
                     <i class="fa-solid fa-angle-left"></i>
                   </a>
                 </li>
-                <li class="page-item"><a class="page-link active" href="{% url 'institutional:projects' %}">1</a></li>
-                <li class="page-item"><a class="page-link" href="{% url 'institutional:projects_page_2' %}">2</a></li>
+                <li class="page-item"><a class="page-link" href="{% url 'institutional:projects' %}">1</a></li>
+                <li class="page-item"><a class="page-link active" href="{% url 'institutional:projects_page_2' %}">2</a></li>
                 <li class="page-item"><a class="page-link" href="{% url 'institutional:projects_page_3' %}">3</a></li>
                 <li class="page-item">
-                  <a class="page-link m-0" href="{% url 'institutional:projects_page_2' %}" aria-label="Próxima">
+                  <a class="page-link m-0" href="{% url 'institutional:projects_page_3' %}" aria-label="Próxima">
                     <i class="fa-solid fa-angle-right"></i>
                   </a>
                 </li>

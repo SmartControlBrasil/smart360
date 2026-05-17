@@ -1,0 +1,113 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
+  <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
+  <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+  <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="inner-header text-center heading1">
+          <h1>Diagnóstico de IA, Dados e Automação</h1>
+          <div class="space28"></div>
+          <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Diagnóstico de IA, Dados e Automação</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="case-single-section-area sp1">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="case-sider-widget-area" style="padding: 0 !important;">
+          <div class="img1 image-anime reveal">
+            <img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt="">
+          </div>
+          <div class="space32"></div>
+          <h3>Diagnóstico de IA, Dados e Automação</h3>
+          <div class="space20"></div>
+          <p><strong>Categoria:</strong> Consultoria e automação</p>
+          <p><strong>Cliente:</strong> Projeto Smart Control Brasil</p>
+          <p><strong>Status:</strong> Em desenvolvimento / Frente de atuação</p>
+          <p><strong>Foco:</strong> Tecnologia aplicada, processos, dados e operação</p>
+          <div class="space20"></div>
+          <p>Análise prática dos processos, dados e gargalos da empresa para identificar oportunidades reais de automação, sistemas, dashboards e inteligência artificial aplicada.</p>
+          <div class="space20"></div>
+          <p>O trabalho prioriza ganhos de curto prazo e estrutura um plano de evolução com etapas claras, indicadores e critérios de implementação compatíveis com a rotina da operação.</p>
+          <div class="space50"></div>
+          <h3>Etapas do diagnóstico</h3>
+          <div class="space20"></div>
+          <p>Mapeamos processos atuais, avaliamos qualidade de dados, identificamos gargalos e classificamos oportunidades por impacto e viabilidade para orientar decisões com menor risco.</p>
+          <div class="space12"></div>
+          <div class="row">
+            <div class="col-lg-4 col-md-6">
+              <ul class="list">
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Mapeamento de processos</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Levantamento de dados</li>
+              </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <ul class="list">
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Identificação de gargalos</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Priorização de oportunidades</li>
+              </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <ul class="list">
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Plano de ação por fases</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Indicadores para acompanhamento</li>
+              </ul>
+            </div>
+          </div>
+          <div class="space32"></div>
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="{% url 'institutional:services' %}" class="vl-btn2">Conhecer soluções <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="case-inner-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5 m-auto">
+        <div class="heading2 space-margin60 text-center">
+          <h2>Projetos relacionados</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-md-6">
+        <div class="case-slider-boxarea">
+          <div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div>
+          <div class="content-area">
+            <p>Smart360</p>
+            <div class="space16"></div>
+            <a href="{% url 'institutional:project_smart360' %}">Ver projetos</a>
+            <div class="arrow"><a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-6">
+        <div class="case-slider-boxarea">
+          <div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div>
+          <div class="content-area">
+            <p>IA Aplicada ao Atendimento e Operação</p>
+            <div class="space16"></div>
+            <a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Falar com especialista</a>
+            <div class="arrow"><a href="{% url 'institutional:project_ia_atendimento_operacao' %}"><i class="fa-solid fa-arrow-right"></i></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

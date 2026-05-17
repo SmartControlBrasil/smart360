@@ -33,11 +33,11 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Smart360</p>
+              <p>Dashboards e Indicadores Operacionais</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_smart360' %}">Plataforma em desenvolvimento para gestão operacional e IA</a>
+              <a href="{% url 'institutional:project_dashboards_indicadores_operacionais' %}">KPIs e painéis para gestão visual da operação</a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_dashboards_indicadores_operacionais' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -49,26 +49,27 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Diagnóstico de IA, Dados e Automação</p>
+              <p>Gestão de Ordens de Serviço e Ativos</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}">Análise prática para identificar oportunidades de automação</a>
+              <a href="{% url 'institutional:project_gestao_os_ativos' %}">Controle de OS, ativos e histórico técnico</a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_gestao_os_ativos' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
         </div>
+
         <div class="col-lg-6 col-md-6">
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Automação Industrial e CLPs</p>
+              <p>Integração de Dados e Sistemas</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_automacao_industrial_clps' %}">Projetos e integração para operação industrial</a>
+              <a href="{% url 'institutional:project_integracao_dados_sistemas' %}">Integrações para reduzir retrabalho manual</a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_integracao_dados_sistemas' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -80,11 +81,11 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img9.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Manutenção e Confiabilidade</p>
+              <p>Segurança, Backup e Continuidade Digital</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_manutencao_confiabilidade' %}">Estratégias de manutenção e TPM</a>
+              <a href="{% url 'institutional:project_seguranca_backup_continuidade' %}">Práticas para continuidade e proteção de dados</a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_manutencao_confiabilidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_seguranca_backup_continuidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -96,15 +97,15 @@
             <nav aria-label="Page navigation example">
               <ul class="pagination">
                 <li class="page-item">
-                  <a class="page-link" href="{% url 'institutional:projects' %}" aria-label="Anterior">
+                  <a class="page-link" href="{% url 'institutional:projects_page_2' %}" aria-label="Anterior">
                     <i class="fa-solid fa-angle-left"></i>
                   </a>
                 </li>
-                <li class="page-item"><a class="page-link active" href="{% url 'institutional:projects' %}">1</a></li>
+                <li class="page-item"><a class="page-link" href="{% url 'institutional:projects' %}">1</a></li>
                 <li class="page-item"><a class="page-link" href="{% url 'institutional:projects_page_2' %}">2</a></li>
-                <li class="page-item"><a class="page-link" href="{% url 'institutional:projects_page_3' %}">3</a></li>
+                <li class="page-item"><a class="page-link active" href="{% url 'institutional:projects_page_3' %}">3</a></li>
                 <li class="page-item">
-                  <a class="page-link m-0" href="{% url 'institutional:projects_page_2' %}" aria-label="Próxima">
+                  <a class="page-link m-0" href="{% url 'institutional:projects_page_3' %}" aria-label="Próxima">
                     <i class="fa-solid fa-angle-right"></i>
                   </a>
                 </li>

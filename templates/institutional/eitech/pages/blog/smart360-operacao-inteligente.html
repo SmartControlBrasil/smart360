@@ -1,0 +1,36 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 m-auto text-center">
+          <h1>Smart360: visão para uma operação mais inteligente</h1>
+          <div class="space20"></div>
+          <p>Categoria: Smart360 • Autor: Smart Control Brasil • Artigo técnico</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container sp2">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="space40"></div>
+        <p>O Smart360 é um ecossistema em desenvolvimento para centralizar operação, manutenção, dados, relatórios, automação e IA aplicada ao negócio. A proposta é criar uma base modular que permita evoluir gradualmente conforme necessidade.</p>
+        <div class="space20"></div>
+        <p>O foco é oferecer visibilidade 360°, reduzir retrabalho e fornecer base técnica para automações e assistentes inteligentes.</p>
+        <div class="space24"></div>
+        <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer o Smart360 <i class="fa-solid fa-arrow-right"></i></a>
+        <div class="space60"></div>
+        <h4>Posts relacionados</h4>
+        <ul>
+          <li><a href="{% url 'institutional:blog_sistemas_web_operacao_moderna' %}">Sistemas web como base da operação moderna</a></li>
+          <li><a href="{% url 'institutional:blog_organizar_dados_antes_automatizar' %}">Por que organizar dados antes de automatizar</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

@@ -1,0 +1,36 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 m-auto text-center">
+          <h1>Marketing digital com tecnologia e processo</h1>
+          <div class="space20"></div>
+          <p>Categoria: Marketing Digital • Autor: Smart Control Brasil • Artigo técnico</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container sp2">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="space40"></div>
+        <p>Sites, vídeos, páginas de venda e conteúdo funcionam melhor quando conectados a uma estratégia clara, dados e acompanhamento comercial. A tecnologia deve servir ao processo de geração e qualificação de oportunidades.</p>
+        <div class="space20"></div>
+        <p>Integrar ferramentas simples com acompanhamento permite medir resultados e ajustar campanhas com foco em conversão e retenção.</p>
+        <div class="space24"></div>
+        <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+        <div class="space60"></div>
+        <h4>Posts relacionados</h4>
+        <ul>
+          <li><a href="{% url 'institutional:blog_sistemas_web_operacao_moderna' %}">Sistemas web como base da operação moderna</a></li>
+          <li><a href="{% url 'institutional:blog_ia_pequenas_empresas' %}">Como a IA pode ajudar pequenas empresas na prática</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

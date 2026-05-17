@@ -1,0 +1,36 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 m-auto text-center">
+          <h1>Por que organizar dados antes de automatizar</h1>
+          <div class="space20"></div>
+          <p>Categoria: Dados e Automação • Autor: Smart Control Brasil • Artigo técnico</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container sp2">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="space40"></div>
+        <p>Planilhas, WhatsApp, e-mails e sistemas isolados dificultam a construção de dashboards, automações e soluções de IA. Sem entender onde os dados estão e como são usados, as iniciativas falham ou geram pouco valor.</p>
+        <div class="space20"></div>
+        <p>O primeiro passo é mapear as fontes de dados, definir responsáveis e limpar os principais pontos de inconsistência. Com isso, automações e relatórios passam a entregar resultados concretos.</p>
+        <div class="space24"></div>
+        <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+        <div class="space60"></div>
+        <h4>Posts relacionados</h4>
+        <ul>
+          <li><a href="{% url 'institutional:blog_ia_pequenas_empresas' %}">Como a IA pode ajudar pequenas empresas na prática</a></li>
+          <li><a href="{% url 'institutional:blog_sistemas_web_operacao_moderna' %}">Sistemas web como base da operação moderna</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

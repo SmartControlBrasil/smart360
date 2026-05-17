@@ -1,0 +1,36 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 m-auto text-center">
+          <h1>Como a IA pode ajudar pequenas empresas na prática</h1>
+          <div class="space20"></div>
+          <p>Categoria: IA Aplicada • Autor: Smart Control Brasil • Artigo técnico</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container sp2">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="space40"></div>
+        <p>A IA não é mágica. Funciona melhor quando existe processo claro, dados organizados e objetivos definidos. Para pequenas empresas, a IA pode apoiar atendimento (triagem de solicitações), organização de dados, geração de relatórios, automação de tarefas repetitivas, apoio à elaboração de orçamentos e análise operacional.</p>
+        <div class="space20"></div>
+        <p>Começamos por identificar casos de uso simples e de alto impacto: automações de fluxo, extração de dados, classificação de solicitações e dashboards que tornam a operação mais previsível.</p>
+        <div class="space24"></div>
+        <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+        <div class="space60"></div>
+        <h4>Posts relacionados</h4>
+        <ul>
+          <li><a href="{% url 'institutional:blog_organizar_dados_antes_automatizar' %}">Por que organizar dados antes de automatizar</a></li>
+          <li><a href="{% url 'institutional:blog_smart360_operacao_inteligente' %}">Smart360: visão para uma operação mais inteligente</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

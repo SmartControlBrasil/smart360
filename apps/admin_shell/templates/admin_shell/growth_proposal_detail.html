@@ -1,0 +1,22 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="panel-card">
+    <h2>{{ proposal.proposal_number }}</h2>
+    <p>{{ proposal.company_name }} • {{ proposal.get_status_display }} • R$ {{ proposal.total_value }}</p>
+    {% if lead %}<a class="quick-action-button" href="{% url 'admin-shell:growth-lead-detail' lead.id %}">Abrir lead</a>{% endif %}
+</section>
+<section class="table-card">
+    <table class="data-table"><tbody>
+        <tr><th>Empresa</th><td>{{ proposal.company_name }}</td></tr>
+        <tr><th>Contato</th><td>{{ proposal.contact_name|default:"-" }}</td></tr>
+        <tr><th>E-mail</th><td>{{ proposal.email|default:"-" }}</td></tr>
+        <tr><th>Telefone</th><td>{{ proposal.phone|default:"-" }}</td></tr>
+        <tr><th>Serviço</th><td>{{ proposal.service_interest|default:"-" }}</td></tr>
+        <tr><th>Urgência</th><td>{{ proposal.urgency|default:"-" }}</td></tr>
+        <tr><th>Origem</th><td>{{ proposal.origin|default:"-" }}</td></tr>
+        <tr><th>Resumo</th><td>{{ proposal.summary|default:"-" }}</td></tr>
+        <tr><th>Escopo</th><td>{{ proposal.scope|default:"-" }}</td></tr>
+        <tr><th>Mensagem ao cliente</th><td>{{ proposal.customer_message|default:"-" }}</td></tr>
+    </tbody></table>
+</section>
+{% endblock %}

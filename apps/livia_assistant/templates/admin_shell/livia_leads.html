@@ -1,0 +1,7 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="panel-card"><form method="get" class="filter-form"><label>Urgência</label><select name="urgency"><option value="">Todas</option>{% for value,label in urgency_choices %}<option value="{{ value }}" {% if current_urgency == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><label>Qualificação</label><select name="qualified"><option value="">Todos</option><option value="true" {% if current_qualified == "true" %}selected{% endif %}>Qualificados</option><option value="false" {% if current_qualified == "false" %}selected{% endif %}>Não qualificados</option></select><button class="quick-action-button" type="submit">Filtrar</button></form></section>
+<section class="table-card"><table class="data-table"><thead><tr><th>Nome</th><th>Empresa</th><th>Cidade</th><th>Contato</th><th>Interesse</th><th>Urgência</th><th>Status</th><th>Ação</th></tr></thead><tbody>
+{% for lead in leads %}<tr><td>{{ lead.name|default:"-" }}</td><td>{{ lead.company|default:"-" }}</td><td>{{ lead.city|default:"-" }}</td><td>{{ lead.phone|default:lead.email|default:"-" }}</td><td>{{ lead.service_interest|default:"-" }}</td><td>{{ lead.get_urgency_display }}</td><td>{{ lead.get_operational_status_display }}</td><td><a href="{% url 'admin-shell:livia-lead-detail' lead.id %}">Detalhe</a></td></tr>{% empty %}<tr><td colspan="8">Nenhum lead encontrado.</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

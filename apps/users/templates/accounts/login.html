@@ -1,0 +1,67 @@
+{% extends "accounts/base_auth.html" %}
+
+{% block title %}Entrar | SMART360{% endblock %}
+
+{% block content %}
+<div class="auth-heading">
+    <h1>Entrar</h1>
+    <p>Acesse o SMART360 com seu e-mail e senha.</p>
+</div>
+
+<form method="post" class="auth-form" novalidate>
+    {% csrf_token %}
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="auth-alert" role="alert">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="auth-field">
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        {{ form.username }}
+        {% for error in form.username.errors %}
+            <p class="auth-error">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="auth-field">
+        <div class="auth-label-row">
+            <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+            <a href="{% url 'users:password-reset' %}">Esqueci minha senha</a>
+        </div>
+        {{ form.password }}
+        {% for error in form.password.errors %}
+            <p class="auth-error">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <label class="auth-check">
+        {{ form.remember_me }}
+        <span>{{ form.remember_me.label }}</span>
+    </label>
+
+    <button type="submit" class="auth-primary-button">Entrar</button>
+</form>
+
+<div class="auth-social">
+    <p>Entrar com</p>
+    {# TODO: avaliar django-allauth para Google/Facebook/Microsoft/GitHub, configurar providers OAuth e callbacks de produção. #}
+    <div class="auth-social-grid" aria-label="Login social em breve">
+        <button type="button" class="auth-social-button google" disabled>Google <span>Em breve</span></button>
+        <button type="button" class="auth-social-button facebook" disabled>Facebook <span>Em breve</span></button>
+        <button type="button" class="auth-social-button microsoft" disabled>Microsoft <span>Em breve</span></button>
+        <button type="button" class="auth-social-button github" disabled>GitHub <span>Em breve</span></button>
+    </div>
+</div>
+
+<p class="auth-bottom-link">
+    Ainda não tem conta?
+    <a href="#" aria-disabled="true">Criar conta em breve</a>
+</p>
+{% endblock %}

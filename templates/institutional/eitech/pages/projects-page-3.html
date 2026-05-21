@@ -1,6 +1,25 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Projetos — página 3 | Smart Control Brasil{% endblock %}
+{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em dashboards operacionais, gestão de OS e ativos, integração de dados, sistemas, backup e continuidade digital.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .project-mini-case p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+  .project-mini-case strong {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
@@ -11,9 +30,11 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
+        <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Projetos</h1>
+            <h1>Projetos e frentes de entrega</h1>
+            <div class="space16"></div>
+            <p class="text-white-50 px-lg-5">Soluções para transformar dados dispersos em indicadores confiáveis, organizar ordens de serviço, integrar sistemas e fortalecer a continuidade digital da empresa.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -32,12 +53,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Dashboards e Indicadores Operacionais</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_dashboards_indicadores_operacionais' %}">KPIs e painéis para gestão visual da operação</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_dashboards_indicadores_operacionais' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Dashboards e indicadores operacionais</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Relatórios atrasados, planilhas paralelas e números divergentes dificultam a tomada de decisão e reduzem a confiança da equipe nos indicadores.</p>
+              <strong>Solução</strong>
+              <p>Definição de KPIs com fonte clara, modelagem dos dados, estruturação de dashboards e visualização simples para acompanhamento técnico e gerencial.</p>
+              <strong>Resultado esperado</strong>
+              <p>Decisões mais rápidas, indicadores mais confiáveis, acompanhamento contínuo da operação e identificação de desvios antes que eles se tornem problemas maiores.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_dashboards_indicadores_operacionais' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Diagnosticar KPIs atuais <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -48,12 +76,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Gestão de Ordens de Serviço e Ativos</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_gestao_os_ativos' %}">Controle de OS, ativos e histórico técnico</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_gestao_os_ativos' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Gestão de OS e ativos</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Ordens de serviço, históricos técnicos, documentos e informações dos ativos ficam espalhados, dificultando atendimento, manutenção, cobrança e continuidade da operação.</p>
+              <strong>Solução</strong>
+              <p>Organização de ativos, serviços, registros técnicos, documentos, prazos e histórico operacional em uma estrutura acessível e rastreável.</p>
+              <strong>Resultado esperado</strong>
+              <p>Mais controle sobre serviços realizados, histórico confiável dos equipamentos, melhor acompanhamento das equipes e redução da dependência de informações informais.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_gestao_os_ativos' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de OS <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -64,12 +99,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Integração de Dados e Sistemas</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_integracao_dados_sistemas' %}">Integrações para reduzir retrabalho manual</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_integracao_dados_sistemas' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Integração de dados e sistemas</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>O mesmo dado é digitado várias vezes em sistemas diferentes, aumentando erros, atrasando fechamentos e criando retrabalho entre áreas técnicas, administrativas e comerciais.</p>
+              <strong>Solução</strong>
+              <p>Mapeamento das fontes de dados, definição de sistemas mestres, regras de integração, formatos de troca e rotinas para reduzir lançamentos manuais.</p>
+              <strong>Resultado esperado</strong>
+              <p>Menos retrabalho, dados mais consistentes, fechamento mais confiável e integração gradual entre sistemas, operação e gestão.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_integracao_dados_sistemas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de integração <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -80,12 +122,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img9.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Segurança, Backup e Continuidade Digital</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_seguranca_backup_continuidade' %}">Práticas para continuidade e proteção de dados</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_seguranca_backup_continuidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Segurança, backup e continuidade</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Arquivos importantes, sistemas, planilhas oficiais e rotinas digitais ficam vulneráveis quando não existe política clara de backup, acesso, recuperação e continuidade.</p>
+              <strong>Solução</strong>
+              <p>Estruturação de boas práticas para backup, recuperação, controle de acessos, organização de arquivos e continuidade digital conforme a realidade e o orçamento da empresa.</p>
+              <strong>Resultado esperado</strong>
+              <p>Menos risco de perda de dados, mais previsibilidade em incidentes, recuperação mais segura e uma operação menos dependente de arquivos soltos ou soluções improvisadas.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_seguranca_backup_continuidade' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de continuidade <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

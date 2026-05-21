@@ -88,6 +88,8 @@ urlpatterns = [
     path("api/v1/ai-voiceops/", include("apps.ai_voice_ops.api.urls")),
     path("api/v1/observability/", include("apps.observability_center.api.urls")),
     path("api/public/v1/", include(("apps.public_api.urls", "public-api"), namespace="public-api")),
+    path("", include(("apps.users.urls", "users"), namespace="users")),
+    path("livia/", include(("apps.livia_assistant.urls", "livia_assistant"), namespace="livia_assistant")),
     path("", include(("apps.institutional.urls", "institutional"), namespace="institutional")),
     path("", include("apps.admin_shell.urls")),
 ]

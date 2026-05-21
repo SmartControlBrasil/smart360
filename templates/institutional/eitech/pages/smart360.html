@@ -1,6 +1,9 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Smart360 — Pré-lançamento | Smart Control Brasil{% endblock %}
+{% block meta_description %}Smart360 em pré-lançamento: plataforma modular para ordens de serviço, manutenção, ativos, relatórios, dashboards, automações e IA aplicada à operação.{% endblock %}
+
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
   <div class="hero3-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg4.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
@@ -10,24 +13,23 @@
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="hero3-header heading3">
-            <h5 data-aos="fade-left" data-aos-duration="800"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Em desenvolvimento e implantação interna</h5>
+            <h5 data-aos="fade-left" data-aos-duration="800"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Pré-lançamento do ecossistema operacional da Smart Control Brasil</h5>
             <div class="space24"></div>
-            <h1 class="text-anime-style-3">Smart360 — Gestão, Automação e IA para Operações Inteligentes</h1>
+            <h1 class="text-anime-style-3">Smart360 — gestão modular para operações, manutenção, ativos e dados</h1>
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Uma plataforma em desenvolvimento para conectar manutenção, serviços, ativos, dados, relatórios, automações e inteligência artificial em um único ecossistema.</p>
+            <p data-aos="fade-left" data-aos-duration="900">Estamos desenvolvendo uma plataforma para conectar clientes, unidades, ordens de serviço, ativos técnicos, documentos, indicadores, relatórios, automações e inteligência artificial em uma base operacional mais organizada.</p>
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="950">O Smart360 é o ecossistema tecnológico em desenvolvimento pela Smart Control Brasil para centralizar processos operacionais, clientes, ativos, ordens de serviço, manutenção, documentos, indicadores, relatórios, automações e inteligência artificial aplicada à gestão.</p>
+            <p data-aos="fade-left" data-aos-duration="950">O Smart360 nasce da rotina real de manutenção, engenharia, serviços técnicos e gestão de campo. A proposta é reduzir controles dispersos, melhorar rastreabilidade e criar uma base confiável para tomada de decisão.</p>
             <div class="space24"></div>
-            <form action="{% url 'institutional:contact' %}" method="get" data-aos="fade-left" data-aos-duration="1000">
-              <input type="text" placeholder="Conte brevemente seu cenário operacional">
-              <button class="vl-btn4" type="submit">Solicitar diagnóstico</button>
-            </form>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico da operação <i class="fa-solid fa-arrow-right ms-2"></i></a>
+              <a href="{% url 'institutional:services' %}" class="vl-btn4 bnt2">Ver serviços complementares</a>
+            </div>
             <div class="space24"></div>
-            <h4 data-aos="fade-left" data-aos-duration="1100">Ambiente reservado para usuários autorizados.</h4>
+            <h4 data-aos="fade-left" data-aos-duration="1100">Ambiente restrito a usuários autorizados pela Smart Control Brasil.</h4>
             <div class="space24"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
-              <a href="{% url 'admin-shell:dashboard-entry' %}" class="vl-btn4 bnt2">Acesso restrito</a>
+              <a href="{% url 'admin-shell:dashboard-entry' %}" class="vl-btn4">Acesso restrito à plataforma</a>
             </div>
             <div class="space24"></div>
             <ul>
@@ -131,7 +133,7 @@
             <div class="space20"></div>
             <h2 class="text-anime-style-3">Operação, manutenção, dados e IA em uma base modular</h2>
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="800">A proposta é unir engenharia, TPM, confiabilidade, dados e tecnologia em uma plataforma modular, evolutiva e preparada para empresas que precisam de mais controle, rastreabilidade e eficiência.</p>
+            <p data-aos="fade-left" data-aos-duration="800">A proposta em pré-lançamento é unir engenharia, TPM, confiabilidade, dados e tecnologia em uma plataforma modular, evolutiva e acompanhada por implantação assistida.</p>
             <div class="space16"></div>
             <div class="row" data-aos="fade-left" data-aos-duration="900">
               <div class="col-lg-5">
@@ -158,6 +160,127 @@
   </div>
   <!--===== ABOUT AREA ENDS =======-->
 
+  <!--===== PARA QUEM É SMART360 =======-->
+  <div class="works3-section-area sp1 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 m-auto">
+          <div class="work-header text-center space-margin60 heading5">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Mercado-alvo</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Para quem o Smart360 foi pensado primeiro</h2>
+            <div class="space16"></div>
+            <p>Empresas que já sentem a dor de informações espalhadas, ordens de serviço sem rastreabilidade e histórico técnico difícil de consultar.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="700">
+          <div class="works-single-boxarea h-100">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Empresas de manutenção especializada</a>
+              <div class="space16"></div>
+              <p>Equipes de campo e backoffice que precisam acompanhar ordens de serviço, evidências, prioridades, clientes, ativos e histórico técnico em um só lugar.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
+          <div class="works-single-boxarea h-100">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Prestadores técnicos e serviço recorrente</a>
+              <div class="space16"></div>
+              <p>Negócios que atendem clientes recorrentes e precisam preservar histórico de equipamentos, chamados, relatórios, documentos e intervenções realizadas.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900">
+          <div class="works-single-boxarea h-100">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Pequenas indústrias e linhas produtivas compactas</a>
+              <div class="space16"></div>
+              <p>Operações que sofrem com paradas, manutenção reativa, preventivas esquecidas e pouca clareza sobre causas, recorrências e impactos operacionais.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="works-single-boxarea h-100">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Academias, clínicas e operações equipadas críticas</a>
+              <div class="space16"></div>
+              <p>Empresas em que equipamentos parados afetam diretamente o atendimento, a experiência do cliente e a imagem da marca.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 offset-lg-2 text-center text-lg-start" data-aos="zoom-in" data-aos-duration="1050">
+          <div class="works-single-boxarea h-100">
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Quem ainda fecha OS em papel, foto ou grupo de WhatsApp</a>
+              <div class="space16"></div>
+              <p>Empresas que precisam sair do improviso com uma primeira camada de controle, sem começar por um ERP complexo ou caro demais para a realidade atual.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== PARA QUEM END =======-->
+
+  <!--===== DORES SMART360 =======-->
+  <div class="others3-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/elements/elements29.png' %}" alt="" class="elements29">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="others-heading heading4">
+            <h5 data-aos="fade-left" data-aos-duration="700"><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Dores reais da operação</h5>
+            <div class="space20"></div>
+            <h2 class="text-anime-style-3">Situações que o Smart360 endereça primeiro</h2>
+            <div class="space18"></div>
+            <p data-aos="fade-left" data-aos-duration="800">Antes de dashboards bonitos, a operação precisa de método, registro confiável e dados repetíveis. O Smart360 foi pensado para atacar essa base primeiro.</p>
+          </div>
+          <div class="space28"></div>
+          <div class="row heading5">
+            <div class="col-md-6" data-aos="fade-left" data-aos-duration="850">
+              <ul class="list-unstyled">
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Dados espalhados em canais paralelos e divergentes</li>
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Perda de histórico técnico entre turnos, técnicos ou equipes</li>
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Falta de rastreabilidade técnica e documental quando o cliente cobra SLA</li>
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Dificuldade para priorizar ordens críticas em uma visão única de gestão</li>
+              </ul>
+            </div>
+            <div class="col-md-6" data-aos="fade-left" data-aos-duration="920">
+              <ul class="list-unstyled">
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Ausência de indicadores confiáveis e comparáveis</li>
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Retrabalho por digitar a mesma informação em vários lugares</li>
+                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt=""> Relatórios finais pouco confiáveis por falta de padrão, evidências e histórico</li>
+              </ul>
+            </div>
+          </div>
+          <div class="space28"></div>
+          <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Diagnosticar a causa primeiro <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5 mt-5 mt-lg-0">
+          <div class="about-header-area heading5">
+            <h3>Não existe Smart360 só pelo gráfico</h3>
+            <div class="space14"></div>
+            <p>Quando cada planilha, conversa e relatório segue um padrão diferente, apenas trocar a interface não resolve a falta de confiabilidade dos dados.</p>
+            <div class="space16"></div>
+            <p>Por isso, a implantação precisa começar pelo processo: cadastros, fluxo, responsabilidades, evidências, histórico e indicadores que realmente sustentem decisões.</p>
+          </div>
+          <div class="space28"></div>
+          <div class="img1 image-anime">
+            <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img6.png' %}" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== DORES END =======-->
+
   <!--===== WORK AREA STARTS =======-->
   <div class="works3-section-area sp2">
     <div class="container">
@@ -181,7 +304,7 @@
             <div class="content-area">
               <a href="{% url 'institutional:contact' %}">Diagnóstico da operação</a>
               <div class="space16"></div>
-              <p>Entendimento dos processos atuais, cadastros, rotinas, controles, relatórios e pontos críticos de gestão.</p>
+              <p>Entendimento dos processos atuais, cadastros, rotinas, controles, relatórios, gargalos e pontos críticos de gestão.</p>
             </div>
           </div>
         </div>
@@ -196,7 +319,7 @@
             <div class="content-area">
               <a href="{% url 'institutional:contact' %}">Configuração inicial</a>
               <div class="space16"></div>
-              <p>Organização do ambiente, cadastro base, adaptação do fluxo e orientação para uso operacional.</p>
+              <p>Organização do ambiente, cadastros base, adaptação do fluxo e orientação para uso operacional com acompanhamento assistido.</p>
             </div>
           </div>
         </div>
@@ -211,7 +334,7 @@
             <div class="content-area">
               <a href="{% url 'institutional:contact' %}">Evolução modular</a>
               <div class="space16"></div>
-              <p>Ampliação gradual para relatórios, dashboards, documentos, automações, IA e integrações conforme necessidade.</p>
+              <p>Ampliação gradual para relatórios, dashboards, documentos, automações, IA e integrações conforme a maturidade da operação.</p>
             </div>
           </div>
         </div>
@@ -234,7 +357,7 @@
             <p data-aos="fade-left" data-aos-duration="900">O Smart360 está sendo preparado para organizar empresas, unidades, contatos, locais de atendimento, solicitações, registros técnicos, documentos e indicadores em uma base única.</p>
             <div class="space32"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar demonstração</a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Conversar sobre piloto assistido</a>
             </div>
           </div>
         </div>
@@ -281,11 +404,11 @@
           <div class="content-area heading5">
             <h3 class="text-anime-style-3">Gestão de Ordens de Serviço</h3>
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Controle de solicitações, status, responsáveis, histórico, prioridades e acompanhamento operacional.</p>
+            <p data-aos="fade-left" data-aos-duration="900">Controle de solicitações, status, responsáveis, histórico, prioridades, evidências e acompanhamento operacional.</p>
             <div class="space18"></div>
             <h3 class="text-anime-style-3">Ativos e Equipamentos</h3>
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="1000">Cadastro de ativos, equipamentos, locais, histórico de manutenção e organização técnica por cliente ou unidade.</p>
+            <p data-aos="fade-left" data-aos-duration="1000">Cadastro de ativos, equipamentos, locais, documentos, histórico de manutenção e organização técnica por cliente ou unidade.</p>
             <div class="space28"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
               <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista</a>
@@ -300,7 +423,7 @@
           <div class="content-area2 heading5">
             <h3 class="text-anime-style-3">Dashboards, relatórios e automações</h3>
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Painéis para acompanhar desempenho, backlog, produtividade, recorrência, disponibilidade e pontos críticos.</p>
+            <p data-aos="fade-left" data-aos-duration="900">Painéis para acompanhar desempenho, backlog, produtividade, recorrência, disponibilidade, prazos e pontos críticos.</p>
             <div class="space18"></div>
             <p data-aos="fade-left" data-aos-duration="1000">Organização de documentos, evidências, relatórios técnicos, registros de atendimento e histórico operacional, com evolução para automações e IA aplicada.</p>
             <div class="space28"></div>
@@ -374,12 +497,12 @@
       <div class="row">
         <div class="col-lg-6 m-auto">
           <div class="pricing-header heading5 text-center">
-            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Planos de acesso</h5>
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Pré-lançamento</h5>
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">Valores de pré-lançamento do Smart360</h2>
+            <h2 class="text-anime-style-3">Planos iniciais com transparência de escopo</h2>
           </div>
           <div class="space24"></div>
-          <p class="text-center">Valores de pré-lançamento sujeitos a ajuste conforme escopo, quantidade de usuários, módulos, integrações e nível de implantação.</p>
+          <p class="text-center px-lg-4">Referências de pré-lançamento para pilotos assistidos. O valor efetivo considera usuários, volume de registros, módulos habilitados, integrações externas, armazenamento e requisitos específicos de implantação.</p>
         </div>
       </div>
 
@@ -393,20 +516,20 @@
                     <div class="pricing-box">
                       <h3>Starter</h3>
                       <div class="space14"></div>
-                      <p>Para operação pequena começando a organizar serviços e controles básicos.</p>
+                      <p>Para empresas que querem sair do improviso e começar com uma base simples para clientes, solicitações e organização inicial da rotina.</p>
                       <div class="space12"></div>
                       <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Cadastro básico de clientes e contatos</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Controle inicial de serviços</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Organização de solicitações</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Acesso ao ambiente Smart360</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Evolução conforme módulos disponíveis</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Cadastro estruturado de clientes, contatos e locais prioritários</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Central de solicitações e registro inicial de ordens em aberto</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Visão enxuta da fila de trabalho da equipe</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Acesso ao ambiente Smart360 durante a fase de pré-lançamento</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Habilitação progressiva dos módulos conforme maturidade do uso</li>
                       </ul>
                       <div class="space28"></div>
                       <h2>R$ 97 <span>/mês</span></h2>
                       <div class="space24"></div>
                       <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar acesso</a>
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Começar com diagnóstico</a>
                       </div>
                     </div>
                   </div>
@@ -416,20 +539,20 @@
                     <div class="pricing-box">
                       <h3>Professional</h3>
                       <div class="space14"></div>
-                      <p>Para empresas que precisam organizar manutenção, ativos, ordens de serviço e indicadores.</p>
+                      <p>Para operações que já precisam controlar ordens de serviço, ativos, evidências e histórico técnico com mais consistência.</p>
                       <div class="space12"></div>
                       <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Ordens de serviço</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Clientes, unidades e ativos</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Histórico operacional</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Indicadores e relatórios básicos</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Suporte de implantação inicial</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Gestão assistida do ciclo de vida da ordem de serviço com priorização</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Estrutura cliente → unidade → ativo técnico rastreado</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Anexação de evidências e documentos correlatos ao atendimento</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Pacote inicial de relatórios e indicadores de operação</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Suporte próximo nos primeiros 90 dias de uso operacional</li>
                       </ul>
                       <div class="space28"></div>
                       <h2>R$ 197 <span>/mês</span></h2>
                       <div class="space24"></div>
                       <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar demonstração</a>
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Avaliar piloto Professional</a>
                       </div>
                     </div>
                   </div>
@@ -439,20 +562,20 @@
                     <div class="pricing-box">
                       <h3>Business</h3>
                       <div class="space14"></div>
-                      <p>Para operações com múltiplos usuários, dashboards, relatórios, automações e gestão mais estruturada.</p>
+                      <p>Para operações com mais usuários, múltiplas equipes, necessidade de painéis, automações e gestão por indicadores.</p>
                       <div class="space12"></div>
                       <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Múltiplos usuários</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Dashboards operacionais</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Relatórios e documentos</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Automação e IA aplicada</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Evolução modular assistida</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Mais usuários simultâneos com trilha simples de auditoria</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Painéis e segmentações customizadas para diferentes gestores</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Biblioteca de relatórios em PDF padronizados para clientes e gestão</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Automações iniciais e pacote de IA assistiva conforme escopo aprovado</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Roadmap técnico trimestral para segurança e evolução modular</li>
                       </ul>
                       <div class="space28"></div>
                       <h2>R$ 397 <span>/mês</span></h2>
                       <div class="space24"></div>
                       <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista</a>
+                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Alinhar piloto Business</a>
                       </div>
                     </div>
                   </div>
@@ -462,14 +585,14 @@
                     <div class="pricing-box">
                       <h3>Implantação assistida</h3>
                       <div class="space14"></div>
-                      <p>Configuração inicial, cadastro base, adaptação do fluxo, treinamento e acompanhamento da primeira etapa.</p>
+                      <p>Para empresas que precisam migrar dados, organizar cadastros, revisar processos e treinar a equipe antes de operar com segurança.</p>
                       <div class="space12"></div>
                       <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Levantamento do processo atual</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Configuração inicial do ambiente</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Cadastro base assistido</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Ajuste de fluxo operacional</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Treinamento e orientação de uso</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Workshop inicial com foco nos processos críticos da operação</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Parâmetros de formulário alinhados para evitar cadastros confusos</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Assistência nas cargas iniciais a partir de planilhas ou histórico legado</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Material e orientação para treinar a equipe em ciclos reais de uso</li>
+                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="">Checkpoint aos 30 dias após entrada em operação</li>
                       </ul>
                       <div class="space28"></div>
                       <h2>A partir de R$ 1.500</h2>
@@ -516,12 +639,12 @@
               <div class="accordion-item">
                 <h2 class="accordion-header">
                   <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    O Smart360 já está finalizado?
+                    Em que fase o Smart360 está?
                   </button>
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
                   <div class="accordion-body">
-                    <p>Não. O Smart360 está em desenvolvimento e implantação interna, com evolução modular e abertura assistida conforme diagnóstico e aderência ao processo.</p>
+                    <p>O Smart360 está em desenvolvimento e implantação interna, com evolução modular e abertura assistida conforme diagnóstico, aderência ao processo e disponibilidade de módulos.</p>
                   </div>
                 </div>
               </div>
@@ -547,7 +670,7 @@
                 </h2>
                 <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                   <div class="accordion-body">
-                    <p>Sim. Os valores são de pré-lançamento e podem variar conforme escopo, quantidade de usuários, módulos, integrações e nível de implantação.</p>
+                    <p>Sim. Os valores são referências de pré-lançamento e podem variar conforme escopo, quantidade de usuários, módulos, integrações, armazenamento e nível de implantação.</p>
                   </div>
                 </div>
               </div>

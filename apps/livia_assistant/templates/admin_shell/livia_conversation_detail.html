@@ -1,0 +1,10 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="content-grid two-column">
+    <article class="panel-card"><h2>Resumo</h2><p><strong>Status:</strong> {{ conversation.get_status_display }}</p><p><strong>Visitante:</strong> {{ conversation.visitor_name|default:"Não informado" }}</p><p><strong>Empresa:</strong> {{ conversation.company_name|default:"Não informada" }}</p><p><strong>Telefone:</strong> {{ conversation.visitor_phone|default:"Não informado" }}</p><p><strong>E-mail:</strong> {{ conversation.visitor_email|default:"Não informado" }}</p><p><strong>Origem:</strong> {{ conversation.source_page|default:"-" }}</p></article>
+    <article class="panel-card"><h2>Leads e handoffs</h2><p><strong>Leads:</strong> {{ lead_captures|length }}</p><p><strong>Handoffs:</strong> {{ handoff_requests|length }}</p>{% for lead in lead_captures %}<p>{{ lead.service_interest|default:"Interesse não informado" }} · {{ lead.get_urgency_display }} · {{ lead.is_qualified|yesno:"Qualificado,Não qualificado" }}</p>{% empty %}<p>Nenhum lead capturado nesta conversa.</p>{% endfor %}</article>
+</section>
+<section class="table-card"><div class="panel-card"><h2>Mensagens</h2><p>Histórico completo da conversa.</p></div><table class="data-table"><thead><tr><th>Horário</th><th>Papel</th><th>Conteúdo</th></tr></thead><tbody>
+{% for message in messages_list %}<tr><td>{{ message.created_at|date:"d/m/Y H:i" }}</td><td>{{ message.get_role_display }}</td><td>{{ message.content }}</td></tr>{% empty %}<tr><td colspan="3">Nenhuma mensagem registrada.</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

@@ -221,3 +221,56 @@ class LeadAssignment(models.Model):
     class Meta:
         db_table = "growth_lead_assignments"
         ordering = ["-assigned_at"]
+
+
+class CommercialProposal(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        SENT = "sent", "Sent"
+        ACCEPTED = "accepted", "Accepted"
+        REJECTED = "rejected", "Rejected"
+        EXPIRED = "expired", "Expired"
+
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    proposal_number = models.CharField(max_length=40, unique=True)
+    lead = models.ForeignKey("growth_engine.Lead", on_delete=models.SET_NULL, related_name="commercial_proposals", null=True, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
+    company_name = models.CharField(max_length=180)
+    contact_name = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=30, blank=True)
+    service_interest = models.CharField(max_length=180, blank=True)
+    urgency = models.CharField(max_length=40, blank=True)
+    origin = models.CharField(max_length=80, blank=True)
+    summary = models.TextField(blank=True)
+    scope = models.TextField(blank=True)
+    customer_message = models.TextField(blank=True)
+    total_value = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="created_commercial_proposals",
+        null=True,
+        blank=True,
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="updated_commercial_proposals",
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "growth_commercial_proposals"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["lead", "status"], name="growth_prop_lead_status_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return self.proposal_number

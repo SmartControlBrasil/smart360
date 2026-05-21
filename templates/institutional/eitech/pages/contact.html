@@ -1,6 +1,28 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Contato e diagnóstico técnico | Smart Control Brasil{% endblock %}
+{% block meta_description %}Entre em contato com a Smart Control Brasil e solicite um diagnóstico inicial para manutenção, automação industrial, Smart360, sistemas web, IA aplicada e segurança digital.{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Formulário de diagnóstico: legibilidade sem alterar o tema principal */
+  .contact-diagnostic-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    opacity: 0.85;
+  }
+  .contact-diagnostic-mini {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
@@ -13,7 +35,7 @@
       <div class="row">
         <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Contato</h1>
+            <h1>Solicite um diagnóstico inicial da sua operação</h1>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Contato</span></a>
           </div>
@@ -29,9 +51,9 @@
       <div class="row">
         <div class="col-lg-10 m-auto">
           <div class="heading2 text-center">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Fale com a Smart Control Brasil</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Smart Control Brasil</h5>
             <div class="space20"></div>
-            <h2>Tecnologia, automacao e IA para organizar sua operacao</h2>
+            <h2>Transforme problemas operacionais em um plano claro de ação</h2>
           </div>
           <div class="space40"></div>
           <div class="row">
@@ -54,8 +76,8 @@
                   <img src="{% static 'institutional/eitech/img/icons/phn2.svg' %}" alt="">
                 </div>
                 <div class="content">
-                  <h4>Telefone</h4>
-                  <a href="tel:+551151968525">+55 11 5196-8525</a>
+                  <h4>WhatsApp</h4>
+                  <a href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20diagn%C3%B3stico%20inicial.">Chamar a Smart Control no WhatsApp</a>
                 </div>
               </div>
               <div class="space30 d-lg-none d-block"></div>
@@ -68,7 +90,7 @@
                 </div>
                 <div class="content">
                   <h4>Atendimento</h4>
-                  <a href="mailto:contato@smartcontrolbrasil.com.br">Atendimento comercial em horário comercial</a>
+                  <a href="mailto:contato@smartcontrolbrasil.com.br">Retorno comercial com análise objetiva do seu cenário</a>
                 </div>
               </div>
             </div>
@@ -77,56 +99,98 @@
           <div class="row">
             <div class="col-lg-6">
               <div class="img1 reveal image-anime">
-                <img src="{% static 'institutional/eitech/img/all-images/others/others-img2.png' %}" alt="">
+                <img src="{% static 'institutional/eitech/img/all-images/others/others-img2.png' %}" alt="Equipe técnica Smart Control Brasil em diagnóstico de operação">
               </div>
             </div>
 
             <div class="col-lg-6">
-                <div class="contact-author-boxarea">
-                <h3>Solicitar diagnóstico</h3>
+              <div class="contact-author-boxarea">
+                <h3>Conte o que sua operação precisa resolver</h3>
+                <p class="contact-diagnostic-mini">Envie um resumo do seu cenário. A partir dessas informações, avaliamos os próximos passos para manutenção, automação industrial, sistemas web, Smart360, IA aplicada, segurança digital ou presença online.</p>
                 <div class="space8"></div>
+                <form method="post" action="{% url 'institutional:contact' %}">
+                  {% csrf_token %}
+                  {% if messages %}
+                    <div class="form-messages" style="margin: 18px 0;">
+                      {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                          {{ message }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 <div class="row">
-                  <div class="col-lg-6">
-                    <div class="input-area">
-                      <input type="text" placeholder="Seu nome">
-                    </div>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <div class="input-area">
-                      <input type="text" placeholder="Seu sobrenome">
-                    </div>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <div class="input-area">
-                      <input type="number" placeholder="Seu telefone">
-                    </div>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <div class="input-area">
-                      <input type="email" placeholder="Seu e-mail">
-                    </div>
-                  </div>
                   <div class="col-lg-12">
+                    <div class="contact-diagnostic-label">Nome</div>
                     <div class="input-area">
-                      <input type="text" placeholder="Assunto: Como podemos ajudar?">
+                      <input type="text" name="contact_name" placeholder="Informe seu nome completo" autocomplete="name" required>
                     </div>
                   </div>
 
                   <div class="col-lg-12">
+                    <div class="contact-diagnostic-label">Empresa</div>
                     <div class="input-area">
-                      <textarea placeholder="Conte um pouco sobre sua necessidade, desafio ou projeto."></textarea>
+                      <input type="text" name="company" placeholder="Nome da empresa, unidade ou projeto" autocomplete="organization">
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <div class="contact-diagnostic-label">WhatsApp</div>
+                    <div class="input-area">
+                      <input type="tel" name="whatsapp" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999">
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <div class="contact-diagnostic-label">E-mail</div>
+                    <div class="input-area">
+                      <input type="email" name="email" placeholder="Informe seu melhor e-mail" autocomplete="email" required>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-12">
+                    <div class="contact-diagnostic-label">Segmento</div>
+                    <div class="input-area">
+                      <input type="text" name="segment" placeholder="Ex.: indústria, manutenção, academia, saúde, comércio, serviços técnicos...">
+                    </div>
+                  </div>
+
+                  <div class="col-lg-12">
+                    <div class="contact-diagnostic-label">Interesse principal</div>
+                    <div class="input-area">
+                      <select name="interest" class="form-select" aria-label="Interesse principal">
+                        <option value="">Selecione a principal necessidade</option>
+                        <option value="manutencao">Manutenção, TPM e Confiabilidade</option>
+                        <option value="automacao">Automação Industrial e CLPs</option>
+                        <option value="smart360">Smart360 e Gestão Operacional</option>
+                        <option value="cybersecurity">Cybersecurity e Segurança Digital</option>
+                        <option value="ia">Inteligência Artificial e Automações</option>
+                        <option value="sites">Sites, SEO e Marketing Digital</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-12">
+                    <div class="contact-diagnostic-label">Principal problema atual</div>
+                    <div class="input-area">
+                                      <textarea name="main_problem" placeholder="Ex.: ordens de serviço espalhadas, falta de histórico técnico, baixa rastreabilidade, falhas recorrentes, dados incompletos..." rows="3"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-12">
+                    <div class="contact-diagnostic-label">Mensagem</div>
+                    <div class="input-area">
+                      <textarea name="message" placeholder="Descreva o contexto, urgência, volume de chamados, equipamentos, sistemas envolvidos ou objetivo do projeto." required rows="5"></textarea>
                     </div>
                   </div>
                   <div class="col-lg-12">
                     <div class="space32"></div>
                     <div class="input-area">
-                      <button type="submit" class="vl-btn2">Enviar mensagem <i class="fa-solid fa-arrow-right"></i></button>
+                      <button type="submit" class="vl-btn2">Enviar solicitação de diagnóstico <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                   </div>
                 </div>
+                </form>
               </div>
             </div>
           </div>

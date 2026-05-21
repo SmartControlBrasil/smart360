@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Lead, LeadAssignment, LeadCampaign, LeadInteraction, LeadQualification, LeadSource, LeadTag
+from .models import CommercialProposal, Lead, LeadAssignment, LeadCampaign, LeadInteraction, LeadQualification, LeadSource, LeadTag
 
 
 class LeadInteractionInline(admin.TabularInline):
@@ -72,3 +72,12 @@ class LeadAssignmentAdmin(admin.ModelAdmin):
     search_fields = ("lead__company_name", "user__email")
     readonly_fields = ("public_id", "created_at", "updated_at")
     autocomplete_fields = ("lead", "user")
+
+
+@admin.register(CommercialProposal)
+class CommercialProposalAdmin(admin.ModelAdmin):
+    list_display = ("proposal_number", "lead", "company_name", "status", "origin", "total_value", "created_at")
+    list_filter = ("status", "origin", "created_at")
+    search_fields = ("proposal_number", "company_name", "contact_name", "email", "phone", "service_interest", "summary")
+    readonly_fields = ("public_id", "proposal_number", "created_at", "updated_at")
+    autocomplete_fields = ("lead", "created_by", "updated_by")

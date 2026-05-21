@@ -24,10 +24,13 @@
                   </div>
               </div>
               <div class="col-lg-3 col-md-6 col-6">
-                  <div class="vl-hero-btn d-none d-lg-block text-end">
-                          <span class="vl-btn-wrap text-end">
-                            <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
-                          </span>
+                  <div class="header-btn-area d-none d-lg-flex">
+                      <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+                      {% if request.user.is_authenticated %}
+                        <a href="/ecossistema/" class="header-login-link">Painel</a>
+                      {% else %}
+                        <a href="{% url 'users:login' %}" class="header-login-link">Entrar</a>
+                      {% endif %}
                   </div>
                   <div class="vl-header-action-item d-block d-lg-none">
                       <button type="button" class="vl-offcanvas-toggle">
@@ -63,6 +66,13 @@
                 <li><a href="{% url 'institutional:projects' %}">Projetos</a></li>
                 <li><a href="{% url 'institutional:blog' %}">Blog</a></li>
                 <li><a href="{% url 'institutional:contact' %}">Contato</a></li>
+                <li class="header-mobile-login">
+                  {% if request.user.is_authenticated %}
+                    <a href="/ecossistema/">Painel</a>
+                  {% else %}
+                    <a href="{% url 'users:login' %}">Entrar</a>
+                  {% endif %}
+                </li>
               </ul>
             </nav>
         </div>
@@ -71,7 +81,7 @@
         <div class="vl-offcanvas-info">
             <h3 class="vl-offcanvas-sm-title">Contato</h3>
             <div class="space20"></div>
-            <span><a href="tel:+551151968525"> <i class="fa-solid fa-phone"></i> +55 11 5196-8525</a></span>
+            <span><a href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20diagn%C3%B3stico%20inicial."> <i class="fa-solid fa-phone"></i> Falar com a Lívia no WhatsApp</a></span>
             <span><a href="mailto:contato@smartcontrolbrasil.com.br"><i class="fa-regular fa-envelope"></i> contato@smartcontrolbrasil.com.br</a></span>
             <span><a href="#"><i class="fa-solid fa-location-dot"></i> Sao Paulo - Brasil</a></span>
         </div>
@@ -86,9 +96,7 @@
          </div>
         <div class="space20"></div>
         <div class="vl-hero-btn">
-          <span class="vl-btn-wrap">
-            <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
-          </span>
+          <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
         </div>
 
     </div>

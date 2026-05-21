@@ -1,11 +1,13 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Smart Control Brasil | Engenharia, Manutenção, Automação e Sistemas{% endblock %}
+{% block meta_description %}Soluções em engenharia, manutenção, automação industrial, sistemas web, Smart360 e segurança digital para reduzir paradas, organizar processos e aumentar o controle operacional da sua empresa.{% endblock %}
+
 {% block body_extra %} class="home-page"{% endblock %}
 
 {% block extra_css %}
 <style>
-  /* Respiro sob o header absoluto; só aplica com body.home-page (esta template). */
   body.home-page .hero1-section-area {
     padding-top: 176px;
   }
@@ -14,11 +16,21 @@
       padding-top: 132px;
     }
   }
+  .pillar-check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .pillar-check-list img {
+    width: 18px;
+    flex: 0 0 18px;
+    margin-top: 2px;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<!--===== HERO AREA STARTS =======-->
+  <!--===== HERO AREA STARTS =======-->
   <div class="hero1-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
     <img src="{% static 'institutional/eitech/img/elements/elements6.png' %}" alt="" class="elements6">
     <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
@@ -27,16 +39,15 @@
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="hero1-header heading1">
-            <h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Transformamos processos, dados e tecnologia em operacao inteligente</h5>
+            <h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Smart Control Brasil</h5>
             <div class="space16"></div>
-            <h1 class="text-anime-style-3">Tecnologia, Automacao e IA para empresas que querem operar com mais controle</h1>
+            <h1 class="text-anime-style-3">Engenharia, manutenção e tecnologia para operações que não podem parar.</h1>
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="900">A Smart Control Brasil integra engenharia, automação, software, dados, IA e segurança digital para ajudar empresas a modernizar processos, reduzir retrabalho e tomar decisões com clareza.</p>
+            <p data-aos="fade-left" data-aos-duration="900">Integramos serviços técnicos, automação, sistemas web e segurança digital para organizar processos, reduzir falhas e transformar dados operacionais em decisões mais rápidas e seguras.</p>
             <div class="space32"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
-              <!-- TODO: substituir pelo vídeo institucional da Smart Control Brasil -->
-              <a href="#" class="popup-youtube"><span><i class="fa-solid fa-play"></i></span>Ver apresentação</a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico técnico <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:smart360' %}" class="vl-btn2">Conhecer o Smart360 <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
@@ -50,8 +61,8 @@
               <img src="{% static 'institutional/eitech/img/all-images/bg/img-bg1.png' %}" alt="">
             </div>
             <div class="elements">
-              <img src="{% static 'institutional/eitech/img/elements/elements3.png' %}" alt="" class="elements3 aniamtion-key-1">
-              <img src="{% static 'institutional/eitech/img/elements/elements2.png' %}" alt="" class="elements2 aniamtion-key-2">
+              <img src="{% static 'institutional/eitech/img/elements/elements51.png' %}"title="Cyber" alt="" class="elements3 aniamtion-key-1">
+              <img src="{% static 'institutional/eitech/img/elements/elements50.png' %}" alt="" class="elements2 aniamtion-key-2">
               <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
             </div>
           </div>
@@ -72,23 +83,23 @@
             <div class="row align-items-center">
               <div class="col-lg-6 col-md-6">
                 <div class="img1 image-anime reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img1.png' %}" alt="">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/robo01.png' %}" alt="">
                 </div>
                 <div class="space30 d-lg-none d-block"></div>
               </div>
               <div class="col-lg-6 col-md-6">
                 <div class="img1 image-anime reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img2.png' %}" alt="">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/note01.png' %}" alt="">
                 </div>
                 <div class="space30"></div>
                 <div class="img1 image-anime reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img3.png' %}" alt="">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/marketing01.png' %}" alt="">
                 </div>
               </div>
             </div>
             <div class="check-icons aniamtion-key-1">
               <img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">
-              <p>Atuação prática em tecnologia, automação e inteligência para pequenas e médias empresas.</p>
+              <p>Manutenção, automação, dados e segurança no mesmo fluxo.</p>
             </div>
           </div>
         </div>
@@ -96,11 +107,11 @@
         <div class="col-lg-1"></div>
         <div class="col-lg-5">
           <div class="about-header-area heading2">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Sobre a Smart Control Brasil</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Sobre nós</h5>
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Tecnologia, automação e inteligência artificial para empresas reais</h2>
+            <h2 class="text-anime-style-3">Unimos campo, sistema e gestão em uma só visão operacional</h2>
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="800">A Smart Control Brasil integra engenharia, automação, software, dados, IA e segurança digital para ajudar empresas a reduzir retrabalho e tomar decisões com clareza.</p>
+            <p data-aos="fade-left" data-aos-duration="800">A Smart Control Brasil atua entre o problema técnico e a decisão de gestão. Mapeamos gargalos, estruturamos processos, desenvolvemos sistemas e aplicamos tecnologia para que sua empresa tenha mais previsibilidade, controle e rastreabilidade.</p>
             <div class="space28"></div>
             <div class="row" data-aos="fade-left" data-aos-duration="900">
               <div class="col-lg-6 col-md-6">
@@ -111,9 +122,9 @@
                     </div>
                   </div>
                   <div class="content-area">
-                    <h4>Automação e Sistemas</h4>
+                    <h4>Operação</h4>
                     <div class="space8"></div>
-                    <p>Engenharia + IA aplicada</p>
+                    <p>Mais controle sobre rotinas técnicas</p>
                   </div>
                 </div>
               </div>
@@ -127,20 +138,20 @@
                     </div>
                   </div>
                   <div class="content-area">
-                    <h4>Cybersecurity</h4>
+                    <h4>Gestão</h4>
                     <div class="space8"></div>
-                    <p>Proteção e governança digital</p>
+                    <p>Mais clareza para decidir com dados</p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="space28"></div>
             <div class="pera-box" data-aos="fade-left" data-aos-duration="1000">
-              <p>“O Smart360 é o ecossistema tecnológico da Smart Control Brasil para gestão operacional, manutenção, dados, automação e IA.”</p>
+              <p>"O Smart360 é nossa plataforma própria para gestão de manutenção, ativos, clientes, dados e rotinas operacionais — criada para empresas que precisam sair da improvisação e ganhar controle."</p>
             </div>
             <div class="space28"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer soluções <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Ver como podemos ajudar <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
@@ -149,125 +160,120 @@
   </div>
   <!--===== ABOUT AREA ENDS =======-->
 
-  <!--===== SERVICE AREA STARTS =======-->
+  <!--===== PILLARS START =======-->
   <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
+        <div class="col-lg-8 m-auto">
           <div class="service-header text-center heading2 space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Nossas Soluções</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Áreas de atuação</h5>
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Soluções de tecnologia para elevar sua operação</h2>
+            <h2 class="text-anime-style-3">Quatro frentes para organizar, proteger e acelerar sua operação</h2>
+            <div class="space16"></div>
+            <p class="text-center">Cada frente resolve uma dor específica. Juntas, elas ajudam sua empresa a reduzir falhas, melhorar processos e crescer com mais controle.</p>
           </div>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Cybersecurity para Empresas</a>
-            <div class="space16"></div>
-            <p>Diagnóstico, proteção e boas práticas de segurança digital para reduzir riscos e proteger dados.</p>
-            <div class="space24"></div>
-            <h5>01</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Sistemas e Inteligência Artificial</a>
-            <div class="space16"></div>
-            <p>Desenvolvimento de sistemas sob medida em Django/Python para organizar processos e dados.</p>
-            <div class="space24"></div>
-            <h5>02</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Automação Industrial e CLPs</a>
-            <div class="space16"></div>
-            <p>Projetos, melhorias e suporte para máquinas, CLPs e integração de sistemas industriais.</p>
-            <div class="space24"></div>
-            <h5>03</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100">
-          <div class="service1-boxarea">
+        <div class="col-lg-6 col-md-6" data-aos="zoom-in" data-aos-duration="800">
+          <div class="service1-boxarea h-100 d-flex flex-column">
             <div class="icons">
               <img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt="">
             </div>
             <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Manutenção e Confiabilidade</a>
+            <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">Manutenção Técnica e Engenharia</a>
             <div class="space16"></div>
-            <p>Estratégias de manutenção, TPM e análise de falhas para aumentar disponibilidade.</p>
-            <div class="space24"></div>
-            <h5>04</h5>
+            <p>Organize ativos, serviços, inspeções e ordens de manutenção para reduzir paradas, retrabalho e perda de histórico técnico.</p>
+            <div class="space16"></div>
+            <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Rotinas preventivas e corretivas mais organizadas</li>
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Histórico técnico dos ativos centralizado</li>
+              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Indicadores para planejar melhor e agir antes da falha</li>
+            </ul>
+            <div class="btn-area1 mt-auto">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar sobre manutenção <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
 
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
-          <div class="service1-boxarea">
+        <div class="col-lg-6 col-md-6" data-aos="zoom-in" data-aos-duration="900">
+          <div class="service1-boxarea h-100 d-flex flex-column">
             <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt="">
             </div>
             <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:service_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Inteligência Artificial Aplicada</a>
+            <a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação Industrial</a>
             <div class="space16"></div>
-            <p>Uso prático de IA para automação de tarefas, organização de dados e apoio à decisão.</p>
-            <div class="space24"></div>
-            <h5>05</h5>
+            <p>Melhore máquinas, linhas produtivas e processos com automação aplicada, integração de dados e controle operacional mais confiável.</p>
+            <div class="space16"></div>
+            <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Melhorias em máquinas, painéis e linhas produtivas</li>
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Integração de CLPs, sensores e sistemas de gestão</li>
+              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Dados operacionais mais confiáveis para decisão</li>
+            </ul>
+            <div class="btn-area1 mt-auto">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Diagnosticar automação <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
 
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1300">
-          <div class="service1-boxarea">
+        <div class="col-lg-6 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="service1-boxarea h-100 d-flex flex-column">
             <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
             </div>
             <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Marketing Digital e Conteúdo</a>
+            <a href="{% url 'institutional:smart360' %}">Sistemas Web e Smart360</a>
             <div class="space16"></div>
-            <p>Sites, vídeos e presença digital para empresas que querem vender com mais clareza.</p>
+            <p>Substitua planilhas, controles soltos e processos manuais por sistemas web sob medida e pela plataforma Smart360.</p>
+            <div class="space16"></div>
+            <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Gestão de ordens de serviço, ativos e clientes</li>
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Dashboards, relatórios e acompanhamento em tempo real</li>
+              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Sistemas Django/Python preparados para evoluir</li>
+            </ul>
+            <div class="btn-area1 mt-auto">
+              <a href="{% url 'institutional:smart360' %}" class="vl-btn2">Conhecer o Smart360 <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6" data-aos="zoom-in" data-aos-duration="1100">
+          <div class="service1-boxarea h-100 d-flex flex-column">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt="">
+            </div>
+            <div class="arrow">
+              <a href="{% url 'institutional:project_cybersecurity_empresas' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            </div>
             <div class="space24"></div>
-            <h5>06</h5>
+            <a href="{% url 'institutional:project_cybersecurity_empresas' %}">Cybersecurity e Inteligência Artificial</a>
+            <div class="space16"></div>
+            <p>Proteja dados, sistemas e rotinas críticas enquanto aplica IA de forma prática, responsável e conectada ao resultado da empresa.</p>
+            <div class="space16"></div>
+            <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Análise de riscos, vulnerabilidades e pontos críticos</li>
+              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">IA aplicada a tarefas repetitivas e decisões operacionais</li>
+              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Mais segurança para dados, acessos e continuidade</li>
+            </ul>
+            <div class="btn-area1 mt-auto">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar sobre segurança <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!--===== SERVICE AREA ENDS =======-->
 
   <!--===== WORK AREA STARTS =======-->
   <div class="work1-section-area sp1">
@@ -276,11 +282,11 @@
       <div class="row align-items-center">
         <div class="col-lg-5">
           <div class="solution-header heading2">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Smart Control Brasil</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Por que escolher a Smart Control</h5>
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Transformamos processos, dados e tecnologia em operação inteligente</h2>
+            <h2 class="text-anime-style-3">Menos improviso. Mais rastreabilidade. Uma operação pronta para crescer.</h2>
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="800">Posicionamento: tecnologia, automação e inteligência artificial para empresas com mais controle, segurança e eficiência.</p>
+            <p data-aos="fade-left" data-aos-duration="800">Ajudamos empresas a sair de controles fragmentados e processos manuais para uma gestão mais clara, integrada e orientada por dados.</p>
             <div class="space24"></div>
             <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
               <div class="progress-bar">
@@ -291,14 +297,14 @@
               </div>
 
               <div class="progress-bar">
-                <label>Cybersecurity <span>97%</span></label>
+                <label>Segurança Operacional <span>97%</span></label>
                 <div class="progress">
                   <div class="progress-inner" data-progress="97" style="width: 0%;"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
-                <label>Soluções em Nuvem <span>99%</span></label>
+                <label>Gestão em Nuvem <span>99%</span></label>
                 <div class="progress">
                   <div class="progress-inner" data-progress="99" style="width: 0%;"></div>
                 </div>
@@ -306,19 +312,19 @@
             </div>
             <div class="space32"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer soluções <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com um especialista <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
         <div class="col-lg-2"></div>
         <div class="col-lg-5">
           <div class="soultions-images">
-            <img src="{% static 'institutional/eitech/img/elements/elements10.png' %}" alt="" class="elements10">
+            <img src="{% static 'institutional/eitech/img/elements/elements52.png' %}" alt="" class="elements10">
             <div class="img1 reveal image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/work/work-img1.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/work/dash01.png' %}" alt="">
             </div>
             <div class="img2 reveal image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/work/work-img2.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/work/cyber01.png' %}" alt="">
             </div>
           </div>
         </div>
@@ -327,27 +333,27 @@
   </div>
   <!--===== WORK AREA ENDS =======-->
 
-  <!--===== WORK AREA STARTS =======-->
+  <!--===== PROCESS AREA STARTS =======-->
   <div class="work-others-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
     <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
-    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements49.png' %}" alt="" class="elements1 keyframe5">
     <div class="container">
       <div class="row">
         <div class="col-lg-6 m-auto">
           <div class="work-header heading1 text-center space-margin60">
             <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Como atuamos</h5>
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Tecnologia aplicada para operacoes mais seguras e eficientes</h2>
+            <h2 class="text-anime-style-3">Do diagnóstico à evolução contínua da operação</h2>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!--===== WORK AREA ENDS =======-->
+  <!--===== PROCESS AREA ENDS =======-->
 
   <!--===== CASE AREA STARTS =======-->
   <div class="case1-section-area sp1">
-          <div class="case-works-section-area">
+    <div class="case-works-section-area">
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
@@ -359,17 +365,17 @@
                       <h3>01</h3>
                     </div>
                     <div class="content-area">
-                      <a href="{% url 'institutional:service_details' %}">Consultoria Diagnóstica</a>
+                      <a href="{% url 'institutional:service_details' %}">Diagnóstico</a>
                       <div class="space14"></div>
-                      <p>Consultoria inicial para mapear oportunidades de automação, dados e redução de retrabalho.</p>
+                      <p>Entendemos a rotina, os gargalos e os impactos reais antes de sugerir qualquer solução técnica.</p>
                     </div>
                   </div>
                   <div class="space30"></div>
                   <div class="card-boxarea box2" data-aos="zoom-in" data-aos-duration="900">
                     <div class="content-area">
-                      <a href="{% url 'institutional:service_details' %}">Estratégia de TI sob medida</a>
+                      <a href="{% url 'institutional:service_details' %}">Planejamento</a>
                       <div class="space14"></div>
-                      <p>Estratégias práticas para organizar processos, dados e facilitar a escalabilidade do negócio.</p>
+                      <p>Definimos prioridades, escopo e caminho de implantação com foco em resultado, segurança e viabilidade.</p>
                     </div>
                     <div class="div text-end">
                       <h3>02</h3>
@@ -383,7 +389,7 @@
                     <img src="{% static 'institutional/eitech/img/elements/elements14.png' %}" alt="" class="elements14">
                     <img src="{% static 'institutional/eitech/img/elements/elements15.png' %}" alt="" class="elements15">
                     <div class="img1">
-                      <img src="{% static 'institutional/eitech/img/all-images/case/case-img4.png' %}" alt="">
+                      <img src="{% static 'institutional/eitech/img/all-images/case/case01.png' %}" alt="">
                     </div>
                   </div>
                 </div>
@@ -393,17 +399,17 @@
                       <h3>03</h3>
                     </div>
                     <div class="content-area2">
-                      <a href="{% url 'institutional:service_details' %}">Garantia de Qualidade</a>
+                      <a href="{% url 'institutional:service_details' %}">Execução</a>
                       <div class="space14"></div>
-                      <p>Testes, validação e boas práticas para garantir entregas robustas e confiáveis.</p>
+                      <p>Implementamos com documentação, testes e validação para que a entrega funcione na prática.</p>
                     </div>
                   </div>
                   <div class="space30"></div>
                   <div class="card-boxarea box4" data-aos="zoom-in" data-aos-duration="1000">
                     <div class="content-area2">
-                      <a href="{% url 'institutional:service_details' %}">Suporte e Operação</a>
+                      <a href="{% url 'institutional:service_details' %}">Acompanhamento</a>
                       <div class="space14"></div>
-                      <p>Serviço contínuo de operação e suporte para reduzir tempo de inatividade.</p>
+                      <p>Apoiamos a operação depois da entrega, ajustando processos e evoluindo a solução conforme a necessidade.</p>
                     </div>
                     <div class="div">
                       <h3>04</h3>
@@ -416,13 +422,14 @@
         </div>
       </div>
     </div>
+
     <div class="container">
       <div class="row">
         <div class="col-lg-5">
           <div class="case-header heading2 space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Projetos</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Soluções</h5>
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Nossos Projetos Recentes</h2>
+            <h2 class="text-anime-style-3">Tecnologia aplicada ao dia a dia da operação</h2>
           </div>
         </div>
       </div>
@@ -430,42 +437,42 @@
         <div class="case-slider-widget owl-carousel">
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case02.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Projeto Smart360</p>
+              <p>Smart360</p>
               <div class="space16"></div>
-              <a href="#">Modernização de infraestrutura para operação segura</a>
+              <a href="{% url 'institutional:project_smart360' %}">Plataforma para gestão operacional, manutenção, ativos e dados</a>
               <div class="arrow">
-                <a href="#"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
 
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case03.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Projeto Smart360</p>
+              <p>Sistemas Web</p>
               <div class="space16"></div>
-              <a href="#">Escalonamento de TI para operações sustentáveis</a>
+              <a href="{% url 'institutional:project_sistemas_web_django_python' %}">Sistemas em Django/Python para substituir planilhas e centralizar processos</a>
               <div class="arrow">
-                <a href="#"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_sistemas_web_django_python' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
 
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case04.png' %}" alt="">
             </div>
             <div class="content-area">
-              <p>Projeto Smart360</p>
+              <p>Automação</p>
               <div class="space16"></div>
-              <a href="#">Otimização de TI para processos industriais</a>
+              <a href="{% url 'institutional:project_automacao_industrial_clps' %}">Integração de máquinas, CLPs e dados para melhorar controle e rastreabilidade</a>
               <div class="arrow">
-                <a href="#"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -473,24 +480,25 @@
       </div>
     </div>
   </div>
-  <!--===== CASE AREA ENDS =======-->
 
   <!--===== TESTIMONIAL AREA STARTS =======-->
   <div class="testimonial1-section-area sp1">
     <div class="container">
       <div class="row">
-        <div class="col-lg-5 m-auto">
+        <div class="col-lg-8 m-auto">
           <div class="testimonial-header text-center heading2 space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Depoimentos</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Nossa postura</h5>
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">O que nossos clientes dizem sobre a Smart Control Brasil</h2>
+            <h2 class="text-anime-style-3">Tecnologia com responsabilidade, clareza e foco em resultado</h2>
+            <div class="space16"></div>
+            <p class="text-center">Nossa entrega é guiada por princípios simples: entender antes de propor, documentar antes de escalar e aplicar tecnologia onde ela realmente resolve.</p>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-lg-5">
           <div class="img1 image-anime reveal">
-            <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img1.png' %}" alt="">
+            <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img10.png' %}" alt="Engenharia e operação Smart Control Brasil">
           </div>
         </div>
 
@@ -498,17 +506,11 @@
           <div class="slider-galeria">
             <div class="testimonial-slider-content-area">
               <div class="testimonial-author-area">
-                <ul>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                </ul>
-                <div class="space16"></div>
+                <p class="text-uppercase fw-semibold mb-2" style="font-size: 13px; letter-spacing: 0.06em;">Princípio 1</p>
+                <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>“A proposta da Smart Control Brasil é unir engenharia, dados e IA para criar operações mais organizadas e eficientes.”</p>
+                <p>Diagnóstico vem antes da proposta. Nenhuma solução deve ser vendida sem entender rotina, urgência, impacto e prioridade do cliente.</p>
               </div>
               <div class="space60"></div>
               <div class="testimonial-man-info-area">
@@ -517,9 +519,9 @@
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:team' %}">Cliente Smart Control Brasil</a>
+                    <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico técnico</a>
                     <div class="space12"></div>
-                    <p>Depoimento institucional</p>
+                    <p>Conversa inicial objetiva e sem compromisso.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -528,17 +530,11 @@
 
             <div class="testimonial-slider-content-area">
               <div class="testimonial-author-area">
-                <ul>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                </ul>
-                <div class="space16"></div>
+                <p class="text-uppercase fw-semibold mb-2" style="font-size: 13px; letter-spacing: 0.06em;">Princípio 2</p>
+                <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>“Cada solução nasce de uma visão prática: reduzir retrabalho, aumentar controle e transformar dados em decisão.”</p>
+                <p>Engenharia, software e segurança precisam conversar. Quando a operação depende de tecnologia, soluções isoladas criam falhas, retrabalho e riscos.</p>
               </div>
               <div class="space60"></div>
               <div class="testimonial-man-info-area">
@@ -547,9 +543,9 @@
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:team' %}">Cliente Smart Control Brasil</a>
+                    <a href="{% url 'institutional:services' %}">Conhecer nossas áreas</a>
                     <div class="space12"></div>
-                    <p>Cliente Smart Control Brasil</p>
+                    <p>Atuação integrada para problemas reais.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -558,17 +554,11 @@
 
             <div class="testimonial-slider-content-area">
               <div class="testimonial-author-area">
-                <ul>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                </ul>
-                <div class="space16"></div>
+                <p class="text-uppercase fw-semibold mb-2" style="font-size: 13px; letter-spacing: 0.06em;">Princípio 3</p>
+                <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>“Automação não é só tecnologia; é processo, método e melhoria contínua aplicada ao negócio.”</p>
+                <p>Rastreabilidade protege a operação. Histórico técnico, registros, indicadores e documentação ajudam sua empresa a decidir melhor e corrigir mais rápido.</p>
               </div>
               <div class="space60"></div>
               <div class="testimonial-man-info-area">
@@ -577,9 +567,9 @@
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:team' %}">Cliente Smart Control Brasil</a>
+                    <a href="{% url 'institutional:smart360' %}">Ver Smart360</a>
                     <div class="space12"></div>
-                    <p>Cliente Smart Control Brasil</p>
+                    <p>Gestão com dados, histórico e controle.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -588,17 +578,11 @@
 
             <div class="testimonial-slider-content-area">
               <div class="testimonial-author-area">
-                <ul>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                </ul>
-                <div class="space16"></div>
+                <p class="text-uppercase fw-semibold mb-2" style="font-size: 13px; letter-spacing: 0.06em;">Princípio 4</p>
+                <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>“A proposta da Smart Control Brasil é unir engenharia, dados e IA para criar operações mais organizadas e eficientes.”</p>
+                <p>IA precisa ter função, não apenas impacto visual. Aplicamos inteligência artificial onde ela reduz esforço, melhora análise e gera resultado mensurável.</p>
               </div>
               <div class="space60"></div>
               <div class="testimonial-man-info-area">
@@ -607,39 +591,9 @@
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:team' %}">Cliente Smart Control Brasil</a>
+                    <a href="{% url 'institutional:contact' %}">Alinhar expectativas</a>
                     <div class="space12"></div>
-                    <p>Cliente Smart Control Brasil</p>
-                  </div>
-                </div>
-                <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
-              </div>
-            </div>
-
-            <div class="testimonial-slider-content-area">
-              <div class="testimonial-author-area">
-                <ul>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                  <li><a href=""><i class="fa-solid fa-star"></i></a></li>
-                </ul>
-                <div class="space16"></div>
-                <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
-                <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>“Cada solução nasce de uma visão prática: reduzir retrabalho, aumentar controle e transformar dados em decisão.”</p>
-              </div>
-              <div class="space60"></div>
-              <div class="testimonial-man-info-area">
-                <div class="man-images-text">
-                  <div class="mans-img">
-                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
-                  </div>
-                  <div class="man-text">
-                    <a href="{% url 'institutional:team' %}">Cliente Smart Control Brasil</a>
-                    <div class="space12"></div>
-                    <p>Cliente Smart Control Brasil</p>
+                    <p>Sem promessas vazias. Com método.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -662,47 +616,11 @@
             <div class="testimonial3-sliders-img">
               <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
             </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
-            </div>
-
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
-            </div>
-
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
-            </div>
-            <div class="testimonial3-sliders-img">
-              <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img2.png' %}" alt="">
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!--===== TESTIMONIAL AREA ENDS =======-->
 
   <!--===== TEAM AREA STARTS =======-->
   <div class="team1-section-area sp2">
@@ -710,9 +628,9 @@
       <div class="row">
         <div class="col-lg-5 m-auto">
           <div class="team-header space-margin60 heading2 text-center">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>nossas especialidades</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Especialidades</h5>
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">Equipe multidisciplinar Smart Control Brasil</h2>
+            <h2 class="text-anime-style-3">Competências que conectam técnica, dados e crescimento</h2>
           </div>
         </div>
       </div>
@@ -724,19 +642,20 @@
             </div>
             <div class="content-area">
               <div class="text">
-                    <a href="{% url 'institutional:team' %}">Engenharia e Automação</a>
+                <a href="{% url 'institutional:team' %}">Eng. Confiabilidade e Inteligencia Artificial</a>
                 <div class="space8"></div>
-                <p>Liderança em Cybersecurity</p>
+                <h5>Marcelo Custódio</h5>
+                <p>Manutenção, CLPs, processos técnicos e integração industrial</p>
               </div>
               <div class="icons">
-                <a href="#"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+                <a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
               </div>
             </div>
             <ul>
-              <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-linkedin-in"></i></a></li>
             </ul>
           </div>
         </div>
@@ -747,50 +666,52 @@
               <img src="{% static 'institutional/eitech/img/all-images/team/team-img2.png' %}" alt="">
             </div>
             <div class="content-area">
-                <div class="text">
-                <a href="{% url 'institutional:team' %}">Marketing Digital e Conteúdo</a>
+              <div class="text">
+                <a href="{% url 'institutional:team' %}">Eng. da Computação e Segurança Digital</a>
                 <div class="space8"></div>
-                <p>Sites, vídeos e marketing digital</p>
+                <h5>Gustavo de Oliveira</h5>
+                <p>Sistemas Django/Python, dados, dashboards e automação inteligente</p>
               </div>
               <div class="icons">
-                <a href="#"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+                <a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
               </div>
             </div>
             <ul>
-              <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-linkedin-in"></i></a></li>
             </ul>
           </div>
         </div>
+
         <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
           <div class="team-author-boxarea">
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/team/team-img3.png' %}" alt="">
             </div>
             <div class="content-area">
-                <div class="text">
-                <a href="{% url 'institutional:team' %}">Desenvolvimento e IA</a>
+              <div class="text">
+                <a href="{% url 'institutional:team' %}">Eng. de Softwares e Marketing Digital</a>
                 <div class="space8"></div>
-                <p>Especialista em dados e analytics</p>
+                <h5>Augusto Oliveira</h5>
+                <p>sites, SEO, vídeos e comunicação para gerar confiança</p>
               </div>
               <div class="icons">
-                <a href="#"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+                <a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
               </div>
             </div>
             <ul>
-              <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
-              <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="{% url 'institutional:contact' %}"><i class="fa-brands fa-linkedin-in"></i></a></li>
             </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!--===== TEAM AREA ENDS =======-->
 
   <!--===== BLOG AREA STARTS =======-->
   <div class="vl-blog-1-area sp1">
@@ -798,9 +719,9 @@
       <div class="row">
         <div class="col-lg-4 m-auto">
           <div class="vl-blog-1-section-box heading2 text-center space-margin60">
-            <h5 class="vl-section-subtitle"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>blog smart control brasil</h5>
+            <h5 class="vl-section-subtitle"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Blog</h5>
             <div class="space20"></div>
-            <h2 class="vl-section-title text-anime-style-3">Conteudos sobre IA, automacao, manutencao e cybersecurity</h2>
+            <h2 class="vl-section-title text-anime-style-3">Conteúdo técnico para decisões melhores</h2>
           </div>
         </div>
       </div>
@@ -813,20 +734,21 @@
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Artigo técnico <span> | </span></a></li>
-                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt=""> Equipe Smart Control Brasil</a></li>
+                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Artigo técnico <span> | </span></a></li>
+                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt=""> Equipe Smart Control Brasil</a></li>
                 </ul>
               </div>
               <div class="space20"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_details' %}">Automação, dados e IA para operações mais eficientes</a></h4>
+              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_details' %}">Automação, dados e IA: como aplicar tecnologia sem desperdiçar investimento</a></h4>
               <div class="space16"></div>
-              <p>A Smart Control Brasil ajuda empresas a organizar processos, reduzir retrabalho e aplicar tecnologia de forma prática no dia a dia.</p>
+              <p>Entenda onde a tecnologia realmente gera valor e como definir os primeiros passos com segurança.</p>
               <div class="vl-blog-1-icon">
                 <a href="{% url 'institutional:blog_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
         </div>
+
         <div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
@@ -835,24 +757,25 @@
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Artigo técnico <span> | </span></a></li>
-                                      <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt=""> Equipe Smart Control Brasil</a></li>
+                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Artigo técnico <span> | </span></a></li>
+                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt=""> Equipe Smart Control Brasil</a></li>
                 </ul>
               </div>
               <div class="space20"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_details' %}">Soluções sob medida para empresas em crescimento</a></h4>
+              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_details' %}">Manutenção técnica: quando parar de improvisar e começar a controlar</a></h4>
               <div class="space16"></div>
-              <p>Unimos engenharia, sistemas, dados, IA e segurança digital para criar soluções alinhadas à realidade de cada operação.</p>
+              <p>Veja como histórico, indicadores e rotina preventiva ajudam a reduzir falhas e aumentar a previsibilidade.</p>
               <div class="vl-blog-1-icon">
                 <a href="{% url 'institutional:blog_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
         </div>
+
         <div class="col-lg-12">
           <div class="space18"></div>
           <div class="btn-area1 text-center">
-            <a href="{% url 'institutional:blog' %}" class="vl-btn2">Ler mais conteudos <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="{% url 'institutional:blog' %}" class="vl-btn2">Ver todos os conteúdos <i class="fa-solid fa-arrow-right"></i></a>
           </div>
         </div>
       </div>

@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.conf import settings
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.shortcuts import redirect, render
 
 
 def home(request):
@@ -42,6 +45,84 @@ def service_diagnostico_ia_dados_automacao(request):
 
 
 def contact(request):
+    if request.method == "POST":
+        contact_name = request.POST.get("contact_name", "").strip()
+        company = request.POST.get("company", "").strip()
+        whatsapp = request.POST.get("whatsapp", "").strip()
+        email = request.POST.get("email", "").strip()
+        segment = request.POST.get("segment", "").strip()
+        interest = (
+            request.POST.get("interest", "").strip()
+            or request.POST.get("primary_interest", "").strip()
+        )
+        main_problem = request.POST.get("main_problem", "").strip()
+        message = request.POST.get("message", "").strip()
+
+        if not contact_name or not email or not message:
+            messages.error(request, "Preencha nome, e-mail e mensagem antes de enviar.")
+            return redirect("institutional:contact")
+
+        interest_label_by_value = {
+            "manutencao": "Manutenção e Confiabilidade",
+            "automacao": "Automação Industrial",
+            "smart360": "Smart360",
+            "cybersecurity": "Cybersecurity",
+            "ia": "IA e Automações",
+            "sites": "Sites e Marketing Digital",
+        }
+        interest_display = interest_label_by_value.get(
+            interest, interest or "Não informado"
+        )
+
+        subject_line = (
+            f"Diagnóstico pelo site: {interest_display}"
+            if interest
+            else "Diagnóstico inicial pelo site"
+        )
+
+        body = f"""
+Solicitação de diagnóstico inicial — Smart Control Brasil.
+
+Nome: {contact_name}
+Empresa: {company or "Não informada"}
+WhatsApp: {whatsapp or "Não informado"}
+E-mail: {email}
+Segmento: {segment or "Não informado"}
+Interesse principal: {interest_display}
+
+Principal problema atual:
+{main_problem or "Não informado"}
+
+Mensagem:
+{message}
+""".strip()
+
+        try:
+            send_mail(
+                subject=subject_line,
+                message=body,
+                from_email=getattr(
+                    settings,
+                    "DEFAULT_FROM_EMAIL",
+                    "Smart Control Brasil <contato@smartcontrolbrasil.com.br>",
+                ),
+                recipient_list=[
+                    getattr(settings, "CONTACT_EMAIL", "contato@smartcontrolbrasil.com.br")
+                ],
+                fail_silently=False,
+            )
+            messages.success(
+                request,
+                "Recebemos sua solicitação de diagnóstico. Em breve entraremos em contato.",
+            )
+        except Exception:
+            messages.error(
+                request,
+                "Não foi possível enviar sua mensagem agora. Tente novamente em alguns minutos.",
+            )
+
+        return redirect("institutional:contact")
+
     return render(request, "institutional/eitech/pages/contact.html")
 
 

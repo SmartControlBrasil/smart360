@@ -1,0 +1,15 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="panel-card">
+    <h2>{{ lead.company_name }}</h2>
+    <p>Confirme os dados antes de criar a proposta. Nenhuma proposta é enviada automaticamente ao cliente.</p>
+</section>
+<section class="panel-card">
+    <form method="post" class="stacked-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="quick-action-button" type="submit">Salvar proposta</button>
+        <a class="quick-action-button" href="{% url 'admin-shell:growth-lead-detail' lead.id %}">Cancelar</a>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SMART360{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'smart360/css/auth.css' %}">
+</head>
+<body class="authentication-bg">
+    <main class="auth-fluid">
+        <section class="auth-fluid-form-box">
+            <div class="auth-brand">
+                <a href="/" class="auth-logo" aria-label="SMART360">SMART360</a>
+            </div>
+
+            <div class="auth-content">
+                {% block content %}{% endblock %}
+            </div>
+
+            <footer class="auth-footer">
+                <span>SMART360</span>
+                <span>Engenharia, campo e inteligência operacional.</span>
+            </footer>
+        </section>
+
+        <aside class="auth-fluid-right" aria-label="Contexto SMART360">
+            <div class="auth-testimonial">
+                <span class="auth-kicker">Plataforma técnica</span>
+                <h2>Conteúdos e ferramentas para decisões melhores em campo.</h2>
+                <p>Ar-condicionado, linha branca, obra e manutenção conectados a uma experiência segura de acesso.</p>
+            </div>
+        </aside>
+    </main>
+</body>
+</html>

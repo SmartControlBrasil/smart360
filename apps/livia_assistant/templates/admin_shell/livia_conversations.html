@@ -1,0 +1,7 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="panel-card"><form method="get" class="filter-form"><label>Status</label><select name="status"><option value="">Todos</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="quick-action-button" type="submit">Filtrar</button></form></section>
+<section class="table-card"><table class="data-table"><thead><tr><th>ID</th><th>Status</th><th>Visitante</th><th>Empresa</th><th>Origem</th><th>Mensagens</th><th>Atualizada</th></tr></thead><tbody>
+{% for conversation in conversations %}<tr><td><a href="{% url 'admin-shell:livia-conversation-detail' conversation.id %}">#{{ conversation.id }}</a></td><td>{{ conversation.get_status_display }}</td><td>{{ conversation.visitor_name|default:conversation.session_key }}</td><td>{{ conversation.company_name|default:"-" }}</td><td>{{ conversation.source_page|default:"-" }}</td><td>{{ conversation.message_count }}</td><td>{{ conversation.updated_at|date:"d/m/Y H:i" }}</td></tr>{% empty %}<tr><td colspan="7">Nenhuma conversa encontrada.</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

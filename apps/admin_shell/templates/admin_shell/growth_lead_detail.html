@@ -1,0 +1,46 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="panel-card">
+    <h2>{{ lead.company_name }}</h2>
+    <p>{{ lead.contact_name|default:"Contato não informado" }} • {{ lead.get_status_display }} • Score {{ lead.score }}</p>
+    <form method="post" action="{% url 'admin-shell:growth-lead-action' lead.id 'mark-contacted' %}" style="display:inline">{% csrf_token %}<button class="quick-action-button" type="submit">Marcar como contatado</button></form>
+    {% if proposal %}<a class="quick-action-button" href="{% url 'admin-shell:growth-proposal-detail' proposal.id %}">Ver proposta</a>{% else %}<a class="quick-action-button" href="{% url 'admin-shell:growth-lead-create-proposal' lead.id %}">Criar proposta</a>{% endif %}
+    <form method="post" action="{% url 'admin-shell:growth-lead-action' lead.id 'move-to-proposal' %}" style="display:inline">{% csrf_token %}<button class="quick-action-button" type="submit">Mover para proposta</button></form>
+    <form method="post" action="{% url 'admin-shell:growth-lead-action' lead.id 'mark-converted' %}" style="display:inline">{% csrf_token %}<button class="quick-action-button" type="submit">Marcar como convertido</button></form>
+    <form method="post" action="{% url 'admin-shell:growth-lead-action' lead.id 'mark-lost' %}" style="display:inline">{% csrf_token %}<button class="quick-action-button" type="submit">Marcar como perdido</button></form>
+</section>
+{% if lead.metadata.source == "livia_assistant" %}
+<section class="panel-card">
+    <h2>Origem Lívia</h2>
+    <p>Lead capturado pela assistente virtual e sincronizado com o Growth Engine.</p>
+    {% if lead.metadata.livia_conversation_id %}<a class="quick-action-button" href="{% url 'admin-shell:livia-conversation-detail' lead.metadata.livia_conversation_id %}">Abrir conversa da Lívia</a>{% endif %}
+    <table class="data-table"><tbody>
+        <tr><th>Serviço de interesse</th><td>{{ lead.metadata.service_interest|default:livia_lead.service_interest|default:"-" }}</td></tr>
+        <tr><th>Urgência</th><td>{% if livia_lead %}{{ livia_lead.get_urgency_display }}{% else %}{{ lead.metadata.urgency|default:"-" }}{% endif %}</td></tr>
+        <tr><th>Resumo da captura</th><td>{% if livia_lead %}{{ livia_lead.notes|default:"-" }}{% else %}{{ lead.notes|default:"-" }}{% endif %}</td></tr>
+        <tr><th>Status operacional da Lívia</th><td>{% if livia_lead %}{{ livia_lead.get_operational_status_display }}{% else %}-{% endif %}</td></tr>
+    </tbody></table>
+</section>
+{% endif %}
+<section class="table-card">
+    <table class="data-table"><tbody>
+        <tr><th>Empresa</th><td>{{ lead.company_name }}</td></tr>
+        <tr><th>Nome</th><td>{{ lead.contact_name|default:"-" }}</td></tr>
+        <tr><th>E-mail</th><td>{{ lead.email|default:"-" }}</td></tr>
+        <tr><th>Telefone</th><td>{{ lead.phone|default:"-" }}</td></tr>
+        <tr><th>WhatsApp</th><td>{{ lead.whatsapp|default:"-" }}</td></tr>
+        <tr><th>Cidade</th><td>{{ lead.city|default:"-" }}</td></tr>
+        <tr><th>Origem</th><td>{{ lead.source|default:"-" }}</td></tr>
+        <tr><th>Serviço de interesse</th><td>{{ lead.metadata.service_interest|default:"-" }}</td></tr>
+        <tr><th>Última ação</th><td>{{ lead.metadata.last_action|default:"-" }}</td></tr>
+        <tr><th>Proposta</th><td>{% if proposal %}<a href="{% url 'admin-shell:growth-proposal-detail' proposal.id %}">{{ proposal.proposal_number }}</a>{% else %}-{% endif %}</td></tr>
+        <tr><th>Notas</th><td>{{ lead.notes|default:"-" }}</td></tr>
+    </tbody></table>
+</section>
+<section class="table-card">
+    <div class="panel-card"><h2>Interações</h2></div>
+    <table class="data-table"><thead><tr><th>Tipo</th><th>Canal</th><th>Resumo</th><th>Data</th></tr></thead><tbody>
+        {% for interaction in interactions %}<tr><td>{{ interaction.get_interaction_type_display }}</td><td>{{ interaction.get_channel_display }}</td><td>{{ interaction.summary }}</td><td>{{ interaction.happened_at|date:"d/m/Y H:i" }}</td></tr>{% empty %}<tr><td colspan="4">Nenhuma interação registrada.</td></tr>{% endfor %}
+    </tbody></table>
+</section>
+{% endblock %}

@@ -1,0 +1,108 @@
+/*
+ * Botões fixos institucional — hierarquia: voltar ao topo (baixo) < WhatsApp (acima) < Lívia (esquerda).
+ * Sobrescreve .progress-wrap do tema Eitech (z-index alto por padrão).
+ */
+
+/* --- WhatsApp: canto inferior direito, acima do “voltar ao topo” --- */
+a.whatsapp-floating-button {
+  align-items: center;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border: none;
+  border-radius: 50%;
+  bottom: 96px;
+  box-shadow: 0 12px 32px rgba(18, 140, 126, 0.45);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 28px;
+  height: 56px;
+  justify-content: center;
+  position: fixed;
+  right: 24px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  width: 56px;
+  z-index: 900;
+}
+
+a.whatsapp-floating-button:hover,
+a.whatsapp-floating-button:focus-visible {
+  color: #fff;
+  opacity: 0.94;
+  outline: none;
+  text-decoration: none;
+  transform: scale(1.05);
+}
+
+a.whatsapp-floating-button i {
+  pointer-events: none;
+}
+
+/* --- Voltar ao topo (tema usa .progress-wrap; .back-to-top por compatibilidade) --- */
+.back-to-top,
+.progress-wrap {
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 850 !important;
+}
+
+/* --- Lívia: canto inferior esquerdo, acima dos botões direitos --- */
+.livia-widget.livia-chat-widget,
+.livia-widget[data-livia-widget] {
+  position: fixed !important;
+  left: max(24px, env(safe-area-inset-left)) !important;
+  right: auto !important;
+  bottom: max(24px, env(safe-area-inset-bottom)) !important;
+  top: auto !important;
+  z-index: 950 !important;
+  font-family: inherit;
+}
+
+.livia-chat-toggle {
+  position: relative;
+}
+
+.livia-chat-panel {
+  position: relative;
+}
+
+@media (max-width: 767.98px) {
+  a.whatsapp-floating-button {
+    bottom: 88px;
+    right: max(18px, env(safe-area-inset-right));
+    height: 52px;
+    width: 52px;
+    font-size: 26px;
+  }
+
+  .back-to-top,
+  .progress-wrap {
+    bottom: 20px !important;
+    right: max(14px, env(safe-area-inset-right)) !important;
+    height: 48px !important;
+    width: 48px !important;
+  }
+
+  .progress-wrap::after,
+  .progress-wrap::before {
+    height: 48px !important;
+    width: 48px !important;
+    line-height: 48px !important;
+    font-size: 16px !important;
+  }
+
+  .livia-widget.livia-chat-widget,
+  .livia-widget[data-livia-widget] {
+    left: max(18px, env(safe-area-inset-left)) !important;
+    bottom: max(20px, env(safe-area-inset-bottom)) !important;
+    z-index: 950 !important;
+  }
+
+  /* bolha Lívia um pouco mais compacta em telas estreitas */
+  .livia-chat-toggle {
+    min-height: 42px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+}

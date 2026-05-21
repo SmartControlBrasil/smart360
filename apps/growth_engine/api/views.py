@@ -80,6 +80,13 @@ class LeadViewSet(GrowthBaseViewSet):
     search_fields = ("company_name", "contact_name", "email", "phone", "website")
     ordering_fields = ("score", "created_at", "updated_at")
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        source_origin = self.request.query_params.get("source_origin") or self.request.query_params.get("origin")
+        if source_origin in {"livia", "livia_assistant"}:
+            queryset = queryset.filter(metadata__source="livia_assistant")
+        return queryset
+
     def get_serializer_class(self):
         if self.action in {"create", "update", "partial_update"}:
             return LeadWriteSerializer

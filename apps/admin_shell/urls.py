@@ -1,5 +1,19 @@
 from django.urls import include, path
 
+from apps.growth_engine.dashboard_views import GrowthLeadActionView, GrowthLeadCreateProposalView, GrowthLeadDetailView, GrowthLiviaLeadListView, GrowthProposalDetailView
+from apps.livia_assistant.dashboard_views import (
+    LiviaConversationDetailView,
+    LiviaConversationListView,
+    LiviaDashboardView,
+    LiviaHandoffListView,
+    LiviaKnowledgeCreateView,
+    LiviaKnowledgeListView,
+    LiviaKnowledgeUpdateView,
+    LiviaLeadActionView,
+    LiviaLeadDetailView,
+    LiviaLeadListView,
+)
+
 from .views import (
     AIAgentActionProposalsView,
     AIAgentAnomalyHealthView,
@@ -230,6 +244,21 @@ urlpatterns = [
     path("portal/requests/<slug:protocol_number>/", ClientPortalRequestDetailView.as_view(), name="client-portal-request-detail"),
     path("portal/sites/", ClientPortalSitesView.as_view(), name="client-portal-sites"),
     path("portal/profile/", ClientPortalProfileView.as_view(), name="client-portal-profile"),
+    path("dashboard/growth/leads/livia/", GrowthLiviaLeadListView.as_view(), name="growth-livia-leads"),
+    path("dashboard/growth/leads/<int:lead_id>/", GrowthLeadDetailView.as_view(), name="growth-lead-detail"),
+    path("dashboard/growth/leads/<int:lead_id>/create-proposal/", GrowthLeadCreateProposalView.as_view(), name="growth-lead-create-proposal"),
+    path("dashboard/growth/leads/<int:lead_id>/<slug:action>/", GrowthLeadActionView.as_view(), name="growth-lead-action"),
+    path("dashboard/growth/proposals/<int:proposal_id>/", GrowthProposalDetailView.as_view(), name="growth-proposal-detail"),
+    path("dashboard/livia/", LiviaDashboardView.as_view(), name="livia-dashboard"),
+    path("dashboard/livia/conversations/", LiviaConversationListView.as_view(), name="livia-conversations"),
+    path("dashboard/livia/conversations/<int:conversation_id>/", LiviaConversationDetailView.as_view(), name="livia-conversation-detail"),
+    path("dashboard/livia/leads/", LiviaLeadListView.as_view(), name="livia-leads"),
+    path("dashboard/livia/leads/<int:lead_id>/", LiviaLeadDetailView.as_view(), name="livia-lead-detail"),
+    path("dashboard/livia/leads/<int:lead_id>/<slug:action>/", LiviaLeadActionView.as_view(), name="livia-lead-action"),
+    path("dashboard/livia/handoffs/", LiviaHandoffListView.as_view(), name="livia-handoffs"),
+    path("dashboard/livia/knowledge/", LiviaKnowledgeListView.as_view(), name="livia-knowledge"),
+    path("dashboard/livia/knowledge/new/", LiviaKnowledgeCreateView.as_view(), name="livia-knowledge-new"),
+    path("dashboard/livia/knowledge/<int:knowledge_id>/edit/", LiviaKnowledgeUpdateView.as_view(), name="livia-knowledge-edit"),
     path("app/ai-agents/", AIAgentsDashboardView.as_view(), name="ai-agents-dashboard"),
     path("app/ai-agents/briefings/", AIBriefingListView.as_view(), name="ai-briefings"),
     path("app/ai-agents/briefings/generate/", AIBriefingGenerateView.as_view(), name="ai-briefing-generate"),

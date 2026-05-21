@@ -312,7 +312,7 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                     ],
                 },
                 {"label": "Scheduling Center", "icon": "calendar", "url_name": "admin-shell:module-page", "slug": "configuration-center"},
-                {"label": "CRM Center", "icon": "briefcase", "url_name": "admin-shell:module-page", "slug": "growth-engine"},
+                {"label": "CRM Center", "icon": "briefcase", "children": [{"label": "Dashboard", "icon": "grid", "url_name": "admin-shell:module-page", "slug": "growth-engine", "match_names": ["admin-shell:module-page"]}, {"label": "Leads da Lívia", "icon": "spark", "url_name": "admin-shell:growth-livia-leads", "match_names": ["admin-shell:growth-livia-leads", "admin-shell:growth-lead-detail"]}]},
             ],
         },
         {
@@ -427,7 +427,7 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                         },
                     ],
                 },
-                {"label": "Growth Engine", "icon": "trend", "url_name": "admin-shell:module-page", "slug": "growth-engine"},
+                {"label": "Growth Engine", "icon": "trend", "children": [{"label": "Dashboard", "icon": "grid", "url_name": "admin-shell:module-page", "slug": "growth-engine", "match_names": ["admin-shell:module-page"]}, {"label": "Leads da Lívia", "icon": "spark", "url_name": "admin-shell:growth-livia-leads", "match_names": ["admin-shell:growth-livia-leads", "admin-shell:growth-lead-detail"]}]},
             ],
         },
         {
@@ -450,6 +450,20 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                         "admin-shell:ai-agents-recommendations",
                         "admin-shell:ai-agents-runs",
                         "admin-shell:ai-agents-proposals",
+                    ],
+                    "permission_domain": "ai_agents_admin",
+                    "permission_action": "view",
+                },
+                {
+                    "label": "Lívia Assistente",
+                    "icon": "spark",
+                    "url_name": "admin-shell:livia-dashboard",
+                    "match_names": [
+                        "admin-shell:livia-dashboard",
+                        "admin-shell:livia-conversations",
+                        "admin-shell:livia-conversation-detail",
+                        "admin-shell:livia-leads",
+                        "admin-shell:livia-handoffs",
                     ],
                     "permission_domain": "ai_agents_admin",
                     "permission_action": "view",

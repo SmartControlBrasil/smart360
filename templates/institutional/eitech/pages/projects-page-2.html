@@ -1,6 +1,25 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Projetos — página 2 | Smart Control Brasil{% endblock %}
+{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em cybersecurity, marketing digital, sistemas web Django/Python e inteligência artificial aplicada ao atendimento e à operação.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .project-mini-case p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+  .project-mini-case strong {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
@@ -11,9 +30,11 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
+        <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Projetos</h1>
+            <h1>Projetos e frentes de entrega</h1>
+            <div class="space16"></div>
+            <p class="text-white-50 px-lg-5">Soluções para proteger dados, fortalecer presença digital, organizar sistemas internos e aplicar inteligência artificial de forma prática na operação.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -32,12 +53,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img10.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Cybersecurity para Empresas</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_cybersecurity_empresas' %}">Diagnóstico e boas práticas de segurança digital</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_cybersecurity_empresas' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Cybersecurity para empresas</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Acessos compartilhados, senhas repetidas, ausência de rotina de backup e baixa cultura de segurança podem transformar pequenas falhas em grandes riscos para a operação.</p>
+              <strong>Solução</strong>
+              <p>Mapeamento dos principais pontos de exposição, análise de acessos, dados, dispositivos e rotinas digitais, com priorização de melhorias aplicáveis à realidade da empresa.</p>
+              <strong>Resultado esperado</strong>
+              <p>Menos risco silencioso, mais controle sobre acessos e dados, melhor continuidade operacional e base organizada para evoluir a segurança digital por etapas.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_cybersecurity_empresas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de risco <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -48,12 +76,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img11.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Sites, Marketing e Conteúdo</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_sites_marketing_conteudo' %}">Criação de presença digital e conteúdo</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_sites_marketing_conteudo' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Sites, marketing e conteúdo</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Muitas empresas têm boa execução técnica, mas não conseguem transmitir autoridade, clareza e confiança no site, nas páginas de serviço ou nos canais digitais.</p>
+              <strong>Solução</strong>
+              <p>Estruturação de conteúdo, páginas comerciais, textos institucionais, SEO e comunicação digital alinhada à realidade técnica e ao posicionamento da empresa.</p>
+              <strong>Resultado esperado</strong>
+              <p>Presença digital mais profissional, mensagem mais clara para o cliente, maior confiança na marca e melhor geração de oportunidades comerciais.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_sites_marketing_conteudo' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico do site <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -64,12 +99,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Sistemas Web em Django/Python</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_sistemas_web_django_python' %}">Sistemas sob medida para organização operacional</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_sistemas_web_django_python' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Sistemas web Django/Python</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Quando planilhas, controles manuais e ferramentas genéricas não acompanham mais a complexidade do negócio, a operação perde velocidade, rastreabilidade e segurança.</p>
+              <strong>Solução</strong>
+              <p>Desenvolvimento de sistemas web em Django/Python, com regras de negócio bem definidas, controle de usuários, registros organizados e evolução planejada por etapas.</p>
+              <strong>Resultado esperado</strong>
+              <p>Fluxos mais auditáveis, menos tarefas repetitivas, dados centralizados e possibilidade de integração gradual com dashboards, automação e processos operacionais.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_sistemas_web_django_python' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico do sistema <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -80,12 +122,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>IA Aplicada ao Atendimento e Operação</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Assistentes e fluxos inteligentes para apoiar decisões</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_ia_atendimento_operacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>IA no atendimento e operação</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Equipes gastam tempo com perguntas repetitivas, triagens manuais e busca por informações que deveriam estar organizadas e disponíveis rapidamente.</p>
+              <strong>Solução</strong>
+              <p>Aplicação prática de IA, automações e bases de conhecimento para apoiar atendimento, análise de dados, geração de respostas, relatórios e rotinas operacionais.</p>
+              <strong>Resultado esperado</strong>
+              <p>Menos ruído operacional, respostas mais rápidas, equipe focada em exceções importantes e base mais organizada antes de investir em soluções complexas.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de atendimento <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

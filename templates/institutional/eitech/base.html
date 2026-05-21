@@ -19,6 +19,8 @@
   <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/slick-slider.css' %}">
   <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/nice-select.css' %}">
   <link rel="stylesheet" href="{% static 'institutional/eitech/css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-header.css' %}">
+  <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-float-widgets.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
 <body{% block body_extra %}{% endblock %}>
@@ -29,8 +31,19 @@
 
   {% include 'institutional/eitech/partials/footer.html' %}
 
+  <a class="whatsapp-floating-button" href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20atendimento%20humano." target="_blank" rel="noopener noreferrer" aria-label="Atendimento humano no WhatsApp">
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+  </a>
+
+  {% include "includes/livia_widget.html" %}
+
   <script src="{% static 'institutional/eitech/js/plugins/jquery-3-7-1.min.js' %}"></script>
   {% include 'institutional/eitech/partials/scripts.html' %}
   {% block extra_js %}{% endblock %}
+  <script type="module">
+    import BubbleChat from "https://agent-factory-chat.hostgator.io/scripts/start-chat.js";
+    const hashId = "13d80814-dbe6-4c84-9764-4d57b34fea14";
+    const bubbleChat = new BubbleChat(hashId, "prod");
+  </script>
 </body>
 </html>

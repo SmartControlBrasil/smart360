@@ -1,5 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import AuthenticationForm, ReadOnlyPasswordHashField
+from django.utils.translation import gettext_lazy as _
 
 from .models import User
 
@@ -47,3 +48,40 @@ class UserChangeForm(forms.ModelForm):
             "is_superuser",
             "is_verified",
         )
+
+
+class Smart360AuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+        label="E-mail ou usuário",
+        widget=forms.TextInput(
+            attrs={
+                "autofocus": True,
+                "autocomplete": "username",
+                "class": "auth-input",
+                "placeholder": "seuemail@empresa.com",
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="Senha",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "current-password",
+                "class": "auth-input",
+                "placeholder": "Digite sua senha",
+            }
+        ),
+    )
+    remember_me = forms.BooleanField(
+        label="Lembrar-me",
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "auth-checkbox"}),
+    )
+
+    error_messages = {
+        "invalid_login": _(
+            "Não foi possível entrar com essas credenciais. Confira os dados e tente novamente."
+        ),
+        "inactive": _("Esta conta está inativa. Fale com o suporte do SMART360."),
+    }

@@ -39,6 +39,8 @@ def env(key: str, default=None, cast=str):
         return str(raw).lower() in {"1", "true", "yes", "on"}
     if cast is int:
         return int(raw)
+    if cast is float:
+        return float(raw)
     if cast is list:
         return [item.strip() for item in str(raw).split(",") if item.strip()]
     return raw
@@ -69,6 +71,11 @@ def sqlite_database_config():
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="change-me-in-production")
 DEBUG = env("DJANGO_DEBUG", default="False", cast=bool)
+LIVIA_ASSISTANT_ENABLED = env("LIVIA_ASSISTANT_ENABLED", default="False", cast=bool)
+LIVIA_AI_PROVIDER = env("LIVIA_AI_PROVIDER", default="fallback")
+LIVIA_AI_MODEL = env("LIVIA_AI_MODEL", default="gpt-4o-mini")
+LIVIA_AI_TEMPERATURE = env("LIVIA_AI_TEMPERATURE", default="0.4", cast=float)
+LIVIA_AI_MAX_TOKENS = env("LIVIA_AI_MAX_TOKENS", default="500", cast=int)
 ENVIRONMENT = env("DJANGO_ENV", default="development")
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=list)
 CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS", default="", cast=list)
@@ -92,6 +99,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.institutional.apps.InstitutionalConfig",
+    "apps.livia_assistant.apps.LiviaAssistantConfig",
     "apps.users.apps.UsersConfig",
     "apps.companies.apps.CompaniesConfig",
     "apps.roles.apps.RolesConfig",
@@ -158,6 +166,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.livia_assistant.context_processors.livia_assistant",
             ],
         },
     },
@@ -194,6 +203,9 @@ APP_DOMAIN = env("SMART360_APP_DOMAIN", default="localhost")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/ecossistema/"
+LOGOUT_REDIRECT_URL = "/login/"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "config.schema.Smart360AutoSchema",
@@ -265,6 +277,7 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = env("EMAIL_USE_TLS", default="False", cast=bool)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@smart360.local")
+CONTACT_EMAIL = env("CONTACT_EMAIL", default="contato@smartcontrolbrasil.com.br")
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = env("DJANGO_USE_X_FORWARDED_HOST", default="False", cast=bool)

@@ -1,0 +1,4 @@
+{# Widget independente do botão WhatsApp; ativado só com LIVIA_ASSISTANT_ENABLED no .env / settings #}
+{% if livia_assistant_enabled %}
+  {% include "livia_assistant/chat_widget.html" %}
+{% endif %}

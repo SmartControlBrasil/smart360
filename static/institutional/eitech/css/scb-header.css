@@ -1,0 +1,91 @@
+/* Header público — CTA compacto + login alinhado ao menu (Smart Control Brasil) */
+
+.header-btn-area {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+/* CTA principal — menor que o vl-btn1 padrão do tema */
+.header-btn-area .vl-btn1 {
+  border-radius: 12px;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  padding: 14px 22px;
+  white-space: nowrap;
+}
+
+.header-btn-area .vl-btn1::after {
+  border-radius: 12px;
+}
+
+.header-btn-area .vl-btn1 i {
+  font-size: 14px;
+}
+
+/*
+ * Login / Painel — mesma cor e contraste dos links do menu (.vl-main-menu > li > a)
+ * Sticky: main.js adiciona .header-sticky em #vl-header-sticky (scroll >= 100px)
+ * Fundo sticky escuro: .homepage1-body .header-sticky .row-bg3 { background: var(--ztc-bg-bg-2) }
+ */
+.homepage1-body .header-login-link {
+  background: transparent;
+  border: none;
+  color: var(--ztc-text-text-1, #ffffff) !important;
+  flex-shrink: 0;
+  font-family: var(--ztc-family-font1);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 0;
+  text-decoration: none;
+  transition: opacity 0.25s ease, color 0.25s ease;
+  white-space: nowrap;
+}
+
+.homepage1-body .header-login-link:hover,
+.homepage1-body .header-login-link:focus-visible {
+  color: var(--ztc-text-text-1, #ffffff) !important;
+  opacity: 0.75;
+  outline: none;
+  text-decoration: none;
+}
+
+/* Topo transparente, sticky e scroll — sempre legível sobre fundo escuro */
+.homepage1-body #vl-header-sticky.header-sticky .header-login-link,
+.homepage1-body .vl-header-area.header-sticky .header-login-link,
+.homepage1-body .header-sticky .header-login-link {
+  color: var(--ztc-text-text-1, #ffffff) !important;
+}
+
+.homepage1-body #vl-header-sticky.header-sticky .header-login-link:hover,
+.homepage1-body #vl-header-sticky.header-sticky .header-login-link:focus-visible,
+.homepage1-body .vl-header-area.header-sticky .header-login-link:hover,
+.homepage1-body .vl-header-area.header-sticky .header-login-link:focus-visible,
+.homepage1-body .header-sticky .header-login-link:hover,
+.homepage1-body .header-sticky .header-login-link:focus-visible {
+  color: var(--ztc-text-text-1, #ffffff) !important;
+  opacity: 0.75;
+}
+
+/* Mobile: login como item normal do menu */
+.vl-offcanvas-menu .header-mobile-login > a {
+  font-weight: 600;
+}
+
+@media (max-width: 991.98px) {
+  .homepage1-body .row-bg3 {
+    align-items: center;
+  }
+
+  .vl-header-action-item {
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

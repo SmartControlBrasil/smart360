@@ -1,0 +1,11 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="panel-card">
+    <form method="post" class="stacked-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="quick-action-button" type="submit">{{ submit_label }}</button>
+        <a class="quick-action-button" href="{% url 'admin-shell:livia-knowledge' %}">Cancelar</a>
+    </form>
+</section>
+{% endblock %}

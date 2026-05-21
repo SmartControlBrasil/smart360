@@ -1,6 +1,25 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Projetos e soluções operacionais | Smart Control Brasil{% endblock %}
+{% block meta_description %}Conheça as frentes de solução da Smart Control Brasil: Smart360, automação industrial, manutenção, sistemas web, dashboards, IA aplicada, dados e cybersecurity para empresas.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .project-mini-case p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+  .project-mini-case strong {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
@@ -11,9 +30,11 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
+        <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Projetos</h1>
+            <h1>Projetos e frentes de entrega</h1>
+            <div class="space16"></div>
+            <p class="text-white-50 px-lg-5">Conheça algumas linhas de solução da Smart Control Brasil. Cada projeto parte de um problema real da operação e evolui com diagnóstico, planejamento técnico e implantação responsável.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -32,12 +53,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt="">
             </div>
-            <div class="content-area">
+            <div class="content-area project-mini-case">
               <p>Smart360</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_smart360' %}">Plataforma em desenvolvimento para gestão operacional e IA</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Ordens de serviço espalhadas em WhatsApp, planilhas e controles manuais dificultam o acompanhamento, escondem falhas e fazem a empresa perder histórico técnico.</p>
+              <strong>Solução</strong>
+              <p>Plataforma modular para centralizar clientes, ativos, serviços, documentos, equipes e indicadores em uma base única de gestão operacional.</p>
+              <strong>Resultado esperado</strong>
+              <p>Mais rastreabilidade, menos retrabalho, melhor controle das equipes e uma base organizada para evoluir com dashboards, automação e inteligência artificial.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_smart360' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Diagnosticar sua operação <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -48,12 +76,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Diagnóstico de IA, Dados e Automação</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}">Análise prática para identificar oportunidades de automação</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Diagnóstico de IA, dados e automação</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Muitas empresas querem usar inteligência artificial, mas ainda não possuem processos organizados, dados confiáveis ou clareza sobre onde a tecnologia pode gerar retorno.</p>
+              <strong>Solução</strong>
+              <p>Mapeamento de processos, dados, gargalos e oportunidades para identificar automações simples, ganhos rápidos e aplicações de IA com impacto real.</p>
+              <strong>Resultado esperado</strong>
+              <p>Um plano prático de evolução, com prioridades claras, expectativas alinhadas e investimento direcionado para onde a tecnologia realmente faz sentido.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -63,12 +98,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img3.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Automação Industrial e CLPs</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_automacao_industrial_clps' %}">Projetos e integração para operação industrial</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Automação industrial e CLPs</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Máquinas com etapas manuais, falhas recorrentes, baixa rastreabilidade e integração limitada dificultam a produtividade e a confiabilidade dos dados da produção.</p>
+              <strong>Solução</strong>
+              <p>Projetos, melhorias ou retrofit com foco em lógica de controle, segurança operacional, integração de CLPs e coleta de dados para supervisão e gestão.</p>
+              <strong>Resultado esperado</strong>
+              <p>Mais repetibilidade, menos erro manual, melhor controle do processo e informações mais confiáveis para indicadores técnicos e gerenciais.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_automacao_industrial_clps' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico da planta <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -79,12 +121,19 @@
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case-img9.png' %}" alt="">
             </div>
-            <div class="content-area">
-              <p>Manutenção e Confiabilidade</p>
-              <div class="space16"></div>
-              <a href="{% url 'institutional:project_manutencao_confiabilidade' %}">Estratégias de manutenção e TPM</a>
-              <div class="arrow">
-                <a href="{% url 'institutional:project_manutencao_confiabilidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            <div class="content-area project-mini-case">
+              <p>Manutenção e confiabilidade</p>
+              <div class="space12"></div>
+              <strong>Problema</strong>
+              <p>Manutenção reativa, planos preventivos pouco acompanhados, falhas sem causa raiz e histórico técnico incompleto dificultam a redução de paradas.</p>
+              <strong>Solução</strong>
+              <p>Estruturação de ordens de manutenção, registros técnicos, indicadores, rotinas preventivas e análise de falhas de acordo com a realidade da operação.</p>
+              <strong>Resultado esperado</strong>
+              <p>Prioridades mais claras, histórico confiável dos ativos, redução de improvisos e uma base técnica para evoluir a confiabilidade de forma contínua.</p>
+              <div class="space14"></div>
+              <div class="d-flex flex-wrap gap-3 align-items-center">
+                <a href="{% url 'institutional:project_manutencao_confiabilidade' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Diagnosticar manutenção <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Portal Técnico Smart360{% endblock %}</title>
+    <style>
+        :root {
+            --portal-bg: #f4f7fb;
+            --portal-surface: #ffffff;
+            --portal-ink: #1d2939;
+            --portal-muted: #667085;
+            --portal-line: #d8e0ea;
+            --portal-primary: #2858d8;
+            --portal-primary-soft: #e9efff;
+            --portal-accent: #069668;
+            --portal-warning: #9a6700;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--portal-ink); background: var(--portal-bg); }
+        a { color: inherit; }
+        .portal-shell { min-height: 100vh; display: flex; flex-direction: column; }
+        .portal-topbar { border-bottom: 1px solid var(--portal-line); background: rgba(255, 255, 255, 0.94); }
+        .portal-topbar-inner, .portal-main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+        .portal-topbar-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 0; }
+        .portal-brand { font-size: 20px; font-weight: 800; letter-spacing: 0; text-decoration: none; }
+        .portal-nav { display: flex; align-items: center; gap: 16px; color: var(--portal-muted); font-size: 14px; }
+        .portal-nav a { text-decoration: none; font-weight: 700; }
+        .portal-main { padding: 54px 0 64px; }
+        .portal-hero { max-width: 860px; margin-bottom: 30px; }
+        .portal-kicker { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 7px 11px; border-radius: 999px; color: var(--portal-primary); background: var(--portal-primary-soft); font-size: 13px; font-weight: 800; }
+        h1 { margin: 0 0 14px; font-size: 42px; line-height: 1.12; letter-spacing: 0; }
+        .portal-subtitle { margin: 0; color: var(--portal-muted); font-size: 18px; line-height: 1.65; }
+        .portal-search { display: flex; gap: 10px; max-width: 760px; margin: 26px 0 0; }
+        .portal-search input { flex: 1; min-width: 0; height: 48px; border: 1px solid var(--portal-line); border-radius: 7px; padding: 0 14px; font: inherit; background: #fff; }
+        .portal-search input:focus { border-color: var(--portal-primary); box-shadow: 0 0 0 3px rgba(40, 88, 216, 0.14); outline: none; }
+        .portal-button { min-height: 48px; border: 0; border-radius: 7px; padding: 0 18px; background: var(--portal-primary); color: #fff; font: inherit; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .portal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+        .portal-card, .portal-panel, .portal-result { padding: 24px; border: 1px solid var(--portal-line); border-radius: 8px; background: var(--portal-surface); box-shadow: 0 12px 32px rgba(16, 24, 40, 0.05); }
+        .portal-card { min-height: 210px; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; }
+        .portal-card h2, .portal-panel h2, .portal-result h2 { margin: 0 0 10px; font-size: 20px; letter-spacing: 0; }
+        .portal-card p, .portal-panel p, .portal-result p { margin: 0; color: var(--portal-muted); line-height: 1.55; }
+        .portal-card-meta { margin-top: 22px; color: var(--portal-primary); font-size: 13px; font-weight: 800; }
+        .portal-next { margin-top: 28px; border-color: rgba(6, 150, 104, 0.22); background: #f0fdf7; }
+        .portal-next h2 { color: #075e49; }
+        .portal-next p { color: #26705a; }
+        .portal-stack { display: grid; gap: 16px; }
+        .portal-section-title { margin: 34px 0 16px; font-size: 24px; letter-spacing: 0; }
+        .portal-tag { display: inline-flex; margin-bottom: 10px; padding: 5px 9px; border-radius: 999px; background: #f2f4f7; color: var(--portal-muted); font-size: 12px; font-weight: 800; }
+        .portal-empty { padding: 24px; border: 1px dashed var(--portal-line); border-radius: 8px; color: var(--portal-muted); background: rgba(255, 255, 255, 0.56); }
+        .portal-warning { margin-top: 12px; color: var(--portal-warning); font-weight: 700; }
+        @media (max-width: 900px) { .portal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } h1 { font-size: 34px; } }
+        @media (max-width: 620px) { .portal-topbar-inner { align-items: flex-start; flex-direction: column; } .portal-nav { align-items: flex-start; flex-direction: column; gap: 6px; } .portal-main { padding-top: 36px; } .portal-grid { grid-template-columns: 1fr; } .portal-search { flex-direction: column; } h1 { font-size: 30px; } }
+    </style>
+</head>
+<body>
+    <div class="portal-shell">
+        <header class="portal-topbar">
+            <div class="portal-topbar-inner">
+                <a class="portal-brand" href="{% url 'technical_portal:home' %}">SMART360</a>
+                <nav class="portal-nav" aria-label="Portal Técnico">
+                    <a href="{% url 'technical_portal:home' %}">Portal Técnico</a>
+                    <span>Acesso técnico{% if request.user.is_authenticated %} · {{ request.user.email }}{% endif %}</span>
+                </nav>
+            </div>
+        </header>
+        <main class="portal-main">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

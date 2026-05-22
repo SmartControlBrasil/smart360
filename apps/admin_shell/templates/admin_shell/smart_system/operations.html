@@ -1,8 +1,43 @@
 {% extends "admin_shell/base.html" %}
+{% load static %}
 
 {% block shell_content %}
 <section class="smart-system-page smart-system-page--operations">
     {% include "admin_shell/smart_system/_kpi_cards.html" with kpis=operation_kpis %}
+
+    {{ operations_chart_data|json_script:"smart-system-operations-chart-data" }}
+    <section class="smart-operations-chart-grid" aria-label="Indicadores gráficos da operação">
+        <article class="smart-chart-card">
+            <header class="smart-chart-card-header">
+                <div>
+                    <h2>OS por status</h2>
+                    <p>Distribuição atual da fila operacional.</p>
+                </div>
+                <span>Placeholder</span>
+            </header>
+            <div id="smart-operation-status-chart" class="smart-apex-chart" role="img" aria-label="Gráfico OS por status"></div>
+        </article>
+        <article class="smart-chart-card">
+            <header class="smart-chart-card-header">
+                <div>
+                    <h2>Preventiva x Corretiva</h2>
+                    <p>Mix de natureza das ordens no período.</p>
+                </div>
+                <span>Placeholder</span>
+            </header>
+            <div id="smart-operation-mix-chart" class="smart-apex-chart" role="img" aria-label="Gráfico Preventiva x Corretiva"></div>
+        </article>
+        <article class="smart-chart-card smart-chart-card--wide">
+            <header class="smart-chart-card-header">
+                <div>
+                    <h2>Backlog da semana</h2>
+                    <p>Evolução diária de pendências abertas.</p>
+                </div>
+                <span>Placeholder</span>
+            </header>
+            <div id="smart-operation-backlog-chart" class="smart-apex-chart" role="img" aria-label="Gráfico Backlog da semana"></div>
+        </article>
+    </section>
 
     <div class="smart-two-column">
         <div class="smart-main-column">
@@ -15,4 +50,10 @@
         </aside>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+    {{ block.super }}
+    <script src="{% static 'smart360/vendor/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'smart360/js/smart-system-operations-charts.js' %}"></script>
 {% endblock %}

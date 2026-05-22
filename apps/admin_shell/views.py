@@ -2924,6 +2924,21 @@ class SmartSystemOperationsView(ShellContextMixin, TemplateView):
             {"label": "Smart System", "url": "admin-shell:module-page", "route_kwargs": {"module_slug": "smart-system"}},
             {"label": "Operacao", "url": None},
         ]
+        # TODO: trocar placeholders por métricas reais agregadas do Smart System.
+        context["operations_chart_data"] = {
+            "status": {
+                "labels": ["Em andamento", "Programada", "Aguardando peça", "Sem responsável"],
+                "series": [18, 12, 7, 4],
+            },
+            "maintenanceMix": {
+                "labels": ["Preventivas", "Corretivas"],
+                "series": [28, 15],
+            },
+            "weeklyBacklog": {
+                "labels": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+                "series": [34, 31, 29, 26, 24, 21, 19],
+            },
+        }
         context["current_module_slug"] = "smart-system"
         return context
 

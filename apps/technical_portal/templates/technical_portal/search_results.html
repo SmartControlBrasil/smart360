@@ -1,0 +1,42 @@
+{% extends "technical_portal/base.html" %}
+
+{% block title %}Busca técnica | Portal Técnico Smart360{% endblock %}
+
+{% block content %}
+<section class="portal-hero">
+    <span class="portal-kicker">Busca técnica</span>
+    <h1>Resultados de busca</h1>
+    <p class="portal-subtitle">{% if query %}{{ result_count }} resultado(s) para “{{ query }}”.{% else %}Digite um termo para buscar artigos e códigos de erro.{% endif %}</p>
+    <form class="portal-search" action="{% url 'technical_portal:search' %}" method="get">
+        <input type="search" name="q" value="{{ query }}" placeholder="Buscar por compressor, código, modelo, sintoma..." aria-label="Buscar no Portal Técnico">
+        <button class="portal-button" type="submit">Buscar</button>
+    </form>
+</section>
+
+<h2 class="portal-section-title">Artigos</h2>
+<section class="portal-stack" aria-label="Artigos encontrados">
+    {% for article in articles %}
+        <article class="portal-result">
+            <span class="portal-tag">{{ article.category.name }} · {{ article.get_difficulty_display }}</span>
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.summary }}</p>
+        </article>
+    {% empty %}
+        <div class="portal-empty">Nenhum artigo encontrado.</div>
+    {% endfor %}
+</section>
+
+<h2 class="portal-section-title">Códigos de erro</h2>
+<section class="portal-stack" aria-label="Códigos de erro encontrados">
+    {% for error_code in error_codes %}
+        <article class="portal-result">
+            <span class="portal-tag">{{ error_code.category.name }} · {{ error_code.equipment_type }}</span>
+            <h2>{{ error_code.code }} - {{ error_code.title }}</h2>
+            <p>{{ error_code.probable_cause }}</p>
+            {% if error_code.safety_warning %}<p class="portal-warning">{{ error_code.safety_warning }}</p>{% endif %}
+        </article>
+    {% empty %}
+        <div class="portal-empty">Nenhum código de erro encontrado.</div>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "technical_portal/base.html" %}
+
+{% block title %}{{ category.name }} | Portal Técnico Smart360{% endblock %}
+
+{% block content %}
+<section class="portal-hero">
+    <span class="portal-kicker">Categoria técnica</span>
+    <h1>{{ category.name }}</h1>
+    <p class="portal-subtitle">{{ category.description }}</p>
+    <form class="portal-search" action="{% url 'technical_portal:search' %}" method="get">
+        <input type="search" name="q" placeholder="Buscar nesta base técnica..." aria-label="Buscar no Portal Técnico">
+        <button class="portal-button" type="submit">Buscar</button>
+    </form>
+</section>
+
+<h2 class="portal-section-title">Artigos técnicos</h2>
+<section class="portal-stack" aria-label="Artigos da categoria">
+    {% for article in articles %}
+        <article class="portal-result">
+            <span class="portal-tag">{{ article.get_difficulty_display }}</span>
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.summary }}</p>
+        </article>
+    {% empty %}
+        <div class="portal-empty">Nenhum artigo ativo nesta categoria.</div>
+    {% endfor %}
+</section>
+
+<h2 class="portal-section-title">Códigos de erro</h2>
+<section class="portal-stack" aria-label="Códigos de erro da categoria">
+    {% for error_code in error_codes %}
+        <article class="portal-result">
+            <span class="portal-tag">{{ error_code.equipment_type }}{% if error_code.brand %} · {{ error_code.brand }}{% endif %}{% if error_code.model %} · {{ error_code.model }}{% endif %}</span>
+            <h2>{{ error_code.code }} - {{ error_code.title }}</h2>
+            <p>{{ error_code.probable_cause }}</p>
+            <p>{{ error_code.recommended_action }}</p>
+            {% if error_code.safety_warning %}<p class="portal-warning">{{ error_code.safety_warning }}</p>{% endif %}
+            {% if error_code.source_note %}<p>{{ error_code.source_note }}</p>{% endif %}
+        </article>
+    {% empty %}
+        <div class="portal-empty">Nenhum código de erro ativo nesta categoria.</div>
+    {% endfor %}
+</section>
+{% endblock %}

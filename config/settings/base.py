@@ -112,6 +112,7 @@ LOCAL_APPS = [
     "apps.marketplace_technicians.apps.MarketplaceTechniciansConfig",
     "apps.marketplace_analytical.apps.MarketplaceAnalyticalConfig",
     "apps.knowledge_engine.apps.KnowledgeEngineConfig",
+    "apps.technical_portal.apps.TechnicalPortalConfig",
     "apps.analytics_platform.apps.AnalyticsPlatformConfig",
     "apps.integration_bus.apps.IntegrationBusConfig",
     "apps.billing.apps.BillingConfig",

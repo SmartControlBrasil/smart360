@@ -726,6 +726,62 @@ img, svg, video, canvas { max-width: 100%; }
     min-width: 0;
 }
 
+.smart-operations-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: var(--space-5);
+    margin: var(--space-5) 0;
+    min-width: 0;
+}
+
+.smart-chart-card {
+    min-width: 0;
+    min-height: 340px;
+    border-radius: var(--shell-radius-lg);
+    border: 1px solid var(--shell-border);
+    background: var(--shell-surface);
+    padding: var(--space-5);
+}
+
+.smart-chart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+}
+
+.smart-chart-card-header h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    letter-spacing: 0;
+}
+
+.smart-chart-card-header p {
+    margin: 0;
+    color: var(--shell-muted);
+    line-height: 1.45;
+}
+
+.smart-chart-card-header span {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    border: 1px solid var(--shell-border);
+    padding: 0.28rem 0.55rem;
+    color: var(--shell-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.smart-apex-chart {
+    min-height: 285px;
+}
+
+.smart-apex-chart .apexcharts-tooltip,
+.smart-apex-chart .apexcharts-legend-text {
+    font-family: inherit !important;
+}
+
 .smart-section-card {
     min-width: 0;
     border-radius: var(--shell-radius-lg);
@@ -3170,6 +3226,14 @@ body.sidebar-collapsed .nav-link { justify-content: center; }
         grid-template-columns: repeat(2, minmax(220px, 1fr));
     }
 
+    .smart-operations-chart-grid {
+        grid-template-columns: repeat(2, minmax(300px, 1fr));
+    }
+
+    .smart-chart-card--wide {
+        grid-column: 1 / -1;
+    }
+
     .smart-two-column,
     .smart-content-grid {
         grid-template-columns: 1fr;
@@ -3204,7 +3268,8 @@ body.sidebar-collapsed .nav-link { justify-content: center; }
 
 @media (max-width: 720px) {
     .shell-content { padding: 1.1rem; }
-    .stats-grid, .shortcut-grid, .module-canvas, .smart-filter-bar, .maintenance-kpi-grid, .health-distribution, .headline-metrics, .mini-summary-grid, .action-shortcut-grid, .dual-stat-grid, .asset-filter-form, .asset-kpi-grid, .asset-summary-grid, .technical-grid, .detail-grid, .checklist-item-detail-grid, .billing-plan-grid.is-full, .marketplace-card-grid { grid-template-columns: 1fr; }
+    .stats-grid, .shortcut-grid, .module-canvas, .smart-filter-bar, .smart-operations-chart-grid, .maintenance-kpi-grid, .health-distribution, .headline-metrics, .mini-summary-grid, .action-shortcut-grid, .dual-stat-grid, .asset-filter-form, .asset-kpi-grid, .asset-summary-grid, .technical-grid, .detail-grid, .checklist-item-detail-grid, .billing-plan-grid.is-full, .marketplace-card-grid { grid-template-columns: 1fr; }
+    .smart-chart-card--wide { grid-column: auto; }
     .health-row { grid-template-columns: 1fr; }
     .page-header { flex-direction: column; gap: var(--space-4); }
     .page-actions { justify-content: flex-start; width: 100%; }

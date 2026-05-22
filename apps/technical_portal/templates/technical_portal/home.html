@@ -1,0 +1,34 @@
+{% extends "technical_portal/base.html" %}
+
+{% block title %}Portal Técnico Smart360{% endblock %}
+
+{% block content %}
+<section class="portal-hero">
+    <span class="portal-kicker">Portal Técnico</span>
+    <h1>Portal Técnico Smart360</h1>
+    <p class="portal-subtitle">Consulte informações técnicas, códigos de erro e orientações práticas para manutenção, engenharia e obra.</p>
+    <form class="portal-search" action="{% url 'technical_portal:search' %}" method="get">
+        <input type="search" name="q" placeholder="Buscar por compressor, código, modelo, sintoma..." aria-label="Buscar no Portal Técnico">
+        <button class="portal-button" type="submit">Buscar</button>
+    </form>
+</section>
+
+<section class="portal-grid" aria-label="Categorias técnicas">
+    {% for category in categories %}
+        <a class="portal-card" href="{% url 'technical_portal:category-detail' category.slug %}">
+            <div>
+                <h2>{{ category.name }}</h2>
+                <p>{{ category.description }}</p>
+            </div>
+            <span class="portal-card-meta">Ver categoria</span>
+        </a>
+    {% empty %}
+        <div class="portal-empty">Nenhuma categoria ativa cadastrada ainda.</div>
+    {% endfor %}
+</section>
+
+<section class="portal-panel portal-next">
+    <h2>Próximo passo</h2>
+    <p>Em breve este portal terá busca técnica, base de conhecimento e assistentes por especialidade.</p>
+</section>
+{% endblock %}

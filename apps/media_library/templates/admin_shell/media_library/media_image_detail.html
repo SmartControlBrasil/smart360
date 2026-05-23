@@ -1,0 +1,62 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<div class="content-grid media-library-detail-grid">
+    <section class="widget-card ml-detail-preview-card">
+        <div class="widget-card-header">
+            <h2>Pré-visualização</h2>
+            <p>Arquivo enviado para a biblioteca.</p>
+        </div>
+        <div class="widget-card-body ml-detail-preview-body">
+            {% if asset.image %}
+            <img src="{{ asset.image.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-detail-large-img" loading="lazy">
+            {% else %}
+            <p class="shell-text-muted">Sem arquivo de imagem.</p>
+            {% endif %}
+        </div>
+    </section>
+    <section class="widget-card">
+        <div class="widget-card-header">
+            <h2>Informações</h2>
+            <p>Metadados técnicos e cadastro.</p>
+        </div>
+        <div class="widget-card-body ml-detail-dl">
+            <dl class="detail-list">
+                <div class="detail-list-row"><span>Título</span><strong>{{ asset.title }}</strong></div>
+                <div class="detail-list-row"><span>Texto alternativo</span><strong>{{ asset.alt_text|default:"—" }}</strong></div>
+                <div class="detail-list-row"><span>URL pública</span>
+                    <strong>
+                        {% if absolute_image_url %}
+                        <a href="{{ absolute_image_url }}" target="_blank" rel="noopener noreferrer">{{ absolute_image_url }}</a>
+                        {% else %}—{% endif %}
+                    </strong>
+                </div>
+                <div class="detail-list-row"><span>MIME</span><strong>{{ asset.mime_type|default:"—" }}</strong></div>
+                <div class="detail-list-row"><span>Tamanho</span><strong>{{ formatted_size }}</strong></div>
+                <div class="detail-list-row"><span>Dimensões</span><strong>{{ asset.width|default:"?" }} × {{ asset.height|default:"?" }} px</strong></div>
+                <div class="detail-list-row"><span>Enviado por</span><strong>{% if asset.uploaded_by %}{{ asset.uploaded_by.display_name|default:asset.uploaded_by.full_name|default:asset.uploaded_by.email }}{% else %}—{% endif %}</strong></div>
+                <div class="detail-list-row"><span>Criado em</span><strong>{{ asset.created_at|date:"d/m/Y H:i" }}</strong></div>
+                <div class="detail-list-row"><span>Atualizado em</span><strong>{{ asset.updated_at|date:"d/m/Y H:i" }}</strong></div>
+                <div class="detail-list-row"><span>Status</span><strong>{% if asset.is_active %}<span class="status-badge status-emerald">Ativa</span>{% else %}<span class="status-badge status-slate">Inativa</span>{% endif %}</strong></div>
+            </dl>
+            {% if asset.metadata %}
+            <div class="ml-metadata-block">
+                <h3 class="ml-subheading">Metadata (JSON)</h3>
+                <pre class="ml-json-preview" aria-readonly="true">{{ metadata_json }}</pre>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+{% if asset.is_active and deactivate_action %}
+<section class="widget-card ml-danger-zone">
+    <div class="widget-card-header">
+        <h2>Gestão</h2>
+        <p>Desativar remove a imagem da listagem padrão (não apaga o arquivo).</p>
+    </div>
+    <div class="widget-card-body">
+        {% include "admin_shell/components/quick_action_button.html" with action=deactivate_action %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

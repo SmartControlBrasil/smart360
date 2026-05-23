@@ -431,6 +431,25 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
             ],
         },
         {
+            "label": "Conteúdo",
+            "items": [
+                {
+                    "label": "Biblioteca de Imagens",
+                    "icon": "layout",
+                    "url_name": "admin-shell:media-image-list",
+                    "match_names": [
+                        "admin-shell:media-image-list",
+                        "admin-shell:media-image-upload",
+                        "admin-shell:media-image-detail",
+                        "admin-shell:media-image-edit",
+                        "admin-shell:media-image-deactivate",
+                    ],
+                    "permission_domain": "dashboard",
+                    "permission_action": "view",
+                },
+            ],
+        },
+        {
             "label": "Intelligence",
             "items": [
                 {

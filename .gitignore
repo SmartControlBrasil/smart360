@@ -64,3 +64,5 @@ ecom/Ecom_v4.1_Unzip-First/6.Development_Source_Dashboard/
 ecom/Ecom_v4.1_Unzip-First/4.Development_Source_Frontend_RTL/
 ecom/Ecom_v4.1_Unzip-First/2.Development_Source_Frontend_LTR/
 *.fig
+.venv/
+test.sqlite3-journal

@@ -100,6 +100,7 @@ LOCAL_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.institutional.apps.InstitutionalConfig",
     "apps.livia_assistant.apps.LiviaAssistantConfig",
+    "apps.media_library.apps.MediaLibraryConfig",
     "apps.users.apps.UsersConfig",
     "apps.companies.apps.CompaniesConfig",
     "apps.roles.apps.RolesConfig",

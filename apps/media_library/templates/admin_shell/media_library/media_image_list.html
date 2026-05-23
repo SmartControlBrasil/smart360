@@ -1,0 +1,82 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="ml-media-toolbar">
+    <form method="get" class="ml-toolbar-form" role="search" aria-label="Filtros da biblioteca">
+        <div class="smart-filter-bar ml-toolbar-row">
+            <div class="filter-pill ml-filter-grow">
+                <label class="filter-label" for="ml-q">Busca</label>
+                <input class="filter-select" type="search" id="ml-q" name="q" value="{{ search_q|default_if_none:'' }}" placeholder="Título ou texto alternativo…" maxlength="200" aria-label="Buscar por título ou texto alternativo">
+            </div>
+            <div class="filter-pill">
+                <label class="filter-label" for="ml-status">Situação</label>
+                <select class="filter-select" id="ml-status" name="status" aria-label="Situação do cadastro">
+                    <option value="active" {% if filter_status == "active" %}selected{% endif %}>Somente ativas</option>
+                    <option value="inactive" {% if filter_status == "inactive" %}selected{% endif %}>Somente inativas</option>
+                    <option value="all" {% if filter_status == "all" %}selected{% endif %}>Todas</option>
+                </select>
+            </div>
+            <div class="filter-pill ml-filter-actions">
+                <span class="filter-label">Execução</span>
+                <div class="ml-toolbar-buttons">
+                    <button class="quick-action-button primary" type="submit">Aplicar</button>
+                    <a class="quick-action-button" href="{% url 'admin-shell:media-image-list' %}">Limpar filtros</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+{% if media_assets %}
+<div class="media-library-gallery">
+    {% for row in media_assets %}
+    <article class="widget-card ml-card">
+        <a href="{% url 'admin-shell:media-image-detail' pk=row.pk %}" class="ml-card-thumb-wrap">
+            {% if row.image %}
+            <img class="ml-card-thumb" src="{{ row.image.url }}" alt="{{ row.alt_text|default:row.title }}" loading="lazy" width="{{ row.width|default:'160' }}" height="{{ row.height|default:'160' }}">
+            {% else %}
+            <div class="ml-card-thumb ml-card-thumb--missing">Sem preview</div>
+            {% endif %}
+        </a>
+        <div class="widget-card-body ml-card-body">
+            <h3 class="ml-card-title">{{ row.title }}</h3>
+            <ul class="ml-card-meta">
+                <li>{{ row.width|default:"?" }} × {{ row.height|default:"?" }} px</li>
+                <li>{{ row.human_file_size }}</li>
+                <li>{{ row.created_at|date:"d/m/Y H:i" }}</li>
+                <li>
+                    {% if row.is_active %}
+                    <span class="status-badge status-emerald">Ativa</span>
+                    {% else %}
+                    <span class="status-badge status-slate">Inativa</span>
+                    {% endif %}
+                </li>
+            </ul>
+            <div class="ml-card-actions">
+                <a class="quick-action-button primary" href="{% url 'admin-shell:media-image-detail' pk=row.pk %}">Ver</a>
+                <a class="quick-action-button" href="{% url 'admin-shell:media-image-edit' pk=row.pk %}">Editar</a>
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="ml-pagination">
+    <span class="shell-text-muted">{{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }}</span>
+    {% if page_obj.has_previous %}<a class="quick-action-button" href="?page={{ page_obj.previous_page_number }}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}&status={{ filter_status }}">Anterior</a>{% endif %}
+    {% if page_obj.has_next %}<a class="quick-action-button" href="?page={{ page_obj.next_page_number }}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}&status={{ filter_status }}">Próxima</a>{% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<section class="widget-card ml-empty">
+    <div class="widget-card-header">
+        <h2>Nenhuma imagem encontrada</h2>
+        <p>Ajuste os filtros ou envie o primeiro arquivo.</p>
+    </div>
+    <div class="widget-card-body">
+        <a class="quick-action-button primary" href="{% url 'admin-shell:media-image-upload' %}">Enviar imagem</a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

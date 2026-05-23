@@ -1,0 +1,49 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="form-page">
+    <div class="form-card">
+        <header class="form-header">
+            <h1>{{ form_heading }}</h1>
+            <p class="muted-block">Formatos: JPG, PNG ou WEBP — máximo 5 MB. Na edição, deixe o arquivo em branco para manter a imagem atual.</p>
+        </header>
+        {% if asset and asset.image %}
+        <div class="ml-current-preview">
+            <p class="shell-text-muted">Imagem atual</p>
+            <img src="{{ asset.image.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-current-preview-img" loading="lazy">
+        </div>
+        {% endif %}
+        <div class="form-card-body">
+            <form method="post" enctype="multipart/form-data" class="form-grid">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="form-field full">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="form-field full">
+                    <label class="form-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<p class="form-error">{{ form.title.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="form-field full">
+                    <label class="form-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                    {{ form.image }}
+                    {% if form.image.errors %}<p class="form-error">{{ form.image.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="form-field full">
+                    <label class="form-label" for="{{ form.alt_text.id_for_label }}">{{ form.alt_text.label }}</label>
+                    {{ form.alt_text }}
+                    {% if form.alt_text.errors %}<p class="form-error">{{ form.alt_text.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="form-field full">
+                    <label class="form-label" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+                    {{ form.is_active }}
+                    {% if form.is_active.errors %}<p class="form-error">{{ form.is_active.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="form-actions form-field full">
+                    <button type="submit" class="btn-primary">{{ submit_label }}</button>
+                    <a class="btn-secondary" href="{% url 'admin-shell:media-image-list' %}">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

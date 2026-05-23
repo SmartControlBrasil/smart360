@@ -13,6 +13,13 @@ from apps.growth_engine.dashboard_views import (
     GrowthMarketplaceLeadListView,
     GrowthProposalDetailView,
 )
+from apps.media_library.dashboard_views import (
+    MediaAssetCreateView,
+    MediaAssetDeactivateView,
+    MediaAssetDetailView,
+    MediaAssetListView,
+    MediaAssetUpdateView,
+)
 from apps.livia_assistant.dashboard_views import (
     LiviaConversationDetailView,
     LiviaConversationListView,
@@ -307,6 +314,15 @@ urlpatterns = [
     path("dashboard/livia/knowledge/", LiviaKnowledgeListView.as_view(), name="livia-knowledge"),
     path("dashboard/livia/knowledge/new/", LiviaKnowledgeCreateView.as_view(), name="livia-knowledge-new"),
     path("dashboard/livia/knowledge/<int:knowledge_id>/edit/", LiviaKnowledgeUpdateView.as_view(), name="livia-knowledge-edit"),
+    path("dashboard/media/images/", MediaAssetListView.as_view(), name="media-image-list"),
+    path("dashboard/media/images/upload/", MediaAssetCreateView.as_view(), name="media-image-upload"),
+    path(
+        "dashboard/media/images/<int:pk>/deactivate/",
+        MediaAssetDeactivateView.as_view(),
+        name="media-image-deactivate",
+    ),
+    path("dashboard/media/images/<int:pk>/edit/", MediaAssetUpdateView.as_view(), name="media-image-edit"),
+    path("dashboard/media/images/<int:pk>/", MediaAssetDetailView.as_view(), name="media-image-detail"),
     path("app/ai-agents/", AIAgentsDashboardView.as_view(), name="ai-agents-dashboard"),
     path("app/ai-agents/briefings/", AIBriefingListView.as_view(), name="ai-briefings"),
     path("app/ai-agents/briefings/generate/", AIBriefingGenerateView.as_view(), name="ai-briefing-generate"),

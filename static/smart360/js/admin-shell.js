@@ -74,4 +74,58 @@
     }
     document.body.classList.toggle("sidebar-collapsed");
   });
+
+  /**
+   * Preserva scrollTop da sidebar entre navegações (sessionStorage).
+   */
+  function initSidebarScrollPersistence() {
+    var sidebar = document.querySelector("[data-admin-shell-sidebar-scroll]");
+    if (!sidebar) return;
+
+    var storageKey = "smart360.adminShell.sidebar.scrollTop";
+    var scrollSaveTimer = null;
+
+    try {
+      var saved = sessionStorage.getItem(storageKey);
+      if (saved !== null) {
+        var y = parseInt(saved, 10);
+        if (!isNaN(y) && y >= 0) {
+          function applyScrollTop() {
+            var max = Math.max(0, sidebar.scrollHeight - sidebar.clientHeight);
+            sidebar.scrollTop = Math.min(y, max);
+          }
+          applyScrollTop();
+          requestAnimationFrame(applyScrollTop);
+        }
+      }
+
+      function persistScroll() {
+        try {
+          sessionStorage.setItem(storageKey, String(sidebar.scrollTop));
+        } catch (err) {}
+      }
+
+      sidebar.addEventListener(
+        "scroll",
+        function () {
+          if (scrollSaveTimer) window.clearTimeout(scrollSaveTimer);
+          scrollSaveTimer = window.setTimeout(persistScroll, 100);
+        },
+        { passive: true }
+      );
+
+      var links = sidebar.querySelectorAll("a[href]");
+      for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener("click", persistScroll);
+      }
+    } catch (e) {
+      /* sessionStorage indisponível — não bloquear UI */
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSidebarScrollPersistence);
+  } else {
+    initSidebarScrollPersistence();
+  }
 })();

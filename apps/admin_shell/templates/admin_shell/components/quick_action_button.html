@@ -54,6 +54,8 @@
             <a class="quick-action-button" href="{% url action.route_name checklist_code=action.route_kwargs.checklist_code execution_code=action.route_kwargs.execution_code %}">{{ action.label }}</a>
         {% elif action.route_kwargs.checklist_code %}
             <a class="quick-action-button" href="{% url action.route_name checklist_code=action.route_kwargs.checklist_code %}">{{ action.label }}</a>
+        {% elif action.route_kwargs.pk %}
+            <a class="quick-action-button" href="{% url action.route_name pk=action.route_kwargs.pk %}">{{ action.label }}</a>
         {% else %}
             <a class="quick-action-button" href="{% url action.route_name %}">{{ action.label }}</a>
         {% endif %}

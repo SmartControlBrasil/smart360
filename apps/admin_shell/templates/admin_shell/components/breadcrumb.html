@@ -19,6 +19,8 @@
                         <a href="{% url item.url checklist_code=item.route_kwargs.checklist_code execution_code=item.route_kwargs.execution_code %}">{{ item.label }}</a>
                     {% elif item.route_kwargs.checklist_code %}
                         <a href="{% url item.url checklist_code=item.route_kwargs.checklist_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.pk %}
+                        <a href="{% url item.url pk=item.route_kwargs.pk %}">{{ item.label }}</a>
                     {% else %}
                         <a href="{% url item.url %}">{{ item.label }}</a>
                     {% endif %}

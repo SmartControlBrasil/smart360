@@ -12,7 +12,7 @@
   <div class="container">
     <div class="row mt-30">
       <div class="col-lg-6">
-        <div class="gallery-image"><div class="galleries"><div class="detail-gallery"><div class="product-image-slider"><figure class="border-radius-10"><img src="{% static product.image %}" alt="{{ product.title }}"></figure></div></div></div></div>
+        <div class="gallery-image"><div class="galleries"><div class="detail-gallery"><div class="product-image-slider"><figure class="border-radius-10">{% if product.featured_image_url %}<img src="{{ product.featured_image_url }}" alt="{{ product.title }}">{% else %}<img src="{% static product.image %}" alt="{{ product.title }}">{% endif %}</figure></div></div></div></div>
       </div>
       <div class="col-lg-6">
         <div class="product-info">
@@ -21,6 +21,9 @@
           <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-sm color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
           <div class="box-product-price mt-20"><h3 class="color-brand-3 price-main d-inline-block mr-10">{{ product.price_label }}</h3></div>
           <p class="font-base color-gray-700 mt-20">{{ product.short_description }}</p>
+          {% if product.description %}
+          <div class="mt-25 font-base color-gray-700">{{ product.description|linebreaksbr }}</div>
+          {% endif %}
           <div class="mt-20">
             <span class="marketplace-mini-pill">Fabricante: {{ product.brand }}</span>
             <span class="marketplace-mini-pill">Parceiro: {{ product.supplier }}</span>
@@ -123,7 +126,7 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% if product.featured_image_url %}<img class="marketplace-product-image" src="{{ product.featured_image_url }}" alt="{{ product.title }}">{% else %}<img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}">{% endif %}</a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.category }}</span><br>

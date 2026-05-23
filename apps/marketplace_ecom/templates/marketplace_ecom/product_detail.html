@@ -1,10 +1,11 @@
 {% extends "marketplace_ecom/base.html" %}
 {% load static %}
-{% block title %}{{ product.title }} | Marketplace Smart360{% endblock %}
+{% block title %}{{ product.title }} | Catálogo Técnico{% endblock %}
+{% block meta_description %}{{ product.short_description }} Solicite orçamento com a Smart Control Brasil — catálogo técnico em automação, robótica e HVAC.{% endblock %}
 {% block content %}
 <div class="section-box">
   <div class="breadcrumbs-div">
-    <div class="container"><ul class="breadcrumb"><li><a href="{% url 'marketplace_ecom:home' %}">Marketplace</a></li><li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li><li><span>{{ product.title }}</span></li></ul></div>
+    <div class="container"><ul class="breadcrumb"><li><a href="{% url 'marketplace_ecom:home' %}">Catálogo Técnico</a></li><li><a href="{% url 'marketplace_ecom:products' %}">Produtos e soluções técnicas</a></li><li><span>{{ product.title }}</span></li></ul></div>
   </div>
 </div>
 <section class="section-box shop-template">
@@ -26,10 +27,9 @@
             <span class="marketplace-mini-pill">Aplicação: {{ product.application_area }}</span>
           </div>
           <div class="border-bottom pt-20 mb-20"></div>
-          <p class="font-sm color-gray-500">Esta página é apenas visual. Preço final, estoque, variações, carrinho e checkout serão implementados em blocos futuros. Para BHP e demais marcas, o preço permanece sob consulta.</p>
+          <p class="font-sm color-gray-500">Preço final, disponibilidade e condições comerciais sob consulta. Variações técnicas e volume são tratados pela equipe comercial após sua solicitação.</p>
           <div class="buy-product mt-30">
             <a class="btn btn-buy" href="#quote-request">Solicitar orçamento</a>
-            <a class="btn btn-cart" href="#quote-request">Adicionar ao interesse</a>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
             <span class="marketplace-mini-pill">{{ product.brand }}</span>
             <span class="marketplace-mini-pill">{{ product.supplier }}</span>
           </div>
-          <p class="font-sm color-gray-500 mt-20">Sem carrinho, checkout ou pagamento nesta etapa. Este fluxo gera uma oportunidade comercial B2B.</p>
+          <p class="font-sm color-gray-500 mt-20">Nesta etapa não há compra nem pagamento pelo site — apenas solicitação B2B de orçamento.</p>
         </div>
       </div>
       <div class="col-lg-7">
@@ -123,7 +123,7 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.category }}</span><br>

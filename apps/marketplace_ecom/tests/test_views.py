@@ -10,7 +10,7 @@ class MarketplaceEcomViewTests(TestCase):
         response = self.client.get(reverse("marketplace_ecom:home"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Marketplace")
+        self.assertContains(response, "Catálogo Técnico")
 
     def test_products_returns_all_products(self):
         response = self.client.get(reverse("marketplace_ecom:products"))
@@ -90,10 +90,10 @@ class MarketplaceEcomViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_home_contains_marketplace_name(self):
+    def test_home_contains_catalog_branding(self):
         response = self.client.get("/marketplace/")
 
-        self.assertContains(response, "Marketplace Smart360")
+        self.assertContains(response, "Catálogo Técnico")
 
     def test_quote_request_valid_post_creates_lead(self):
         response = self.client.post(

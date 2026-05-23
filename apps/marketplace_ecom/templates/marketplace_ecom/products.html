@@ -1,10 +1,11 @@
 {% extends "marketplace_ecom/base.html" %}
 {% load static %}
-{% block title %}Produtos | Marketplace Smart360{% endblock %}
+{% block title %}Produtos e soluções técnicas | Catálogo Técnico{% endblock %}
+{% block meta_description %}Listagem do catálogo técnico — automação, robótica, HVAC e soluções industriais. Solicite orçamento com a Smart Control Brasil.{% endblock %}
 {% block content %}
 <div class="section-box">
   <div class="breadcrumbs-div">
-    <div class="container"><ul class="breadcrumb"><li><a href="{% url 'marketplace_ecom:home' %}">Marketplace</a></li><li><span>Produtos</span></li></ul></div>
+    <div class="container"><ul class="breadcrumb"><li><a href="{% url 'marketplace_ecom:home' %}">Catálogo Técnico</a></li><li><span>Produtos e soluções técnicas</span></li></ul></div>
   </div>
 </div>
 <div class="section-box shop-template mt-30">
@@ -24,20 +25,20 @@
               {% for brand in available_brands %}<li><a href="?brand={{ brand|urlencode }}">{{ brand }}</a></li>{% endfor %}
             </ul>
             <div class="border-bottom pt-10 mb-20"></div>
-            <h6 class="color-gray-900 mb-10">Parceiros</h6>
+            <h6 class="color-gray-900 mb-10">Representadas e parceiros técnicos</h6>
             <ul class="list-nav-arrow">
               {% for supplier in available_suppliers %}<li><a href="?supplier={{ supplier|urlencode }}">{{ supplier }}</a></li>{% endfor %}
             </ul>
             <div class="border-bottom pt-10 mb-20"></div>
-            <p class="font-sm color-gray-500">Filtros funcionais via querystring sobre o catálogo visual mockado.</p>
+            <p class="font-sm color-gray-500">Filtros via URL sobre o catálogo atual (lista visual).</p>
           </div>
         </div>
       </div>
       <div class="col-lg-9">
         <div class="box-filters mt-0 pb-5 border-bottom">
           <div class="row">
-            <div class="col-xl-8 col-lg-8 mb-10 text-lg-start text-center"><h4 class="color-brand-3">Catálogo técnico do Marketplace</h4><span class="font-sm color-gray-500">Exibindo {{ result_count }} soluções</span></div>
-            <div class="col-xl-4 col-lg-4 mb-10 text-lg-end text-center"><span class="marketplace-mini-pill">MVP visual</span></div>
+            <div class="col-xl-8 col-lg-8 mb-10 text-lg-start text-center"><h4 class="color-brand-3">Produtos e soluções técnicas</h4><span class="font-sm color-gray-500">Exibindo {{ result_count }} soluções</span></div>
+            <div class="col-xl-4 col-lg-4 mb-10 text-lg-end text-center"><span class="marketplace-mini-pill">Catálogo em evolução</span></div>
           </div>
         </div>
         <form method="get" class="mt-20 mb-25">
@@ -87,14 +88,14 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.category }}</span><br>
         <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:product-detail' product.slug %}">{{ product.title }}</a>
         <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-xs color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
         <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">{{ product.price_label }}</strong></div>
-        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="#">Solicitar orçamento</a></div>
+        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
       </div>
     </div>
   </div>
@@ -103,7 +104,7 @@
           <div class="col-12">
             <div class="sidebar-border text-center p-40">
               <h5 class="color-brand-3 mb-10">Nenhuma solução encontrada com esses filtros.</h5>
-              <p class="font-sm color-gray-500">Ajuste a busca ou limpe os filtros para ver todo o catálogo visual.</p>
+              <p class="font-sm color-gray-500">Ajuste a busca ou limpe os filtros para ver todo o catálogo técnico.</p>
             </div>
           </div>
           {% endfor %}

@@ -1,6 +1,6 @@
 {% extends "marketplace_ecom/base.html" %}
 {% load static %}
-{% block title %}Marketplace Smart360{% endblock %}
+{% block title %}Catálogo Técnico | Smart Control Brasil{% endblock %}
 {% block content %}
 <section class="section-box">
   <div class="banner-hero banner-1">
@@ -8,11 +8,11 @@
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="marketplace-hero-copy">
-            <span class="marketplace-smart-badge">Marketplace visual MVP</span>
-            <h1 class="color-brand-3">Marketplace Smart360</h1>
-            <p>Catálogo técnico B2B com fabricantes, parceiros de distribuição e soluções sob consulta para robótica, climatização, automação e infraestrutura predial.</p>
-            <a class="btn btn-buy" href="{% url 'marketplace_ecom:products' %}">Ver produtos</a>
-            <p class="marketplace-disabled-note">Carrinho, checkout e pagamentos serao conectados em etapas futuras.</p>
+            <span class="marketplace-smart-badge">Catálogo técnico em evolução</span>
+            <h1 class="color-brand-3">Catálogo Técnico</h1>
+            <p>Catálogo técnico B2B com fabricantes representados e parceiros técnicos, soluções sob consulta em robótica, climatização, automação e infraestrutura predial.</p>
+            <a class="btn btn-buy" href="{% url 'marketplace_ecom:products' %}">Ver produtos e soluções técnicas</a>
+            <p class="marketplace-disabled-note">Nesta fase o foco é consulta técnica e solicitação de orçamento. Carrinho e pagamento ficam para uma etapa futura.</p>
           </div>
         </div>
         <div class="col-lg-6">
@@ -26,7 +26,7 @@
   <div class="container">
     <div class="head-main">
       <h3 class="mb-5">Categorias em destaque</h3>
-      <p class="font-base color-gray-500">Vitrines iniciais para organizar a futura operacao do marketplace.</p>
+      <p class="font-base color-gray-500">Vitrines organizadas dentro do catálogo técnico para orientar projetos e consultas.</p>
     </div>
     <div class="row mt-30">
       {% for category in categories %}
@@ -44,8 +44,8 @@
 <section class="section-box mt-50">
   <div class="container">
     <div class="head-main">
-      <h3 class="mb-5">Marcas e parceiros</h3>
-      <p class="font-base color-gray-500">Fabricantes e canais comerciais posicionados para projetos técnicos, B2B e sob consulta.</p>
+      <h3 class="mb-5">Fabricantes representados</h3>
+      <p class="font-base color-gray-500">Representadas e parceiros posicionados para projetos B2B técnicos, sob consulta.</p>
     </div>
     <div class="row mt-30">
       {% for item in brand_partners %}
@@ -73,14 +73,14 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.category }}</span><br>
         <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:product-detail' product.slug %}">{{ product.title }}</a>
         <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-xs color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
         <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">{{ product.price_label }}</strong></div>
-        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="#">Solicitar orçamento</a></div>
+        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
       </div>
     </div>
   </div>
@@ -89,12 +89,12 @@
     </div>
   </div>
 </section>
-<section id="vendedores" class="section-box box-newsletter mt-50">
+<section id="representadas-parceiros" class="section-box box-newsletter mt-50">
   <div class="container">
     <div class="box-form-newsletter">
       <div class="row align-items-center">
-        <div class="col-lg-7"><h3 class="color-brand-3">Parceiros e fabricantes</h3><p class="font-lg color-gray-500">Em breve este marketplace terá filtros técnicos, páginas comerciais por fabricante e fluxo de solicitação de orçamento.</p></div>
-        <div class="col-lg-5 text-lg-end"><span class="marketplace-mini-pill">Preparado para evolucao futura</span></div>
+        <div class="col-lg-7"><h3 class="color-brand-3">Representadas e parceiros</h3><p class="font-lg color-gray-500">Em breve este catálogo terá filtros técnicos, páginas por fabricante e fluxo guiado para solicitar orçamento.</p></div>
+        <div class="col-lg-5 text-lg-end"><span class="marketplace-mini-pill">Evolução contínua</span></div>
       </div>
     </div>
   </div>

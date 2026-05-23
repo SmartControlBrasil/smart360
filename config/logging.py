@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime, timezone
 
 from django.conf import settings
@@ -23,7 +24,9 @@ def sanitize_payload(payload):
     return payload
 
 
-class Smart360JsonFormatter:
+class Smart360JsonFormatter(logging.Formatter):
+    """JSON estruturado; herda logging.Formatter para expor formatException em exc_info."""
+
     def format(self, record):
         request_context = get_request_context()
         payload = {

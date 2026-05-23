@@ -1,0 +1,146 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<div class="dashboard-grid marketplace-lead-detail">
+    <nav class="marketplace-lead-detail__nav">
+        <a href="{% url 'admin-shell:growth-marketplace-leads' %}">← Lista Marketplace</a>
+        <span class="detail-nav-sep" aria-hidden="true">•</span>
+        <a href="{% url 'admin-shell:growth-lead-detail' lead.id %}">Detalhe global Growth</a>
+    </nav>
+
+    <section class="panel-card">
+        <h2>{{ lead.company_name }}</h2>
+        <p class="shell-text-muted">{{ lead.contact_name|default:"Contato não informado" }} · Pipeline: <strong>{{ lead.get_status_display }}</strong>{% if lead.score %} · Score {{ lead.score }}{% endif %}</p>
+    </section>
+
+    <section class="panel-card marketplace-lead-proposal-panel">
+        <h3>Proposta comercial</h3>
+        <p class="shell-text-muted">
+            Cria uma proposta em <strong>rascunho</strong> no Growth Engine, vinculada a este lead, com empresa, contato, produto e resumo vindos do Marketplace.
+            Fluxo apenas de orçamento B2B (sem checkout, carrinho ou pagamento automático).
+        </p>
+        <div class="marketplace-lead-proposal-actions__buttons">
+            {% if commercial_proposal %}
+                <a class="quick-action-button primary" href="{% url 'admin-shell:growth-proposal-detail' commercial_proposal.id %}">Ver proposta {{ commercial_proposal.proposal_number }}</a>
+            {% else %}
+                <form method="post" action="{% url 'admin-shell:growth-marketplace-lead-create-proposal' lead.id %}">
+                    {% csrf_token %}
+                    <button class="quick-action-button primary" type="submit">Criar proposta</button>
+                </form>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="table-card">
+        <table class="data-table">
+            <tbody>
+                <tr><th scope="row">Empresa</th><td>{{ lead.company_name }}</td></tr>
+                <tr><th scope="row">Nome do contato</th><td>{{ lead.contact_name|default:"—" }}</td></tr>
+                <tr><th scope="row">E-mail</th><td>{{ lead.email|default:"—" }}</td></tr>
+                <tr><th scope="row">Telefone</th><td>{{ lead.phone|default:"—" }}</td></tr>
+                <tr><th scope="row">WhatsApp</th><td>{{ lead.whatsapp|default:"—" }}</td></tr>
+                <tr><th scope="row">Cidade / Estado</th><td>{{ lead.city|default:"—" }}{% if lead.state %} · {{ lead.state }}{% endif %}</td></tr>
+                <tr><th scope="row">Status</th><td>{{ lead.get_status_display }}</td></tr>
+                <tr><th scope="row">Origem (fonte)</th><td>{% if lead.source %}{{ lead.source.name }}{% else %}—{% endif %}</td></tr>
+                <tr><th scope="row">Origem (metadata)</th><td>{{ lead.metadata.origin|default:"—" }}</td></tr>
+                <tr><th scope="row">Produto solicitado</th><td><strong>{{ lead.metadata.product_title|default:lead.metadata.product_slug|default:"—" }}</strong>{% if lead.metadata.product_slug and lead.metadata.product_title %}<br><span class="shell-text-muted">Slug: {{ lead.metadata.product_slug }}</span>{% endif %}</td></tr>
+                <tr><th scope="row">Criado em</th><td>{{ lead.created_at|date:"d/m/Y H:i" }}</td></tr>
+                <tr><th scope="row">Atualizado em</th><td>{{ lead.updated_at|date:"d/m/Y H:i" }}</td></tr>
+                <tr><th scope="row">Notas internas</th><td>{{ lead.notes|default:"—"|linebreaksbr }}</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel-card">
+        <h3>Metadados do solicitante</h3>
+        <p class="shell-text-muted">Chaves ordenadas vindas do fluxo Marketplace (podem mudar conforme evolução do catálogo).</p>
+        <div class="table-wrapper">
+            <table class="data-table marketplace-lead-metadata-table">
+                <thead>
+                    <tr><th scope="col">Chave</th><th scope="col">Valor</th></tr>
+                </thead>
+                <tbody>
+                    {% for key, val in metadata_rows %}
+                        <tr>
+                            <td><code>{{ key }}</code></td>
+                            <td class="metadata-cell-value">{{ val|default:"—" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2">Sem metadados gravados neste lead.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="content-grid marketplace-lead-forms-row">
+        <div class="column-span-6">
+            <div class="smart-form-card marketplace-lead-detail-form-card">
+                <h3>Nova interação comercial</h3>
+                <p class="shell-text-muted">Data/hora são registradas automaticamente; você é gravado como responsável quando disponível.</p>
+                <form method="post" action="" class="smart-form-grid">
+                    {% csrf_token %}
+                    {% for field in interaction_form %}
+                        <div class="smart-field smart-field--full">
+                            {% if field.is_hidden %}
+                                {{ field }}
+                            {% else %}
+                                <label class="smart-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                                {{ field }}
+                                {% if field.errors %}<p class="flash-message flash-error" role="alert">{{ field.errors|striptags }}</p>{% endif %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="form-actions smart-field--full">
+                        <button class="quick-action-button primary" type="submit" name="interaction_submit" value="1">Registrar interação</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="column-span-6">
+            <div class="smart-form-card marketplace-lead-detail-form-card">
+                <h3>Alterar status do lead</h3>
+                <p class="shell-text-muted">Somente valores já definidos no Growth Engine.</p>
+                <form method="post" action="" class="smart-form-grid">
+                    {% csrf_token %}
+                    <div class="smart-field smart-field--full">
+                        <label class="smart-label" for="{{ status_form.status.id_for_label }}">{{ status_form.status.label }}</label>
+                        {{ status_form.status }}
+                        {% if status_form.status.errors %}<p class="flash-message flash-error" role="alert">{{ status_form.status.errors|striptags }}</p>{% endif %}
+                    </div>
+                    <div class="form-actions smart-field--full">
+                        <button class="quick-action-button primary" type="submit" name="status_submit" value="1">Atualizar status</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="table-card">
+        <h3>Histórico de interações</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Canal</th>
+                    <th scope="col">Observação</th>
+                    <th scope="col">Quando</th>
+                    <th scope="col">Responsável</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for interaction in interactions %}
+                    <tr>
+                        <td>{{ interaction.get_interaction_type_display }}</td>
+                        <td>{{ interaction.get_channel_display }}</td>
+                        <td>{{ interaction.summary|linebreaksbr }}</td>
+                        <td>{{ interaction.happened_at|date:"d/m/Y H:i" }}</td>
+                        <td>{% if interaction.owner %}{{ interaction.owner.email|default:interaction.owner.pk }}{% else %}—{% endif %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5">Nenhuma interação registrada ainda.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}

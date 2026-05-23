@@ -1,0 +1,84 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="stat-grid">
+    {% for card in summary_cards %}<article class="stat-card"><span>{{ card.label }}</span><strong>{{ card.value }}</strong></article>{% endfor %}
+</section>
+
+<section class="panel-card">
+    <form method="get" action="" class="smart-filter-bar growth-marketplace-leads-filter">
+        <div class="filter-pill">
+            <label class="filter-label" for="mp-filter-status">Status</label>
+            <select class="filter-select" id="mp-filter-status" name="status" aria-label="Filtrar por status">
+                <option value="">Todos</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-pill">
+            <label class="filter-label" for="mp-filter-from">Período (de)</label>
+            <input class="filter-select" id="mp-filter-from" type="date" name="date_from" value="{{ date_from }}" aria-label="Data inicial">
+        </div>
+        <div class="filter-pill">
+            <label class="filter-label" for="mp-filter-to">Período (até)</label>
+            <input class="filter-select" id="mp-filter-to" type="date" name="date_to" value="{{ date_to }}" aria-label="Data final">
+        </div>
+        <div class="filter-pill growth-marketplace-leads-filter__search">
+            <label class="filter-label" for="mp-filter-q">Busca</label>
+            <input class="filter-select" id="mp-filter-q" type="search" name="q" value="{{ search_query|default_if_none:'' }}" placeholder="Empresa, contato, e-mail, produto…" maxlength="120" aria-label="Busca livre">
+        </div>
+        <div class="filter-pill growth-marketplace-leads-filter__actions">
+            <span class="filter-label">Ações</span>
+            <div class="growth-marketplace-leads-filter__buttons">
+                <button class="quick-action-button primary" type="submit">Aplicar filtros</button>
+                <a class="quick-action-button" href="{% url 'admin-shell:growth-marketplace-leads' %}">Limpar</a>
+            </div>
+        </div>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nome / empresa</th>
+                    <th>E-mail</th>
+                    <th>Telefone</th>
+                    <th>Produto solicitado</th>
+                    <th>Origem</th>
+                    <th>Status</th>
+                    <th>Criado em</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in marketplace_lead_rows %}
+                    {% with lead=row.lead %}
+                    <tr>
+                        <td>
+                            <strong>{{ lead.company_name }}</strong>
+                            {% if lead.contact_name %}<br><span class="shell-text-muted">{{ lead.contact_name }}</span>{% endif %}
+                        </td>
+                        <td>{{ lead.email|default:"—" }}</td>
+                        <td>{{ lead.phone|default:lead.whatsapp|default:"—" }}</td>
+                        <td>{{ row.product_summary }}</td>
+                        <td>
+                            {% if lead.source %}{{ lead.source.name }}{% else %}—{% endif %}
+                            {% if row.origin %}<br><span class="shell-text-muted">{{ row.origin }}</span>{% endif %}
+                        </td>
+                        <td>{{ lead.get_status_display }}</td>
+                        <td>{{ lead.created_at|date:"d/m/Y H:i" }}</td>
+                        <td><a href="{% url 'admin-shell:growth-marketplace-lead-detail' lead.id %}">Detalhe</a></td>
+                    </tr>
+                    {% endwith %}
+                {% empty %}
+                    <tr>
+                        <td colspan="8">Nenhum lead do Marketplace encontrado com os filtros atuais.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

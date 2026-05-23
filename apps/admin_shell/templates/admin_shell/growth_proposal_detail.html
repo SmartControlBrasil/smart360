@@ -2,21 +2,138 @@
 {% block content %}
 <section class="panel-card">
     <h2>{{ proposal.proposal_number }}</h2>
-    <p>{{ proposal.company_name }} • {{ proposal.get_status_display }} • R$ {{ proposal.total_value }}</p>
-    {% if lead %}<a class="quick-action-button" href="{% url 'admin-shell:growth-lead-detail' lead.id %}">Abrir lead</a>{% endif %}
+    <p>{{ proposal.company_name }} · {{ proposal.get_status_display }} · Valor atual: <strong>R$ {{ proposal.total_value }}</strong></p>
+    <div class="growth-proposal-quick-actions growth-proposal-no-print">
+        {% if lead %}
+            <a class="quick-action-button" href="{% url 'admin-shell:growth-lead-detail' lead.id %}">Abrir lead (Growth Engine)</a>
+        {% endif %}
+        {% if is_marketplace_proposal and marketplace_lead_detail_id %}
+            <a class="quick-action-button primary" href="{% url 'admin-shell:growth-marketplace-lead-detail' marketplace_lead_detail_id %}">Voltar ao lead Marketplace</a>
+        {% endif %}
+        {% if is_marketplace_proposal %}
+            <button type="button" class="quick-action-button growth-proposal-no-print" onclick="window.print()">Imprimir / salvar PDF</button>
+        {% endif %}
+        {% if show_approved_proposals_queue_link %}
+            <a class="quick-action-button" href="{% url 'admin-shell:growth-proposals-approved' %}">Fila: propostas aprovadas</a>
+        {% endif %}
+    </div>
+    <p class="shell-text-muted growth-proposal-no-print">Área técnico-comercial Smart360 Growth Engine.</p>
+
+    {% if can_mark_proposal_sent or can_approve_proposal or can_reject_proposal %}
+        <section class="growth-proposal-status-toolbar growth-proposal-no-print" aria-label="Ações comerciais">
+            {% if can_mark_proposal_sent %}
+                <form method="post" action="{% url 'admin-shell:growth-proposal-mark-sent' proposal.id %}" class="growth-proposal-status-form">
+                    {% csrf_token %}
+                    <button class="quick-action-button primary" type="submit">Marcar como enviada</button>
+                </form>
+            {% endif %}
+            {% if can_approve_proposal %}
+                <form method="post" action="{% url 'admin-shell:growth-proposal-approve' proposal.id %}" class="growth-proposal-status-form">
+                    {% csrf_token %}
+                    <button class="quick-action-button" type="submit">Aprovar proposta</button>
+                </form>
+            {% endif %}
+            {% if can_reject_proposal %}
+                <form method="post" action="{% url 'admin-shell:growth-proposal-reject' proposal.id %}" class="growth-proposal-status-form">
+                    {% csrf_token %}
+                    <button class="quick-action-button" type="submit">Rejeitar proposta</button>
+                </form>
+            {% endif %}
+        </section>
+        <p class="shell-text-muted growth-proposal-no-print growth-proposal-status-hint">Alterações apenas no status interno; sem envio de e-mail nem PDF pelo servidor nesta etapa.</p>
+    {% else %}
+        <p class="shell-text-muted growth-proposal-no-print">Nenhuma alteração rápida de status disponível para o estado atual desta proposta.</p>
+    {% endif %}
 </section>
+
+{% if show_operational_next_step %}
+<section class="panel-card growth-proposal-operational-next" aria-labelledby="titulo-prox-etapa-operacional">
+    <h3 id="titulo-prox-etapa-operacional">Próxima etapa operacional</h3>
+    <p>Esta proposta foi aprovada e está pronta para encaminhamento operacional.</p>
+
+    {% if operational_forward_complete %}
+        <section class="growth-operational-forward-record" aria-label="Encaminhamento já registrado">
+            <p class="growth-operational-forward-state"><strong>Já registrada como encaminhada</strong></p>
+            <dl class="growth-proposal-dl-inline growth-operational-forward-dl">
+                <div><dt>Data do registro</dt><dd>{{ operational_forward.at_display }}</dd></div>
+                {% if operational_forward.by_label %}
+                    <div><dt>Registrado por</dt><dd>{{ operational_forward.by_label }}</dd></div>
+                {% endif %}
+            </dl>
+            <div class="growth-operational-forward-note-section">
+                <h4 class="growth-proposal-subheading">Observação de encaminhamento</h4>
+                <pre class="growth-proposal-text-block">{{ operational_forward.note|default:"—" }}</pre>
+            </div>
+        </section>
+    {% elif show_operational_forward_form and operational_forward_form %}
+        <form method="post" action="{% url 'admin-shell:growth-proposal-operational-forward' proposal.id %}" class="growth-operational-forward-form">
+            {% csrf_token %}
+            {% if operational_forward_form.non_field_errors %}
+                <div class="form-errors" role="alert">{{ operational_forward_form.non_field_errors }}</div>
+            {% endif %}
+            <div class="form-field growth-operational-forward-field">
+                <label class="form-label" for="{{ operational_forward_form.note.id_for_label }}">{{ operational_forward_form.note.label }}</label>
+                {{ operational_forward_form.note }}
+                {% if operational_forward_form.note.errors %}<div class="form-errors">{{ operational_forward_form.note.errors }}</div>{% endif %}
+            </div>
+            <p id="growth-operational-forward-hint" class="shell-text-muted growth-operational-forward-hint">Este registro é apenas interno: não há criação de OS nem envio automático nesta etapa.</p>
+            <div class="form-actions growth-operational-forward-actions">
+                <button type="submit" class="quick-action-button primary">Registrar encaminhamento operacional</button>
+            </div>
+        </form>
+    {% endif %}
+</section>
+{% endif %}
+
+{% if is_marketplace_proposal %}
+<section class="panel-card growth-proposal-marketplace-panel" aria-labelledby="titulo-origem-marketplace">
+    <h3 id="titulo-origem-marketplace">Origem técnica Marketplace</h3>
+    <p class="shell-text-muted">Este bloco consolida a demanda conforme registrada no <strong>Marketplace E-com</strong> (B2B técnico sob consulta, sem checkout). Adequado para impressão quando você usar «Imprimir / salvar PDF».</p>
+
+    <h4 class="growth-proposal-subheading">Origem da demanda</h4>
+    <p>{{ proposal.company_name }}{% if lead %} · contato registrado sob o lead Marketplace #{{ marketplace_lead_detail_id }}{% endif %}.</p>
+    <dl class="growth-proposal-dl-inline">
+        <div><dt>Canal</dt><dd>Marketplace E-com (Smart360)</dd></div>
+        <div><dt>Lead vinculado</dt><dd>{% if marketplace_lead_detail_id %}<strong>#{{ marketplace_lead_detail_id }}</strong>{% elif lead %}#{{ lead.id }}{% else %}—{% endif %}</dd></div>
+        <div><dt>Campo Origem na proposta</dt><dd><code>{{ proposal.origin }}</code></dd></div>
+    </dl>
+
+    <h4 class="growth-proposal-subheading">Produto ou solução solicitada</h4>
+    <table class="data-table growth-proposal-meta-table">
+        <tbody>
+            <tr><th scope="row">Descrição catalogada</th><td>{{ marketplace_meta.product_title|default:"—" }}</td></tr>
+            <tr><th scope="row">Slug do produto</th><td><code>{{ marketplace_meta.product_slug|default:"—" }}</code></td></tr>
+            <tr><th scope="row">Linha em «Serviço»</th><td>{{ proposal.service_interest|default:"—" }}</td></tr>
+            <tr><th scope="row">Marca / fabricante citado</th><td>{{ marketplace_meta.brand|default:"—" }}</td></tr>
+            <tr><th scope="row">Fornecedor / parceiro</th><td>{{ marketplace_meta.supplier|default:"—" }}</td></tr>
+            <tr><th scope="row">Categoria</th><td>{{ marketplace_meta.category|default:"—" }}</td></tr>
+            <tr><th scope="row">Área de aplicação</th><td>{{ marketplace_meta.application_area|default:"—" }}</td></tr>
+            <tr><th scope="row">Tipo de solicitação</th><td>{{ marketplace_meta.request_type|default:"—" }}</td></tr>
+        </tbody>
+    </table>
+
+    <h4 class="growth-proposal-subheading">Observações técnicas / operacionais (lead)</h4>
+    {% if marketplace_lead_notes %}<pre class="growth-proposal-technical-notes">{{ marketplace_lead_notes }}</pre>{% else %}<p class="shell-text-muted">Nenhuma nota textual adicional no momento da conversão para proposta.</p>{% endif %}
+
+    <h4 class="growth-proposal-subheading">Trecho sugerido — corpo de e-mail ao cliente</h4>
+    <p class="shell-text-muted">Texto inicial para colar quando enviar pelo seu cliente de e-mail; não há envio automático por esta etapa.</p>
+    <pre class="growth-proposal-email-preview" aria-label="Trecho sugerido de e-mail">{{ marketplace_email_suggested_body }}</pre>
+</section>
+{% endif %}
+
 <section class="table-card">
+    <h3 class="growth-proposal-subheading growth-proposal-no-print">Dados da proposta comercial</h3>
     <table class="data-table"><tbody>
-        <tr><th>Empresa</th><td>{{ proposal.company_name }}</td></tr>
-        <tr><th>Contato</th><td>{{ proposal.contact_name|default:"-" }}</td></tr>
-        <tr><th>E-mail</th><td>{{ proposal.email|default:"-" }}</td></tr>
-        <tr><th>Telefone</th><td>{{ proposal.phone|default:"-" }}</td></tr>
-        <tr><th>Serviço</th><td>{{ proposal.service_interest|default:"-" }}</td></tr>
-        <tr><th>Urgência</th><td>{{ proposal.urgency|default:"-" }}</td></tr>
-        <tr><th>Origem</th><td>{{ proposal.origin|default:"-" }}</td></tr>
-        <tr><th>Resumo</th><td>{{ proposal.summary|default:"-" }}</td></tr>
-        <tr><th>Escopo</th><td>{{ proposal.scope|default:"-" }}</td></tr>
-        <tr><th>Mensagem ao cliente</th><td>{{ proposal.customer_message|default:"-" }}</td></tr>
+        <tr><th scope="row">Empresa</th><td>{{ proposal.company_name }}</td></tr>
+        <tr><th scope="row">Contato</th><td>{{ proposal.contact_name|default:"—" }}</td></tr>
+        <tr><th scope="row">E-mail</th><td>{{ proposal.email|default:"—" }}</td></tr>
+        <tr><th scope="row">Telefone</th><td>{{ proposal.phone|default:"—" }}</td></tr>
+        <tr><th scope="row">Serviço / linha de interesse</th><td>{{ proposal.service_interest|default:"—" }}</td></tr>
+        <tr><th scope="row">Urgência</th><td>{{ proposal.urgency|default:"—" }}</td></tr>
+        <tr><th scope="row">Origem (campo)</th><td>{{ proposal.origin|default:"—" }}</td></tr>
+        <tr><th scope="row">Resumo</th><td><pre class="growth-proposal-text-block">{{ proposal.summary|default:"—" }}</pre></td></tr>
+        <tr><th scope="row">Escopo</th><td><pre class="growth-proposal-text-block">{{ proposal.scope|default:"—" }}</pre></td></tr>
+        <tr><th scope="row">Mensagem ao cliente</th><td><pre class="growth-proposal-text-block">{{ proposal.customer_message|default:"—" }}</pre></td></tr>
     </tbody></table>
 </section>
 {% endblock %}

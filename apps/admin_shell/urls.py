@@ -1,6 +1,18 @@
 from django.urls import include, path
 
-from apps.growth_engine.dashboard_views import GrowthLeadActionView, GrowthLeadCreateProposalView, GrowthLeadDetailView, GrowthLiviaLeadListView, GrowthProposalDetailView
+from apps.growth_engine.dashboard_views import (
+    GrowthApprovedProposalsListView,
+    GrowthCommercialProposalActionView,
+    GrowthCommercialProposalOperationalForwardView,
+    GrowthLeadActionView,
+    GrowthLeadCreateProposalView,
+    GrowthLeadDetailView,
+    GrowthLiviaLeadListView,
+    GrowthMarketplaceLeadCreateProposalView,
+    GrowthMarketplaceLeadDetailView,
+    GrowthMarketplaceLeadListView,
+    GrowthProposalDetailView,
+)
 from apps.livia_assistant.dashboard_views import (
     LiviaConversationDetailView,
     LiviaConversationListView,
@@ -244,11 +256,47 @@ urlpatterns = [
     path("portal/requests/<slug:protocol_number>/", ClientPortalRequestDetailView.as_view(), name="client-portal-request-detail"),
     path("portal/sites/", ClientPortalSitesView.as_view(), name="client-portal-sites"),
     path("portal/profile/", ClientPortalProfileView.as_view(), name="client-portal-profile"),
+    path("dashboard/growth/marketplace-leads/", GrowthMarketplaceLeadListView.as_view(), name="growth-marketplace-leads"),
+    path(
+        "dashboard/growth/marketplace-leads/<int:lead_id>/create-proposal/",
+        GrowthMarketplaceLeadCreateProposalView.as_view(),
+        name="growth-marketplace-lead-create-proposal",
+    ),
+    path(
+        "dashboard/growth/marketplace-leads/<int:lead_id>/",
+        GrowthMarketplaceLeadDetailView.as_view(),
+        name="growth-marketplace-lead-detail",
+    ),
     path("dashboard/growth/leads/livia/", GrowthLiviaLeadListView.as_view(), name="growth-livia-leads"),
     path("dashboard/growth/leads/<int:lead_id>/", GrowthLeadDetailView.as_view(), name="growth-lead-detail"),
     path("dashboard/growth/leads/<int:lead_id>/create-proposal/", GrowthLeadCreateProposalView.as_view(), name="growth-lead-create-proposal"),
     path("dashboard/growth/leads/<int:lead_id>/<slug:action>/", GrowthLeadActionView.as_view(), name="growth-lead-action"),
+    path(
+        "dashboard/growth/proposals/approved/",
+        GrowthApprovedProposalsListView.as_view(),
+        name="growth-proposals-approved",
+    ),
     path("dashboard/growth/proposals/<int:proposal_id>/", GrowthProposalDetailView.as_view(), name="growth-proposal-detail"),
+    path(
+        "dashboard/growth/proposals/<int:proposal_id>/mark-sent/",
+        GrowthCommercialProposalActionView.as_view(action_name="mark-sent"),
+        name="growth-proposal-mark-sent",
+    ),
+    path(
+        "dashboard/growth/proposals/<int:proposal_id>/approve/",
+        GrowthCommercialProposalActionView.as_view(action_name="approve"),
+        name="growth-proposal-approve",
+    ),
+    path(
+        "dashboard/growth/proposals/<int:proposal_id>/reject/",
+        GrowthCommercialProposalActionView.as_view(action_name="reject"),
+        name="growth-proposal-reject",
+    ),
+    path(
+        "dashboard/growth/proposals/<int:proposal_id>/operational-forward/",
+        GrowthCommercialProposalOperationalForwardView.as_view(),
+        name="growth-proposal-operational-forward",
+    ),
     path("dashboard/livia/", LiviaDashboardView.as_view(), name="livia-dashboard"),
     path("dashboard/livia/conversations/", LiviaConversationListView.as_view(), name="livia-conversations"),
     path("dashboard/livia/conversations/<int:conversation_id>/", LiviaConversationDetailView.as_view(), name="livia-conversation-detail"),

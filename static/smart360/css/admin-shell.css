@@ -633,6 +633,210 @@ img, svg, video, canvas { max-width: 100%; }
 }
 .filter-select { width: 100%; text-align: left; }
 
+.shell-text-muted {
+    color: var(--shell-muted);
+    font-size: 0.86em;
+}
+.marketplace-lead-detail__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+.marketplace-lead-detail__nav a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.detail-nav-sep {
+    color: var(--shell-muted);
+    user-select: none;
+}
+.marketplace-lead-forms-row {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+.marketplace-lead-forms-row > .column-span-6 {
+    grid-column: span 6;
+    min-width: 0;
+}
+.marketplace-lead-metadata-table .metadata-cell-value {
+    max-width: min(100%, 52ch);
+    overflow-wrap: break-word;
+}
+.marketplace-lead-detail-form-card h3 {
+    margin-top: 0;
+}
+.marketplace-lead-proposal-panel h3 {
+    margin-top: 0;
+}
+.marketplace-lead-proposal-actions__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+}
+.marketplace-lead-proposal-actions__buttons form {
+    margin: 0;
+}
+
+/* Growth Engine — CommercialProposal detalhe (bloco Marketplace + impressão) */
+.growth-proposal-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    margin-top: var(--space-3);
+}
+.growth-proposal-status-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    margin-top: var(--space-3);
+}
+.growth-proposal-status-form {
+    margin: 0;
+}
+.growth-proposal-status-hint {
+    margin-top: var(--space-3);
+    margin-bottom: 0;
+}
+.growth-proposal-marketplace-panel {
+    border-left: 4px solid rgba(59, 130, 246, 0.55);
+    padding-left: var(--space-4);
+}
+.growth-proposal-subheading {
+    margin: var(--space-5) 0 var(--space-2);
+    font-size: 1rem;
+    color: var(--shell-text);
+}
+.growth-proposal-marketplace-panel h4.growth-proposal-subheading:first-of-type {
+    margin-top: var(--space-3);
+}
+.growth-proposal-dl-inline {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-3);
+}
+.growth-proposal-dl-inline dt {
+    color: var(--shell-muted);
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.2rem;
+}
+.growth-proposal-dl-inline dd {
+    margin: 0;
+    overflow-wrap: break-word;
+}
+.growth-proposal-email-preview,
+.growth-proposal-technical-notes,
+.growth-proposal-text-block {
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    background: rgba(148, 163, 184, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: var(--shell-radius-md, 12px);
+    padding: var(--space-3);
+}
+@media print {
+    .growth-proposal-no-print {
+        display: none !important;
+    }
+    .growth-proposal-marketplace-panel {
+        page-break-inside: avoid;
+    }
+}
+
+/* Growth — lista de propostas aprovadas (fila operacional) */
+.growth-proposal-operational-next {
+    border-left: 4px solid rgba(34, 197, 94, 0.5);
+    padding-left: var(--space-4);
+}
+.growth-proposal-operational-next h3 {
+    margin-top: 0;
+}
+.growth-approved-proposals-intro {
+    margin-bottom: var(--space-3);
+}
+.growth-approved-contact-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 10rem;
+}
+.growth-approved-contact-name {
+    font-weight: 600;
+}
+.growth-approved-mp-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--shell-text);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+}
+.growth-approved-proposals-table .growth-approved-actions-cell {
+    white-space: nowrap;
+}
+
+/* Growth — encaminhamento operacional na proposta aprovada */
+.growth-operational-forward-form {
+    margin-top: var(--space-4);
+    max-width: 860px;
+}
+.growth-operational-forward-field {
+    margin-bottom: var(--space-3);
+}
+.growth-operational-forward-field .form-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 120px;
+}
+.growth-operational-forward-actions {
+    justify-content: flex-start;
+}
+.growth-operational-forward-record {
+    margin-top: var(--space-4);
+}
+.growth-operational-forward-state {
+    margin-bottom: var(--space-3);
+}
+.growth-operational-forward-note-section .growth-proposal-subheading {
+    margin-top: var(--space-4);
+}
+
+@media (max-width: 900px) {
+    .marketplace-lead-forms-row > .column-span-6 {
+        grid-column: 1 / -1;
+    }
+}
+.growth-marketplace-leads-filter {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+}
+.growth-marketplace-leads-filter__search {
+    grid-column: span 2;
+    min-width: 0;
+}
+.growth-marketplace-leads-filter__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+@media (max-width: 980px) {
+    .growth-marketplace-leads-filter__search {
+        grid-column: span 1;
+    }
+}
+
 .maintenance-kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

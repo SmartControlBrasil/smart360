@@ -312,7 +312,7 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                     ],
                 },
                 {"label": "Scheduling Center", "icon": "calendar", "url_name": "admin-shell:module-page", "slug": "configuration-center"},
-                {"label": "CRM Center", "icon": "briefcase", "children": [{"label": "Dashboard", "icon": "grid", "url_name": "admin-shell:module-page", "slug": "growth-engine", "match_names": ["admin-shell:module-page"]}, {"label": "Leads da Lívia", "icon": "spark", "url_name": "admin-shell:growth-livia-leads", "match_names": ["admin-shell:growth-livia-leads", "admin-shell:growth-lead-detail"]}]},
+                {"label": "CRM Center", "icon": "briefcase", "children": [{"label": "Dashboard", "icon": "grid", "url_name": "admin-shell:module-page", "slug": "growth-engine", "match_names": ["admin-shell:module-page", "admin-shell:growth-proposals-approved", "admin-shell:growth-proposal-detail", "admin-shell:growth-proposal-mark-sent", "admin-shell:growth-proposal-approve", "admin-shell:growth-proposal-reject", "admin-shell:growth-proposal-operational-forward"]}, {"label": "Leads Marketplace E-com", "icon": "bag", "url_name": "admin-shell:growth-marketplace-leads", "match_names": ["admin-shell:growth-marketplace-leads", "admin-shell:growth-marketplace-lead-detail", "admin-shell:growth-marketplace-lead-create-proposal"]}, {"label": "Leads da Lívia", "icon": "spark", "url_name": "admin-shell:growth-livia-leads", "match_names": ["admin-shell:growth-livia-leads", "admin-shell:growth-lead-detail", "admin-shell:growth-lead-create-proposal", "admin-shell:growth-lead-action"]}]},
             ],
         },
         {
@@ -427,7 +427,7 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                         },
                     ],
                 },
-                {"label": "Growth Engine", "icon": "trend", "children": [{"label": "Dashboard", "icon": "grid", "url_name": "admin-shell:module-page", "slug": "growth-engine", "match_names": ["admin-shell:module-page"]}, {"label": "Leads da Lívia", "icon": "spark", "url_name": "admin-shell:growth-livia-leads", "match_names": ["admin-shell:growth-livia-leads", "admin-shell:growth-lead-detail"]}]},
+                {"label": "Growth Engine", "icon": "trend", "children": [{"label": "Dashboard", "icon": "grid", "url_name": "admin-shell:module-page", "slug": "growth-engine", "match_names": ["admin-shell:module-page", "admin-shell:growth-proposals-approved", "admin-shell:growth-proposal-detail", "admin-shell:growth-proposal-mark-sent", "admin-shell:growth-proposal-approve", "admin-shell:growth-proposal-reject", "admin-shell:growth-proposal-operational-forward"]}, {"label": "Leads Marketplace E-com", "icon": "bag", "url_name": "admin-shell:growth-marketplace-leads", "match_names": ["admin-shell:growth-marketplace-leads", "admin-shell:growth-marketplace-lead-detail", "admin-shell:growth-marketplace-lead-create-proposal"]}, {"label": "Leads da Lívia", "icon": "spark", "url_name": "admin-shell:growth-livia-leads", "match_names": ["admin-shell:growth-livia-leads", "admin-shell:growth-lead-detail", "admin-shell:growth-lead-create-proposal", "admin-shell:growth-lead-action"]}]},
             ],
         },
         {

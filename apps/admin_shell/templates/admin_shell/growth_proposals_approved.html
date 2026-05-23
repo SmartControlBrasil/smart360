@@ -1,0 +1,86 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="stat-grid">
+    <article class="stat-card">
+        <span>Total aprovadas (registro)</span>
+        <strong>{{ approved_proposals_total }}</strong>
+    </article>
+    <article class="stat-card">
+        <span>Exibindo na lista</span>
+        <strong>{{ approved_proposal_rows|length }}</strong>
+    </article>
+</section>
+
+<section class="panel-card growth-approved-proposals-intro">
+    <p class="shell-text-muted">
+        Somente status <strong>aceito</strong> (accepted). Rascunhos, enviadas, rejeitadas ou expiradas ficam de fora.
+        Use cada linha para abrir o detalhe ou o lead quando houver vínculo.
+    </p>
+</section>
+
+<section class="table-card growth-approved-proposals-table-wrap">
+    <table class="data-table growth-approved-proposals-table">
+        <thead>
+            <tr>
+                <th scope="col">Proposta</th>
+                <th scope="col">Cliente / empresa</th>
+                <th scope="col">Contato</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Origem</th>
+                <th scope="col">Marketplace</th>
+                <th scope="col">Serviço / interesse</th>
+                <th scope="col">Atualização</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in approved_proposal_rows %}
+            {% with proposal=row.proposal %}
+            <tr>
+                <th scope="row"><code>{{ proposal.proposal_number }}</code></th>
+                <td>{{ proposal.company_name }}</td>
+                <td class="growth-approved-contact-cell">
+                    <span class="growth-approved-contact-name">{{ proposal.contact_name|default:"—" }}</span>
+                    {% if proposal.email %}
+                        <span class="shell-text-muted">{{ proposal.email }}</span>
+                    {% endif %}
+                    {% if proposal.phone %}
+                        <span class="shell-text-muted">{{ proposal.phone }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if proposal.total_value %}
+                        R$ {{ proposal.total_value|floatformat:2 }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ proposal.origin|default:"—" }}</td>
+                <td>
+                    {% if row.is_marketplace %}
+                        <span class="growth-approved-mp-tag" aria-label="Origem Marketplace E-com">Marketplace E-com</span>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ proposal.service_interest|default:"—" }}</td>
+                <td>{{ proposal.updated_at|date:"d/m/Y H:i" }}</td>
+                <td class="growth-approved-actions-cell">
+                    <a href="{% url 'admin-shell:growth-proposal-detail' proposal.id %}">Detalhe</a>
+                    {% if proposal.lead_id %}
+                        {% if row.is_marketplace %}
+                            · <a href="{% url 'admin-shell:growth-marketplace-lead-detail' proposal.lead_id %}">Lead Marketplace</a>
+                        {% else %}
+                            · <a href="{% url 'admin-shell:growth-lead-detail' proposal.lead_id %}">Lead</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endwith %}
+        {% empty %}
+            <tr><td colspan="9">Nenhuma proposta aprovada no momento.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

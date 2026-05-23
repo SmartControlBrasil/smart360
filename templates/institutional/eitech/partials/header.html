@@ -19,6 +19,13 @@
                               <li><a href="{% url 'institutional:projects' %}">Projetos</a></li>
                               <li><a href="{% url 'institutional:blog' %}">Blog</a></li>
                               <li><a href="{% url 'institutional:contact' %}">Contato</a></li>
+                              <li class="header-mobile-login d-lg-none">
+                                {% if request.user.is_authenticated %}
+                                  <a href="/ecossistema/">Painel</a>
+                                {% else %}
+                                  <a href="{% url 'users:login' %}">Entrar</a>
+                                {% endif %}
+                              </li>
                           </ul>
                       </nav>
                   </div>
@@ -58,23 +65,7 @@
         </div>
 
         <div class="vl-offcanvas-menu d-lg-none mb-40">
-            <nav>
-              <ul>
-                <li><a href="{% url 'institutional:home' %}">Home</a></li>
-                <li><a href="{% url 'institutional:about' %}">Sobre</a></li>
-                <li><a href="{% url 'institutional:services' %}">Soluções</a></li>
-                <li><a href="{% url 'institutional:projects' %}">Projetos</a></li>
-                <li><a href="{% url 'institutional:blog' %}">Blog</a></li>
-                <li><a href="{% url 'institutional:contact' %}">Contato</a></li>
-                <li class="header-mobile-login">
-                  {% if request.user.is_authenticated %}
-                    <a href="/ecossistema/">Painel</a>
-                  {% else %}
-                    <a href="{% url 'users:login' %}">Entrar</a>
-                  {% endif %}
-                </li>
-              </ul>
-            </nav>
+            <nav></nav>
         </div>
 
         <div class="space20"></div>

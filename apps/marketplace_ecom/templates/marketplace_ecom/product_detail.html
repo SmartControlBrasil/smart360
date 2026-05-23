@@ -1,0 +1,142 @@
+{% extends "marketplace_ecom/base.html" %}
+{% load static %}
+{% block title %}{{ product.title }} | Marketplace Smart360{% endblock %}
+{% block content %}
+<div class="section-box">
+  <div class="breadcrumbs-div">
+    <div class="container"><ul class="breadcrumb"><li><a href="{% url 'marketplace_ecom:home' %}">Marketplace</a></li><li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li><li><span>{{ product.title }}</span></li></ul></div>
+  </div>
+</div>
+<section class="section-box shop-template">
+  <div class="container">
+    <div class="row mt-30">
+      <div class="col-lg-6">
+        <div class="gallery-image"><div class="galleries"><div class="detail-gallery"><div class="product-image-slider"><figure class="border-radius-10"><img src="{% static product.image %}" alt="{{ product.title }}"></figure></div></div></div></div>
+      </div>
+      <div class="col-lg-6">
+        <div class="product-info">
+          <span class="marketplace-smart-badge">{{ product.category }}</span>
+          <h3 class="color-brand-3 mt-10 mb-10">{{ product.title }}</h3>
+          <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-sm color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
+          <div class="box-product-price mt-20"><h3 class="color-brand-3 price-main d-inline-block mr-10">{{ product.price_label }}</h3></div>
+          <p class="font-base color-gray-700 mt-20">{{ product.short_description }}</p>
+          <div class="mt-20">
+            <span class="marketplace-mini-pill">Fabricante: {{ product.brand }}</span>
+            <span class="marketplace-mini-pill">Parceiro: {{ product.supplier }}</span>
+            <span class="marketplace-mini-pill">Aplicação: {{ product.application_area }}</span>
+          </div>
+          <div class="border-bottom pt-20 mb-20"></div>
+          <p class="font-sm color-gray-500">Esta página é apenas visual. Preço final, estoque, variações, carrinho e checkout serão implementados em blocos futuros. Para BHP e demais marcas, o preço permanece sob consulta.</p>
+          <div class="buy-product mt-30">
+            <a class="btn btn-buy" href="#quote-request">Solicitar orçamento</a>
+            <a class="btn btn-cart" href="#quote-request">Adicionar ao interesse</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section-box mt-50" id="quote-request">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5">
+        <div class="box-contact-support">
+          <h3 class="color-brand-3 mb-10">Solicitar orçamento</h3>
+          <p class="font-md color-gray-700">Informe seus dados e o contexto da necessidade. A equipe comercial recebe a solicitação como lead no Growth Engine e retorna com a melhor orientação.</p>
+          <div class="mt-25">
+            <span class="marketplace-mini-pill">{{ product.title }}</span>
+            <span class="marketplace-mini-pill">{{ product.brand }}</span>
+            <span class="marketplace-mini-pill">{{ product.supplier }}</span>
+          </div>
+          <p class="font-sm color-gray-500 mt-20">Sem carrinho, checkout ou pagamento nesta etapa. Este fluxo gera uma oportunidade comercial B2B.</p>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="box-contact-form">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success mb-20" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+          {% if quote_form.non_field_errors %}
+            <div class="alert alert-danger mb-20" role="alert">{{ quote_form.non_field_errors }}</div>
+          {% endif %}
+          <form method="post" action="{% url 'marketplace_ecom:request-quote' product.slug %}">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="font-sm color-gray-700">{{ quote_form.name.label }}</label>
+                  {{ quote_form.name }}
+                  {% for error in quote_form.name.errors %}<div class="font-xs color-danger">{{ error }}</div>{% endfor %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="font-sm color-gray-700">{{ quote_form.company.label }}</label>
+                  {{ quote_form.company }}
+                  {% for error in quote_form.company.errors %}<div class="font-xs color-danger">{{ error }}</div>{% endfor %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="font-sm color-gray-700">{{ quote_form.email.label }}</label>
+                  {{ quote_form.email }}
+                  {% for error in quote_form.email.errors %}<div class="font-xs color-danger">{{ error }}</div>{% endfor %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="font-sm color-gray-700">{{ quote_form.phone.label }}</label>
+                  {{ quote_form.phone }}
+                  {% for error in quote_form.phone.errors %}<div class="font-xs color-danger">{{ error }}</div>{% endfor %}
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="font-sm color-gray-700">{{ quote_form.city.label }}</label>
+                  {{ quote_form.city }}
+                  {% for error in quote_form.city.errors %}<div class="font-xs color-danger">{{ error }}</div>{% endfor %}
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="font-sm color-gray-700">{{ quote_form.message.label }}</label>
+                  {{ quote_form.message }}
+                  {% for error in quote_form.message.errors %}<div class="font-xs color-danger">{{ error }}</div>{% endfor %}
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-buy mt-10" type="submit">Enviar solicitação</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section-box mt-50 mb-50">
+  <div class="container">
+    <div class="head-main"><h3 class="mb-5">Soluções relacionadas</h3></div>
+    <div class="row mt-30">
+      {% for product in related_products %}
+      <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
+  <div class="card-grid-style-3">
+    <div class="card-grid-inner">
+      <div class="image-box">
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}"><img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}"></a>
+      </div>
+      <div class="info-right">
+        <span class="font-xs color-gray-500">{{ product.category }}</span><br>
+        <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:product-detail' product.slug %}">{{ product.title }}</a>
+        <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-xs color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
+        <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">{{ product.price_label }}</strong></div>
+        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

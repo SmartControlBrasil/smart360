@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="Marketplace visual inicial do ecossistema Smart360.">
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'marketplace/ecom/img/template/favicon.svg' %}">
+  <link href="{% static 'marketplace/ecom/css/style.css' %}" rel="stylesheet">
+  <link href="{% static 'marketplace/ecom/css/smart360-marketplace.css' %}" rel="stylesheet">
+  <title>{% block title %}Marketplace Smart360{% endblock %}</title>
+</head>
+<body>
+  <header class="header sticky-bar">
+    <div class="container">
+      <div class="main-header">
+        <div class="header-left">
+          <div class="header-logo">
+            <a class="d-flex" href="{% url 'marketplace_ecom:home' %}">
+              <img alt="Marketplace Smart360" src="{% static 'marketplace/ecom/img/template/logo.svg' %}">
+            </a>
+          </div>
+          <div class="header-search">
+            <div class="box-header-search">
+              <form class="form-search" method="get" action="{% url 'marketplace_ecom:products' %}">
+                <div class="box-category">
+                  <select class="select-active">
+                    <option>Todos</option>
+                    <option>Presentes criativos</option>
+                    <option>Moda personalizada</option>
+                    <option>Decoracao</option>
+                  </select>
+                </div>
+                <div class="box-keysearch">
+                  <input class="form-control font-xs" type="text" name="q" placeholder="Buscar produtos em breve">
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="header-nav">
+            <nav class="nav-main-menu d-none d-xl-block">
+              <ul class="main-menu">
+                <li><a href="{% url 'marketplace_ecom:home' %}">Marketplace</a></li>
+                <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+                <li><a href="#vendedores">Vendedores</a></li>
+                <li><a href="/">Smart360</a></li>
+              </ul>
+            </nav>
+            <div class="burger-icon burger-icon-white"><span class="burger-icon-top"></span><span class="burger-icon-mid"></span><span class="burger-icon-bottom"></span></div>
+          </div>
+          <div class="header-shop">
+            <a class="font-lg icon-list icon-account" href="/login/"><span>Entrar</span></a>
+            <a class="font-lg icon-list icon-cart" href="#"><span>Carrinho</span><span class="number-item font-xs">0</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
+    <div class="mobile-header-wrapper-inner">
+      <div class="mobile-header-content-area">
+        <div class="mobile-logo"><a class="d-flex" href="{% url 'marketplace_ecom:home' %}"><img alt="Marketplace Smart360" src="{% static 'marketplace/ecom/img/template/logo.svg' %}"></a></div>
+        <div class="perfect-scroll">
+          <div class="mobile-menu-wrap mobile-header-border">
+            <nav class="mt-15">
+              <ul class="mobile-menu font-heading">
+                <li><a href="{% url 'marketplace_ecom:home' %}">Marketplace</a></li>
+                <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+                <li><a href="#vendedores">Vendedores</a></li>
+                <li><a href="/login/">Entrar</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <div class="footer-1">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 width-25 mb-30">
+            <h4 class="mb-30 color-gray-1000">Marketplace Smart360</h4>
+            <div class="font-md color-gray-900">Camada visual inicial para produtos personalizados, criadores e vendedores parceiros.</div>
+          </div>
+          <div class="col-lg-2 width-20 mb-30">
+            <h4 class="mb-30 color-gray-1000">Navegacao</h4>
+            <ul class="menu-footer">
+              <li><a href="{% url 'marketplace_ecom:home' %}">Inicio</a></li>
+              <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+              <li><a href="#vendedores">Vendedores</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-3 width-25 mb-30">
+            <h4 class="mb-30 color-gray-1000">Status</h4>
+            <p class="font-md color-gray-900">Carrinho, checkout e dashboard de vendedores entram em blocos futuros.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="{% static 'marketplace/ecom/js/vendors/modernizr-3.6.0.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/jquery-3.6.0.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/jquery-migrate-3.3.0.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/wow.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/perfect-scrollbar.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/select2.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/vendors/slick.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/main.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/shop.js' %}"></script>
+</body>
+</html>

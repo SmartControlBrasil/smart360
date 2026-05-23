@@ -1,0 +1,60 @@
+
+.marketplace-smart-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #e8f6ff;
+  color: #0b5f8a;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  margin-bottom: 16px;
+}
+.marketplace-hero-copy {
+  max-width: 560px;
+}
+.marketplace-hero-copy h1 {
+  font-size: 48px;
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+.marketplace-hero-copy p {
+  font-size: 17px;
+  color: #425466;
+  margin: 18px 0 26px;
+}
+.marketplace-hero-visual {
+  min-height: 420px;
+  background-position: center right;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.marketplace-disabled-note {
+  color: #667085;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.marketplace-product-image {
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+.marketplace-category-card {
+  height: 100%;
+}
+.marketplace-category-card img {
+  max-height: 86px;
+  object-fit: contain;
+}
+.marketplace-mini-pill {
+  border: 1px solid #d5dde5;
+  border-radius: 999px;
+  color: #425466;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+}
+@media (max-width: 991px) {
+  .marketplace-hero-copy h1 { font-size: 36px; }
+  .marketplace-hero-visual { min-height: 260px; }
+}

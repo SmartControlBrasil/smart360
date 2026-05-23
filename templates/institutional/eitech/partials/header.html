@@ -15,7 +15,17 @@
                           <ul>
                               <li><a href="{% url 'institutional:home' %}">Home</a></li>
                               <li><a href="{% url 'institutional:about' %}">Sobre</a></li>
-                              <li><a href="{% url 'institutional:services' %}">Soluções</a></li>
+                              <li class="nav-item nav-item--has-dropdown scb-nav-dropdown">
+                                <a href="{% url 'institutional:services' %}">Soluções</a>
+                                <ul class="sub-menu solutions-dropdown">
+                                  <li><a href="{% url 'institutional:services' %}">Visão geral</a></li>
+                                  <li><a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação Industrial</a></li>
+                                  <li><a href="{% url 'institutional:service_inteligencia_artificial' %}">Inteligência Artificial</a></li>
+                                  <li><a href="{% url 'institutional:service_details' %}">Cybersecurity</a></li>
+                                  <li><a href="{% url 'institutional:smart360' %}">Sites e Sistemas</a></li>
+                                  <li><a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">Manutenção Técnica / HVAC</a></li>
+                                </ul>
+                              </li>
                               <li><a href="{% url 'institutional:projects' %}">Projetos</a></li>
                               <li><a href="{% url 'institutional:blog' %}">Blog</a></li>
                               <li><a href="{% url 'institutional:contact' %}">Contato</a></li>
@@ -32,7 +42,7 @@
               </div>
               <div class="col-lg-3 col-md-6 col-6">
                   <div class="header-btn-area d-none d-lg-flex">
-                      <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+                      <a href="{% url 'marketplace_ecom:home' %}" class="vl-btn1">Catalogo Técnico<i class="fa-solid fa-arrow-right"></i></a>
                       {% if request.user.is_authenticated %}
                         <a href="/ecossistema/" class="header-login-link">Painel</a>
                       {% else %}
@@ -87,7 +97,7 @@
          </div>
         <div class="space20"></div>
         <div class="vl-hero-btn">
-          <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="{% url 'marketplace_ecom:home' %}" class="vl-btn1">Marketplace <i class="fa-solid fa-arrow-right"></i></a>
         </div>
 
     </div>

@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
@@ -9,7 +10,11 @@ app_name = "institutional"
 urlpatterns = [
     path("", views.home, name="home"),
     path("sobre/", views.about, name="about"),
-    path("servicos/", views.services, name="services"),
+    path("solucoes/", views.services, name="services"),
+    path(
+        "servicos/",
+        RedirectView.as_view(pattern_name="institutional:services", permanent=True),
+    ),
     path("servicos/detalhes/", views.service_details, name="service_details"),
     path("servicos/marketing-digital-sites-conteudo/", views.service_marketing_digital, name="service_marketing_digital"),
     path("servicos/automacao-industrial-clps/", views.service_automacao_industrial_clps, name="service_automacao_industrial_clps"),
@@ -51,7 +56,11 @@ urlpatterns = [
     path("faq/", views.faq, name="faq"),
     # Aliases curtos para manter compatibilidade com o novo plano de URLs publicas.
     path("about/", views.about, name="about_alias"),
-    path("services/", views.services, name="services_alias"),
+    path(
+        "services/",
+        RedirectView.as_view(pattern_name="institutional:services", permanent=True),
+        name="services_alias",
+    ),
     path("contact/", views.contact, name="contact_alias"),
     path("service-details/", views.service_details, name="service_details_alias"),
     path("team/", views.team, name="team_alias"),

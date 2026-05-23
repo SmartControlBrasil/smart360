@@ -1,5 +1,32 @@
 /* Header público — CTA compacto + login alinhado ao menu (Smart Control Brasil) */
 
+/* Respiro lateral: logo e Painel/Marketplace (site público Smart Control Brasil).
+ * Nota: #vl-header-sticky e .vl-header-area estão no MESMO elemento — o seletor
+ * ancestral .vl-header-area filho não casava e o padding nem era aplicado. */
+.homepage1-body #vl-header-sticky > .container.headerfix {
+  margin-inline: auto;
+  max-width: 1440px;
+  width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .homepage1-body #vl-header-sticky > .container.headerfix {
+    padding-inline: clamp(16px, 5vw, 24px);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .homepage1-body #vl-header-sticky > .container.headerfix {
+    padding-inline: clamp(24px, 3.75vw, 40px);
+  }
+}
+
+@media (min-width: 992px) {
+  .homepage1-body #vl-header-sticky > .container.headerfix {
+    padding-inline: clamp(48px, 6vw, 72px);
+  }
+}
+
 .header-btn-area {
   align-items: center;
   display: flex;
@@ -78,6 +105,101 @@
   font-weight: 600;
 }
 
+@media (min-width: 992px) {
+  /*
+   * Dropdown Soluções (desktop): main.css usa .vl-main-menu ul > li .sub-menu com top:201% + scale(),
+   * o que abre um vão real — perde hover entre o link e o painel.
+   */
+  .homepage1-body .vl-main-menu,
+  .homepage1-body .vl-main-menu nav,
+  .homepage1-body .vl-main-menu nav > ul {
+    overflow: visible;
+  }
+
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown {
+    position: relative;
+  }
+
+  /* Ponte invisível: mantém hover no pai ao descer até o submenu */
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown::after {
+    content: "";
+    height: 28px;
+    left: 0;
+    pointer-events: auto;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 9998;
+  }
+
+  /* Ancorado ao li pai; !important ganha das regras do tema para top/transform */
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown > ul.sub-menu.solutions-dropdown {
+    background: var(--ztc-bg-bg-2, #0d1b33);
+    border-radius: 14px;
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.35);
+    border: none;
+    display: block;
+    left: 0;
+    list-style: none;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    min-width: min(320px, calc(100vw - 48px));
+    opacity: 0;
+    padding: 14px 0 12px !important;
+    pointer-events: none;
+    position: absolute;
+    text-align: left;
+    top: 100% !important;
+    transform: none !important;
+    transform-origin: unset !important;
+    transition:
+      opacity 0.18s ease,
+      visibility 0.18s ease;
+    visibility: hidden;
+    width: auto;
+    z-index: 9999;
+  }
+
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown:focus-within > ul.sub-menu.solutions-dropdown,
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown:hover > ul.sub-menu.solutions-dropdown {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    top: 100% !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown > ul.sub-menu.solutions-dropdown > li {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown > ul.sub-menu.solutions-dropdown > li > a {
+    color: var(--ztc-text-text-1, #ffffff) !important;
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    padding: 10px 22px !important;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown > ul.sub-menu.solutions-dropdown > li > a:hover,
+  .homepage1-body .vl-main-menu ul > li.nav-item--has-dropdown > ul.sub-menu.solutions-dropdown > li > a:focus-visible {
+    opacity: 0.85;
+    outline: none;
+    text-decoration: none;
+  }
+
+  /* Ícone de expansão só no off-canvas (desktop esconde botão do clone) */
+  .vl-offcanvas-menu nav .scb-nav-dropdown > .vl-menu-close {
+    display: none;
+  }
+}
+
+/* Off-canvas: submenu colapsável (main.js + slide + botão .vl-menu-close) */
 @media (max-width: 991.98px) {
   .homepage1-body .row-bg3 {
     align-items: center;
@@ -88,4 +210,21 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  .vl-offcanvas-menu nav .scb-nav-dropdown > .sub-menu {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 14px;
+  }
+}
+
+/* Páginas verticais /solucoes/… */
+.scb-vertical-intro p {
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.scb-vertical-cta-row {
+  gap: 14px;
 }

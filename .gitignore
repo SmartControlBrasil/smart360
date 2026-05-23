@@ -49,3 +49,18 @@ static/institutional/eitech/.htaccess
 static/institutional/eitech/robots.txt
 static/institutional/eitech/scss/
 static/institutional/eitech/**/*.map
+ecom/Ecom_v4.1_Unzip-First/8.Figma Design/
+ecom/Ecom_v4.1_Unzip-First/7.Documentation/
+ecom/Ecom_v4.1_Unzip-First/6.Development_Source_Dashboard/
+ecom/Ecom_v4.1_Unzip-First/4.Development_Source_Frontend_RTL/
+ecom/Ecom_v4.1_Unzip-First/2.Development_Source_Frontend_LTR/
+*.fig
+
+
+# Ecom template raw files - keep only adapted Django/static assets
+ecom/Ecom_v4.1_Unzip-First/8.Figma Design/
+ecom/Ecom_v4.1_Unzip-First/7.Documentation/
+ecom/Ecom_v4.1_Unzip-First/6.Development_Source_Dashboard/
+ecom/Ecom_v4.1_Unzip-First/4.Development_Source_Frontend_RTL/
+ecom/Ecom_v4.1_Unzip-First/2.Development_Source_Frontend_LTR/
+*.fig

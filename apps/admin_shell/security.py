@@ -9,6 +9,7 @@ from apps.access_control_center.services.smart_system_access import (
 )
 from apps.billing.services.billing_service import BillingAccessService
 from apps.companies.services.tenant_scope import TenantScopeService
+from apps.smart_system.services.tenant_scope import SmartSystemScopeService
 
 from .services.shell import get_dashboard_context, get_navigation
 from .services.tenant_scope import build_shell_tenant_context
@@ -37,6 +38,12 @@ def filter_context_actions(payload, permission_map):
     return payload
 
 
+class SmartSystemOperationalRouteMixin:
+    """Rotas CMMS do Admin Shell: exige membership ativa em ao menos uma Company (usuario comum)."""
+
+    enforce_active_company_membership = True
+
+
 class SmartSystemAccessMixin(LoginRequiredMixin):
     login_url = "/admin/login/"
     permission_domain = None
@@ -45,6 +52,8 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
     denied_template_name = "admin_shell/access_denied.html"
     log_permission_decision = False
     enforce_billing_access = True
+
+    enforce_active_company_membership = False
 
     def get_current_company(self):
         return TenantScopeService.resolve_context(self.request).company or get_default_company_for_user(self.request.user)
@@ -93,9 +102,36 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
             reason=f"{self.permission_domain}.{self.permission_action}",
         )
 
+    def _maybe_deny_without_smart_system_company_membership(self, request):
+        active = getattr(self, "enforce_active_company_membership", False)
+        if not active:
+            return None
+        if not request.user.is_authenticated:
+            return None
+        if request.user.is_superuser:
+            return None
+        if SmartSystemScopeService.get_allowed_company_ids(request.user):
+            return None
+        return render(
+            request,
+            self.denied_template_name,
+            self.get_access_denied_context(
+                title="Nenhuma empresa vinculada",
+                description=(
+                    "Sua conta nao possui membership ativa em nenhuma empresa do Smart360. "
+                    "Finalize o cadastro empresarial ou solicite um convite ao administrador para acessar o CMMS."
+                ),
+                notification_title="Contexto corporativo obrigatorio para esta area",
+            ),
+            status=403,
+        )
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
+        denial = self._maybe_deny_without_smart_system_company_membership(request)
+        if denial is not None:
+            return denial
         if self.enforce_billing_access:
             company_access = BillingAccessService.get_company_billing_context(self.get_current_company())
             if (

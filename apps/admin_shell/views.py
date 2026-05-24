@@ -47,7 +47,13 @@ from .forms import (
     SmartSystemEquipmentModelForm,
     TechnicianServiceSignatureForm,
 )
-from .security import ClientPortalAccessMixin, ClientPortalShellAccessMixin, SmartSystemAccessMixin, SmartSystemShellAccessMixin
+from .security import (
+    ClientPortalAccessMixin,
+    ClientPortalShellAccessMixin,
+    SmartSystemAccessMixin,
+    SmartSystemOperationalRouteMixin,
+    SmartSystemShellAccessMixin,
+)
 from .services.client_portal import (
     create_client_portal_request,
     generate_client_report_pdf,
@@ -171,6 +177,7 @@ from .services.smart_system_work_orders import get_work_order_detail_context, ge
 from apps.smart_system.models import Checklist, ChecklistItem, ServiceOrder, ServiceSignature
 from apps.smart_system.models import CustomerEquipment, EquipmentModel, MaintenanceClient, OperationalSite
 from apps.smart_system.services.maintenance_service import ServiceOrderService
+from apps.smart_system.services.admin_shell_dashboard import build_operations_chart_data
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
 from apps.smart_system.services.offline_sync import FieldOfflineSyncService
 from apps.smart_system.services.quote_service import ServiceQuoteService
@@ -223,6 +230,10 @@ class ShellContextMixin(SmartSystemShellAccessMixin):
         context = self.get_context_data(form=form)
         # When using FormView, render the template with status 400
         return render(self.request, self.get_template_names(), context=context, status=400)
+
+
+class CMMSOperationalShellMixin(SmartSystemOperationalRouteMixin, ShellContextMixin):
+    """Rotas CMMS no Admin Shell: shell + obrigatoriedade de membership empresa (usuario comum)."""
 
 
 class ClientPortalContextMixin(ClientPortalShellAccessMixin):
@@ -311,7 +322,7 @@ class TechnicianScopedTemplateView(TechnicianAppContextMixin, TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class ScopedResourceTemplateView(ShellContextMixin, TemplateView):
+class ScopedResourceTemplateView(CMMSOperationalShellMixin, TemplateView):
     scoped_resource = None
 
     def load_scoped_resource(self):
@@ -2752,7 +2763,7 @@ class DashboardView(ShellContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(get_dashboard_context(tenant_context=self.get_tenant_context()))
+        context.update(get_dashboard_context(tenant_context=self.get_tenant_context(), request=self.request))
         context["page_title"] = "Executive Command Center"
         context["page_description"] = "Cockpit administrativo do ecossistema SMART360 com visao executiva, operacional e modular."
         context["breadcrumbs"] = [{"label": "Dashboard", "url": None}]
@@ -2762,6 +2773,10 @@ class DashboardView(ShellContextMixin, TemplateView):
 
 class ModulePageView(ShellContextMixin, TemplateView):
     template_name = "admin_shell/module_page.html"
+
+    @property
+    def enforce_active_company_membership(self):
+        return self.kwargs.get("module_slug") == "smart-system"
 
     def has_required_permission(self):
         module_slug = self.kwargs.get("module_slug")
@@ -2795,7 +2810,7 @@ class ModulePageView(ShellContextMixin, TemplateView):
         context["current_module_slug"] = module_slug
         if module_slug == "smart-system":
             smart_context = build_smart_system_page_context(
-                get_smart_system_dashboard_context(tenant_context=self.get_tenant_context()),
+                get_smart_system_dashboard_context(self.request, tenant_context=self.get_tenant_context()),
                 "overview",
             )
             context.update(smart_context)
@@ -2860,14 +2875,7 @@ def build_smart_system_page_context(dashboard_context, page):
         ]
         context.update(
             {
-                "operation_kpis": [
-                    {"label": "OS em andamento", "value": "18", "context": "equipes em execucao", "trend": "fila ativa do dia", "badge": "Campo", "tone": "sky"},
-                    {"label": "OS aguardando peca", "value": "4", "context": "2 acima do SLA", "trend": "MRO em acompanhamento", "badge": "Pecas", "tone": "amber"},
-                    {"label": "OS sem responsavel", "value": "4", "context": "triagem pendente", "trend": "+2 em 24h", "badge": "Atribuir", "tone": "red"},
-                    {"label": "Preventivas programadas", "value": "14", "context": "janela de hoje", "trend": "38 na semana", "badge": "Planejado", "tone": "emerald"},
-                    {"label": "Visitas de hoje", "value": "12", "context": "7 em rota", "trend": "3 janelas criticas", "badge": "Agenda", "tone": "indigo"},
-                    {"label": "Tecnicos em campo", "value": "9", "context": "4 equipes ativas", "trend": "cobertura normal", "badge": "Equipe", "tone": "teal"},
-                ],
+                "operation_kpis": dashboard_context["operation_kpis"],
                 "work_orders": dashboard_context["work_orders"],
                 "preventive_plan": dashboard_context["preventive_plan"],
                 "backlog": dashboard_context["backlog"],
@@ -2900,24 +2908,25 @@ def build_smart_system_page_context(dashboard_context, page):
             "operational_health": dashboard_context["operational_health"],
             "site_status": dashboard_context["site_status"],
             "engineering_alerts": dashboard_context["alerts"][1:],
-            "tpm_indicators": [
-                {"label": "OEE tecnico", "value": "88%", "context": "estimado em ativos criticos", "trend": "+2 pp", "badge": "TPM", "tone": "cyan"},
-                {"label": "Checklists pendentes", "value": "11", "context": "3 nao conformes", "trend": "prioridade alta", "badge": "Qualidade", "tone": "amber"},
-                {"label": "PMOC / conformidade", "value": "94%", "context": "documentos e rotinas", "trend": "dentro da meta", "badge": "PMOC", "tone": "emerald"},
-            ],
+            "tpm_indicators": dashboard_context["tpm_indicators"],
         }
     )
     return context
 
 
-class SmartSystemOperationsView(ShellContextMixin, TemplateView):
+class SmartSystemOperationsView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system/operations.html"
     permission_domain = "dashboard"
     permission_action = "view"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(build_smart_system_page_context(get_smart_system_dashboard_context(tenant_context=self.get_tenant_context()), "operations"))
+        context.update(
+            build_smart_system_page_context(
+                get_smart_system_dashboard_context(self.request, tenant_context=self.get_tenant_context()),
+                "operations",
+            )
+        )
         context["page_title"] = "Smart System - Operacao"
         context["page_description"] = "Controle diario da manutencao: OS, agenda, backlog e alertas operacionais."
         context["breadcrumbs"] = [
@@ -2925,33 +2934,24 @@ class SmartSystemOperationsView(ShellContextMixin, TemplateView):
             {"label": "Smart System", "url": "admin-shell:module-page", "route_kwargs": {"module_slug": "smart-system"}},
             {"label": "Operacao", "url": None},
         ]
-        # TODO: trocar placeholders por métricas reais agregadas do Smart System.
-        context["operations_chart_data"] = {
-            "status": {
-                "labels": ["Em andamento", "Programada", "Aguardando peça", "Sem responsável"],
-                "series": [18, 12, 7, 4],
-            },
-            "maintenanceMix": {
-                "labels": ["Preventivas", "Corretivas"],
-                "series": [28, 15],
-            },
-            "weeklyBacklog": {
-                "labels": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
-                "series": [34, 31, 29, 26, 24, 21, 19],
-            },
-        }
+        context["operations_chart_data"] = build_operations_chart_data(self.request)
         context["current_module_slug"] = "smart-system"
         return context
 
 
-class SmartSystemReliabilityView(ShellContextMixin, TemplateView):
+class SmartSystemReliabilityView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system/reliability.html"
     permission_domain = "dashboard"
     permission_action = "view"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(build_smart_system_page_context(get_smart_system_dashboard_context(tenant_context=self.get_tenant_context()), "reliability"))
+        context.update(
+            build_smart_system_page_context(
+                get_smart_system_dashboard_context(self.request, tenant_context=self.get_tenant_context()),
+                "reliability",
+            )
+        )
         context["page_title"] = "Smart System - Engenharia & TPM"
         context["page_description"] = "Analise tecnica de confiabilidade, aderencia preventiva, reincidencia e conformidade."
         context["breadcrumbs"] = [
@@ -2963,7 +2963,7 @@ class SmartSystemReliabilityView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemAssetListView(ShellContextMixin, TemplateView):
+class SmartSystemAssetListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_assets_list.html"
     permission_domain = "assets"
     permission_action = "view"
@@ -3016,7 +3016,7 @@ class SmartSystemAssetDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemEquipmentModelListView(ShellContextMixin, TemplateView):
+class SmartSystemEquipmentModelListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_equipment_models_list.html"
     permission_domain = "assets"
     permission_action = "view"
@@ -3066,7 +3066,7 @@ class SmartSystemEquipmentModelDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemEquipmentModelCreateView(ShellContextMixin, FormView):
+class SmartSystemEquipmentModelCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_equipment_model_form.html"
     form_class = SmartSystemEquipmentModelForm
     permission_domain = "assets"
@@ -3099,7 +3099,7 @@ class SmartSystemEquipmentModelCreateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-equipment-model-detail", model_code=str(model.public_id)[:8])
 
 
-class SmartSystemEquipmentModelUpdateView(ShellContextMixin, FormView):
+class SmartSystemEquipmentModelUpdateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_equipment_model_form.html"
     form_class = SmartSystemEquipmentModelForm
     permission_domain = "assets"
@@ -3141,7 +3141,7 @@ class SmartSystemEquipmentModelUpdateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-equipment-model-detail", model_code=str(model.public_id)[:8])
 
 
-class SmartSystemCustomerEquipmentListView(ShellContextMixin, TemplateView):
+class SmartSystemCustomerEquipmentListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_customer_equipments_list.html"
     permission_domain = "assets"
     permission_action = "view"
@@ -3191,7 +3191,7 @@ class SmartSystemCustomerEquipmentDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemCustomerEquipmentCreateView(ShellContextMixin, FormView):
+class SmartSystemCustomerEquipmentCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_customer_equipment_form.html"
     form_class = SmartSystemCustomerEquipmentForm
     permission_domain = "assets"
@@ -3224,7 +3224,7 @@ class SmartSystemCustomerEquipmentCreateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-customer-equipment-detail", equipment_code=str(equipment.public_id)[:8])
 
 
-class SmartSystemCustomerEquipmentUpdateView(ShellContextMixin, FormView):
+class SmartSystemCustomerEquipmentUpdateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_customer_equipment_form.html"
     form_class = SmartSystemCustomerEquipmentForm
     permission_domain = "assets"
@@ -3266,7 +3266,7 @@ class SmartSystemCustomerEquipmentUpdateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-customer-equipment-detail", equipment_code=str(equipment.public_id)[:8])
 
 
-class SmartSystemCustomerListView(ShellContextMixin, TemplateView):
+class SmartSystemCustomerListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_customers_list.html"
     permission_domain = "assets"
     permission_action = "view"
@@ -3285,7 +3285,7 @@ class SmartSystemCustomerListView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemCustomerCreateView(ShellContextMixin, FormView):
+class SmartSystemCustomerCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_customer_form.html"
     form_class = SmartSystemMaintenanceClientForm
     permission_domain = "assets"
@@ -3354,7 +3354,7 @@ class SmartSystemCustomerDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemCustomerUpdateView(ShellContextMixin, FormView):
+class SmartSystemCustomerUpdateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_customer_form.html"
     form_class = SmartSystemMaintenanceClientForm
     permission_domain = "assets"
@@ -3396,7 +3396,7 @@ class SmartSystemCustomerUpdateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-customers")
 
 
-class SmartSystemSiteCreateView(ShellContextMixin, FormView):
+class SmartSystemSiteCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_site_form.html"
     form_class = SmartSystemOperationalSiteForm
     permission_domain = "assets"
@@ -3428,7 +3428,7 @@ class SmartSystemSiteCreateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-customers")
 
 
-class SmartSystemSchedulingDashboardView(ShellContextMixin, TemplateView):
+class SmartSystemSchedulingDashboardView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_scheduling_dashboard.html"
     permission_domain = "scheduling"
     permission_action = "view"
@@ -3464,7 +3464,7 @@ class SmartSystemSchedulingDashboardView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemScheduleCalendarView(ShellContextMixin, TemplateView):
+class SmartSystemScheduleCalendarView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_schedule_calendar.html"
     permission_domain = "scheduling"
     permission_action = "view"
@@ -3530,7 +3530,7 @@ class SmartSystemTechnicianAgendaView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemUnassignedVisitsView(ShellContextMixin, TemplateView):
+class SmartSystemUnassignedVisitsView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_unassigned_visits.html"
     permission_domain = "scheduling"
     permission_action = "view"
@@ -3558,7 +3558,7 @@ class SmartSystemUnassignedVisitsView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemPartListView(ShellContextMixin, TemplateView):
+class SmartSystemPartListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_parts_list.html"
     permission_domain = "inventory"
     permission_action = "view"
@@ -3626,7 +3626,7 @@ class SmartSystemPartDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemPartCreateView(ShellContextMixin, FormView):
+class SmartSystemPartCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_part_form.html"
     form_class = SmartSystemPartForm
     permission_domain = "inventory"
@@ -3662,7 +3662,7 @@ class SmartSystemPartCreateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-parts")
 
 
-class SmartSystemPartUpdateView(ShellContextMixin, FormView):
+class SmartSystemPartUpdateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_part_form.html"
     form_class = SmartSystemPartForm
     permission_domain = "inventory"
@@ -3704,7 +3704,7 @@ class SmartSystemPartUpdateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-parts")
 
 
-class SmartSystemPartDeactivateView(ShellContextMixin, View):
+class SmartSystemPartDeactivateView(CMMSOperationalShellMixin, View):
     permission_domain = "inventory"
     permission_action = "update"
     resource_type = "part"
@@ -3721,7 +3721,7 @@ class SmartSystemPartDeactivateView(ShellContextMixin, View):
         return redirect("admin-shell:smart-system-parts")
 
 
-class SmartSystemStockMovementView(ShellContextMixin, TemplateView):
+class SmartSystemStockMovementView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_stock_movements.html"
     permission_domain = "inventory"
     permission_action = "view"
@@ -3741,7 +3741,7 @@ class SmartSystemStockMovementView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemReportListView(ShellContextMixin, TemplateView):
+class SmartSystemReportListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_reports_list.html"
     permission_domain = "reports"
     permission_action = "view"
@@ -3790,7 +3790,7 @@ class SmartSystemReportPreviewView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemReportDownloadView(SmartSystemAccessMixin, View):
+class SmartSystemReportDownloadView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "reports"
     permission_action = "export"
     resource_type = "report"
@@ -3822,7 +3822,7 @@ class SmartSystemReportDownloadView(SmartSystemAccessMixin, View):
         return response
 
 
-class SmartSystemQuoteListView(ShellContextMixin, TemplateView):
+class SmartSystemQuoteListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_quotes_list.html"
     permission_domain = "quotes"
     permission_action = "view"
@@ -3866,7 +3866,7 @@ class SmartSystemQuoteDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemQuoteSendView(SmartSystemAccessMixin, View):
+class SmartSystemQuoteSendView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "quotes"
     permission_action = "send"
     resource_type = "service_quote"
@@ -3880,7 +3880,7 @@ class SmartSystemQuoteSendView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-quote-detail", quote_number=quote_number)
 
 
-class SmartSystemQuoteApproveView(SmartSystemAccessMixin, View):
+class SmartSystemQuoteApproveView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "quotes"
     permission_action = "approve"
     resource_type = "service_quote"
@@ -3899,7 +3899,7 @@ class SmartSystemQuoteApproveView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-quote-detail", quote_number=quote_number)
 
 
-class SmartSystemQuoteRejectView(SmartSystemAccessMixin, View):
+class SmartSystemQuoteRejectView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "quotes"
     permission_action = "reject"
     resource_type = "service_quote"
@@ -3918,7 +3918,7 @@ class SmartSystemQuoteRejectView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-quote-detail", quote_number=quote_number)
 
 
-class SmartSystemContractListView(ShellContextMixin, TemplateView):
+class SmartSystemContractListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_contracts_list.html"
     permission_domain = "maintenance_contracts"
     permission_action = "view"
@@ -3970,7 +3970,7 @@ class SmartSystemContractDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemContractActivateView(SmartSystemAccessMixin, View):
+class SmartSystemContractActivateView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "maintenance_contracts"
     permission_action = "manage"
     resource_type = "maintenance_contract"
@@ -3984,7 +3984,7 @@ class SmartSystemContractActivateView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-contract-detail", contract_number=contract_number)
 
 
-class SmartSystemContractSuspendView(SmartSystemAccessMixin, View):
+class SmartSystemContractSuspendView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "maintenance_contracts"
     permission_action = "manage"
     resource_type = "maintenance_contract"
@@ -4002,7 +4002,7 @@ class SmartSystemContractSuspendView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-contract-detail", contract_number=contract_number)
 
 
-class SmartSystemContractGeneratePreventivesView(SmartSystemAccessMixin, View):
+class SmartSystemContractGeneratePreventivesView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "maintenance_contracts"
     permission_action = "generate"
     resource_type = "maintenance_contract"
@@ -4016,7 +4016,7 @@ class SmartSystemContractGeneratePreventivesView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-contract-detail", contract_number=contract_number)
 
 
-class SmartSystemContractGenerateBillingView(SmartSystemAccessMixin, View):
+class SmartSystemContractGenerateBillingView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "maintenance_contracts"
     permission_action = "generate"
     resource_type = "maintenance_contract"
@@ -4030,7 +4030,7 @@ class SmartSystemContractGenerateBillingView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-contract-detail", contract_number=contract_number)
 
 
-class SmartSystemWorkOrderListView(ShellContextMixin, TemplateView):
+class SmartSystemWorkOrderListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_work_orders_list.html"
     permission_domain = "work_orders"
     permission_action = "view"
@@ -4050,7 +4050,7 @@ class SmartSystemWorkOrderListView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemWorkOrderCreateView(ShellContextMixin, FormView):
+class SmartSystemWorkOrderCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_work_order_create.html"
     form_class = CorrectiveServiceOrderForm
     permission_domain = "work_orders"
@@ -4127,7 +4127,7 @@ class SmartSystemWorkOrderCreateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-work-order-detail", order_code=so.order_number)
 
 
-class SmartSystemWorkOrderPreventiveCreateView(ShellContextMixin, FormView):
+class SmartSystemWorkOrderPreventiveCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_work_order_create_preventive.html"
     form_class = PreventiveServiceOrderForm
     permission_domain = "work_orders"
@@ -4294,7 +4294,7 @@ class SmartSystemWorkOrderExecutionView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemWorkOrderExecutionStartView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderExecutionStartView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "work_execution"
     permission_action = "execute"
     resource_type = "work_order_execution"
@@ -4319,7 +4319,7 @@ class SmartSystemWorkOrderExecutionStartView(SmartSystemAccessMixin, View):
         return post_service_order_named_transition(request=request, order_code=order_code, transition="start")
 
 
-class SmartSystemWorkOrderExecutionSaveView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderExecutionSaveView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "work_execution"
     permission_action = "execute"
     resource_type = "work_order_execution"
@@ -4344,7 +4344,7 @@ class SmartSystemWorkOrderExecutionSaveView(SmartSystemAccessMixin, View):
         return post_service_order_progress_notes(request=request, order_code=order_code)
 
 
-class SmartSystemWorkOrderTechnicianSignatureView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderTechnicianSignatureView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "service_signatures"
     permission_action = "capture"
     resource_type = "work_order_signature"
@@ -4379,7 +4379,7 @@ class SmartSystemWorkOrderTechnicianSignatureView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-work-order-execution", order_code=order_code)
 
 
-class SmartSystemWorkOrderClientSignatureView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderClientSignatureView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "service_signatures"
     permission_action = "capture"
     resource_type = "work_order_signature"
@@ -4414,7 +4414,7 @@ class SmartSystemWorkOrderClientSignatureView(SmartSystemAccessMixin, View):
         return redirect("admin-shell:smart-system-work-order-execution", order_code=order_code)
 
 
-class SmartSystemWorkOrderExecutionCompleteView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderExecutionCompleteView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "work_orders"
     permission_action = "close"
     resource_type = "work_order"
@@ -4446,7 +4446,7 @@ class SmartSystemWorkOrderExecutionCompleteView(SmartSystemAccessMixin, View):
         return post_service_order_complete(request=request, order_code=order_code)
 
 
-class SmartSystemWorkOrderTransitionView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderTransitionView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "work_orders"
     permission_action = "update"
     resource_type = "work_order"
@@ -4462,7 +4462,7 @@ class SmartSystemWorkOrderTransitionView(SmartSystemAccessMixin, View):
         return post_service_order_transition(request=request, order_code=order_code)
 
 
-class SmartSystemWorkOrderWorkLogView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderWorkLogView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "work_orders"
     permission_action = "update"
     resource_type = "work_order"
@@ -4478,7 +4478,7 @@ class SmartSystemWorkOrderWorkLogView(SmartSystemAccessMixin, View):
         return post_service_order_worklog(request=request, order_code=order_code)
 
 
-class SmartSystemWorkOrderChecklistSaveView(SmartSystemAccessMixin, View):
+class SmartSystemWorkOrderChecklistSaveView(SmartSystemOperationalRouteMixin, SmartSystemAccessMixin, View):
     permission_domain = "work_execution"
     permission_action = "execute"
     resource_type = "work_order_execution"
@@ -4494,7 +4494,7 @@ class SmartSystemWorkOrderChecklistSaveView(SmartSystemAccessMixin, View):
         return post_service_order_checklist_responses(request=request, order_code=order_code)
 
 
-class SmartSystemPreventiveListView(ShellContextMixin, TemplateView):
+class SmartSystemPreventiveListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_preventives_list.html"
     permission_domain = "preventive_plans"
     permission_action = "view"
@@ -4514,7 +4514,7 @@ class SmartSystemPreventiveListView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemPreventiveScheduleView(ShellContextMixin, TemplateView):
+class SmartSystemPreventiveScheduleView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_preventives_schedule.html"
     permission_domain = "preventive_plans"
     permission_action = "view"
@@ -4534,7 +4534,7 @@ class SmartSystemPreventiveScheduleView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemPreventiveCalendarView(ShellContextMixin, TemplateView):
+class SmartSystemPreventiveCalendarView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_preventives_calendar.html"
     permission_domain = "preventive_plans"
     permission_action = "view"
@@ -4580,7 +4580,7 @@ class SmartSystemPreventiveDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemFailureListView(ShellContextMixin, TemplateView):
+class SmartSystemFailureListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_failures_list.html"
     permission_domain = "failures"
     permission_action = "view"
@@ -4626,7 +4626,7 @@ class SmartSystemFailureDetailView(ScopedResourceTemplateView):
         return context
 
 
-class SmartSystemChecklistListView(ShellContextMixin, TemplateView):
+class SmartSystemChecklistListView(CMMSOperationalShellMixin, TemplateView):
     template_name = "admin_shell/smart_system_checklists_list.html"
     permission_domain = "checklists"
     permission_action = "view"
@@ -4662,7 +4662,7 @@ class SmartSystemChecklistListView(ShellContextMixin, TemplateView):
         return context
 
 
-class SmartSystemChecklistCreateView(ShellContextMixin, FormView):
+class SmartSystemChecklistCreateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_checklist_form.html"
     form_class = SmartSystemChecklistForm
     permission_domain = "checklists"
@@ -4732,7 +4732,7 @@ class SmartSystemChecklistCreateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-checklists")
 
 
-class SmartSystemChecklistUpdateView(ShellContextMixin, FormView):
+class SmartSystemChecklistUpdateView(CMMSOperationalShellMixin, FormView):
     template_name = "admin_shell/smart_system_checklist_form.html"
     form_class = SmartSystemChecklistForm
     permission_domain = "checklists"
@@ -4845,7 +4845,7 @@ class SmartSystemChecklistUpdateView(ShellContextMixin, FormView):
         return redirect("admin-shell:smart-system-checklists")
 
 
-class SmartSystemChecklistDeactivateView(ShellContextMixin, View):
+class SmartSystemChecklistDeactivateView(CMMSOperationalShellMixin, View):
     permission_domain = "checklists"
     permission_action = "update"
     resource_type = "checklist"

@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
+from apps.admin_shell.security import SmartSystemOperationalRouteMixin
 from apps.admin_shell.views import ShellContextMixin
 
 from apps.smart_system.forms import (
@@ -42,7 +43,7 @@ def lookup_preventive_routine(request, code: str) -> PreventiveInspectionRoutine
     return None
 
 
-class SmartInspectionRoutineBase(ShellContextMixin):
+class SmartInspectionRoutineBase(SmartSystemOperationalRouteMixin, ShellContextMixin):
     permission_domain = "preventive_plans"
     permission_action = "view"
 

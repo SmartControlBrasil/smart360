@@ -1,7 +1,6 @@
 from copy import deepcopy
 
 from apps.access_control_center.services.smart_system_access import filter_permissioned_items
-from .tenant_scope import record_matches_scope
 
 
 MODULE_PAGES = {
@@ -683,7 +682,7 @@ def _apply_tenant_context_to_dashboard(payload, tenant_context=None):
     return payload
 
 
-def get_dashboard_context(tenant_context=None):
+def get_dashboard_context(tenant_context=None, request=None):
     payload = {
         "summary_cards": [
             {"label": "Modulos ativos", "value": "23", "delta": "+3 nesta sprint", "tone": "indigo"},
@@ -727,168 +726,27 @@ def get_dashboard_context(tenant_context=None):
             {"label": "Entrar em configuracoes", "slug": "configuration-center"},
         ],
     }
+    if request is not None:
+        from apps.smart_system.services.admin_shell_dashboard import scoped_open_service_orders_count
+
+        open_ss = scoped_open_service_orders_count(request)
+        metric = "0 OS em aberto"
+        if open_ss == 1:
+            metric = "1 OS em aberto"
+        elif open_ss > 1:
+            metric = f"{open_ss} OS em aberto"
+        for shortcut in payload["module_shortcuts"]:
+            if shortcut.get("slug") == "smart-system":
+                shortcut["metric"] = metric
+                break
+
     return _apply_tenant_context_to_dashboard(payload, tenant_context=tenant_context)
 
 
-def get_smart_system_dashboard_context(tenant_context=None):
-    tenant_context = tenant_context or {}
-    company = tenant_context.get("company")
-    site = tenant_context.get("site")
-    scope_client = company.name if company else "Academia Exemplo"
-    scope_site = site.name if site else "Todos os sites permitidos"
+def get_smart_system_dashboard_context(request, tenant_context=None):
+    from apps.smart_system.services.admin_shell_dashboard import build_smart_system_dashboard_context
 
-    site_status = [
-        {"client": "Academia Exemplo", "site": "Unidade Centro", "open_orders": "18", "delays": "3", "critical_assets": "4", "compliance": "93%", "status": "Sob controle", "tone": "emerald"},
-        {"client": "Academia Exemplo", "site": "Unidade Norte", "open_orders": "11", "delays": "4", "critical_assets": "6", "compliance": "84%", "status": "Atencao", "tone": "amber"},
-        {"client": "Laboratorio Exemplo", "site": "Laboratorio Campinas", "open_orders": "7", "delays": "2", "critical_assets": "2", "compliance": "96%", "status": "Saudavel", "tone": "sky"},
-        {"client": "Panobianco", "site": "Academia Premium Sul", "open_orders": "16", "delays": "5", "critical_assets": "7", "compliance": "79%", "status": "Critico", "tone": "red"},
-    ]
-    scoped_site_status = [
-        item
-        for item in site_status
-        if record_matches_scope(item, tenant_context, client_key="client", site_key="site")
-    ] or site_status
-
-    payload = {
-        "page_actions": [
-            {"label": "Nova OS", "route_name": "admin-shell:smart-system-work-order-create", "permission_domain": "work_orders", "permission_action": "create"},
-            {"label": "Nova preventiva", "href": "#nova-preventiva", "permission_domain": "preventive_plans", "permission_action": "create"},
-            {"label": "Registrar falha", "href": "#registrar-falha", "permission_domain": "failures", "permission_action": "create"},
-            {"label": "Ver ativos", "route_name": "admin-shell:smart-system-assets", "permission_domain": "assets", "permission_action": "view"},
-            {"label": "Ordens de servico", "route_name": "admin-shell:smart-system-work-orders", "permission_domain": "work_orders", "permission_action": "view"},
-            {"label": "Preventivas", "route_name": "admin-shell:smart-system-preventives", "permission_domain": "preventive_plans", "permission_action": "view"},
-            {"label": "Planos rotativos", "route_name": "admin-shell:smart-system-inspection-routines", "permission_domain": "preventive_plans", "permission_action": "view"},
-            {"label": "Falhas", "route_name": "admin-shell:smart-system-failures", "permission_domain": "failures", "permission_action": "view"},
-            {"label": "Checklists", "route_name": "admin-shell:smart-system-checklists", "permission_domain": "checklists", "permission_action": "view"},
-            {"label": "Relatorios", "route_name": "admin-shell:smart-system-reports", "permission_domain": "reports", "permission_action": "view"},
-            {"label": "Exportar visao", "href": "#exportar", "permission_domain": "reports", "permission_action": "export"},
-        ],
-        "filter_groups": [
-            {"label": "Periodo", "type": "chips", "options": ["Hoje", "7 dias", "30 dias", "Trimestre"], "active": "30 dias"},
-            {"label": "Site / unidade", "type": "select", "value": scope_site},
-            {"label": "Cliente", "type": "select", "value": scope_client},
-            {"label": "Criticidade", "type": "select", "value": "Todas"},
-            {"label": "Status da OS", "type": "select", "value": "Abertas e em andamento"},
-            {"label": "Tipo", "type": "select", "value": "Preventiva + Corretiva"},
-        ],
-        "kpis": [
-            {"label": "Ativos monitorados", "value": "284", "context": "31 sob plano premium", "trend": "+4,1% vs mes anterior", "badge": "Cobertura alta", "tone": "indigo"},
-            {"label": "Ordens abertas", "value": "52", "context": "18 em execucao", "trend": "-7 ordens vs ontem", "badge": "Fluxo controlado", "tone": "sky"},
-            {"label": "OS atrasadas", "value": "9", "context": "4 sem responsavel", "trend": "+2 nas ultimas 24h", "badge": "Atencao", "tone": "amber"},
-            {"label": "Preventivas do mes", "value": "118", "context": "96 concluidas", "trend": "81% aderencia mensal", "badge": "Planejado", "tone": "emerald"},
-            {"label": "Falhas criticas", "value": "6", "context": "3 reincidentes", "trend": "-1 evento vs semana anterior", "badge": "Risco moderado", "tone": "red"},
-            {"label": "Backlog tecnico", "value": "34", "context": "12 de alta criticidade", "trend": "+8 itens acumulados", "badge": "Pressao em campo", "tone": "orange"},
-            {"label": "Disponibilidade operacional", "value": "96,8%", "context": "chillers e esteiras lideram uptime", "trend": "+0,6 pp", "badge": "Saudavel", "tone": "emerald"},
-            {"label": "MTTR", "value": "3,4 h", "context": "tempo medio corretivo", "trend": "-18 min", "badge": "Melhorando", "tone": "teal"},
-            {"label": "MTBF", "value": "186 h", "context": "ativos criticos", "trend": "+9 h", "badge": "Estavel", "tone": "violet"},
-            {"label": "Conformidade preventiva", "value": "91%", "context": "janela do ciclo atual", "trend": "+3 pp", "badge": "Acima da meta", "tone": "cyan"},
-        ],
-        "operational_health": {
-            "distribution": [
-                {"label": "Ativos saudaveis", "value": 224, "percentage": 79, "tone": "emerald"},
-                {"label": "Em atencao", "value": 42, "percentage": 15, "tone": "amber"},
-                {"label": "Criticos", "value": 18, "percentage": 6, "tone": "red"},
-            ],
-            "focus_areas": [
-                {"area": "HVAC - Unidade Centro", "summary": "4 ativos com alarme de temperatura e 2 corretivas pendentes", "tone": "red"},
-                {"area": "Cardio Floor", "summary": "Esteiras com desgaste acelerado e backlog de pecas", "tone": "amber"},
-                {"area": "Utilidades Prediais", "summary": "Disponibilidade acima da meta, sem OS criticas abertas", "tone": "emerald"},
-            ],
-            "critical_orders": [
-                {"label": "OS criticas abertas", "value": "5"},
-                {"label": "Paradas de ativo", "value": "2"},
-                {"label": "Areas com maior incidencia", "value": "HVAC / Cardio"},
-            ],
-        },
-        "work_orders": [
-            {"code": "OS-2026-0148", "asset": "CHILLER-UNID-A", "type": "Corretiva", "priority": "Critica", "status": "Em andamento", "owner": "Carlos Mota", "deadline": "Hoje 18:00", "tone": "red"},
-            {"code": "OS-2026-0151", "asset": "ESTEIRA-ERG-12", "type": "Preventiva", "priority": "Media", "status": "Programada", "owner": "Ana Lopes", "deadline": "Amanha 09:00", "tone": "sky"},
-            {"code": "OS-2026-0154", "asset": "COMP-AR-01", "type": "Corretiva", "priority": "Alta", "status": "Aguardando peca", "owner": "Equipe HVAC", "deadline": "Hoje 16:30", "tone": "amber"},
-            {"code": "OS-2026-0143", "asset": "CAMARA-CLIMATICA-01", "type": "Inspecao", "priority": "Alta", "status": "Atrasada", "owner": "Bruno Salles", "deadline": "Ontem 14:00", "tone": "red"},
-            {"code": "OS-2026-0137", "asset": "QGBT-ACADEMIA-C", "type": "Preventiva", "priority": "Media", "status": "Concluida", "owner": "Juliana Costa", "deadline": "Concluida hoje", "tone": "emerald"},
-        ],
-        "backlog": {
-            "total": "34",
-            "by_criticality": [
-                {"label": "Alta criticidade", "value": "12"},
-                {"label": "Media criticidade", "value": "15"},
-                {"label": "Baixa criticidade", "value": "7"},
-            ],
-            "by_type": [
-                {"label": "Corretiva", "value": "16"},
-                {"label": "Preventiva", "value": "11"},
-                {"label": "Inspecao", "value": "7"},
-            ],
-            "urgent_items": [
-                {"title": "CHILLER-UNID-A com parada parcial", "meta": "OS-2026-0148 • 6h em aberto"},
-                {"title": "COMP-AR-01 aguardando kit de vedacao", "meta": "OS-2026-0154 • aguardando peca ha 2 dias"},
-                {"title": "HVAC-ACADEMIA-02 sem inspeção trimestral", "meta": "preventiva P-332 atrasada ha 5 dias"},
-            ],
-        },
-        "reliability": {
-            "recurring_failures": [
-                {"title": "Falha de partida em esteiras cardio", "meta": "9 ocorrencias • modo: capacitor / chave magnetica"},
-                {"title": "Oscilacao termica em chillers", "meta": "4 ocorrencias • modo: sensor / fluxo"},
-                {"title": "Perda de pressao em compressores", "meta": "3 ocorrencias • modo: vazamento / vedacao"},
-            ],
-            "top_assets": [
-                {"asset": "ESTEIRA-ERG-12", "failures": "5 falhas", "trend": "MTBF 72h"},
-                {"asset": "CHILLER-UNID-A", "failures": "4 falhas", "trend": "MTBF 96h"},
-                {"asset": "COMP-AR-01", "failures": "3 falhas", "trend": "MTBF 104h"},
-            ],
-            "recent_events": [
-                {"timestamp": "08:10", "event": "Falha de partida registrada em ESTEIRA-ERG-12", "reference": "FailureEvent FE-0093"},
-                {"timestamp": "09:24", "event": "Inspecao termografica indicou aquecimento em QGBT-ACADEMIA-C", "reference": "OS-2026-0150"},
-                {"timestamp": "11:42", "event": "RCM sugeriu revisão do plano do CHILLER-UNID-A", "reference": "Plano PM-078"},
-            ],
-            "trend_text": "Confiabilidade melhorou em utilidades, mas cardio floor continua concentrando reincidencia corretiva.",
-        },
-        "preventive_plan": {
-            "headline": [
-                {"label": "Programadas hoje", "value": "14"},
-                {"label": "Da semana", "value": "38"},
-                {"label": "Atrasadas", "value": "7"},
-                {"label": "Concluidas", "value": "96"},
-            ],
-            "adherence": 91,
-            "schedule": [
-                {"date": "Hoje 08:00", "asset": "HVAC-ACADEMIA-02", "activity": "Limpeza e medicao de corrente", "owner": "Equipe HVAC", "status": "Em execucao"},
-                {"date": "Hoje 10:30", "asset": "ESTEIRA-ERG-08", "activity": "Inspecao de correia e lubrificacao", "owner": "Ana Lopes", "status": "Programada"},
-                {"date": "Amanha 07:00", "asset": "CHILLER-UNID-A", "activity": "Checklist semanal de utilidades", "owner": "Carlos Mota", "status": "Confirmada"},
-                {"date": "Qui 14:00", "asset": "COMP-AR-01", "activity": "Troca preventiva de vedacao", "owner": "Bruno Salles", "status": "Atrasada"},
-            ],
-        },
-        "alerts": [
-            {"title": "OS vencida sem responsavel definido", "description": "OS-2026-0143 para CAMARA-CLIMATICA-01 segue sem aceite tecnico.", "severity": "critical"},
-            {"title": "Preventiva critica atrasada", "description": "Plano PM-332 do HVAC-ACADEMIA-02 excedeu janela em 5 dias.", "severity": "warning"},
-            {"title": "Ativo parado em area premium", "description": "CHILLER-UNID-A impacta conforto térmico da unidade A.", "severity": "critical"},
-            {"title": "Aguardando peca acima do SLA", "description": "COMP-AR-01 aguarda kit de vedacao ha 49h.", "severity": "warning"},
-            {"title": "Equipamento sem inspeção recente", "description": "QGBT-ACADEMIA-C sem inspeção termográfica há 46 dias.", "severity": "info"},
-        ],
-        "activity_feed": [
-            {"time": "12:14", "actor": "Carlos Mota", "event": "concluiu intervenção corretiva", "reference": "OS-2026-0137 • QGBT-ACADEMIA-C"},
-            {"time": "11:42", "actor": "Motor de regras", "event": "reprogramou preventiva semanal", "reference": "PM-078 • CHILLER-UNID-A"},
-            {"time": "10:08", "actor": "Ana Lopes", "event": "registrou falha reincidente", "reference": "FE-0093 • ESTEIRA-ERG-12"},
-            {"time": "09:31", "actor": "Bruno Salles", "event": "abriu OS aguardando peca", "reference": "OS-2026-0154 • COMP-AR-01"},
-            {"time": "08:55", "actor": "Juliana Costa", "event": "atualizou criticidade do ativo", "reference": "HVAC-ACADEMIA-02 • criticidade alta"},
-        ],
-        "action_shortcuts": [
-            {"label": "Abrir ordem de servico", "context": "Registro corretivo imediato", "route_name": "admin-shell:smart-system-work-order-create", "tone": "indigo"},
-            {"label": "Cadastrar ativo", "context": "Novo equipamento ou substituicao", "href": "#ativos", "tone": "sky"},
-            {"label": "Registrar falha", "context": "Evento tecnico e confiabilidade", "href": "#registrar-falha", "tone": "red"},
-            {"label": "Lancar inspecao", "context": "Checklist e ronda operacional", "href": "#inspecao", "tone": "emerald"},
-            {"label": "Consultar backlog", "context": "Pendencias e aging", "href": "#backlog", "tone": "amber"},
-            {"label": "Ver indicadores", "context": "MTBF, MTTR e disponibilidade", "href": "#indicadores", "tone": "violet"},
-        ],
-        "site_status": scoped_site_status,
-    }
-    if company or site:
-        payload["alerts"] = [
-            alert
-            for alert in payload["alerts"]
-            if (not site and scope_client in alert["description"]) or (site and scope_site in alert["description"]) or "QGBT" not in alert["description"]
-        ] or payload["alerts"][:3]
-    return payload
+    return build_smart_system_dashboard_context(request, tenant_context=tenant_context)
 
 
 def build_module_page_context(module_slug):

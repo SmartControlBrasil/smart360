@@ -133,6 +133,6 @@ class MaintenanceCustomerTenantShellTests(TestCase):
             },
         )
 
-        self.assertEqual(resp.status_code, 400)
-        self.assertContains(resp, "Não há empresa SaaS disponível", status_code=400)
+        self.assertEqual(resp.status_code, 403)
+        self.assertContains(resp, "Nenhuma empresa vinculada", status_code=403)
         self.assertFalse(MaintenanceClient.objects.filter(display_name="Sem membership").exists())

@@ -142,11 +142,27 @@ class AdminShellViewTests(TestCase):
             next_due_date=timezone.localdate(),
         )
 
+        plan_chiller = MaintenancePlan.objects.create(
+            company=self.academia_company,
+            operational_site=self.default_site,
+            asset=asset_chiller,
+            category=cat_hvac,
+            name="Plano PM chiller demo",
+            description="Plano HVAC com mesmo checklist tecnico disponivel para a OS demo do relatorio.",
+            frequency_type=MaintenancePlan.FrequencyType.MONTHLY,
+            frequency_value=1,
+            estimated_duration_minutes=90,
+            checklist=cl,
+            is_active=True,
+            next_due_date=timezone.localdate(),
+        )
+
         ServiceOrderFactory(
             order_number="OS-2026-0148",
             client=self.default_client,
             operational_site=self.default_site,
             asset=asset_chiller,
+            maintenance_plan=plan_chiller,
             assigned_to=self.user,
             created_by=self.user,
             title="Baixa eficiencia de resfriamento",

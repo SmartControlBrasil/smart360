@@ -12,6 +12,7 @@
             </div>
         </div>
 
+        {% if shell_tenant_context.company_options|length > 1 or request.user.is_superuser %}
         <form class="tenant-context-switcher" method="post" action="{% url 'admin-shell:set-active-context' %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -39,6 +40,7 @@
                 </select>
             </div>
         </form>
+        {% endif %}
 
         <div class="shell-topbar-actions">
             <button id="shell-theme-toggle" class="shell-theme-toggle" type="button" aria-pressed="false" aria-label="Alternar tema">
@@ -56,6 +58,16 @@
                     <span>{{ shell_user.email }}</span>
                 </div>
             </div>
+
+            <form class="shell-logout-form" method="post" action="{% url 'users:logout' %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="quick-action-button shell-logout-submit"
+                        title="Sair do sistema"
+                        aria-label="Sair do sistema">
+                    Sair
+                </button>
+            </form>
         </div>
 
     </div>

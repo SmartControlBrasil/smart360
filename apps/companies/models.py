@@ -19,6 +19,12 @@ class Company(models.Model):
     email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=30, blank=True)
     website = models.URLField(blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    state = models.CharField(
+        max_length=80,
+        blank=True,
+        help_text="UF ou estado/regiao conforme o documento cadastrado.",
+    )
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
     metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

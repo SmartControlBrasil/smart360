@@ -18,6 +18,11 @@ class Smart360AuthViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Entrar")
 
+    def test_login_links_to_saas_signup(self):
+        response = self.client.get(reverse("users:login"))
+        self.assertContains(response, reverse("users:saas-register"))
+        self.assertContains(response, "Cadastrar minha empresa")
+
     def test_login_form_contains_csrf(self):
         response = self.client.get(reverse("users:login"))
 

@@ -1,0 +1,113 @@
+{% extends "accounts/base_auth.html" %}
+
+{% block title %}Criar conta empresarial | SMART360{% endblock %}
+
+{% block auth_form_box_extra_class %} auth-form-wide{% endblock %}
+
+{% block content %}
+<div class="auth-heading">
+    <h1>Criar conta empresarial</h1>
+    <p>Cadastre sua empresa e o administrador inicial para acessar o SMART360.</p>
+</div>
+
+<form method="post" class="auth-form auth-form-signup" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="auth-alert" role="alert">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2 class="auth-section-title">Dados da empresa</h2>
+
+    <div class="auth-field">
+        <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label>
+        {{ form.company_name }}
+        {% for error in form.company_name.errors %}
+            <p class="auth-error">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="auth-form-grid-two">
+        <div class="auth-field">
+            <label for="{{ form.legal_name.id_for_label }}">{{ form.legal_name.label }}</label>
+            {{ form.legal_name }}
+            {% for error in form.legal_name.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="auth-field">
+            <label for="{{ form.tax_id.id_for_label }}">{{ form.tax_id.label }}</label>
+            {{ form.tax_id }}
+            {% for error in form.tax_id.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+    </div>
+
+    <div class="auth-field">
+        <label for="{{ form.company_email.id_for_label }}">{{ form.company_email.label }}</label>
+        {{ form.company_email }}
+        {% for error in form.company_email.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="auth-form-grid-two">
+        <div class="auth-field">
+            <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+            {{ form.phone_number }}
+            {% for error in form.phone_number.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="auth-field">
+            <label for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>
+            {{ form.website }}
+            {% for error in form.website.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+    </div>
+
+    <div class="auth-form-grid-two">
+        <div class="auth-field">
+            <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+            {{ form.city }}
+            {% for error in form.city.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="auth-field">
+            <label for="{{ form.state.id_for_label }}">{{ form.state.label }}</label>
+            {{ form.state }}
+            {% for error in form.state.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+    </div>
+
+    <h2 class="auth-section-title">Dados do administrador</h2>
+
+    <div class="auth-field">
+        <label for="{{ form.admin_name.id_for_label }}">{{ form.admin_name.label }}</label>
+        {{ form.admin_name }}
+        {% for error in form.admin_name.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="auth-field">
+        <label for="{{ form.admin_email.id_for_label }}">{{ form.admin_email.label }}</label>
+        {{ form.admin_email }}
+        {% for error in form.admin_email.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+    </div>
+
+    <div class="auth-form-grid-two">
+        <div class="auth-field">
+            <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="auth-field">
+            <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+            {{ form.password2 }}
+            {% for error in form.password2.errors %}<p class="auth-error">{{ error }}</p>{% endfor %}
+        </div>
+    </div>
+
+    <button type="submit" class="auth-primary-button">Criar conta</button>
+</form>
+
+<p class="auth-bottom-link">
+    Ja possui conta?
+    <a href="{% url 'users:login' %}">Entrar</a>
+</p>
+{% endblock %}

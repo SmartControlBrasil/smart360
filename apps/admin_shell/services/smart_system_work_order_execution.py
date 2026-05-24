@@ -9,7 +9,11 @@ from apps.smart_system.models import FailureEvent, FieldExecutionSnapshot, Servi
 from apps.smart_system.services.offline_sync import FieldOfflineSyncService
 from apps.smart_system.services.signature_service import ServiceSignatureService
 
-from .smart_system_work_orders_domain import build_checklist_execution_for_order, get_scoped_service_order
+from .smart_system_work_orders_domain import (
+    build_checklist_execution_for_order,
+    get_scoped_service_order,
+    safe_user_display_name,
+)
 
 
 def _blank_checklist_context():
@@ -32,7 +36,7 @@ def _blank_checklist_context():
 def _work_logs_as_hours(so: ServiceOrder) -> list[dict]:
     rows = []
     for wl in so.work_logs.select_related("user").order_by("-started_at")[:30]:
-        tech = (wl.user.get_full_name() or wl.user.email) if wl.user else "—"
+        tech = safe_user_display_name(wl.user) if wl.user else "—"
         mins = wl.labor_minutes or 0
         h, m = divmod(mins, 60)
         rows.append(
@@ -277,11 +281,11 @@ def get_work_order_execution_context(order_code, *, request=None, tenant_context
         uid = request.user.pk
         seen_ids.add(uid)
         worklog_technicians.append(
-            {"id": str(uid), "label": (request.user.get_full_name() or request.user.email or str(uid))[:120]}
+            {"id": str(uid), "label": (safe_user_display_name(request.user) or str(uid))[:120]}
         )
     if so.assigned_to_id and so.assigned_to_id not in seen_ids:
         u = so.assigned_to
-        worklog_technicians.append({"id": str(u.pk), "label": (u.get_full_name() or u.email or str(u.pk))[:120]})
+        worklog_technicians.append({"id": str(u.pk), "label": (safe_user_display_name(u) or str(u.pk))[:120]})
 
     execution = {
         "execution_code": f"EX-{so.order_number}",

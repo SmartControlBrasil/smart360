@@ -347,6 +347,19 @@ img, svg, video, canvas { max-width: 100%; }
     min-width: 0;
 }
 
+.shell-logout-form {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.shell-logout-form .shell-logout-submit {
+    cursor: pointer;
+    height: 38px;
+    font-family: inherit;
+}
+
 .quick-actions {
     display: flex;
     align-items: center;

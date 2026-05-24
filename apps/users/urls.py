@@ -1,5 +1,7 @@
 from django.urls import path
 
+from apps.companies.views import SaasTenantRegistrationView
+
 from .views import (
     Smart360LoginView,
     Smart360LogoutView,
@@ -12,6 +14,7 @@ from .views import (
 app_name = "users"
 
 urlpatterns = [
+    path("cadastro-empresa/", SaasTenantRegistrationView.as_view(), name="saas-register"),
     path("login/", Smart360LoginView.as_view(), name="login"),
     path("logout/", Smart360LogoutView.as_view(), name="logout"),
     path("password-reset/", Smart360PasswordResetView.as_view(), name="password-reset"),

@@ -18,6 +18,31 @@ from apps.smart_system.models import (
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
 
 
+def safe_user_display_name(user):
+    """Rotula usuario para timelines/apontamentos: full_name custom, get_full_name, email, str."""
+    if not user:
+        return ""
+    explicit = getattr(user, "full_name", None)
+    if isinstance(explicit, str):
+        stripped = explicit.strip()
+        if stripped:
+            return stripped
+    getter = getattr(user, "get_full_name", None)
+    if callable(getter):
+        try:
+            resolved = getter()
+            if isinstance(resolved, str):
+                cand = resolved.strip()
+                if cand:
+                    return cand
+        except Exception:
+            pass
+    email = (getattr(user, "email", None) or "").strip()
+    if email:
+        return email
+    return str(user)
+
+
 def service_orders_base_queryset():
     return ServiceOrder.objects.select_related(
         "client",
@@ -111,7 +136,7 @@ def serialize_work_order_row(so: ServiceOrder) -> dict:
         "started_at": so.started_at.strftime("%d/%m/%Y %H:%M") if so.started_at else "",
         "completed_at": so.completed_at.strftime("%d/%m/%Y %H:%M") if so.completed_at else "",
         "requester": so.requested_by or "—",
-        "responsible": (so.assigned_to.get_full_name() or so.assigned_to.email) if so.assigned_to else "",
+        "responsible": safe_user_display_name(so.assigned_to) if so.assigned_to else "",
         "team": "",
         "estimated_hours": "",
         "executed_hours": "",
@@ -141,7 +166,7 @@ def _timeline_from_order(so: ServiceOrder, work_logs: list[WorkLog], history: li
     items.append(
         {
             "timestamp": so.opened_at.strftime("%d/%m/%Y %H:%M") if so.opened_at else "—",
-            "actor": (so.created_by.get_full_name() or so.created_by.email) if so.created_by else "Sistema",
+            "actor": safe_user_display_name(so.created_by) if so.created_by else "Sistema",
             "event_type": "OS aberta",
             "description": so.title,
             "reference": so.order_number,
@@ -149,7 +174,7 @@ def _timeline_from_order(so: ServiceOrder, work_logs: list[WorkLog], history: li
         }
     )
     for wl in work_logs:
-        tech = (wl.user.get_full_name() or wl.user.email) if wl.user else "—"
+        tech = safe_user_display_name(wl.user) if wl.user else "—"
         mins = wl.labor_minutes or 0
         h, m = divmod(mins, 60)
         duration_label = f"{h}h{m:02d} ({mins} min)" if mins else "0 min"
@@ -169,7 +194,7 @@ def _timeline_from_order(so: ServiceOrder, work_logs: list[WorkLog], history: li
         items.append(
             {
                 "timestamp": ev.occurred_at.strftime("%d/%m/%Y %H:%M"),
-                "actor": (ev.created_by.get_full_name() or ev.created_by.email) if ev.created_by else "Sistema",
+                "actor": safe_user_display_name(ev.created_by) if ev.created_by else "Sistema",
                 "event_type": ev.get_event_type_display(),
                 "description": ev.title + (f" — {ev.description}" if ev.description else ""),
                 "reference": str(ev.public_id)[:8],
@@ -255,13 +280,15 @@ def serialize_work_order_detail(so: ServiceOrder, *, request=None) -> dict:
         worklog_technician_options.append(
             {
                 "value": str(request.user.pk),
-                "label": (request.user.get_full_name() or request.user.email or str(request.user.pk))[:120],
+                "label": (safe_user_display_name(request.user) or str(request.user.pk))[:120],
             }
         )
         seen_u.add(request.user.pk)
     if so.assigned_to_id and so.assigned_to_id not in seen_u:
         u = so.assigned_to
-        worklog_technician_options.append({"value": str(u.pk), "label": (u.get_full_name() or u.email or str(u.pk))[:120]})
+        worklog_technician_options.append(
+            {"value": str(u.pk), "label": (safe_user_display_name(u) or str(u.pk))[:120]}
+        )
 
     page_actions = [
         {
@@ -562,6 +589,8 @@ def build_checklist_execution_for_order(so: ServiceOrder) -> tuple[dict | None, 
         "code": str(checklist.public_id)[:12].upper(),
         "name": checklist.name,
         "preventive_plan_code": str(plan.public_id)[:12].upper() if plan else "",
+        "items_count": total,
+        "items": [{"order": it.ordering, "title": it.title} for it in items],
     }
     execution_dict = {
         "execution_code": f"EX-{so.order_number}",
@@ -573,6 +602,11 @@ def build_checklist_execution_for_order(so: ServiceOrder) -> tuple[dict | None, 
         "nok_count": nok_c,
         "na_count": na_c,
         "progress": progress,
+        "responses": [
+            {"order": row["order"], "response": row["response"], "note": row["note"] or "-"}
+            for row in exec_items
+            if row.get("response")
+        ],
     }
     return checklist_dict, execution_dict
 

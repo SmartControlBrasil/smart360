@@ -14,7 +14,10 @@ class CompaniesApiTests(APITestCase):
             password="StrongPass123",
             first_name="Owner",
         )
-        Role.objects.create(code="company_owner", label="Company Owner")
+        Role.objects.get_or_create(
+            code="company_owner",
+            defaults={"label": "Company Owner"},
+        )
         self.client.force_authenticate(self.user)
 
     def test_create_company_also_creates_membership(self):

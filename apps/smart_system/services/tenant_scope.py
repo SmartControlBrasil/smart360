@@ -167,6 +167,29 @@ class SmartSystemScopeService:
             restricted_to_sites=restricted_to_sites,
         )
 
+    @staticmethod
+    def _site_pk_in_lookup(site_field: str) -> str:
+        """Monta lookup tipo __in para filtro por PK de unidade/site.
+
+        OperationalSite mapeia ``site_field='id'``; anexar ``_id`` geraria ``id_id__in`` (inválido).
+        Campos que já terminam em ``_id`` (ex.: FK explícita) usam ``campo__in``.
+        Demais usam ``campo_id__in``.
+        """
+        if site_field == "id":
+            return "id__in"
+        if site_field.endswith("_id"):
+            return f"{site_field}__in"
+        return f"{site_field}_id__in"
+
+    @staticmethod
+    def _site_pk_lookup(site_field: str) -> str:
+        """Lookup para igualdade de PK (escopo de unidade única ativa)."""
+        if site_field == "id":
+            return "id"
+        if site_field.endswith("_id"):
+            return site_field
+        return f"{site_field}_id"
+
     @classmethod
     def scope_queryset(cls, queryset: QuerySet, request) -> QuerySet:
         model = queryset.model
@@ -183,9 +206,9 @@ class SmartSystemScopeService:
             queryset = queryset.filter(**{f"{company_field}_id": scope.company.id})
 
         if site_field and scope.restricted_to_sites:
-            queryset = queryset.filter(**{f"{site_field}_id__in": scope.site_ids})
+            queryset = queryset.filter(**{cls._site_pk_in_lookup(site_field): scope.site_ids})
         if site_field and scope.site:
-            queryset = queryset.filter(**{f"{site_field}_id": scope.site.id})
+            queryset = queryset.filter(**{cls._site_pk_lookup(site_field): scope.site.id})
 
         return queryset.distinct()
 

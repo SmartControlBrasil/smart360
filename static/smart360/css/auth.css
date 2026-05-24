@@ -38,6 +38,30 @@ body.authentication-bg {
     z-index: 1;
 }
 
+.auth-fluid-form-box.auth-form-wide {
+    max-width: 640px;
+}
+
+.auth-section-title {
+    margin: 4px 0 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--auth-ink);
+    border-bottom: 1px solid var(--auth-line);
+    padding-bottom: 10px;
+}
+
+.auth-form-signup .auth-field textarea.auth-input {
+    min-height: 88px;
+    padding: 12px 14px;
+    height: auto;
+}
+
+.auth-form-grid-two {
+    display: grid;
+    gap: 18px;
+}
+
 .auth-brand { margin-bottom: 16px; }
 .auth-logo { color: var(--auth-ink); font-size: 22px; font-weight: 800; letter-spacing: 0; text-decoration: none; }
 .auth-content { margin: auto 0; }
@@ -121,6 +145,12 @@ body.authentication-bg {
 .auth-kicker { display: inline-block; margin-bottom: 14px; font-size: 13px; font-weight: 800; text-transform: uppercase; }
 .auth-testimonial h2 { max-width: 680px; margin: 0 0 16px; font-size: 42px; line-height: 1.12; letter-spacing: 0; }
 .auth-testimonial p { max-width: 560px; margin: 0; color: rgba(255, 255, 255, 0.84); font-size: 18px; line-height: 1.6; }
+
+@media (min-width: 520px) {
+    .auth-form-grid-two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
 
 @media (max-width: 960px) {
     .auth-fluid { display: block; background: #fff; }

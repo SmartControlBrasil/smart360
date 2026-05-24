@@ -3801,7 +3801,7 @@ class SmartSystemReportDownloadView(SmartSystemOperationalRouteMixin, SmartSyste
             payload = generate_report_pdf(
                 report_type,
                 reference_code,
-                tenant_context=self.get_shell_context()["shell_tenant_context"],
+                tenant_context=build_shell_tenant_context(request),
             )
         except RuntimeError as exc:
             return HttpResponse(str(exc), status=503, content_type="text/plain; charset=utf-8")
@@ -4304,7 +4304,7 @@ class SmartSystemWorkOrderExecutionStartView(SmartSystemOperationalRouteMixin, S
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         AccessAuditService.log(
@@ -4329,7 +4329,7 @@ class SmartSystemWorkOrderExecutionSaveView(SmartSystemOperationalRouteMixin, Sm
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         AccessAuditService.log(
@@ -4354,7 +4354,7 @@ class SmartSystemWorkOrderTechnicianSignatureView(SmartSystemOperationalRouteMix
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         result, error_response = _capture_service_signature_or_error(
@@ -4389,7 +4389,7 @@ class SmartSystemWorkOrderClientSignatureView(SmartSystemOperationalRouteMixin, 
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         result, error_response = _capture_service_signature_or_error(
@@ -4424,7 +4424,7 @@ class SmartSystemWorkOrderExecutionCompleteView(SmartSystemOperationalRouteMixin
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         service_order = ServiceSignatureService.get_service_order(order_code)
@@ -4456,7 +4456,7 @@ class SmartSystemWorkOrderTransitionView(SmartSystemOperationalRouteMixin, Smart
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         return post_service_order_transition(request=request, order_code=order_code)
@@ -4472,7 +4472,7 @@ class SmartSystemWorkOrderWorkLogView(SmartSystemOperationalRouteMixin, SmartSys
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         return post_service_order_worklog(request=request, order_code=order_code)
@@ -4488,7 +4488,7 @@ class SmartSystemWorkOrderChecklistSaveView(SmartSystemOperationalRouteMixin, Sm
         if get_work_order_detail_context(
             order_code,
             request=request,
-            tenant_context=self.get_shell_context()["shell_tenant_context"],
+            tenant_context=build_shell_tenant_context(request),
         ) is None:
             return self.handle_scope_denied()
         return post_service_order_checklist_responses(request=request, order_code=order_code)

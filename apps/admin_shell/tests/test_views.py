@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.access_control_center.services.smart_system_access import assign_smart_system_role, bootstrap_smart_system_access
 from apps.billing.models import Contract
@@ -20,6 +21,8 @@ from apps.marketplace_technicians.models import (
 )
 from apps.smart_system.models import (
     Asset,
+    Checklist,
+    ChecklistItem,
     ClientPortalRequest,
     ContractAsset,
     FieldExecutionSnapshot,
@@ -29,6 +32,7 @@ from apps.smart_system.models import (
     QuoteItem,
     RoutePlan,
     ScheduledVisit,
+    ServiceOrder,
     ServiceQuote,
     ServiceSignature,
     TechnicianSchedule,
@@ -63,8 +67,163 @@ class AdminShellViewTests(TestCase):
     def setUp(self):
         bootstrap_smart_system_access()
         self.user = UserFactory(password="admin123!", is_staff=True)
-        assign_smart_system_role(self.user, "maintenance-manager")
+        self.academia_company = CompanyFactory(name="Academia Exemplo")
+        MembershipFactory(user=self.user, company=self.academia_company, is_primary=True)
+        assign_smart_system_role(self.user, "maintenance-manager", company=self.academia_company)
+
+        self.default_client = MaintenanceClientFactory(
+            company=self.academia_company,
+            display_name="Academia Exemplo",
+        )
+        self.default_site = OperationalSiteFactory(
+            maintenance_client=self.default_client,
+            name="Unidade Centro",
+            code="ADM-SHELL-TST",
+        )
+        self._seed_default_smart_system_demo_data()
+
         self.client.force_login(self.user)
+
+    def _seed_default_smart_system_demo_data(self):
+        """ORM alinhado aos mocks Smart System Academia para listagens/execucao no tenant padrao."""
+        cat_hvac = AssetCategoryFactory(name="Seed HVAC")
+        cat_cardio = AssetCategoryFactory(name="Seed Cardio")
+
+        asset_chiller = AssetFactory(
+            operational_site=self.default_site,
+            category=cat_hvac,
+            asset_tag="CHILLER-UNID-A",
+            name="Chiller Unidade A",
+        )
+        asset_esteira = AssetFactory(
+            operational_site=self.default_site,
+            category=cat_cardio,
+            asset_tag="ESTEIRA-ERG-12",
+            name="Esteira Ergometrica 12",
+        )
+
+        cl = Checklist.objects.create(
+            company=self.academia_company,
+            operational_site=self.default_site,
+            name="Verificacao Funcional de Esteira",
+            description="Rotina equivalente aos dados demo do checklist.",
+            is_active=True,
+        )
+        item_specs = [
+            (1, "Verificar tensao de alimentacao", "Conferir estabilidade de alimentacao antes da partida."),
+            (2, "Inspecionar ruido anormal na partida", "Verificar estalos ou travamento inicial."),
+            (3, "Conferir temperatura da placa de potencia", "Validar aquecimento no conjunto de acionamento."),
+            (4, "Checar alarmes ativos no console", "Consultar estado e registrar codigos."),
+            (5, "Registrar observacao final", "Sintese rapida ao final da avaliacao."),
+        ]
+        for ordering, title, description in item_specs:
+            ChecklistItem.objects.create(
+                checklist=cl,
+                title=title,
+                description=description,
+                item_type=ChecklistItem.ItemType.BOOLEAN,
+                ordering=ordering,
+                is_required=True,
+                is_active=True,
+            )
+
+        plan_esteira = MaintenancePlan.objects.create(
+            company=self.academia_company,
+            operational_site=self.default_site,
+            asset=asset_esteira,
+            category=cat_cardio,
+            name="Plano PM cardio demo",
+            description="Plano ligado ao checklist de execucao da OS demo.",
+            frequency_type=MaintenancePlan.FrequencyType.WEEKLY,
+            frequency_value=2,
+            estimated_duration_minutes=60,
+            checklist=cl,
+            is_active=True,
+            next_due_date=timezone.localdate(),
+        )
+
+        plan_chiller = MaintenancePlan.objects.create(
+            company=self.academia_company,
+            operational_site=self.default_site,
+            asset=asset_chiller,
+            category=cat_hvac,
+            name="Plano PM chiller demo",
+            description="Plano HVAC com mesmo checklist tecnico disponivel para a OS demo do relatorio.",
+            frequency_type=MaintenancePlan.FrequencyType.MONTHLY,
+            frequency_value=1,
+            estimated_duration_minutes=90,
+            checklist=cl,
+            is_active=True,
+            next_due_date=timezone.localdate(),
+        )
+
+        ServiceOrderFactory(
+            order_number="OS-2026-0148",
+            client=self.default_client,
+            operational_site=self.default_site,
+            asset=asset_chiller,
+            maintenance_plan=plan_chiller,
+            assigned_to=self.user,
+            created_by=self.user,
+            title="Baixa eficiencia de resfriamento",
+            status=ServiceOrder.Status.IN_PROGRESS,
+        )
+
+        wo_151 = ServiceOrderFactory(
+            order_number="OS-2026-0151",
+            client=self.default_client,
+            operational_site=self.default_site,
+            asset=asset_esteira,
+            maintenance_plan=plan_esteira,
+            assigned_to=self.user,
+            created_by=self.user,
+            title="Falha de partida da esteira ergometrica 12",
+            status=ServiceOrder.Status.WAITING_PARTS,
+            description=(
+                "Falha na esteira relacionada ao acionamento; verificar modulo de potencia "
+                "(placa modelo RT250) antes de nova partida."
+            ),
+        )
+
+        FieldExecutionSnapshot.objects.create(
+            company=self.academia_company,
+            operational_site=self.default_site,
+            service_order=wo_151,
+            technician=self.user,
+            sync_state=FieldExecutionSnapshot.SyncState.SYNCED,
+            materials_payload=[
+                {
+                    "code": "PRT-0005",
+                    "name": "Inversor WEG CFW300",
+                    "quantity": "1 un",
+                    "notes": "Reposicao tecnica utilizada nos testes de campo.",
+                }
+            ],
+        )
+
+        # OS aguardando peca apenas no tenant Laboratorio — nunca visivel para o usuario Academia
+        laboratorio_company = CompanyFactory(name="Laboratorio Exemplo", slug="tests-isolamento-laboratorio")
+        laboratorio_mc = MaintenanceClientFactory(company=laboratorio_company, display_name="Laboratorio Exemplo")
+        laboratorio_site = OperationalSiteFactory(
+            maintenance_client=laboratorio_mc,
+            name="Laboratorio Campinas",
+            code="LAB-TST-ISO",
+        )
+        laboratorio_cat = AssetCategoryFactory(name="Lab Seed")
+        laboratorio_asset = AssetFactory(
+            operational_site=laboratorio_site,
+            category=laboratorio_cat,
+            asset_tag="CAMARA-ISO-TEST",
+            name="Camara Seed",
+        )
+        ServiceOrderFactory(
+            order_number="OS-2026-0149",
+            client=laboratorio_mc,
+            operational_site=laboratorio_site,
+            asset=laboratorio_asset,
+            title="Laboratorio pendente peca isolada",
+            status=ServiceOrder.Status.WAITING_PARTS,
+        )
 
     def _create_scoped_manager(self):
         user = UserFactory(password="admin123!", is_staff=True)
@@ -270,6 +429,10 @@ class AdminShellViewTests(TestCase):
             state=site.state,
             location_label=site.name,
         )
+        schedule_session = self.client.session
+        schedule_session["smart_system_active_company_id"] = company.id
+        schedule_session.pop("smart_system_active_site_id", None)
+        schedule_session.save()
         return company
 
     def _create_war_room_data(self, *, company=None, site=None):
@@ -560,7 +723,7 @@ class AdminShellViewTests(TestCase):
 
     def _create_voiceops_data(self):
         company = CompanyFactory(name="VoiceOps Company", slug="voiceops-company")
-        MembershipFactory(user=self.user, company=company, is_primary=True)
+        MembershipFactory(user=self.user, company=company, is_primary=False)
         assign_smart_system_role(self.user, "maintenance-manager", company=company)
         client = MaintenanceClientFactory(company=company, display_name="VoiceOps Client")
         site = OperationalSiteFactory(maintenance_client=client, name="VoiceOps Site", code="VOICE-001")
@@ -890,7 +1053,7 @@ class AdminShellViewTests(TestCase):
     def test_technician_copilot_sync_persists_offline_messages(self):
         user, academia, _, academia_site, _ = self._create_scoped_manager()
         self.client.force_login(user)
-        maintenance_client = MaintenanceClientFactory(company=academia, display_name="Academia Exemplo")
+        maintenance_client = academia_site.maintenance_client
         category = AssetCategoryFactory(name="Copilot Sync")
         asset = AssetFactory(operational_site=academia_site, category=category, asset_tag="COP-SYNC-01", name="Asset Copilot")
         order = ServiceOrderFactory(
@@ -1070,8 +1233,11 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:smart-system-assets"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Gestao de ativos, criticidade, condicao e historico operacional")
-        self.assertContains(response, "CAMARA-CLIMATICA-01")
+        self.assertContains(response, "CHILLER-UNID-A")
+        self.assertContains(response, "Esteira Ergometrica 12")
+        self.assertNotContains(response, "CAMARA-CLIMATICA-01")
         self.assertContains(response, "Carteira de ativos")
+        self.assertContains(response, reverse("admin-shell:smart-system-customer-equipment-create"))
 
     def test_asset_detail_loads(self):
         response = self.client.get(
@@ -1083,6 +1249,14 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "Historico recente do ativo")
 
     def test_asset_filter_by_client(self):
+        laboratorio_company = CompanyFactory(name="Laboratorio Exemplo", slug="tests-shell-filtro-laboratorio")
+        MembershipFactory(user=self.user, company=laboratorio_company, is_primary=False)
+        assign_smart_system_role(self.user, "maintenance-manager", company=laboratorio_company)
+        filt_session = self.client.session
+        filt_session["smart_system_active_company_id"] = laboratorio_company.id
+        filt_session.pop("smart_system_active_site_id", None)
+        filt_session.save()
+
         response = self.client.get(reverse("admin-shell:smart-system-assets"), {"client": "Laboratorio Exemplo"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "CAMARA-CLIMATICA-01")
@@ -1130,21 +1304,21 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "Checklist executado")
 
     def test_work_order_report_preview_renders_service_signatures(self):
-        client = MaintenanceClientFactory(display_name="Assinatura Cliente")
-        site = OperationalSiteFactory(maintenance_client=client, name="Unidade Assinada", code="SIG-01")
+        client = MaintenanceClientFactory(company=self.academia_company, display_name="Assinatura Cliente Demo")
+        site = OperationalSiteFactory(maintenance_client=client, name="Unidade Assinada", code="SIG-01-WO")
         category = AssetCategoryFactory(name="Assinatura HVAC")
         asset = AssetFactory(
             operational_site=site,
             category=category,
-            asset_tag="CHILLER-UNID-A",
-            name="Chiller Unidade A",
+            asset_tag="CHILLER-SIG-WO-RPT",
+            name="Chiller Assinatura",
         )
         order = ServiceOrderFactory(
-            order_number="OS-2026-0148",
+            order_number="OS-RPT-SIG-WO01",
             client=client,
             operational_site=site,
             asset=asset,
-            title="Baixa eficiencia de resfriamento",
+            title="Demonstracao assinatura de relatorio tecnico",
             assigned_to=self.user,
             created_by=self.user,
         )
@@ -1153,7 +1327,7 @@ class AdminShellViewTests(TestCase):
             signer_role=ServiceSignature.SignerRole.TECHNICIAN,
             signer_name="Carlos Mota",
             signer_user=self.user,
-            company=client.company,
+            company=self.academia_company,
             operational_site=site,
             service_order=order,
             signature_data="data:image/png;base64,AAAA",
@@ -1162,7 +1336,7 @@ class AdminShellViewTests(TestCase):
             signature_type=ServiceSignature.SignatureType.CLIENT_ACCEPTANCE,
             signer_role=ServiceSignature.SignerRole.CLIENT_RESPONSIBLE,
             signer_name="Patricia Souza",
-            company=client.company,
+            company=self.academia_company,
             operational_site=site,
             service_order=order,
             signature_data="data:image/png;base64,BBBB",
@@ -1171,7 +1345,7 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "admin-shell:smart-system-report-preview",
-                kwargs={"report_type": "work-order", "reference_code": "OS-2026-0148"},
+                kwargs={"report_type": "work-order", "reference_code": "OS-RPT-SIG-WO01"},
             )
         )
 
@@ -1812,7 +1986,8 @@ class AdminShellViewTests(TestCase):
 
     def test_technician_cannot_complete_work_order_directly(self):
         user = UserFactory(password="admin123!", is_staff=True)
-        assign_smart_system_role(user, "technician")
+        MembershipFactory(user=user, company=self.academia_company, is_primary=False)
+        assign_smart_system_role(user, "technician", company=self.academia_company)
         self.client.force_login(user)
 
         response = self.client.post(
@@ -1823,47 +1998,56 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "Acesso negado")
 
     def test_shell_execution_requires_final_observations_before_completion(self):
-        client = MaintenanceClientFactory(display_name="Cliente Assinatura Shell")
-        site = OperationalSiteFactory(maintenance_client=client, name="Site Shell", code="SHELL-01")
         category = AssetCategoryFactory(name="Categoria Shell")
-        asset = AssetFactory(operational_site=site, category=category, asset_tag="ESTEIRA-07", name="Esteira 07")
+        asset = AssetFactory(
+            operational_site=self.default_site,
+            category=category,
+            asset_tag="ESTEIRA-SHELL-01",
+            name="Esteira Shell",
+        )
         ServiceOrderFactory(
-            order_number="OS-2026-0151",
-            client=client,
-            operational_site=site,
+            order_number="OS-SHELL-EXEC-998",
+            client=self.default_client,
+            operational_site=self.default_site,
             asset=asset,
             assigned_to=self.user,
             created_by=self.user,
             title="Falha na esteira",
+            status=ServiceOrder.Status.IN_PROGRESS,
         )
 
         response = self.client.post(
-            reverse("admin-shell:smart-system-work-order-complete-execution", kwargs={"order_code": "OS-2026-0151"})
+            reverse("admin-shell:smart-system-work-order-complete-execution", kwargs={"order_code": "OS-SHELL-EXEC-998"})
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn("/app/smart-system/work-orders/OS-2026-0151/execute/", response.url)
+        self.assertIn("/app/smart-system/work-orders/OS-SHELL-EXEC-998/execute/", response.url)
 
     def test_mobile_signature_capture_creates_technician_signature(self):
         technician = UserFactory(password="admin123!", is_staff=True)
-        assign_smart_system_role(technician, "technician")
-        client = MaintenanceClientFactory(display_name="Cliente Mobile")
-        site = OperationalSiteFactory(maintenance_client=client, name="Site Mobile", code="MOB-01")
+        MembershipFactory(user=technician, company=self.academia_company, is_primary=False)
+        assign_smart_system_role(technician, "technician", company=self.academia_company)
         category = AssetCategoryFactory(name="Categoria Mobile")
-        asset = AssetFactory(operational_site=site, category=category, asset_tag="BIKE-SPIN-07", name="Bike 07")
+        asset = AssetFactory(
+            operational_site=self.default_site,
+            category=category,
+            asset_tag="BIKE-MOB-TST-01",
+            name="Bike 07",
+        )
         ServiceOrderFactory(
-            order_number="OS-2026-0151",
-            client=client,
-            operational_site=site,
+            order_number="OS-MOB-SIG-887",
+            client=self.default_client,
+            operational_site=self.default_site,
             asset=asset,
             assigned_to=technician,
             created_by=self.user,
             title="Falha de partida",
+            status=ServiceOrder.Status.IN_PROGRESS,
         )
         self.client.force_login(technician)
 
         response = self.client.post(
-            reverse("admin-shell:technician-app-service-sign-technician", kwargs={"order_code": "OS-2026-0151"}),
+            reverse("admin-shell:technician-app-service-sign-technician", kwargs={"order_code": "OS-MOB-SIG-887"}),
             {
                 "signer_name": "Ana Lopes",
                 "signature_data": "data:image/png;base64,AAAA",
@@ -1874,7 +2058,7 @@ class AdminShellViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             ServiceSignature.objects.filter(
-                service_order__order_number="OS-2026-0151",
+                service_order__order_number="OS-MOB-SIG-887",
                 signature_type=ServiceSignature.SignatureType.TECHNICIAN_COMPLETION,
                 signer_name="Ana Lopes",
                 is_current=True,
@@ -1893,17 +2077,18 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:smart-system-assets"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "CAMARA-CLIMATICA-01")
+        self.assertContains(response, "CHILLER-UNID-A")
         self.assertContains(response, "HVAC-ACADEMIA-02")
-        self.assertNotContains(response, "CHILLER-UNID-A")
+        self.assertContains(response, "ESTEIRA-ERG-12")
+        self.assertNotContains(response, "CAMARA-CLIMATICA-01")
         self.assertNotContains(response, "Laboratorio Campinas")
 
     def test_scoped_user_cannot_open_asset_from_other_company(self):
-        scoped_user, academia, _, _, _ = self._create_scoped_manager()
+        scoped_user, academia, panobianco, _, _ = self._create_scoped_manager()
         self.client.force_login(scoped_user)
 
         session = self.client.session
-        session["smart_system_active_company_id"] = academia.id
+        session["smart_system_active_company_id"] = panobianco.id
         session.save()
 
         response = self.client.get(
@@ -1932,11 +2117,11 @@ class AdminShellViewTests(TestCase):
         self.assertEqual(session["smart_system_active_site_id"], panobianco_site.id)
 
     def test_scoped_report_preview_denies_foreign_company(self):
-        scoped_user, academia, _, _, _ = self._create_scoped_manager()
+        scoped_user, academia, panobianco, _, _ = self._create_scoped_manager()
         self.client.force_login(scoped_user)
 
         session = self.client.session
-        session["smart_system_active_company_id"] = academia.id
+        session["smart_system_active_company_id"] = panobianco.id
         session.save()
 
         response = self.client.get(
@@ -1978,7 +2163,7 @@ class AdminShellViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Contexto operacional")
         self.assertContains(response, "Checklist executavel")
-        self.assertContains(response, "Placa de potencia RT250")
+        self.assertContains(response, "RT250")
         self.assertContains(response, "PRT-0005")
 
     def test_work_order_start_execution_redirects(self):
@@ -2058,6 +2243,14 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "Historico do ativo")
 
     def test_failure_filter_without_diagnosis(self):
+        scb = CompanyFactory(name="Smart Control Brasil", slug="tests-shell-smart-control")
+        MembershipFactory(user=self.user, company=scb, is_primary=False)
+        assign_smart_system_role(self.user, "maintenance-manager", company=scb)
+        fail_session = self.client.session
+        fail_session["smart_system_active_company_id"] = scb.id
+        fail_session.pop("smart_system_active_site_id", None)
+        fail_session.save()
+
         response = self.client.get(reverse("admin-shell:smart-system-failures"), {"without_diagnosis": "yes"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "FE-2026-004")

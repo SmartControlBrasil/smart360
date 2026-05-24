@@ -527,7 +527,12 @@ def get_asset_listing_context(filters=None, tenant_context=None):
     options = get_asset_options(all_assets)
     return {
         "page_actions": [
-            {"label": "Novo ativo", "href": "#novo-ativo", "permission_domain": "assets", "permission_action": "create"},
+            {
+                "label": "Novo ativo",
+                "route_name": "admin-shell:smart-system-customer-equipment-create",
+                "permission_domain": "assets",
+                "permission_action": "create",
+            },
             {"label": "Importar ativos", "href": "#importar-ativos", "permission_domain": "assets", "permission_action": "create"},
             {"label": "Exportar lista", "href": "#exportar-ativos", "permission_domain": "assets", "permission_action": "export"},
             {"label": "Ver criticidade", "href": "#criticidade", "permission_domain": "assets", "permission_action": "view"},

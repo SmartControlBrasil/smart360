@@ -128,4 +128,56 @@
   } else {
     initSidebarScrollPersistence();
   }
+
+  function initSidebarAccordion() {
+    var sidebar = document.querySelector("[data-sidebar]");
+    if (!sidebar || sidebar.dataset.accordionBound === "1") return;
+
+    sidebar.dataset.accordionBound = "1";
+
+    var triggers = sidebar.querySelectorAll("[data-nav-accordion-trigger]");
+
+    function setExpanded(trigger, expanded) {
+      var panelId = trigger.getAttribute("aria-controls");
+      var panel = panelId ? document.getElementById(panelId) : null;
+
+      trigger.setAttribute("aria-expanded", expanded ? "true" : "false");
+
+      if (panel) {
+        if (expanded) {
+          panel.classList.add("is-expanded");
+        } else {
+          panel.classList.remove("is-expanded");
+        }
+      }
+    }
+
+    for (var i = 0; i < triggers.length; i++) {
+      triggers[i].addEventListener("click", function (e) {
+        e.preventDefault();
+
+        var trigger = e.currentTarget;
+        var willExpand = trigger.getAttribute("aria-expanded") !== "true";
+        var section = trigger.closest(".nav-section");
+
+        if (section) {
+          var sectionTriggers = section.querySelectorAll("[data-nav-accordion-trigger]");
+          for (var j = 0; j < sectionTriggers.length; j++) {
+            if (sectionTriggers[j] !== trigger) {
+              setExpanded(sectionTriggers[j], false);
+            }
+          }
+        }
+
+        setExpanded(trigger, willExpand);
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSidebarAccordion);
+  } else {
+    initSidebarAccordion();
+  }
+
 })();

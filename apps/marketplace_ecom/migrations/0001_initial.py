@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("media_library", "__first__"),
+    ("media_library", "__first__"),
     ]
 
     operations = [

@@ -2,7 +2,7 @@
     <table class="asset-table">
         <thead>
             <tr>
-                <th>Site/unidade</th>
+                <th>Unidade / local</th>
                 <th>Endereço</th>
                 <th>Cidade</th>
                 <th>Estado</th>
@@ -14,7 +14,7 @@
         <tbody>
             {% for site in sites %}
                 <tr>
-                    <td><strong>{{ site.name }}</strong></td>
+                    <td><strong>{{ site.name }}</strong>{% if site.is_principal_unit %} <span class="muted-block">· Unidade principal</span>{% endif %}</td>
                     <td>{{ site.address }}</td>
                     <td>{{ site.city }}</td>
                     <td>{{ site.state }}</td>

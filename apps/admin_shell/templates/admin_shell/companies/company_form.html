@@ -1,0 +1,40 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{% if form_mode == "update" %}Editar empresa{% else %}Nova empresa SaaS{% endif %}</h1>
+            <p class="muted-block">Cadastro minimal do tenant SMART360.</p>
+        </div>
+
+        <form method="post" class="form-card-body" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for err in form.non_field_errors %}
+                    <div class="form-error">{{ err }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-grid">
+                {% include "admin_shell/components/forms/field.html" with field=form.name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.legal_name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.tax_id %}
+                {% include "admin_shell/components/forms/field.html" with field=form.email %}
+                {% include "admin_shell/components/forms/field.html" with field=form.phone_number %}
+                {% include "admin_shell/components/forms/field.html" with field=form.website full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.status %}
+                {% if form.vincular_usuario_atual %}
+                {% include "admin_shell/components/forms/field.html" with field=form.vincular_usuario_atual full=True %}
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a class="btn-secondary" href="{{ cancel_href }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

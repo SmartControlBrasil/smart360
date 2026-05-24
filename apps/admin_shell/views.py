@@ -28,6 +28,7 @@ from apps.analytics_platform.models import OperationalMetrics
 from apps.analytics_platform.services.analytics_service import ExecutiveAnalyticsService
 from apps.billing.models import Contract, Invoice
 from apps.billing.services.billing_service import ContractService, PaymentService
+from apps.companies.services.company_shell_access import user_can_create_saas_company
 from apps.companies.services.tenant_scope import TenantScopeService
 from apps.integration_bus.services.realtime_bus import RealtimeEventBus
 
@@ -3309,31 +3310,22 @@ class SmartSystemCustomerCreateView(ShellContextMixin, FormView):
             {"label": "Novo cliente", "url": None},
         ]
         context["current_module_slug"] = "smart-system"
+        avail = TenantScopeService.get_available_companies(self.request.user)
+        context["saas_company_count"] = len(avail)
+        context["saas_companies_dashboard_url"] = reverse("admin-shell:dashboard-companies")
+        context["saas_companies_create_url"] = reverse("admin-shell:dashboard-company-create")
+        context["can_manage_saas_companies_shell"] = user_can_create_saas_company(self.request.user)
         return context
 
     def form_valid(self, form):
-        tenant_context = self.get_tenant_context()
-        company = (
-            tenant_context.get("company")
-            or getattr(self.request, "current_company", None)
-            or getattr(self.request, "company", None)
-            or self.get_current_company()
-        )
-        if company is None:
-            form.add_error(
-                None,
-                "Selecione uma empresa ativa no contexto antes de cadastrar um cliente.",
-            )
-            messages.error(
+        form.save()
+        if getattr(form, "_principal_site_created", False):
+            messages.success(
                 self.request,
-                "Nao foi possivel cadastrar o cliente sem empresa ativa no contexto.",
+                "Cliente cadastrado com sucesso. Unidade principal criada automaticamente.",
             )
-            return self.form_invalid(form)
-
-        client = form.save(commit=False)
-        client.company = company
-        client.save()
-        messages.success(self.request, "Cliente cadastrado com sucesso.")
+        else:
+            messages.success(self.request, "Cliente cadastrado com sucesso.")
         return redirect("admin-shell:smart-system-customers")
 
 

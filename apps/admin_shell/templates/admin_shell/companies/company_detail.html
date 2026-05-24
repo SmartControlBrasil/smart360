@@ -1,0 +1,28 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        {% if can_edit %}
+        <div class="page-actions">
+            <a class="btn-primary" href="{% url 'admin-shell:dashboard-company-update' company_id=company.pk %}">Editar</a>
+            {% if can_toggle_status %}
+            <a class="btn-secondary" href="{% url 'admin-shell:dashboard-company-toggle-status' company_id=company.pk %}">Ativar/Inativar</a>
+            {% endif %}
+            <a class="btn-secondary" href="{% url 'admin-shell:dashboard-companies' %}">Voltar</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="form-card" style="max-width:720px;">
+        <p><strong>Razão social:</strong> {{ company.legal_name|default:"—" }}</p>
+        <p><strong>CNPJ/Tax:</strong> {{ company.tax_id|default:"—" }}</p>
+        <p><strong>E-mail:</strong> {{ company.email|default:"—" }}</p>
+        <p><strong>Telefone:</strong> {{ company.phone_number|default:"—" }}</p>
+        <p><strong>Site:</strong> {% if company.website %}<a href="{{ company.website }}" rel="noopener" target="_blank">{{ company.website }}</a>{% else %}—{% endif %}</p>
+        <p><strong>Status:</strong> {{ company.get_status_display }}</p>
+    </div>
+</div>
+{% endblock %}

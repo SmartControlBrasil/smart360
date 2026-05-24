@@ -1,0 +1,42 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        {% if can_create_company %}
+        <div class="page-actions">
+            <a class="btn-primary" href="{% url 'admin-shell:dashboard-company-create' %}">Nova empresa</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="table-card">
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Slug</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in companies %}
+                    <tr>
+                        <td><strong>{{ c.name }}</strong></td>
+                        <td>{{ c.slug }}</td>
+                        <td>{{ c.get_status_display }}</td>
+                        <td><a href="{% url 'admin-shell:dashboard-company-detail' company_id=c.pk %}">Abrir</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">Nenhuma empresa no escopo do seu usuario.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

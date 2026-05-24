@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 
 class MaintenanceClient(models.Model):
@@ -312,6 +313,124 @@ class ChecklistItem(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class PreventiveInspectionRoutine(models.Model):
+    """
+    Rotina de inspecao preventiva com divisões configuráveis por unidade/checklist.
+
+    Estado `next_division` aponta a divisão sugerida para a próxima visita (Fase 1 manual).
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    company = models.ForeignKey(
+        "companies.Company",
+        on_delete=models.CASCADE,
+        related_name="preventive_inspection_routines",
+        null=True,
+        blank=True,
+    )
+    operational_site = models.ForeignKey(
+        "smart_system.OperationalSite",
+        on_delete=models.CASCADE,
+        related_name="preventive_inspection_routines",
+    )
+    checklist = models.ForeignKey(
+        "smart_system.Checklist",
+        on_delete=models.PROTECT,
+        related_name="preventive_inspection_routines",
+    )
+    name = models.CharField(max_length=180)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    next_division = models.ForeignKey(
+        "smart_system.InspectionDivision",
+        on_delete=models.SET_NULL,
+        related_name="+",
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "smart_system_preventive_inspection_routines"
+        ordering = ["operational_site__name", "name"]
+
+    def clean(self) -> None:
+        if not self.next_division_id:
+            return
+        if self.pk is None:
+            raise ValidationError(
+                {"next_division": "Salve a rotina antes de definir a proxima divisão sugerida."}
+            )
+        if self.next_division.routine_id != self.pk:
+            raise ValidationError({"next_division": "A divisão precisa pertencer a esta rotina."})
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class InspectionDivision(models.Model):
+    """
+    Divisão nomeável da rotativa (lot A/B, semanas, zonas etc.).
+    Não há exclusão física no Admin; usar `is_active` e `archived_at`.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    routine = models.ForeignKey(
+        "smart_system.PreventiveInspectionRoutine",
+        on_delete=models.CASCADE,
+        related_name="divisions",
+    )
+    name = models.CharField(max_length=180)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    archived_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "smart_system_inspection_divisions"
+        ordering = ["routine_id", "sort_order", "id"]
+
+    def __str__(self) -> str:
+        return f"{self.routine.name} — {self.name}"
+
+
+class InspectionDivisionEquipment(models.Model):
+    """
+    Ligação equipamento ↔ divisão; `always_include_in_visit` atende inclusão obrigatória na visita.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    division = models.ForeignKey(
+        "smart_system.InspectionDivision",
+        on_delete=models.CASCADE,
+        related_name="division_equipment_links",
+    )
+    asset = models.ForeignKey(
+        "smart_system.Asset",
+        on_delete=models.CASCADE,
+        related_name="inspection_division_links",
+    )
+    always_include_in_visit = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "smart_system_inspection_division_equipment"
+        ordering = ["division_id", "asset__asset_tag"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["division", "asset"],
+                name="uniq_inspection_division_asset",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.division} @ {self.asset.asset_tag}"
 
 
 class MaintenancePlan(models.Model):

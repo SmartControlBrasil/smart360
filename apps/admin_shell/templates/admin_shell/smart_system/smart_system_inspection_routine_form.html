@@ -1,0 +1,36 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{% if form_mode == "update" %}Editar rotina{% else %}Nova rotina{% endif %}</h1>
+            <p class="muted-block">{{ page_description }}</p>
+        </div>
+
+        <form method="post" class="form-card-body" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for err in form.non_field_errors %}
+                    <div class="form-error">{{ err }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-grid">
+                {% include "admin_shell/components/forms/field.html" with field=form.company %}
+                {% include "admin_shell/components/forms/field.html" with field=form.operational_site %}
+                {% include "admin_shell/components/forms/field.html" with field=form.checklist %}
+                {% include "admin_shell/components/forms/field.html" with field=form.name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.description full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.is_active %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a class="btn-secondary" href="{{ cancel_url }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

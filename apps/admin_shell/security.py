@@ -61,7 +61,19 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
         return self._smart_system_permission_map
 
     def get_permission_resource_id(self):
-        for key in ("asset_code", "order_code", "plan_code", "failure_code", "checklist_code", "part_code", "quote_number", "contract_number", "report_type"):
+        for key in (
+            "asset_code",
+            "order_code",
+            "plan_code",
+            "failure_code",
+            "checklist_code",
+            "routine_code",
+            "company_id",
+            "part_code",
+            "quote_number",
+            "contract_number",
+            "report_type",
+        ):
             value = self.kwargs.get(key)
             if value:
                 return str(value)

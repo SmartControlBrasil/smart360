@@ -1,7 +1,10 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils import timezone
 
+from apps.companies.models import Company
+from apps.companies.services.company_shell_access import user_can_create_saas_company
 from apps.companies.services.tenant_scope import TenantScopeService
 from apps.smart_system.models import (
     Asset,
@@ -15,6 +18,7 @@ from apps.smart_system.models import (
     ServiceOrder,
     ServiceSignature,
 )
+from apps.smart_system.services.default_operational_site import ensure_default_operational_site_for_client
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
 
 from .services.smart_system_work_order_create import maintenance_plan_client_and_site
@@ -462,6 +466,14 @@ class SmartSystemChecklistItemForm(forms.Form):
 
 
 class SmartSystemMaintenanceClientForm(forms.ModelForm):
+    saas_tenant_company = forms.ModelChoiceField(
+        label="Empresa SaaS (tenant)",
+        queryset=Company.objects.none(),
+        required=False,
+        help_text="Somente aparece quando voce pode escolher entre varias empresas disponíveis ao seu usuário.",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
     class Meta:
         model = MaintenanceClient
         fields = (
@@ -485,6 +497,23 @@ class SmartSystemMaintenanceClientForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.request = request
         self.tenant_context = tenant_context or {}
+        self._resolved_saas_company = None
+        instance = kwargs.get("instance")
+        avail = TenantScopeService.get_available_companies(request.user) if request else []
+        self._saas_available_ids = [c.id for c in avail]
+        self.fields["saas_tenant_company"].queryset = (
+            Company.objects.filter(id__in=self._saas_available_ids).order_by("name")
+            if self._saas_available_ids
+            else Company.objects.none()
+        )
+
+        show_picker = (
+            bool(request)
+            and not (instance and instance.pk)
+            and (getattr(request.user, "is_superuser", False) or user_can_create_saas_company(request.user))
+            and len(avail) > 1
+        )
+
         self.fields["display_name"].label = "Nome"
         self.fields["document_number"].label = "Documento"
         self.fields["contact_email"].label = "Email"
@@ -492,21 +521,69 @@ class SmartSystemMaintenanceClientForm(forms.ModelForm):
         self.fields["is_active"].label = "Status ativo"
         self.fields["notes"].label = "Observações"
 
+        self._principal_site_created = False
+
+        if instance and instance.pk:
+            del self.fields["saas_tenant_company"]
+        elif not show_picker:
+            del self.fields["saas_tenant_company"]
+        else:
+            self.fields["saas_tenant_company"].required = True
+
+    def clean(self):
+        cleaned = super().clean()
+        if self.instance and self.instance.pk:
+            return cleaned
+        request = self.request
+        avail = TenantScopeService.get_available_companies(request.user) if request else []
+        avail_ids = {c.id for c in avail}
+        tenant_company = self.tenant_context.get("company")
+        picked = cleaned.get("saas_tenant_company")
+
+        if not avail_ids:
+            raise forms.ValidationError(
+                "Não há empresa SaaS disponível no seu contexto. Cadastre uma empresa assinante "
+                "(tenant) antes de registrar clientes operacionais.",
+            )
+
+        target = None
+        if picked is not None:
+            if picked.id not in avail_ids:
+                raise forms.ValidationError("Empresa SaaS selecionada inválida para o seu usuário.")
+            target = picked
+        elif tenant_company is not None and tenant_company.id in avail_ids:
+            target = tenant_company
+        elif len(avail) == 1:
+            target = avail[0]
+        else:
+            raise forms.ValidationError(
+                "Várias empresas estão disponíveis. Por favor use o seletor de contexto (empresa ativa) "
+                "na interface ou escolha a empresa SaaS quando o formulário disponibilizar esse campo.",
+            )
+
+        self._resolved_saas_company = target
+        return cleaned
+
     def save(self, commit=True):
         obj = super().save(commit=False)
-        company = self.tenant_context.get("company")
-        if company is None and obj.company_id is None:
-            self.add_error(
-                None,
-                "Empresa ativa obrigatoria para cadastrar cliente no escopo atual.",
-            )
-            raise forms.ValidationError(
-                "Empresa ativa obrigatoria para cadastrar cliente no escopo atual."
-            )
-        if company is not None:
-            obj.company = company
+        if obj.pk:
+            pass
+        else:
+            if self._resolved_saas_company is None:
+                raise forms.ValidationError("Empresa SaaS não informada.")
+            obj.company = self._resolved_saas_company
+
+        self._principal_site_created = False
         if commit:
-            obj.save()
+            creating_new = obj.pk is None
+            with transaction.atomic():
+                obj.save()
+                if creating_new:
+                    _, self._principal_site_created = ensure_default_operational_site_for_client(
+                        obj,
+                        user=self.request.user if self.request else None,
+                    )
+
         return obj
 
 

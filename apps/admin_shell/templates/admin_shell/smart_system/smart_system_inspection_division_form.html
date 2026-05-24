@@ -1,0 +1,24 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ page_title }}</h1>
+            <p class="muted-block">Rotina: {{ routine.name }}</p>
+        </div>
+        <form method="post" class="form-card-body" novalidate>
+            {% csrf_token %}
+            <div class="form-grid">
+                {% include "admin_shell/components/forms/field.html" with field=form.name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.sort_order %}
+                {% include "admin_shell/components/forms/field.html" with field=form.is_active %}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Criar divisao</button>
+                <a class="btn-secondary" href="{{ cancel_url }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

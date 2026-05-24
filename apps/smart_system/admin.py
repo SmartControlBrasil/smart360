@@ -14,6 +14,8 @@ from .models import (
     FieldExecutionSnapshot,
     FieldSyncOperation,
     FailureEvent,
+    InspectionDivision,
+    InspectionDivisionEquipment,
     MaintenanceContract,
     MaintenanceClient,
     MaintenancePlan,
@@ -32,6 +34,7 @@ from .models import (
     TechnicianAvailabilityWindow,
     TechnicianSchedule,
     WorkLog,
+    PreventiveInspectionRoutine,
 )
 
 
@@ -144,6 +147,64 @@ class ChecklistItemAdmin(admin.ModelAdmin):
     search_fields = ("title", "description", "checklist__name")
     readonly_fields = ("public_id", "created_at", "updated_at")
     autocomplete_fields = ("checklist",)
+
+
+class InspectionDivisionInline(admin.TabularInline):
+    model = InspectionDivision
+    extra = 0
+    fields = ("name", "sort_order", "is_active", "archived_at")
+    ordering = ("sort_order", "id")
+
+
+@admin.register(PreventiveInspectionRoutine)
+class PreventiveInspectionRoutineAdmin(admin.ModelAdmin):
+    list_display = ("name", "company", "operational_site", "checklist", "next_division", "is_active", "updated_at")
+    list_filter = ("is_active",)
+    search_fields = ("name", "description")
+    readonly_fields = ("public_id", "created_at", "updated_at")
+    autocomplete_fields = ("company", "operational_site", "checklist")
+    inlines = (InspectionDivisionInline,)
+    fieldsets = (
+        (None, {"fields": ("public_id", "company", "operational_site", "checklist", "name", "description", "is_active")}),
+        ("Rotacao", {"fields": ("next_division",)}),
+    )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "next_division":
+            obj_id = request.resolver_match.kwargs.get("object_id") if request.resolver_match else None
+            if obj_id:
+                kwargs["queryset"] = InspectionDivision.objects.filter(routine_id=obj_id).order_by(
+                    "sort_order", "id"
+                )
+            else:
+                kwargs["queryset"] = InspectionDivision.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+class InspectionDivisionEquipmentInline(admin.TabularInline):
+    model = InspectionDivisionEquipment
+    extra = 0
+    autocomplete_fields = ("asset",)
+
+
+@admin.register(InspectionDivision)
+class InspectionDivisionAdmin(admin.ModelAdmin):
+    list_display = ("name", "routine", "sort_order", "is_active", "archived_at", "updated_at")
+    list_filter = ("is_active", "routine__operational_site")
+    search_fields = ("name", "routine__name")
+    readonly_fields = ("public_id", "created_at", "updated_at")
+    autocomplete_fields = ("routine",)
+    inlines = (InspectionDivisionEquipmentInline,)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(InspectionDivisionEquipment)
+class InspectionDivisionEquipmentAdmin(admin.ModelAdmin):
+    list_display = ("division", "asset", "always_include_in_visit", "created_at")
+    search_fields = ("division__name", "asset__asset_tag", "asset__name")
+    autocomplete_fields = ("division", "asset")
 
 
 @admin.register(MaintenancePlan)

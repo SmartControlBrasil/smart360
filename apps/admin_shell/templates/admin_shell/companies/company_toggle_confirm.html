@@ -1,0 +1,28 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ page_title }}</h1>
+            <p class="muted-block">
+                {% if will_activate %}
+                    A empresa ficará disponível nos contextos SaaS quando ativa e com permissões corretas ao usuario.
+                {% else %}
+                    A empresa ficará inativa e pode deixar de aparecer no seletor de contexto.
+                {% endif %}
+            </p>
+        </div>
+        <p><strong>{{ company.name }}</strong> ({{ company.slug }} — {{ company.get_status_display }})</p>
+        <form method="post" class="form-actions" style="margin-top:24px;">
+            {% csrf_token %}
+            {% if will_activate %}
+            <button type="submit" class="btn-primary">Confirmar ativação</button>
+            {% else %}
+            <button type="submit" class="btn-secondary">Confirmar desativação</button>
+            {% endif %}
+            <a class="btn-secondary" href="{% url 'admin-shell:dashboard-company-detail' company_id=company.pk %}">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

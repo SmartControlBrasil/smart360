@@ -20,6 +20,21 @@ from apps.media_library.dashboard_views import (
     MediaAssetListView,
     MediaAssetUpdateView,
 )
+from apps.smart_system.dashboard_views import (
+    SmartSystemInspectionDivisionCreateView,
+    SmartSystemInspectionDivisionDetailView,
+    SmartSystemInspectionRoutineCreateView,
+    SmartSystemInspectionRoutineDetailView,
+    SmartSystemInspectionRoutineListView,
+    SmartSystemInspectionRoutineUpdateView,
+)
+from apps.companies.dashboard_views import (
+    CompanyShellCreateView,
+    CompanyShellDeactivateView,
+    CompanyShellDetailView,
+    CompanyShellListView,
+    CompanyShellUpdateView,
+)
 from apps.livia_assistant.dashboard_views import (
     LiviaConversationDetailView,
     LiviaConversationListView,
@@ -364,6 +379,15 @@ urlpatterns = [
     path("app/platform-admin/billing/invoices/", BillingInvoiceListView.as_view(), name="billing-invoices"),
     path("app/platform-admin/billing/invoices/<slug:invoice_number>/mark-paid/", BillingInvoiceMarkPaidView.as_view(), name="billing-invoice-mark-paid"),
     path("app/platform-admin/billing/invoices/<slug:invoice_number>/cancel/", BillingInvoiceCancelView.as_view(), name="billing-invoice-cancel"),
+    path("app/dashboard/companies/", CompanyShellListView.as_view(), name="dashboard-companies"),
+    path("app/dashboard/companies/new/", CompanyShellCreateView.as_view(), name="dashboard-company-create"),
+    path("app/dashboard/companies/<int:company_id>/", CompanyShellDetailView.as_view(), name="dashboard-company-detail"),
+    path("app/dashboard/companies/<int:company_id>/edit/", CompanyShellUpdateView.as_view(), name="dashboard-company-update"),
+    path(
+        "app/dashboard/companies/<int:company_id>/toggle-status/",
+        CompanyShellDeactivateView.as_view(),
+        name="dashboard-company-toggle-status",
+    ),
     path("app/marketplace/technicians/", MarketplaceTechniciansDashboardView.as_view(), name="marketplace-technicians-dashboard"),
     path("app/marketplace/technicians/requests/", MarketplaceTechniciansRequestListView.as_view(), name="marketplace-technicians-requests"),
     path("app/marketplace/technicians/matching/", MarketplaceTechniciansMatchingListView.as_view(), name="marketplace-technicians-matching"),
@@ -422,6 +446,36 @@ urlpatterns = [
     path("app/smart-system/checklists/<slug:checklist_code>/executions/<slug:execution_code>/", SmartSystemChecklistExecutionDetailView.as_view(), name="smart-system-checklist-execution-detail"),
     path("app/smart-system/failures/", SmartSystemFailureListView.as_view(), name="smart-system-failures"),
     path("app/smart-system/failures/<slug:failure_code>/", SmartSystemFailureDetailView.as_view(), name="smart-system-failure-detail"),
+    path(
+        "app/smart-system/inspection-routines/",
+        SmartSystemInspectionRoutineListView.as_view(),
+        name="smart-system-inspection-routines",
+    ),
+    path(
+        "app/smart-system/inspection-routines/new/",
+        SmartSystemInspectionRoutineCreateView.as_view(),
+        name="smart-system-inspection-routine-create",
+    ),
+    path(
+        "app/smart-system/inspection-routines/<slug:routine_code>/",
+        SmartSystemInspectionRoutineDetailView.as_view(),
+        name="smart-system-inspection-routine-detail",
+    ),
+    path(
+        "app/smart-system/inspection-routines/<slug:routine_code>/edit/",
+        SmartSystemInspectionRoutineUpdateView.as_view(),
+        name="smart-system-inspection-routine-update",
+    ),
+    path(
+        "app/smart-system/inspection-routines/<slug:routine_code>/divisions/new/",
+        SmartSystemInspectionDivisionCreateView.as_view(),
+        name="smart-system-inspection-division-create",
+    ),
+    path(
+        "app/smart-system/inspection-routines/<slug:routine_code>/divisions/<int:division_id>/",
+        SmartSystemInspectionDivisionDetailView.as_view(),
+        name="smart-system-inspection-division-detail",
+    ),
     path("app/smart-system/preventives/", SmartSystemPreventiveListView.as_view(), name="smart-system-preventives"),
     path("app/smart-system/preventives/schedule/", SmartSystemPreventiveScheduleView.as_view(), name="smart-system-preventives-schedule"),
     path("app/smart-system/preventives/calendar/", SmartSystemPreventiveCalendarView.as_view(), name="smart-system-preventives-calendar"),

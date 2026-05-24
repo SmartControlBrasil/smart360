@@ -1,7 +1,9 @@
 <nav class="breadcrumb">
     {% for item in breadcrumbs %}
         <span class="breadcrumb-item">
-            {% if item.url %}
+            {% if item.href %}
+                <a href="{{ item.href }}">{{ item.label }}</a>
+            {% elif item.url %}
                 {% if item.route_kwargs %}
                     {% if item.route_kwargs.module_slug %}
                         <a href="{% url item.url module_slug=item.route_kwargs.module_slug %}">{{ item.label }}</a>
@@ -19,6 +21,10 @@
                         <a href="{% url item.url checklist_code=item.route_kwargs.checklist_code execution_code=item.route_kwargs.execution_code %}">{{ item.label }}</a>
                     {% elif item.route_kwargs.checklist_code %}
                         <a href="{% url item.url checklist_code=item.route_kwargs.checklist_code %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.routine_code and item.route_kwargs.division_id %}
+                        <a href="{% url item.url routine_code=item.route_kwargs.routine_code division_id=item.route_kwargs.division_id %}">{{ item.label }}</a>
+                    {% elif item.route_kwargs.routine_code %}
+                        <a href="{% url item.url routine_code=item.route_kwargs.routine_code %}">{{ item.label }}</a>
                     {% elif item.route_kwargs.pk %}
                         <a href="{% url item.url pk=item.route_kwargs.pk %}">{{ item.label }}</a>
                     {% else %}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from apps.smart_system.models import MaintenanceClient, OperationalSite
+from apps.smart_system.services.default_operational_site import DEFAULT_PRINCIPAL_SITE_NAME
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
 
 
@@ -30,6 +31,7 @@ def _serialize_site(site: OperationalSite) -> dict:
         "contact_name": site.contact_name or "—",
         "contact_phone": site.contact_phone or "—",
         "status": "Ativo" if site.is_active else "Inativo",
+        "is_principal_unit": site.name == DEFAULT_PRINCIPAL_SITE_NAME,
     }
 
 

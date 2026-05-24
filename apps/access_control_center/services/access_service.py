@@ -244,10 +244,13 @@ class AccessControlService:
         )
         roles = [assignment.role for assignment in assignments]
         domain = PermissionDomain.objects.filter(Q(slug=domain_slug) | Q(name__iexact=domain_slug), is_active=True).first()
-        action = PermissionAction.objects.filter(
-            Q(slug=action_slug) | Q(action_name__iexact=action_slug),
-            is_active=True,
-        ).first()
+        action = None
+        if domain is not None:
+            action = (
+                PermissionAction.objects.filter(domain=domain, is_active=True)
+                .filter(Q(slug=action_slug) | Q(action_name__iexact=action_slug))
+                .first()
+            )
         if not domain or not action:
             reason = "Permission domain or action not found."
             if log_decision:

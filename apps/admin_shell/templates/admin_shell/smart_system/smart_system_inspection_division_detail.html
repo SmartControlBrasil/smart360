@@ -1,0 +1,91 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+    </div>
+
+    <div class="form-page">
+        <div class="form-card">
+            <div class="form-header"><h2>Dados da divisao</h2></div>
+            <form method="post" class="form-card-body" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_division" />
+                <div class="form-grid">
+                    {% include "admin_shell/components/forms/field.html" with field=division_form.name %}
+                    {% include "admin_shell/components/forms/field.html" with field=division_form.sort_order %}
+                    {% include "admin_shell/components/forms/field.html" with field=division_form.is_active %}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar divisao</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="form-page">
+        <div class="form-card">
+            <div class="form-header"><h2>Equipamentos nesta divisao</h2></div>
+            <div class="table-wrapper" style="padding: 0 28px 12px;">
+                <table class="table-smart">
+                    <thead>
+                        <tr>
+                            <th>TAG</th>
+                            <th>Nome</th>
+                            <th>Sempre na visita</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for link in equipment_links %}
+                        <tr>
+                            <td>{{ link.asset.asset_tag }}</td>
+                            <td>{{ link.asset.name }}</td>
+                            <td>{% if link.always_include_in_visit %}Sim{% else %}—{% endif %}</td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_equipment" />
+                                    <input type="hidden" name="link_id" value="{{ link.pk }}" />
+                                    <button type="submit" class="btn-secondary btn-sm">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">Nenhum equipamento.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <form method="post" class="form-card-body" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_equipment" />
+                <div class="form-grid">
+                    {% include "admin_shell/components/forms/field.html" with field=equipment_form.asset %}
+                    {% include "admin_shell/components/forms/field.html" with field=equipment_form.always_include_in_visit %}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Vincular equipamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="form-actions" style="margin: 24px 0;">
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="deactivate_only" />
+            <button type="submit" class="btn-secondary">Desativar divisao</button>
+        </form>
+        <form method="post" style="display:inline; margin-left: 8px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="archive" />
+            <button type="submit" class="btn-secondary">Arquivar divisao</button>
+        </form>
+        <a class="btn-secondary" href="{% url 'admin-shell:smart-system-inspection-routine-detail' routine_code=routine_code %}" style="margin-left: 8px;">Voltar à rotina</a>
+    </div>
+</div>
+{% endblock %}

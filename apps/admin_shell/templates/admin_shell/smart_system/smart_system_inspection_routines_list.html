@@ -1,0 +1,43 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-primary" href="{% url 'admin-shell:smart-system-inspection-routine-create' %}">Nova rotina</a>
+            <a class="btn-secondary" href="{% url 'admin-shell:smart-system-preventives' %}">Planos preventivos</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Rotina</th>
+                        <th>Unidade</th>
+                        <th>Checklist</th>
+                        <th>Proxima divisao</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r, code, next_name in routine_rows %}
+                    <tr>
+                        <td><strong>{{ r.name }}</strong>{% if not r.is_active %} <span class="muted-block">(inativa)</span>{% endif %}</td>
+                        <td>{{ r.operational_site.name }}</td>
+                        <td>{{ r.checklist.name }}</td>
+                        <td>{{ next_name }}</td>
+                        <td><a href="{% url 'admin-shell:smart-system-inspection-routine-detail' routine_code=code %}">Abrir</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">Nenhuma rotina cadastrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

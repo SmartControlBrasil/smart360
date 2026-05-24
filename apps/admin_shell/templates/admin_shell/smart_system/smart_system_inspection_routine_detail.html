@@ -1,0 +1,51 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+    </div>
+
+    <div class="content-grid">
+        <div class="form-card">
+            <p><strong>Unidade:</strong> {{ routine.operational_site.name }}</p>
+            <p><strong>Checklist:</strong> {{ routine.checklist.name }}</p>
+            <p><strong>Proxima divisao sugerida:</strong> {% if next_eligible %}{{ next_eligible.name }} (ordem {{ next_eligible.sort_order }}){% else %}—{% endif %}</p>
+        </div>
+    </div>
+
+    <div class="table-card" style="margin-top: 20px;">
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Ordem</th>
+                        <th>Divisão</th>
+                        <th>Status</th>
+                        <th>Equipamentos</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in divisions %}
+                    <tr>
+                        <td>{{ d.sort_order }}</td>
+                        <td>{{ d.name }}</td>
+                        <td>
+                            {% if d.archived_at %}Arquivada{% elif d.is_active %}Ativa{% else %}Inativa{% endif %}
+                        </td>
+                        <td>{{ d.division_equipment_links.count }}</td>
+                        <td>
+                            <a href="{% url 'admin-shell:smart-system-inspection-division-detail' routine_code=routine_code division_id=d.pk %}">Gerir</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">Nenhuma divisao. Use <em>Nova divisao</em>.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

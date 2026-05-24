@@ -620,7 +620,7 @@ def has_smart_system_permission(
         payload["company_id"] = resolved_company.id
         payload["user_company_id"] = resolved_company.id
         payload["assignment_company_ids"] = [resolved_company.id]
-    return AccessControlService.check_permission(
+    allowed, _reason = AccessControlService.check_permission(
         user=user,
         domain_slug=domain_slug,
         action_slug=action_slug,
@@ -630,6 +630,7 @@ def has_smart_system_permission(
         resource_type=resource_type,
         resource_id=resource_id,
     )
+    return allowed
 
 
 def get_smart_system_permission_map(user, company=None):

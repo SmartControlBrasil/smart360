@@ -8,6 +8,20 @@
             <p class="muted-block">Cadastro operacional de empresa contratante.</p>
         </div>
 
+        {% if saas_company_count == 0 %}
+        <div class="form-errors" style="margin-bottom: 16px;">
+            <div class="form-error">
+                Não há empresa SaaS (tenant) disponível no sistema para o seu usuário.
+                {% if can_manage_saas_companies_shell %}
+                <a href="{{ saas_companies_create_url }}">Cadastre uma empresa</a>
+                ou consulte a <a href="{{ saas_companies_dashboard_url }}">lista de empresas</a>.
+                {% else %}
+                Solicite ao administrador da plataforma que crie o tenant e associe seu usuário via Membership.
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
         <form method="post" class="form-card-body" novalidate>
             {% csrf_token %}
             {% if form.non_field_errors %}
@@ -19,6 +33,9 @@
             {% endif %}
             <div class="form-grid">
                 {% include "admin_shell/components/forms/field.html" with field=form.display_name %}
+                {% if 'saas_tenant_company' in form.fields %}
+                {% include "admin_shell/components/forms/field.html" with field=form.saas_tenant_company full=True %}
+                {% endif %}
                 {% include "admin_shell/components/forms/field.html" with field=form.document_number %}
                 {% include "admin_shell/components/forms/field.html" with field=form.contact_email %}
                 {% include "admin_shell/components/forms/field.html" with field=form.contact_phone %}

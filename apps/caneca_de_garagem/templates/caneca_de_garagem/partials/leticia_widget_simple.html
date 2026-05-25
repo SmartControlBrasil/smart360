@@ -1,0 +1,225 @@
+{# Widget Letícia sem backend de IA: atalhos e saudação. Requer livia_chat_branding e livia_caneca_simple_mode no contexto. #}
+<div class="livia-widget livia-chat-widget cdg-leticia-simple-widget" data-cdg-leticia-simple aria-live="polite">
+  <section class="cdg-leticia-panel" id="cdg-leticia-panel" hidden data-cdg-panel>
+    <header class="cdg-leticia-header">
+      <div>
+        <strong>{{ livia_chat_branding.assistant_name }}</strong>
+        <span>{{ livia_chat_branding.assistant_subtitle }}</span>
+      </div>
+      <button class="cdg-leticia-minimize" type="button" data-cdg-minimize aria-label="Fechar ajuda rápida">−</button>
+    </header>
+    <div class="cdg-leticia-body">
+      <p class="cdg-leticia-intro">{{ livia_chat_branding.opening_message }}</p>
+      {% if livia_chat_branding.cta_primary_label and livia_chat_branding.cta_primary_url %}
+      <nav class="cdg-leticia-links" aria-label="Atalhos da Letícia">
+        <a class="cdg-leticia-link cdg-leticia-link-primary"
+           href="{{ livia_chat_branding.cta_primary_url }}">{{ livia_chat_branding.cta_primary_label }}</a>
+        {% if livia_chat_branding.cta_secondary_label and livia_chat_branding.cta_secondary_url %}
+        <a class="cdg-leticia-link"
+           href="{{ livia_chat_branding.cta_secondary_url }}">{{ livia_chat_branding.cta_secondary_label }}</a>
+        {% endif %}
+        {% if livia_chat_branding.cta_tertiary_label and livia_chat_branding.cta_tertiary_url %}
+        <a class="cdg-leticia-link"
+           href="{{ livia_chat_branding.cta_tertiary_url }}">{{ livia_chat_branding.cta_tertiary_label }}</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+      <p class="cdg-leticia-footnote">
+        Canal humano também pelo WhatsApp nos botões da loja quando disponíveis.
+      </p>
+    </div>
+  </section>
+  <button class="cdg-leticia-toggle livia-chat-toggle" type="button" aria-expanded="false"
+          aria-controls="cdg-leticia-panel" data-cdg-toggle>
+    <span class="livia-chat-toggle-icon cdg-leticia-toggle-icon" aria-hidden="true">💬</span>
+    {{ livia_chat_branding.toggle_label }}
+  </button>
+</div>
+
+<style>
+  /* Posicionamento igual ao tema Eitech (sem depender do CSS institucional) */
+  .livia-widget.livia-chat-widget.cdg-leticia-simple-widget,
+  .cdg-leticia-simple-widget.livia-chat-widget {
+    position: fixed !important;
+    left: max(24px, env(safe-area-inset-left)) !important;
+    right: auto !important;
+    bottom: max(24px, env(safe-area-inset-bottom)) !important;
+    top: auto !important;
+    z-index: 950 !important;
+    font-family: inherit;
+  }
+
+  .cdg-leticia-simple-widget .cdg-leticia-panel {
+    position: relative;
+    width: min(360px, calc(100vw - 40px));
+    margin-bottom: 12px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 22px 52px rgba(15, 23, 42, 0.24);
+    overflow: hidden;
+    border: 1px solid #e6e8ef;
+  }
+
+  .cdg-leticia-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #4a3728 0%, #d97830 140%);
+    color: #fff;
+  }
+
+  .cdg-leticia-header div {
+    display: grid;
+    gap: 2px;
+  }
+
+  .cdg-leticia-header span {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+
+  .cdg-leticia-minimize {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .cdg-leticia-body {
+    padding: 14px 16px 16px;
+    background: #f8fafc;
+  }
+
+  .cdg-leticia-intro {
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #1f2937;
+  }
+
+  .cdg-leticia-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .cdg-leticia-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(217, 120, 48, 0.45);
+    color: #4a3728;
+    background: #fff;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cdg-leticia-link:hover,
+  .cdg-leticia-link:focus-visible {
+    border-color: #d97830;
+    box-shadow: 0 8px 20px rgba(217, 120, 48, 0.18);
+    outline: none;
+    color: #2d2118;
+  }
+
+  .cdg-leticia-link-primary {
+    background: linear-gradient(135deg, #d97830 0%, #c46a29 100%);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .cdg-leticia-link-primary:hover,
+  .cdg-leticia-link-primary:focus-visible {
+    color: #fff;
+    box-shadow: 0 12px 28px rgba(217, 120, 48, 0.35);
+  }
+
+  .cdg-leticia-footnote {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #64748b;
+  }
+
+  .cdg-leticia-toggle {
+    border: 0;
+    cursor: pointer;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #4a3728 0%, #33251b 100%);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(41, 32, 25, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    position: relative;
+  }
+
+  .cdg-leticia-toggle:hover,
+  .cdg-leticia-toggle:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 38px rgba(41, 32, 25, 0.42);
+    outline: none;
+  }
+
+  .cdg-leticia-simple-widget .cdg-leticia-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  @media (max-width: 767.98px) {
+    .livia-widget.livia-chat-widget.cdg-leticia-simple-widget,
+    .cdg-leticia-simple-widget.livia-chat-widget {
+      left: max(14px, env(safe-area-inset-left)) !important;
+      bottom: max(20px, env(safe-area-inset-bottom)) !important;
+      z-index: 950 !important;
+    }
+
+    .cdg-leticia-toggle {
+      min-height: 44px !important;
+      padding: 10px 14px !important;
+      font-size: 13px !important;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.querySelector("[data-cdg-leticia-simple]");
+    if (!root || root.dataset.initialized === "true") return;
+    root.dataset.initialized = "true";
+
+    var toggle = root.querySelector("[data-cdg-toggle]");
+    var panel = root.querySelector("[data-cdg-panel]");
+    var minimize = root.querySelector("[data-cdg-minimize]");
+
+    function setOpen(open) {
+      panel.toggleAttribute("hidden", !open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.toggleAttribute("hidden", open);
+    }
+
+    toggle.addEventListener("click", function () { setOpen(true); });
+    minimize.addEventListener("click", function () { setOpen(false); });
+  })();
+</script>

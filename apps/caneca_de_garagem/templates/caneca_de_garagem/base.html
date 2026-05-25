@@ -458,6 +458,13 @@
     <script src="{% static 'caneca_de_garagem/public/assets/js/tsparticles.js' %}"></script>
     <script src="{% static 'caneca_de_garagem/public/assets/js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
+    {% if livia_caneca_public_widget %}
+    {% if livia_caneca_ai_chat_mode %}
+    {% include "livia_assistant/chat_widget.html" %}
+    {% elif livia_caneca_simple_mode %}
+    {% include "caneca_de_garagem/partials/leticia_widget_simple.html" %}
+    {% endif %}
+    {% endif %}
 </body>
 
 </html>

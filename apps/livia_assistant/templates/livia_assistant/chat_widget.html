@@ -1,31 +1,57 @@
-<div class="livia-widget livia-chat-widget" data-livia-widget data-endpoint="/livia/chat/">
+{% load i18n %}
+<div class="livia-widget livia-chat-widget"
+     data-livia-widget
+     data-endpoint="{% url 'livia_assistant:chat' %}">
   <section class="livia-chat-panel" id="livia-chat-panel" hidden data-livia-panel>
     <header class="livia-chat-header">
       <div>
-        <strong>Lívia</strong>
-        <span>Assistente da Smart Control Brasil</span>
+        <strong>{{ livia_chat_branding.assistant_name }}</strong>
+        <span>{{ livia_chat_branding.assistant_subtitle }}</span>
       </div>
       <button class="livia-chat-minimize" type="button" data-livia-minimize aria-label="Minimizar chat">−</button>
     </header>
     <div class="livia-chat-messages" data-livia-messages aria-live="polite">
       <p class="livia-chat-message livia-chat-message-assistant">
-        Olá, eu sou a Lívia 👋 Como posso ajudar?
+        {{ livia_chat_branding.opening_message }}
       </p>
+      {% if livia_chat_branding.cta_primary_label and livia_chat_branding.cta_primary_url %}
+      <div class="livia-chat-quick-links" role="navigation" aria-label="{% trans 'Atalhos do assistente' %}">
+        <a class="livia-chat-quick-link" href="{{ livia_chat_branding.cta_primary_url }}">{{ livia_chat_branding.cta_primary_label }}</a>
+        {% if livia_chat_branding.cta_secondary_label and livia_chat_branding.cta_secondary_url %}
+        <a class="livia-chat-quick-link" href="{{ livia_chat_branding.cta_secondary_url }}">{{ livia_chat_branding.cta_secondary_label }}</a>
+        {% endif %}
+        {% if livia_chat_branding.cta_tertiary_label and livia_chat_branding.cta_tertiary_url %}
+        <a class="livia-chat-quick-link" href="{{ livia_chat_branding.cta_tertiary_url }}">{{ livia_chat_branding.cta_tertiary_label }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
     <p class="livia-chat-state" data-livia-state hidden></p>
     <form class="livia-chat-form" data-livia-form>
-      <input type="text" name="message" placeholder="Digite sua mensagem" autocomplete="off" aria-label="Mensagem para a Lívia" required>
-      <button type="submit" data-livia-submit>Enviar</button>
+      <input type="text" name="message" placeholder="{{ livia_chat_branding.placeholder_input }}"
+             autocomplete="off" aria-label="{{ livia_chat_branding.aria_input_label }}" required>
+      <button type="submit" data-livia-submit>{% trans "Enviar" %}</button>
     </form>
   </section>
   <button class="livia-chat-toggle" type="button" aria-expanded="false" aria-controls="livia-chat-panel" data-livia-toggle>
-    <span class="livia-chat-toggle-icon" aria-hidden="true"><i class="fa-solid fa-comments"></i></span>
-    Fale com a Lívia
+    <span class="livia-chat-toggle-icon" aria-hidden="true">💬</span>
+    {{ livia_chat_branding.toggle_label }}
   </button>
 </div>
 
 <style>
-  /* Posição/z-index definidos em static/institutional/eitech/css/scb-float-widgets.css */
+  /* Fixação no canto (também em sites sem scb-float-widgets.css) */
+  .livia-widget.livia-chat-widget,
+  .livia-widget[data-livia-widget] {
+    position: fixed !important;
+    left: max(24px, env(safe-area-inset-left)) !important;
+    right: auto !important;
+    bottom: max(24px, env(safe-area-inset-bottom)) !important;
+    top: auto !important;
+    z-index: 950 !important;
+    font-family: inherit;
+  }
+
   .livia-chat-toggle,
   .livia-chat-form button,
   .livia-chat-minimize {
@@ -44,12 +70,14 @@
     color: #fff;
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    position: relative;
   }
   .livia-chat-toggle:hover,
   .livia-chat-toggle:focus {
     background: #1f2937;
     transform: translateY(-2px);
     box-shadow: 0 18px 36px rgba(15, 23, 42, 0.3);
+    outline: none;
   }
   .livia-chat-toggle-icon {
     display: inline-flex;
@@ -110,7 +138,30 @@
     padding: 10px 12px;
     font-size: 14px;
     line-height: 1.45;
-    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .livia-chat-quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 2px;
+    padding-top: 4px;
+  }
+  .livia-chat-quick-link {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    color: #0f766e;
+    background: #fff;
+  }
+  .livia-chat-quick-link:hover,
+  .livia-chat-quick-link:focus-visible {
+    border-color: #0f766e;
+    outline: none;
   }
   .livia-chat-message-user {
     justify-self: end;
@@ -156,24 +207,40 @@
     cursor: progress;
     opacity: 0.72;
   }
+
+  @media (max-width: 767.98px) {
+    .livia-widget.livia-chat-widget,
+    .livia-widget[data-livia-widget] {
+      left: max(18px, env(safe-area-inset-left)) !important;
+      bottom: max(20px, env(safe-area-inset-bottom)) !important;
+      z-index: 950 !important;
+    }
+
+    .livia-chat-toggle {
+      min-height: 42px !important;
+      padding: 10px 14px !important;
+      font-size: 13px !important;
+    }
+  }
 </style>
 
 <script>
   (function () {
-    const widget = document.querySelector("[data-livia-widget]");
+    var widget = document.querySelector("[data-livia-widget]");
     if (!widget || widget.dataset.initialized === "true") return;
     widget.dataset.initialized = "true";
 
-    const endpoint = widget.dataset.endpoint || "/livia/chat/";
-    const toggle = widget.querySelector("[data-livia-toggle]");
-    const minimize = widget.querySelector("[data-livia-minimize]");
-    const panel = widget.querySelector("[data-livia-panel]");
-    const form = widget.querySelector("[data-livia-form]");
-    const submit = widget.querySelector("[data-livia-submit]");
-    const messages = widget.querySelector("[data-livia-messages]");
-    const state = widget.querySelector("[data-livia-state]");
-    let sessionKey = window.localStorage.getItem("livia_session_key") || "";
-    let isLoading = false;
+    var endpoint = widget.dataset.endpoint || "/livia/chat/";
+    var typingText = "{{ livia_chat_branding.typing_indicator_js|escapejs }}";
+    var toggle = widget.querySelector("[data-livia-toggle]");
+    var minimize = widget.querySelector("[data-livia-minimize]");
+    var panel = widget.querySelector("[data-livia-panel]");
+    var form = widget.querySelector("[data-livia-form]");
+    var submit = widget.querySelector("[data-livia-submit]");
+    var messages = widget.querySelector("[data-livia-messages]");
+    var state = widget.querySelector("[data-livia-state]");
+    var sessionKey = window.localStorage.getItem("livia_session_key") || "";
+    var isLoading = false;
 
     function setOpen(open) {
       panel.toggleAttribute("hidden", !open);
@@ -193,11 +260,11 @@
     function setLoading(loading) {
       isLoading = loading;
       submit.disabled = loading;
-      setState(loading ? "Lívia está digitando..." : "", false);
+      setState(loading ? typingText : "", false);
     }
 
     function appendMessage(content, role) {
-      const node = document.createElement("p");
+      var node = document.createElement("p");
       node.className = "livia-chat-message livia-chat-message-" + role;
       node.textContent = content;
       messages.appendChild(node);
@@ -211,8 +278,8 @@
       event.preventDefault();
       if (isLoading) return;
 
-      const input = form.elements.message;
-      const message = input.value.trim();
+      var input = form.elements.message;
+      var message = input.value.trim();
       if (!message) {
         input.value = "";
         return;
@@ -223,7 +290,7 @@
       setLoading(true);
 
       try {
-        const response = await fetch(endpoint, {
+        var response = await fetch(endpoint, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({
@@ -232,7 +299,7 @@
             source_page: window.location.pathname
           })
         });
-        const data = await response.json();
+        var data = await response.json();
         if (!response.ok) {
           throw new Error(data.error || "Falha ao enviar mensagem.");
         }

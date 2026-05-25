@@ -65,6 +65,7 @@ CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
 
 # Namespace `admin-shell` (apps.admin_shell.urls / app_name).
 CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION = "admin-shell:caneca-order-create-production"
+CANECA_ADMIN_URL_ORDER_COMPLETE = "admin-shell:caneca-order-complete"
 CANECA_ADMIN_URL_PRODUCTION_JOB_START = "admin-shell:caneca-production-job-start"
 CANECA_ADMIN_URL_PRODUCTION_JOB_COMPLETE = "admin-shell:caneca-production-job-complete"
 
@@ -353,6 +354,25 @@ def _caneca_shell_decorate_job_actions(job) -> None:
         ProductionJob.Status.BLOCKED,
     }
     job.shell_can_complete = status == ProductionJob.Status.IN_PROGRESS
+
+
+def caneca_order_can_be_completed(request: HttpRequest, order) -> bool:
+    """Pedido Caneca pode ser concluído quando todos os jobs estão completed."""
+    from apps.caneca_de_garagem.models import ProductionJob
+    from apps.market_core.models import MarketplaceOrder
+
+    if not caneca_marketplace_orders_queryset(request).filter(pk=getattr(order, "pk", None)).exists():
+        return False
+    if getattr(order, "status", "") == MarketplaceOrder.Status.CANCELLED:
+        return False
+
+    jobs = getattr(order, "production_jobs", None)
+    if jobs is None:
+        return False
+    qs = jobs.all()
+    if not qs.exists():
+        return False
+    return not qs.exclude(status=ProductionJob.Status.COMPLETED).exists()
 
 
 def _caneca_shell_production_job_chips(order) -> list[dict[str, str]]:
@@ -740,6 +760,12 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         for job in ctx["production_jobs"]:
             _caneca_shell_decorate_job_actions(job)
         ctx["can_create_caneca_production"] = len(ctx["production_jobs"]) == 0
+        ctx["can_complete_caneca_order"] = caneca_order_can_be_completed(self.request, order)
+        ctx["caneca_order_complete_warning"] = (
+            "Finalize todos os jobs de produção antes de concluir o pedido."
+            if ctx["production_jobs"] and not ctx["can_complete_caneca_order"]
+            else ""
+        )
         try:
             shipment = order.shipment_preparation
         except ObjectDoesNotExist:
@@ -771,7 +797,57 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["page_description"] = f"Pedido {order.code} · status atual {order.get_status_display()}"
         ctx["page_title"] = f"Pedido {order.code}"
         ctx["status_update_url"] = reverse("admin-shell:caneca-order-status", kwargs={"order_id": order.pk})
+        ctx["order_complete_url"] = reverse(CANECA_ADMIN_URL_ORDER_COMPLETE, kwargs={"order_id": order.pk})
         return ctx
+
+
+class CanecaOrderCompleteView(CanecaGaragemShellMixin, View):
+    """POST apenas: finaliza pedido Caneca quando todos os ProductionJobs estão concluídos."""
+
+    http_method_names = ["post"]
+
+    @staticmethod
+    def _final_status():
+        from apps.market_core.models import MarketplaceOrder
+
+        status_codes = {code for code, _ in MarketplaceOrder.Status.choices}
+        if MarketplaceOrder.Status.DELIVERED in status_codes:
+            return MarketplaceOrder.Status.DELIVERED
+        completed = getattr(MarketplaceOrder.Status, "COMPLETED", "completed")
+        if completed in status_codes:
+            return completed
+        return None
+
+    def post(self, request: HttpRequest, order_id: int) -> HttpResponse:
+        from apps.market_core.models import MarketplaceOrder
+
+        qs = caneca_marketplace_orders_queryset(request).prefetch_related("production_jobs")
+        order = get_object_or_404(qs, pk=order_id)
+        detail_url = reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk})
+
+        if not caneca_order_can_be_completed(request, order):
+            messages.warning(request, "Finalize todos os jobs de produção antes de concluir o pedido.")
+            return redirect(detail_url)
+
+        final_status = self._final_status()
+        if not final_status:
+            messages.warning(request, "Nenhum status final de pedido está disponível para concluir este pedido.")
+            return redirect(detail_url)
+
+        with transaction.atomic():
+            locked = MarketplaceOrder.objects.select_for_update().prefetch_related("production_jobs").get(pk=order.pk)
+            if not caneca_order_can_be_completed(request, locked):
+                messages.warning(request, "Finalize todos os jobs de produção antes de concluir o pedido.")
+                return redirect(detail_url)
+
+            locked.status = final_status
+            update_fields = ["status"]
+            if any(field.name == "updated_at" for field in MarketplaceOrder._meta.fields):
+                update_fields.append("updated_at")
+            locked.save(update_fields=update_fields)
+
+        messages.success(request, "Pedido finalizado com sucesso.")
+        return redirect(detail_url)
 
 
 class CanecaOrderCreateProductionView(CanecaGaragemShellMixin, View):

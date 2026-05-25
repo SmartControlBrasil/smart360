@@ -189,3 +189,129 @@ class TestCanecaPublicOrderDashboardFlow(TestCase):
         self.assertEqual(outside_job.status, ProductionJob.Status.QUEUED)
         self.assertIsNone(outside_job.started_at)
 
+    def test_caneca_order_complete_does_not_finalize_without_production_job(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-complete", kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 302)
+        order.refresh_from_db()
+        self.assertNotEqual(order.status, MarketplaceOrder.Status.DELIVERED)
+
+    def test_caneca_order_complete_does_not_finalize_with_queued_job(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        self.client.post(
+            reverse(dashboard_views.CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION, kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-complete", kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 302)
+        order.refresh_from_db()
+        self.assertNotEqual(order.status, MarketplaceOrder.Status.DELIVERED)
+
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        self.assertIn("Finalize todos os jobs de produção antes de concluir o pedido.", detail.content.decode())
+
+    def test_caneca_order_complete_does_not_finalize_with_in_progress_job(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        self.client.post(
+            reverse(dashboard_views.CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION, kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        job = ProductionJob.objects.get(order_id=order.pk)
+        job.status = ProductionJob.Status.IN_PROGRESS
+        job.save(update_fields=["status", "updated_at"])
+
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-complete", kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 302)
+        order.refresh_from_db()
+        self.assertNotEqual(order.status, MarketplaceOrder.Status.DELIVERED)
+
+    def test_caneca_order_complete_finalizes_when_all_jobs_completed(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        self.client.post(
+            reverse(dashboard_views.CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION, kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        job = ProductionJob.objects.get(order_id=order.pk)
+        job.status = ProductionJob.Status.COMPLETED
+        job.save(update_fields=["status", "updated_at"])
+
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        self.assertIn("Finalizar pedido", detail.content.decode())
+
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-complete", kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 302)
+        order.refresh_from_db()
+        status_codes = {code for code, _ in MarketplaceOrder.Status.choices}
+        completed_status = getattr(MarketplaceOrder.Status, "COMPLETED", "completed")
+        expected_status = MarketplaceOrder.Status.DELIVERED if MarketplaceOrder.Status.DELIVERED in status_codes else completed_status
+        self.assertEqual(order.status, expected_status)
+
+    def test_caneca_order_complete_requires_caneca_scope(self):
+        outside_order = MarketplaceOrder.objects.create(
+            code="OUT-SCOPE-COMPLETE",
+            company=self.company,
+            status=MarketplaceOrder.Status.IN_PRODUCTION,
+            metadata={"origin": "outside"},
+        )
+        ProductionJob.objects.create(
+            order=outside_order,
+            job_type=ProductionJob.JobType.ART_PREP,
+            status=ProductionJob.Status.COMPLETED,
+        )
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-complete", kwargs={"order_id": outside_order.pk}),
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 404)
+        outside_order.refresh_from_db()
+        self.assertEqual(outside_order.status, MarketplaceOrder.Status.IN_PRODUCTION)
+

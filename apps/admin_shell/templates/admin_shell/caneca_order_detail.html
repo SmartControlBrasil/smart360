@@ -80,6 +80,18 @@
         {% endif %}
     </div>
     {% endif %}
+    {% if can_complete_caneca_order %}
+    <div class="widget-card-body" style="padding-top: 0;">
+        <form method="post" action="{{ order_complete_url }}" class="page-actions">
+            {% csrf_token %}
+            <button type="submit" class="quick-action-button primary">Finalizar pedido</button>
+        </form>
+    </div>
+    {% elif caneca_order_complete_warning %}
+    <div class="widget-card-body" style="padding-top: 0;">
+        <p class="shell-text-muted" style="margin: 0;">{{ caneca_order_complete_warning }}</p>
+    </div>
+    {% endif %}
 </section>
 
 <section class="panel-card mb-24">

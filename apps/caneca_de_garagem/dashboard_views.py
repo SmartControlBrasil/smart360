@@ -66,6 +66,7 @@ CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
 # Namespace `admin-shell` (apps.admin_shell.urls / app_name).
 CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION = "admin-shell:caneca-order-create-production"
 CANECA_ADMIN_URL_ORDER_COMPLETE = "admin-shell:caneca-order-complete"
+CANECA_ADMIN_URL_ORDER_DELIVER = "admin-shell:caneca-order-deliver"
 CANECA_ADMIN_URL_PRODUCTION_JOB_START = "admin-shell:caneca-production-job-start"
 CANECA_ADMIN_URL_PRODUCTION_JOB_COMPLETE = "admin-shell:caneca-production-job-complete"
 
@@ -80,13 +81,13 @@ CANECA_DISPLAY_JOB_STATUS_PT: dict[str, str] = {
     "queued": "Na fila",
     "in_progress": "Em progresso",
     "blocked": "Bloqueado",
-    "completed": "Concluído",
+    "completed": "Produção concluída",
 }
 CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT: dict[str, str] = {
     "pending": "Pendente",
     "paid": "Pago",
     "in_production": "Em produção",
-    "shipped": "Enviado",
+    "shipped": "Expedido",
     "delivered": "Entregue",
     "cancelled": "Cancelado",
 }
@@ -354,16 +355,19 @@ def _caneca_shell_decorate_job_actions(job) -> None:
         ProductionJob.Status.BLOCKED,
     }
     job.shell_can_complete = status == ProductionJob.Status.IN_PROGRESS
+    job.shell_status_pt = CANECA_DISPLAY_JOB_STATUS_PT.get(status, status.replace("_", " ").title())
 
 
-def caneca_order_can_be_completed(request: HttpRequest, order) -> bool:
-    """Pedido Caneca pode ser concluído quando todos os jobs estão completed."""
+def caneca_order_can_be_shipped(request: HttpRequest, order) -> bool:
+    """Pedido Caneca pode ser expedido quando todos os jobs estão completed."""
     from apps.caneca_de_garagem.models import ProductionJob
     from apps.market_core.models import MarketplaceOrder
 
     if not caneca_marketplace_orders_queryset(request).filter(pk=getattr(order, "pk", None)).exists():
         return False
-    if getattr(order, "status", "") == MarketplaceOrder.Status.CANCELLED:
+    if getattr(order, "status", "") in {MarketplaceOrder.Status.CANCELLED, MarketplaceOrder.Status.DELIVERED}:
+        return False
+    if getattr(order, "status", "") == MarketplaceOrder.Status.SHIPPED:
         return False
 
     jobs = getattr(order, "production_jobs", None)
@@ -373,6 +377,17 @@ def caneca_order_can_be_completed(request: HttpRequest, order) -> bool:
     if not qs.exists():
         return False
     return not qs.exclude(status=ProductionJob.Status.COMPLETED).exists()
+
+
+def caneca_order_can_be_delivered(request: HttpRequest, order) -> bool:
+    """Pedido Caneca pode ser entregue apenas após expedição."""
+    from apps.market_core.models import MarketplaceOrder
+
+    if not caneca_marketplace_orders_queryset(request).filter(pk=getattr(order, "pk", None)).exists():
+        return False
+    if getattr(order, "status", "") == MarketplaceOrder.Status.CANCELLED:
+        return False
+    return getattr(order, "status", "") == MarketplaceOrder.Status.SHIPPED
 
 
 def _caneca_shell_production_job_chips(order) -> list[dict[str, str]]:
@@ -433,18 +448,28 @@ def caneca_production_orders_queryset(request: HttpRequest) -> QuerySet:
     Fila de produção Caneca: mesmo escopo de pedidos Caneca (`caneca_marketplace_orders_queryset`),
     filtrando pedidos que já entraram na produção OU possuem pelo menos um ProductionJob.
     Status considerados até produção: pago ou em_produção.
-    Cancelados ficam de fora.
+    Expedido/entregue/cancelado ficam de fora.
     """
     from apps.caneca_de_garagem.models import ProductionJob
     from apps.market_core.models import MarketplaceOrder
 
     prod_or_job = Q(status__in=[MarketplaceOrder.Status.PAID, MarketplaceOrder.Status.IN_PRODUCTION]) | Q(
-        production_jobs__isnull=False
+        production_jobs__status__in=[
+            ProductionJob.Status.QUEUED,
+            ProductionJob.Status.IN_PROGRESS,
+            ProductionJob.Status.BLOCKED,
+        ]
     )
     qs = (
         caneca_marketplace_orders_queryset(request)
         .filter(prod_or_job)
-        .exclude(status=MarketplaceOrder.Status.CANCELLED)
+        .exclude(
+            status__in=[
+                MarketplaceOrder.Status.CANCELLED,
+                MarketplaceOrder.Status.SHIPPED,
+                MarketplaceOrder.Status.DELIVERED,
+            ]
+        )
         .select_related("customer", "company")
         .distinct()
         .prefetch_related(
@@ -760,10 +785,12 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         for job in ctx["production_jobs"]:
             _caneca_shell_decorate_job_actions(job)
         ctx["can_create_caneca_production"] = len(ctx["production_jobs"]) == 0
-        ctx["can_complete_caneca_order"] = caneca_order_can_be_completed(self.request, order)
+        ctx["can_ship_caneca_order"] = caneca_order_can_be_shipped(self.request, order)
+        ctx["can_deliver_caneca_order"] = caneca_order_can_be_delivered(self.request, order)
+        ctx["caneca_order_is_delivered"] = order.status == MarketplaceOrder.Status.DELIVERED
         ctx["caneca_order_complete_warning"] = (
-            "Finalize todos os jobs de produção antes de concluir o pedido."
-            if ctx["production_jobs"] and not ctx["can_complete_caneca_order"]
+            "Finalize todos os jobs de produção antes de expedir o pedido."
+            if ctx["production_jobs"] and not ctx["can_ship_caneca_order"] and not ctx["can_deliver_caneca_order"] and not ctx["caneca_order_is_delivered"]
             else ""
         )
         try:
@@ -798,25 +825,14 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["page_title"] = f"Pedido {order.code}"
         ctx["status_update_url"] = reverse("admin-shell:caneca-order-status", kwargs={"order_id": order.pk})
         ctx["order_complete_url"] = reverse(CANECA_ADMIN_URL_ORDER_COMPLETE, kwargs={"order_id": order.pk})
+        ctx["order_deliver_url"] = reverse(CANECA_ADMIN_URL_ORDER_DELIVER, kwargs={"order_id": order.pk})
         return ctx
 
 
 class CanecaOrderCompleteView(CanecaGaragemShellMixin, View):
-    """POST apenas: finaliza pedido Caneca quando todos os ProductionJobs estão concluídos."""
+    """POST apenas: marca pedido Caneca como expedido após produção concluída."""
 
     http_method_names = ["post"]
-
-    @staticmethod
-    def _final_status():
-        from apps.market_core.models import MarketplaceOrder
-
-        status_codes = {code for code, _ in MarketplaceOrder.Status.choices}
-        if MarketplaceOrder.Status.DELIVERED in status_codes:
-            return MarketplaceOrder.Status.DELIVERED
-        completed = getattr(MarketplaceOrder.Status, "COMPLETED", "completed")
-        if completed in status_codes:
-            return completed
-        return None
 
     def post(self, request: HttpRequest, order_id: int) -> HttpResponse:
         from apps.market_core.models import MarketplaceOrder
@@ -825,28 +841,55 @@ class CanecaOrderCompleteView(CanecaGaragemShellMixin, View):
         order = get_object_or_404(qs, pk=order_id)
         detail_url = reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk})
 
-        if not caneca_order_can_be_completed(request, order):
-            messages.warning(request, "Finalize todos os jobs de produção antes de concluir o pedido.")
-            return redirect(detail_url)
-
-        final_status = self._final_status()
-        if not final_status:
-            messages.warning(request, "Nenhum status final de pedido está disponível para concluir este pedido.")
+        if not caneca_order_can_be_shipped(request, order):
+            messages.warning(request, "Finalize todos os jobs de produção antes de expedir o pedido.")
             return redirect(detail_url)
 
         with transaction.atomic():
             locked = MarketplaceOrder.objects.select_for_update().prefetch_related("production_jobs").get(pk=order.pk)
-            if not caneca_order_can_be_completed(request, locked):
-                messages.warning(request, "Finalize todos os jobs de produção antes de concluir o pedido.")
+            if not caneca_order_can_be_shipped(request, locked):
+                messages.warning(request, "Finalize todos os jobs de produção antes de expedir o pedido.")
                 return redirect(detail_url)
 
-            locked.status = final_status
+            locked.status = MarketplaceOrder.Status.SHIPPED
             update_fields = ["status"]
             if any(field.name == "updated_at" for field in MarketplaceOrder._meta.fields):
                 update_fields.append("updated_at")
             locked.save(update_fields=update_fields)
 
-        messages.success(request, "Pedido finalizado com sucesso.")
+        messages.success(request, "Pedido marcado como expedido.")
+        return redirect(detail_url)
+
+
+class CanecaOrderDeliverView(CanecaGaragemShellMixin, View):
+    """POST apenas: marca pedido Caneca expedido como entregue."""
+
+    http_method_names = ["post"]
+
+    def post(self, request: HttpRequest, order_id: int) -> HttpResponse:
+        from apps.market_core.models import MarketplaceOrder
+
+        qs = caneca_marketplace_orders_queryset(request)
+        order = get_object_or_404(qs, pk=order_id)
+        detail_url = reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk})
+
+        if not caneca_order_can_be_delivered(request, order):
+            messages.warning(request, "O pedido precisa estar expedido antes de ser marcado como entregue.")
+            return redirect(detail_url)
+
+        with transaction.atomic():
+            locked = MarketplaceOrder.objects.select_for_update().get(pk=order.pk)
+            if not caneca_order_can_be_delivered(request, locked):
+                messages.warning(request, "O pedido precisa estar expedido antes de ser marcado como entregue.")
+                return redirect(detail_url)
+
+            locked.status = MarketplaceOrder.Status.DELIVERED
+            update_fields = ["status"]
+            if any(field.name == "updated_at" for field in MarketplaceOrder._meta.fields):
+                update_fields.append("updated_at")
+            locked.save(update_fields=update_fields)
+
+        messages.success(request, "Pedido marcado como entregue.")
         return redirect(detail_url)
 
 

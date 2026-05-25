@@ -41,7 +41,7 @@
                 <tr>
                     <td><code>{{ job.id }}</code></td>
                     <td>{{ job.get_job_type_display }}</td>
-                    <td>{{ job.get_status_display }}</td>
+                    <td>{{ job.shell_status_pt }}</td>
                     <td>{% if job.vendor %}{{ job.vendor.name }}{% else %}—{% endif %}</td>
                     <td>{% if job.internal_factory %}{{ job.internal_factory.display_name }}{% else %}—{% endif %}</td>
                     <td>{% if job.order_item and job.order_item.product %}{{ job.order_item.product.name }}{% else %}—{% endif %}</td>
@@ -80,12 +80,23 @@
         {% endif %}
     </div>
     {% endif %}
-    {% if can_complete_caneca_order %}
+    {% if can_ship_caneca_order %}
     <div class="widget-card-body" style="padding-top: 0;">
         <form method="post" action="{{ order_complete_url }}" class="page-actions">
             {% csrf_token %}
-            <button type="submit" class="quick-action-button primary">Finalizar pedido</button>
+            <button type="submit" class="quick-action-button primary">Enviar / marcar como expedido</button>
         </form>
+    </div>
+    {% elif can_deliver_caneca_order %}
+    <div class="widget-card-body" style="padding-top: 0;">
+        <form method="post" action="{{ order_deliver_url }}" class="page-actions">
+            {% csrf_token %}
+            <button type="submit" class="quick-action-button primary">Marcar como entregue</button>
+        </form>
+    </div>
+    {% elif caneca_order_is_delivered %}
+    <div class="widget-card-body" style="padding-top: 0;">
+        <span class="status-badge status-emerald">Pedido entregue</span>
     </div>
     {% elif caneca_order_complete_warning %}
     <div class="widget-card-body" style="padding-top: 0;">

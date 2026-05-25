@@ -24,6 +24,7 @@ from apps.caneca_de_garagem.dashboard_views import (
     CanecaGaragemDashboardView,
     CanecaOrderCompleteView,
     CanecaOrderCreateProductionView,
+    CanecaOrderDeliverView,
     CanecaOrderDetailView,
     CanecaOrderListView,
     CanecaOrderStatusView,
@@ -355,6 +356,11 @@ urlpatterns = [
         "dashboard/caneca/pedidos/<int:order_id>/finalizar/",
         CanecaOrderCompleteView.as_view(),
         name="caneca-order-complete",
+    ),
+    path(
+        "dashboard/caneca/pedidos/<int:order_id>/entregar/",
+        CanecaOrderDeliverView.as_view(),
+        name="caneca-order-deliver",
     ),
     path(
         "dashboard/caneca/pedidos/<int:order_id>/",

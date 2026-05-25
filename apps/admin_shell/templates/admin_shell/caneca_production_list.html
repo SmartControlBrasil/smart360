@@ -13,40 +13,55 @@
     </header>
 </section>
 
-<section class="table-card">
-    <div class="table-wrapper">
-        <table class="data-table">
+<section class="table-card shell-caneca-production-card">
+    <div class="table-wrapper shell-caneca-production-scroll">
+        <table class="data-table shell-caneca-production-table">
             <thead>
                 <tr>
-                    <th>Código pedido</th>
-                    <th>ID</th>
+                    <th class="shell-caneca-th-code">Código</th>
+                    <th class="shell-caneca-th-narrow">ID</th>
                     <th>Cliente</th>
-                    <th>Produto principal</th>
-                    <th>Qtd.</th>
-                    <th>Status pedido</th>
-                    <th>Produção (jobs)</th>
-                    <th>Criado em</th>
-                    <th></th>
+                    <th>Produto</th>
+                    <th class="shell-caneca-th-narrow">Qtd.</th>
+                    <th class="shell-caneca-th-status">Status pedido</th>
+                    <th class="shell-caneca-th-prod">Produção</th>
+                    <th class="shell-caneca-th-date">Criado</th>
+                    <th class="shell-caneca-th-action"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for o in production_orders %}
                 <tr>
-                    <td><code>{{ o.code }}</code></td>
+                    <td class="shell-caneca-code-cell"><code>{{ o.code }}</code></td>
                     <td><code>{{ o.id }}</code></td>
                     <td>{{ o.shell_display_customer_name }}</td>
                     <td>{{ o.shell_product_label }}</td>
                     <td>{{ o.shell_qty_display }}</td>
-                    <td>{{ o.get_status_display }}</td>
-                    <td class="shell-text-muted">{{ o.shell_production_jobs_label }}</td>
                     <td>
+                        <span class="status-badge {{ o.shell_caneca_order_status_class }}">{{ o.shell_caneca_order_status_pt }}</span>
+                    </td>
+                    <td class="shell-caneca-prod-cell">
+                        <div class="shell-caneca-prod-badges">
+                            {% for chip in o.shell_caneca_production_job_chips %}
+                            <div class="shell-caneca-prod-job-chip" title="{{ chip.type_pt }} — {{ chip.status_pt }}">
+                                <span class="shell-caneca-prod-job-type">{{ chip.type_pt }}</span>
+                                <span class="status-badge {{ chip.status_class }}">{{ chip.status_pt }}</span>
+                            </div>
+                            {% empty %}
+                            <span class="shell-text-muted">—</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="shell-caneca-date-cell">
                         {% if o.shell_display_created_at %}
                             {{ o.shell_display_created_at|date:"d/m/Y H:i" }}
                         {% else %}
                             —
                         {% endif %}
                     </td>
-                    <td><a href="{% url 'admin-shell:caneca-order-detail' o.id %}">Ver pedido</a></td>
+                    <td>
+                        <a class="quick-action-button shell-caneca-production-row-action" href="{% url 'admin-shell:caneca-order-detail' o.id %}">Ver pedido</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="9">Nenhum item na fila de produção. Incluem-se pedidos <strong>pago</strong> ou <strong>em produção</strong>, ou com <code class="shell-text-muted">ProductionJob</code>.</td></tr>

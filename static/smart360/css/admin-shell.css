@@ -1465,6 +1465,96 @@ img, svg, video, canvas { max-width: 100%; }
     color: #fff;
     border-color: rgba(255, 255, 255, 0.12);
 }
+
+/* Caneca · fila de produção — tabela mais legível, scroll horizontal, chips compactos */
+.shell-caneca-production-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.shell-caneca-production-table {
+    min-width: 880px;
+    width: 100%;
+}
+.shell-caneca-production-table thead th.shell-caneca-th-narrow {
+    white-space: nowrap;
+    width: 1%;
+}
+.shell-caneca-production-table thead th.shell-caneca-th-code {
+    white-space: nowrap;
+    width: 1%;
+}
+.shell-caneca-production-table thead th.shell-caneca-th-status,
+.shell-caneca-production-table thead th.shell-caneca-th-prod {
+    white-space: nowrap;
+}
+.shell-caneca-production-table thead th.shell-caneca-th-date {
+    white-space: nowrap;
+    width: 1%;
+}
+.shell-caneca-production-table thead th.shell-caneca-th-action {
+    width: 1%;
+}
+.shell-caneca-code-cell code {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 0.76rem;
+    letter-spacing: 0.015em;
+    max-width: 18rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+.shell-caneca-prod-cell {
+    vertical-align: top;
+}
+.shell-caneca-prod-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.42rem;
+    align-items: flex-start;
+    max-width: 22rem;
+}
+.shell-caneca-prod-job-chip {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.42rem;
+    padding: 0.22rem 0.42rem;
+    border-radius: var(--shell-radius-md, 10px);
+    border: 1px solid var(--shell-border);
+    background: rgba(23, 32, 51, 0.03);
+}
+html[data-theme="dark"] .shell-caneca-prod-job-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.09);
+}
+.shell-caneca-prod-job-type {
+    font-size: 0.72rem;
+    font-weight: 650;
+    color: var(--shell-fg, #172033);
+}
+.shell-caneca-prod-job-chip .status-badge {
+    flex-shrink: 0;
+    font-size: 0.69rem;
+    padding: 0.22rem 0.5rem;
+}
+.shell-caneca-date-cell {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8rem;
+    color: var(--shell-muted);
+}
+.shell-caneca-production-row-action.quick-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.36rem 0.72rem;
+    font-size: 0.75rem;
+    line-height: 1.22;
+    white-space: nowrap;
+}
+
 .tone-indigo,
 .tone-emerald,
 .tone-red,

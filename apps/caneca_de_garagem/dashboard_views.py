@@ -65,6 +65,27 @@ CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
 # Namespace `admin-shell` (apps.admin_shell.urls / app_name).
 CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION = "admin-shell:caneca-order-create-production"
 
+# Labels PT para a fila de produção Caneca (somente apresentação).
+CANECA_DISPLAY_JOB_TYPE_PT: dict[str, str] = {
+    "art_prep": "Preparação de arte",
+    "print": "Impressão",
+    "sublimation": "Sublimação",
+    "packaging": "Embalagem",
+}
+CANECA_DISPLAY_JOB_STATUS_PT: dict[str, str] = {
+    "queued": "Na fila",
+    "in_progress": "Em progresso",
+    "blocked": "Bloqueado",
+    "completed": "Concluído",
+}
+CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT: dict[str, str] = {
+    "pending": "Pendente",
+    "paid": "Pago",
+    "in_production": "Em produção",
+    "shipped": "Enviado",
+    "delivered": "Entregue",
+    "cancelled": "Cancelado",
+}
 
 def _caneca_branded_metadata_q() -> Q:
     """Pedidos originados no site público Caneca (chaves gravadas pelo fluxo público)."""
@@ -297,6 +318,51 @@ def _qty_total(order) -> int:
     return total
 
 
+def _caneca_shell_market_order_status_class(status_val: str) -> str:
+    mp = {
+        "pending": "status-indigo",
+        "paid": "status-sky",
+        "in_production": "status-amber",
+        "shipped": "status-teal",
+        "delivered": "status-emerald",
+        "cancelled": "status-slate",
+    }
+    return mp.get(status_val or "", "status-slate")
+
+
+def _caneca_shell_production_job_status_class(job_status_val: str) -> str:
+    jp = {
+        "queued": "status-indigo",
+        "in_progress": "status-amber",
+        "blocked": "status-rose",
+        "completed": "status-emerald",
+    }
+    return jp.get(job_status_val or "", "status-slate")
+
+
+def _caneca_shell_production_job_chips(order) -> list[dict[str, str]]:
+    """Lista de dicts para badges compactos por job (apenas fila de produção)."""
+    pref = getattr(order, "production_jobs", None)
+    if pref is None:
+        return []
+    jobs = pref.all()
+    if hasattr(jobs, "exists") and callable(jobs.exists) and not jobs.exists():
+        return []
+    rows = list(jobs.order_by("queue_position", "id")) if hasattr(jobs, "order_by") else list(jobs)
+    chips: list[dict[str, str]] = []
+    for job in rows[:12]:
+        jt = getattr(job, "job_type", "") or ""
+        st = getattr(job, "status", "") or ""
+        chips.append(
+            {
+                "type_pt": CANECA_DISPLAY_JOB_TYPE_PT.get(jt, jt.replace("_", " ").title()),
+                "status_pt": CANECA_DISPLAY_JOB_STATUS_PT.get(st, st.replace("_", " ").title()),
+                "status_class": _caneca_shell_production_job_status_class(st),
+            }
+        )
+    return chips
+
+
 def _summarize_order_production_jobs(order) -> str:
     """Resumo textual dos ProductionJob ligados ao pedido (prefetch recomendado)."""
     pref = getattr(order, "production_jobs", None)
@@ -310,11 +376,17 @@ def _summarize_order_production_jobs(order) -> str:
         return "—"
     parts: list[str] = []
     for job in rows[:8]:
-        jlabel = job.get_job_type_display() if hasattr(job, "get_job_type_display") else str(job.job_type)
-        slabel = job.get_status_display() if hasattr(job, "get_status_display") else str(job.status)
+        jcode = getattr(job, "job_type", "") or ""
+        scode = getattr(job, "status", "") or ""
+        jlabel = CANECA_DISPLAY_JOB_TYPE_PT.get(jcode) or (
+            job.get_job_type_display() if hasattr(job, "get_job_type_display") else str(jcode)
+        )
+        slabel = CANECA_DISPLAY_JOB_STATUS_PT.get(scode) or (
+            job.get_status_display() if hasattr(job, "get_status_display") else str(scode)
+        )
         parts.append(f"{jlabel}: {slabel}")
     if len(rows) > 8:
-        parts.append(f"+{len(rows) - 8} job(s)")
+        parts.append(f"+{len(rows) - 8} outro(s) job(s)")
     return " · ".join(parts)
 
 
@@ -571,6 +643,11 @@ class CanecaProductionListView(CanecaGaragemShellMixin, ListView):
             order.shell_qty_display = qty if qty else (getattr(fi, "quantity", 0) or 0 if fi else 0)
             order.shell_production_jobs_label = _summarize_order_production_jobs(order)
             order.shell_display_created_at = getattr(order, "created_at", None)
+
+            ost = getattr(order, "status", "") or ""
+            order.shell_caneca_order_status_pt = CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT.get(ost) or order.get_status_display()
+            order.shell_caneca_order_status_class = _caneca_shell_market_order_status_class(ost)
+            order.shell_caneca_production_job_chips = _caneca_shell_production_job_chips(order)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

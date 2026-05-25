@@ -1,0 +1,75 @@
+{% extends "admin_shell/base.html" %}
+{% block content %}
+<section class="widget-card mb-24">
+    <header class="widget-card-header">
+        <div>
+            <h2>{{ page_title }}</h2>
+            <p>{{ page_description }}</p>
+        </div>
+        <div class="page-actions">
+            <a class="quick-action-button" href="{% url 'admin-shell:caneca-dashboard' %}">Visão geral</a>
+            <a class="quick-action-button primary" href="{% url 'admin-shell:caneca-order-list' %}">Pedidos / Orçamentos</a>
+        </div>
+    </header>
+</section>
+
+<section class="table-card">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código pedido</th>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Produto principal</th>
+                    <th>Qtd.</th>
+                    <th>Status pedido</th>
+                    <th>Produção (jobs)</th>
+                    <th>Criado em</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in production_orders %}
+                <tr>
+                    <td><code>{{ o.code }}</code></td>
+                    <td><code>{{ o.id }}</code></td>
+                    <td>{{ o.shell_display_customer_name }}</td>
+                    <td>{{ o.shell_product_label }}</td>
+                    <td>{{ o.shell_qty_display }}</td>
+                    <td>{{ o.get_status_display }}</td>
+                    <td class="shell-text-muted">{{ o.shell_production_jobs_label }}</td>
+                    <td>
+                        {% if o.shell_display_created_at %}
+                            {{ o.shell_display_created_at|date:"d/m/Y H:i" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'admin-shell:caneca-order-detail' o.id %}">Ver pedido</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9">Nenhum item na fila de produção. Incluem-se pedidos <strong>pago</strong> ou <strong>em produção</strong>, ou com <code class="shell-text-muted">ProductionJob</code>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if is_paginated %}
+<section class="panel-card">
+    <div class="page-actions" style="flex-wrap: wrap;">
+        {% if page_obj.has_previous %}
+        <a class="quick-action-button" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span class="shell-text-muted" style="flex: 1 1 auto; align-self: center;">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            · {{ page_obj.paginator.count }} pedido(s)
+        </span>
+        {% if page_obj.has_next %}
+        <a class="quick-action-button" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -25,6 +25,7 @@ from apps.caneca_de_garagem.dashboard_views import (
     CanecaOrderDetailView,
     CanecaOrderListView,
     CanecaOrderStatusView,
+    CanecaProductionListView,
 )
 from apps.smart_system.dashboard_views import (
     SmartSystemInspectionDivisionCreateView,
@@ -327,6 +328,11 @@ urlpatterns = [
     ),
     path("dashboard/caneca/", CanecaGaragemDashboardView.as_view(), name="caneca-dashboard"),
     path("dashboard/caneca/pedidos/", CanecaOrderListView.as_view(), name="caneca-order-list"),
+    path(
+        "dashboard/caneca/producao/",
+        CanecaProductionListView.as_view(),
+        name="caneca-production-list",
+    ),
     path(
         "dashboard/caneca/pedidos/<int:order_id>/",
         CanecaOrderDetailView.as_view(),

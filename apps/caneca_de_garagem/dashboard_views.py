@@ -49,6 +49,12 @@ class CanecaGaragemShellMixin(ShellContextMixin):
                 "permission_domain": "dashboard",
                 "permission_action": "view",
             },
+            {
+                "label": "Fila de produção",
+                "route_name": "admin-shell:caneca-production-list",
+                "permission_domain": "dashboard",
+                "permission_action": "view",
+            },
         ]
 
 
@@ -287,6 +293,62 @@ def _qty_total(order) -> int:
     return total
 
 
+def _summarize_order_production_jobs(order) -> str:
+    """Resumo textual dos ProductionJob ligados ao pedido (prefetch recomendado)."""
+    pref = getattr(order, "production_jobs", None)
+    if pref is None:
+        return "—"
+    jobs = pref.all()
+    if hasattr(jobs, "exists") and callable(jobs.exists) and not jobs.exists():
+        return "—"
+    rows = list(jobs.order_by("queue_position", "id")) if hasattr(jobs, "order_by") else list(jobs)
+    if not rows:
+        return "—"
+    parts: list[str] = []
+    for job in rows[:8]:
+        jlabel = job.get_job_type_display() if hasattr(job, "get_job_type_display") else str(job.job_type)
+        slabel = job.get_status_display() if hasattr(job, "get_status_display") else str(job.status)
+        parts.append(f"{jlabel}: {slabel}")
+    if len(rows) > 8:
+        parts.append(f"+{len(rows) - 8} job(s)")
+    return " · ".join(parts)
+
+
+def caneca_production_orders_queryset(request: HttpRequest) -> QuerySet:
+    """
+    Fila de produção Caneca: mesmo escopo de pedidos Caneca (`caneca_marketplace_orders_queryset`),
+    filtrando pedidos que já entraram na produção OU possuem pelo menos um ProductionJob.
+    Status considerados até produção: pago ou em_produção.
+    Cancelados ficam de fora.
+    """
+    from apps.caneca_de_garagem.models import ProductionJob
+    from apps.market_core.models import MarketplaceOrder
+
+    prod_or_job = Q(status__in=[MarketplaceOrder.Status.PAID, MarketplaceOrder.Status.IN_PRODUCTION]) | Q(
+        production_jobs__isnull=False
+    )
+    qs = (
+        caneca_marketplace_orders_queryset(request)
+        .filter(prod_or_job)
+        .exclude(status=MarketplaceOrder.Status.CANCELLED)
+        .select_related("customer", "company")
+        .distinct()
+        .prefetch_related(
+            order_item_prefetch(True),
+            Prefetch(
+                "production_jobs",
+                queryset=ProductionJob.objects.select_related(
+                    "vendor",
+                    "order_item",
+                    "assigned_to",
+                ).order_by("queue_position", "id"),
+            ),
+        )
+        .order_by("-ordered_at", "-id")
+    )
+    return qs
+
+
 class CanecaGaragemDashboardView(CanecaGaragemShellMixin, TemplateView):
     """Dashboard inicial Caneca de Garagem dentro do Admin Shell."""
 
@@ -358,7 +420,11 @@ class CanecaGaragemDashboardView(CanecaGaragemShellMixin, TemplateView):
             },
             {"label": "Produtos", "soon": True},
             {"label": "Criadores", "soon": True},
-            {"label": "Produção", "soon": True},
+            {
+                "label": "Produção",
+                "soon": False,
+                "route_name": "admin-shell:caneca-production-list",
+            },
         ]
         return context
 
@@ -474,6 +540,52 @@ class CanecaOrderListView(CanecaGaragemShellMixin, ListView):
             objs = ctx.get(self.context_object_name)
             if objs is not None:
                 self._decorate_order_rows(objs)
+
+        return ctx
+
+
+class CanecaProductionListView(CanecaGaragemShellMixin, ListView):
+    """Fila operacional da Caneca: pedidos em produção ou com ProductionJob."""
+
+    template_name = "admin_shell/caneca_production_list.html"
+    context_object_name = "production_orders"
+    paginate_by = 25
+
+    def get_queryset(self):
+        return caneca_production_orders_queryset(self.request)
+
+    def _decorate_production_rows(self, seq) -> None:
+        for order in seq:
+            name, _, _ = _customer_display_parts(order)
+            order.shell_display_customer_name = name
+            fi = _first_line_item(order)
+            if fi is not None and getattr(fi, "product", None):
+                order.shell_product_label = getattr(fi.product, "name", "") or "—"
+            else:
+                order.shell_product_label = "—"
+            qty = _qty_total(order)
+            order.shell_qty_display = qty if qty else (getattr(fi, "quantity", 0) or 0 if fi else 0)
+            order.shell_production_jobs_label = _summarize_order_production_jobs(order)
+            order.shell_display_created_at = getattr(order, "created_at", None)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["page_title"] = "Fila de produção"
+        ctx["page_description"] = (
+            "Pedidos Caneca com status pago/em produção ou com ao menos um ProductionJob vinculado."
+        )
+        crumbs = self.breadcrumb_tail_caneca()
+        crumbs.append({"label": "Produção", "url": None})
+        ctx["breadcrumbs"] = crumbs
+        ctx["page_actions"] = self.get_page_actions_orders()
+
+        page_obj = ctx.get("page_obj")
+        if page_obj is not None:
+            self._decorate_production_rows(page_obj.object_list)
+        else:
+            objs = ctx.get(self.context_object_name)
+            if objs is not None:
+                self._decorate_production_rows(objs)
 
         return ctx
 

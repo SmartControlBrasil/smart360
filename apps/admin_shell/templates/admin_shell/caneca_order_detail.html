@@ -126,6 +126,31 @@
 </section>
 
 <section class="panel-card mb-24">
+    <header class="widget-card-header">
+        <div>
+            <h2 style="margin:0;font-size:1rem;">Histórico operacional</h2>
+        </div>
+    </header>
+    <div class="widget-card-body">
+        {% if operational_timeline %}
+        <div style="display: grid; gap: 0.75rem;">
+            {% for event in operational_timeline %}
+            <div style="display: grid; grid-template-columns: minmax(120px, 160px) 1fr; gap: 1rem; align-items: flex-start;">
+                <div class="shell-text-muted">{{ event.happened_at|date:"d/m/Y H:i" }}</div>
+                <div>
+                    <span class="status-badge {{ event.status_class }}">{{ event.label }}</span>
+                    <p style="margin: 0.35rem 0 0; color: var(--shell-muted);">{{ event.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="shell-text-muted" style="margin: 0;">Nenhum evento operacional com data confiável.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="panel-card mb-24">
     <header class="widget-card-header"><div><h2 style="margin:0;font-size:1rem;">Pedido</h2></div></header>
     <table class="data-table"><tbody>
         <tr><th>Código</th><td>{{ order.code|default:"—" }}</td></tr>

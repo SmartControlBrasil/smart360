@@ -358,6 +358,106 @@ def _caneca_shell_decorate_job_actions(job) -> None:
     job.shell_status_pt = CANECA_DISPLAY_JOB_STATUS_PT.get(status, status.replace("_", " ").title())
 
 
+def _caneca_add_timeline_event(events: list[dict[str, Any]], label: str, description: str, happened_at, status_class: str = "status-slate") -> None:
+    if not happened_at:
+        return
+    events.append(
+        {
+            "label": label,
+            "description": description,
+            "happened_at": happened_at,
+            "status_class": status_class,
+        }
+    )
+
+
+def build_caneca_order_operational_timeline(order) -> list[dict[str, Any]]:
+    """Monta histórico operacional derivado dos timestamps reais do pedido Caneca."""
+    from apps.caneca_de_garagem.models import ProductionJob
+    from apps.market_core.models import MarketplaceOrder
+
+    events: list[dict[str, Any]] = []
+    _caneca_add_timeline_event(
+        events,
+        "Pedido criado",
+        f"Pedido {getattr(order, 'code', '')} registrado no marketplace Caneca.",
+        getattr(order, "created_at", None),
+        "status-indigo",
+    )
+
+    items = getattr(order, "items", None)
+    if items is not None:
+        for item in items.all():
+            customization = getattr(item, "customization_request", None)
+            if customization is not None:
+                product = getattr(getattr(item, "product", None), "name", "") or f"item {getattr(item, 'id', '')}"
+                _caneca_add_timeline_event(
+                    events,
+                    "Personalização recebida",
+                    f"Dados de personalização recebidos para {product}.",
+                    getattr(customization, "created_at", None),
+                    "status-sky",
+                )
+
+    jobs = getattr(order, "production_jobs", None)
+    if jobs is not None:
+        rows = list(jobs.all())
+        rows.sort(key=lambda job: ((getattr(job, "queue_position", None) is None), getattr(job, "queue_position", 0) or 0, getattr(job, "id", 0)))
+        for job in rows:
+            job_type = CANECA_DISPLAY_JOB_TYPE_PT.get(getattr(job, "job_type", ""), job.get_job_type_display())
+            _caneca_add_timeline_event(
+                events,
+                "Produção gerada",
+                f"Job de {job_type} criado para o pedido.",
+                getattr(job, "created_at", None),
+                "status-indigo",
+            )
+            _caneca_add_timeline_event(
+                events,
+                "Job de produção iniciado",
+                f"{job_type} entrou em execução.",
+                getattr(job, "started_at", None),
+                "status-amber",
+            )
+            _caneca_add_timeline_event(
+                events,
+                "Job de produção concluído",
+                f"{job_type} concluído.",
+                getattr(job, "completed_at", None),
+                "status-emerald",
+            )
+
+    order_status = getattr(order, "status", "")
+    updated_at = getattr(order, "updated_at", None)
+    if order_status == MarketplaceOrder.Status.SHIPPED:
+        _caneca_add_timeline_event(
+            events,
+            "Pedido expedido",
+            "Pedido marcado como expedido.",
+            updated_at,
+            "status-teal",
+        )
+    elif order_status == MarketplaceOrder.Status.DELIVERED:
+        _caneca_add_timeline_event(
+            events,
+            "Pedido entregue",
+            "Pedido marcado como entregue.",
+            updated_at,
+            "status-emerald",
+        )
+    elif updated_at and updated_at != getattr(order, "created_at", None):
+        status_label = CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT.get(order_status) or (order.get_status_display() if hasattr(order, "get_status_display") else order_status)
+        _caneca_add_timeline_event(
+            events,
+            "Pedido atualizado",
+            f"Status atual: {status_label}.",
+            updated_at,
+            _caneca_shell_market_order_status_class(order_status),
+        )
+
+    return sorted(events, key=lambda event: event["happened_at"])
+
+
 def caneca_order_can_be_shipped(request: HttpRequest, order) -> bool:
     """Pedido Caneca pode ser expedido quando todos os jobs estão completed."""
     from apps.caneca_de_garagem.models import ProductionJob
@@ -782,6 +882,7 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
             ctx["metadata_pretty"] = "—"
 
         ctx["production_jobs"] = list(order.production_jobs.all()) if hasattr(order, "production_jobs") else []
+        ctx["operational_timeline"] = build_caneca_order_operational_timeline(order)
         for job in ctx["production_jobs"]:
             _caneca_shell_decorate_job_actions(job)
         ctx["can_create_caneca_production"] = len(ctx["production_jobs"]) == 0

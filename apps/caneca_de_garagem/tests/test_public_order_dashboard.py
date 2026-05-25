@@ -5,6 +5,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpRequest
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.companies.models import Company
 from apps.market_core.models import MarketplaceOrder
@@ -81,6 +82,10 @@ class TestCanecaPublicOrderDashboardFlow(TestCase):
         self.assertEqual(list_resp.status_code, 200)
         detail_resp = self.client.get(detail_url)
         self.assertEqual(detail_resp.status_code, 200)
+        detail_body = detail_resp.content.decode()
+        self.assertIn("Histórico operacional", detail_body)
+        self.assertIn("Pedido criado", detail_body)
+        self.assertIn("Personalização recebida", detail_body)
 
     def test_create_production_job_idempotent_queue_and_detail(self):
         slug = "kit-presentes-personalizados"
@@ -378,3 +383,83 @@ class TestCanecaPublicOrderDashboardFlow(TestCase):
         self.assertEqual(deliver_resp.status_code, 404)
         outside_order.refresh_from_db()
         self.assertEqual(outside_order.status, MarketplaceOrder.Status.SHIPPED)
+
+    def test_caneca_order_detail_timeline_does_not_break_without_production_job(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        body = detail.content.decode()
+        self.assertIn("Histórico operacional", body)
+        self.assertIn("Pedido criado", body)
+        self.assertNotIn("Job de produção concluído", body)
+
+    def test_caneca_order_detail_timeline_shows_completed_production_event(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        self.client.post(
+            reverse(dashboard_views.CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION, kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        job = ProductionJob.objects.get(order_id=order.pk)
+        job.status = ProductionJob.Status.COMPLETED
+        job.completed_at = timezone.now()
+        job.save(update_fields=["status", "completed_at", "updated_at"])
+
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        body = detail.content.decode()
+        self.assertIn("Histórico operacional", body)
+        self.assertIn("Job de produção concluído", body)
+        self.assertIn("Preparação de arte concluído", body)
+
+    def test_caneca_order_detail_timeline_shows_shipped_event(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+        order.status = MarketplaceOrder.Status.SHIPPED
+        order.save(update_fields=["status", "updated_at"])
+
+        self.client.force_login(self.admin)
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        body = detail.content.decode()
+        self.assertIn("Pedido expedido", body)
+        self.assertIn("Pedido marcado como expedido.", body)
+
+    def test_caneca_order_detail_timeline_shows_delivered_event(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+        order.status = MarketplaceOrder.Status.DELIVERED
+        order.save(update_fields=["status", "updated_at"])
+
+        self.client.force_login(self.admin)
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        body = detail.content.decode()
+        self.assertIn("Pedido entregue", body)
+        self.assertIn("Pedido marcado como entregue.", body)
+

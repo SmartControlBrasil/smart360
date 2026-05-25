@@ -14,6 +14,7 @@ from django.db.models.functions import Cast
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
@@ -64,6 +65,8 @@ CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
 
 # Namespace `admin-shell` (apps.admin_shell.urls / app_name).
 CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION = "admin-shell:caneca-order-create-production"
+CANECA_ADMIN_URL_PRODUCTION_JOB_START = "admin-shell:caneca-production-job-start"
+CANECA_ADMIN_URL_PRODUCTION_JOB_COMPLETE = "admin-shell:caneca-production-job-complete"
 
 # Labels PT para a fila de produção Caneca (somente apresentação).
 CANECA_DISPLAY_JOB_TYPE_PT: dict[str, str] = {
@@ -340,6 +343,18 @@ def _caneca_shell_production_job_status_class(job_status_val: str) -> str:
     return jp.get(job_status_val or "", "status-slate")
 
 
+def _caneca_shell_decorate_job_actions(job) -> None:
+    """Anexa flags de ação apenas para apresentação no Admin Shell."""
+    from apps.caneca_de_garagem.models import ProductionJob
+
+    status = getattr(job, "status", "") or ""
+    job.shell_can_start = status in {
+        ProductionJob.Status.QUEUED,
+        ProductionJob.Status.BLOCKED,
+    }
+    job.shell_can_complete = status == ProductionJob.Status.IN_PROGRESS
+
+
 def _caneca_shell_production_job_chips(order) -> list[dict[str, str]]:
     """Lista de dicts para badges compactos por job (apenas fila de produção)."""
     pref = getattr(order, "production_jobs", None)
@@ -355,9 +370,12 @@ def _caneca_shell_production_job_chips(order) -> list[dict[str, str]]:
         st = getattr(job, "status", "") or ""
         chips.append(
             {
+                "id": getattr(job, "id", None),
                 "type_pt": CANECA_DISPLAY_JOB_TYPE_PT.get(jt, jt.replace("_", " ").title()),
                 "status_pt": CANECA_DISPLAY_JOB_STATUS_PT.get(st, st.replace("_", " ").title()),
                 "status_class": _caneca_shell_production_job_status_class(st),
+                "can_start": st in {"queued", "blocked"},
+                "can_complete": st == "in_progress",
             }
         )
     return chips
@@ -719,6 +737,8 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
             ctx["metadata_pretty"] = "—"
 
         ctx["production_jobs"] = list(order.production_jobs.all()) if hasattr(order, "production_jobs") else []
+        for job in ctx["production_jobs"]:
+            _caneca_shell_decorate_job_actions(job)
         ctx["can_create_caneca_production"] = len(ctx["production_jobs"]) == 0
         try:
             shipment = order.shipment_preparation
@@ -795,6 +815,69 @@ class CanecaOrderCreateProductionView(CanecaGaragemShellMixin, View):
 
         messages.success(request, "Job de produção criado com sucesso.")
         return redirect(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order_short.pk}))
+
+
+class CanecaProductionJobStatusView(CanecaGaragemShellMixin, View):
+    """POST apenas: altera status de ProductionJob dentro do escopo Caneca."""
+
+    http_method_names = ["post"]
+    action_name = ""
+
+    def _scoped_jobs_queryset(self, request: HttpRequest):
+        from apps.caneca_de_garagem.models import ProductionJob
+
+        orders = caneca_marketplace_orders_queryset(request)
+        return ProductionJob.objects.select_related("order", "order_item__order").filter(
+            Q(order__in=orders)
+            | Q(order__isnull=True, order_item__order__in=orders)
+        )
+
+    @staticmethod
+    def _job_order(job):
+        order = getattr(job, "order", None)
+        if order is not None:
+            return order
+        item = getattr(job, "order_item", None)
+        return getattr(item, "order", None) if item is not None else None
+
+    def post(self, request: HttpRequest, job_id: int) -> HttpResponse:
+        from apps.caneca_de_garagem.models import ProductionJob
+        from apps.market_core.models import MarketplaceOrder
+
+        with transaction.atomic():
+            scoped = self._scoped_jobs_queryset(request).select_for_update()
+            job = get_object_or_404(scoped, pk=job_id)
+            order = self._job_order(job)
+
+            update_fields = ["status", "updated_at"]
+            now = timezone.now()
+            if self.action_name == "start":
+                job.status = ProductionJob.Status.IN_PROGRESS
+                if any(field.name == "started_at" for field in ProductionJob._meta.fields):
+                    job.started_at = job.started_at or now
+                    update_fields.append("started_at")
+                message = "Produção iniciada."
+
+                order_status_codes = {code for code, _ in MarketplaceOrder.Status.choices}
+                if order is not None and MarketplaceOrder.Status.IN_PRODUCTION in order_status_codes:
+                    order.status = MarketplaceOrder.Status.IN_PRODUCTION
+                    order.save(update_fields=["status", "updated_at"])
+            elif self.action_name == "complete":
+                job.status = ProductionJob.Status.COMPLETED
+                if any(field.name == "completed_at" for field in ProductionJob._meta.fields):
+                    job.completed_at = job.completed_at or now
+                    update_fields.append("completed_at")
+                message = "Job de produção finalizado."
+            else:
+                messages.warning(request, "Ação de produção não reconhecida.")
+                return redirect(reverse("admin-shell:caneca-production-list"))
+
+            job.save(update_fields=update_fields)
+
+        messages.success(request, message)
+        if order is not None:
+            return redirect(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        return redirect(reverse("admin-shell:caneca-production-list"))
 
 
 class CanecaOrderStatusView(CanecaGaragemShellMixin, View):

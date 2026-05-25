@@ -118,3 +118,74 @@ class TestCanecaPublicOrderDashboardFlow(TestCase):
         self.assertIn("art preparation", body)
         self.assertIn(str(job.id).lower(), body)
         self.assertNotIn("gerar produção".lower(), body)
+
+    def test_production_job_start_complete_and_queue_visibility(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        self.client.post(
+            reverse(dashboard_views.CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION, kwargs={"order_id": order.pk}),
+            follow=False,
+        )
+        job = ProductionJob.objects.get(order_id=order.pk)
+
+        order.status = MarketplaceOrder.Status.PAID
+        order.save(update_fields=["status", "updated_at"])
+
+        start_resp = self.client.post(
+            reverse("admin-shell:caneca-production-job-start", kwargs={"job_id": job.pk}),
+            follow=False,
+        )
+        self.assertEqual(start_resp.status_code, 302)
+        job.refresh_from_db()
+        order.refresh_from_db()
+        self.assertEqual(job.status, ProductionJob.Status.IN_PROGRESS)
+        self.assertIsNotNone(job.started_at)
+        self.assertEqual(order.status, MarketplaceOrder.Status.IN_PRODUCTION)
+
+        complete_resp = self.client.post(
+            reverse("admin-shell:caneca-production-job-complete", kwargs={"job_id": job.pk}),
+            follow=False,
+        )
+        self.assertEqual(complete_resp.status_code, 302)
+        job.refresh_from_db()
+        self.assertEqual(job.status, ProductionJob.Status.COMPLETED)
+        self.assertIsNotNone(job.completed_at)
+        self.assertEqual(ProductionJob.objects.filter(order_id=order.pk).count(), 1)
+
+        queue_resp = self.client.get(reverse("admin-shell:caneca-production-list"))
+        self.assertEqual(queue_resp.status_code, 200)
+        body = queue_resp.content.decode().lower()
+        self.assertIn(order.code.lower(), body)
+        self.assertIn("preparação de arte", body)
+        self.assertIn("concluído", body)
+
+    def test_production_job_status_actions_require_caneca_scope(self):
+        outside_order = MarketplaceOrder.objects.create(
+            code="OUT-SCOPE-1",
+            company=self.company,
+            status=MarketplaceOrder.Status.PAID,
+            metadata={"origin": "outside"},
+        )
+        outside_job = ProductionJob.objects.create(
+            order=outside_order,
+            job_type=ProductionJob.JobType.ART_PREP,
+            status=ProductionJob.Status.QUEUED,
+        )
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse("admin-shell:caneca-production-job-start", kwargs={"job_id": outside_job.pk}),
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 404)
+        outside_job.refresh_from_db()
+        self.assertEqual(outside_job.status, ProductionJob.Status.QUEUED)
+        self.assertIsNone(outside_job.started_at)
+

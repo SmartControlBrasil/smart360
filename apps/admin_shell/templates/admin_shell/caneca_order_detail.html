@@ -33,6 +33,7 @@
                     <th>Parceiro</th>
                     <th>Fábrica interna</th>
                     <th>Item</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,6 +45,25 @@
                     <td>{% if job.vendor %}{{ job.vendor.name }}{% else %}—{% endif %}</td>
                     <td>{% if job.internal_factory %}{{ job.internal_factory.display_name }}{% else %}—{% endif %}</td>
                     <td>{% if job.order_item and job.order_item.product %}{{ job.order_item.product.name }}{% else %}—{% endif %}</td>
+                    <td>
+                        <div class="page-actions" style="gap: 0.4rem; flex-wrap: wrap;">
+                            {% if job.shell_can_start %}
+                            <form method="post" action="{% url 'admin-shell:caneca-production-job-start' job.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="quick-action-button">Iniciar</button>
+                            </form>
+                            {% endif %}
+                            {% if job.shell_can_complete %}
+                            <form method="post" action="{% url 'admin-shell:caneca-production-job-complete' job.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="quick-action-button primary">Finalizar</button>
+                            </form>
+                            {% endif %}
+                            {% if not job.shell_can_start and not job.shell_can_complete %}
+                            <span class="shell-text-muted">—</span>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

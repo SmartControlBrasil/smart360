@@ -26,6 +26,7 @@ from apps.caneca_de_garagem.dashboard_views import (
     CanecaOrderDetailView,
     CanecaOrderListView,
     CanecaOrderStatusView,
+    CanecaProductionJobStatusView,
     CanecaProductionListView,
 )
 from apps.smart_system.dashboard_views import (
@@ -333,6 +334,16 @@ urlpatterns = [
         "dashboard/caneca/producao/",
         CanecaProductionListView.as_view(),
         name="caneca-production-list",
+    ),
+    path(
+        "dashboard/caneca/producao/jobs/<int:job_id>/start/",
+        CanecaProductionJobStatusView.as_view(action_name="start"),
+        name="caneca-production-job-start",
+    ),
+    path(
+        "dashboard/caneca/producao/jobs/<int:job_id>/complete/",
+        CanecaProductionJobStatusView.as_view(action_name="complete"),
+        name="caneca-production-job-complete",
     ),
     path(
         "dashboard/caneca/pedidos/<int:order_id>/gerar-producao/",

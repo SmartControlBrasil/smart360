@@ -46,6 +46,18 @@
                             <div class="shell-caneca-prod-job-chip" title="{{ chip.type_pt }} — {{ chip.status_pt }}">
                                 <span class="shell-caneca-prod-job-type">{{ chip.type_pt }}</span>
                                 <span class="status-badge {{ chip.status_class }}">{{ chip.status_pt }}</span>
+                                {% if chip.can_start %}
+                                <form method="post" action="{% url 'admin-shell:caneca-production-job-start' chip.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="quick-action-button shell-caneca-production-row-action">Iniciar</button>
+                                </form>
+                                {% endif %}
+                                {% if chip.can_complete %}
+                                <form method="post" action="{% url 'admin-shell:caneca-production-job-complete' chip.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="quick-action-button shell-caneca-production-row-action">Finalizar</button>
+                                </form>
+                                {% endif %}
                             </div>
                             {% empty %}
                             <span class="shell-text-muted">—</span>

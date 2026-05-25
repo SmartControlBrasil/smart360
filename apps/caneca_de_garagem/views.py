@@ -20,12 +20,15 @@ from django.urls import reverse
 from apps.market_core.models import MarketplaceOrder, MarketplaceOrderItem, MarketplaceProduct, MarketplaceVendor
 
 from .forms import B2BQuoteLeadForm, ContactForm, PersonalizationLeadForm
-from .models import CreativeStoreProfile
+from .models import CreativeStoreProfile, CustomizationRequest
 
 FACTORY_VENDOR_SLUG = "caneca-de-garagem-factory"
 FACTORY_VENDOR_NAME = "Caneca de Garagem Factory"
 QUOTE_SKU_PLACEHOLDER = "CANECA-GARAGEM-QUOTE"
 PLACEHOLDER_SLUG = "pedido-personalizacao-caneca"
+
+# Identificação fixa de pedidos/orçamentos originados no site público Caneca de Garagem.
+CDG_PUBLIC_STOREFRONT_AND_ORIGIN = "caneca_de_garagem"
 
 
 @dataclass(frozen=True)
@@ -46,6 +49,39 @@ class CatalogProductSnapshot:
         if self.base_price is None or self.base_price <= Decimal("0"):
             return "Sob orçamento"
         return _format_currency_brl(self.base_price)
+
+
+def _caneca_public_order_metadata(extra: dict) -> dict[str, object]:
+    """Mescla payload do lead garantindo origin/storefront caneca_de_garagem (sem inventar chaves extras)."""
+
+    merged: dict[str, object] = dict(extra)
+    merged["origin"] = CDG_PUBLIC_STOREFRONT_AND_ORIGIN
+    merged["storefront"] = CDG_PUBLIC_STOREFRONT_AND_ORIGIN
+    return merged
+
+
+def _resolve_company_for_public_order(
+    *,
+    snapshot: CatalogProductSnapshot | None,
+    line_product: MarketplaceProduct,
+) -> "Company | None":
+    """Empresa para escopo do pedido admin: produto real, vendor da linha ou factory já com empresa padrão."""
+    from apps.companies.models import Company
+
+    if snapshot is not None and snapshot.source_db is not None:
+        co_id = getattr(getattr(snapshot.source_db, "vendor", None), "company_id", None)
+        if co_id:
+            return Company.objects.filter(pk=co_id).first()
+
+    v = getattr(line_product, "vendor", None)
+    if v is not None and getattr(v, "company_id", None):
+        return Company.objects.filter(pk=v.company_id).first()
+
+    factory = MarketplaceVendor.objects.filter(slug=FACTORY_VENDOR_SLUG).first()
+    if factory is not None and factory.company_id:
+        return Company.objects.filter(pk=factory.company_id).first()
+
+    return Company.objects.order_by("pk").first()
 
 
 MOCK_PRODUCTS_SNAPSHOT = [
@@ -881,10 +917,17 @@ def get_product_snapshot(slug: str) -> CatalogProductSnapshot:
 
 
 def ensure_factory_vendor() -> MarketplaceVendor:
+    from apps.companies.models import Company
+
     vendor, _ = MarketplaceVendor.objects.get_or_create(
         slug=FACTORY_VENDOR_SLUG,
         defaults={"name": FACTORY_VENDOR_NAME, "status": MarketplaceVendor.Status.ACTIVE},
     )
+    if vendor.company_id is None:
+        co = Company.objects.order_by("pk").first()
+        if co is not None:
+            vendor.company = co
+            vendor.save(update_fields=["company", "updated_at"])
     return vendor
 
 
@@ -929,6 +972,19 @@ def _flat_lead_payload(cleaned: dict, *, channel: str) -> dict[str, object]:
     }
 
 
+def _text_from_optional_fields(labeled_parts: Sequence[tuple[str, str | None]]) -> str:
+    """Junta primeira ocorrência de cada texto não vazio (rótulos ajudam B2B)."""
+    parts: list[str] = []
+    seen: set[str] = set()
+    for label, raw in labeled_parts:
+        if isinstance(raw, str):
+            stripped = raw.strip()
+            if stripped and stripped not in seen:
+                parts.append(label + stripped if label else stripped)
+                seen.add(stripped)
+    return "\n".join(parts).strip()
+
+
 def _save_personalization_lead(snapshot: CatalogProductSnapshot, cleaned: dict) -> str:
     factory = ensure_factory_vendor()
     placeholder = ensure_quote_placeholder_product(factory)
@@ -943,8 +999,8 @@ def _save_personalization_lead(snapshot: CatalogProductSnapshot, cleaned: dict) 
         unit_price = target.base_price or Decimal("0")
         total = unit_price * qty
 
-    payload = _flat_lead_payload(cleaned, channel="personalization")
-    payload.update(
+    flat = _flat_lead_payload(cleaned, channel="personalization")
+    flat.update(
         {
             "product_slug": snapshot.slug,
             "product_label": snapshot.name,
@@ -953,22 +1009,38 @@ def _save_personalization_lead(snapshot: CatalogProductSnapshot, cleaned: dict) 
             "pricing_display": snapshot.price_label(),
         }
     )
+    payload = _caneca_public_order_metadata(flat)
+
+    cust_text_personalization = {
+        k: cleaned[k]
+        for k in ("usage_type", "artwork_need", "message_or_phrase", "observations")
+        if cleaned.get(k) not in (None, "")
+    }
+    extras_notes_personalization = _text_from_optional_fields(
+        [
+            ("", cleaned.get("message_or_phrase")),
+            ("", cleaned.get("observations")),
+        ]
+    )
+
+    company = _resolve_company_for_public_order(snapshot=snapshot, line_product=line_product)
 
     with transaction.atomic():
         code = _new_order_code()
         order = MarketplaceOrder.objects.create(
             code=code,
+            company=company,
             status=MarketplaceOrder.Status.PENDING,
             total_amount=total,
             notes=(
                 f"Lead público · {snapshot.name}\n"
                 f"Parceiro: {snapshot.vendor_name}\n"
                 f"Cliente: {cleaned['customer_name']} ({cleaned['email']})\n"
-                + (payload.get("message_or_phrase") or "")
+                + (str(payload.get("message_or_phrase") or ""))
             ),
             metadata=payload,
         )
-        MarketplaceOrderItem.objects.create(
+        item = MarketplaceOrderItem.objects.create(
             order=order,
             product=line_product,
             quantity=qty,
@@ -979,6 +1051,11 @@ def _save_personalization_lead(snapshot: CatalogProductSnapshot, cleaned: dict) 
                 "presentation_product_name": snapshot.name,
             },
         )
+        CustomizationRequest.objects.create(
+            order_item=item,
+            customer_text=cust_text_personalization or {},
+            extra_notes=extras_notes_personalization,
+        )
 
     return code
 
@@ -988,23 +1065,47 @@ def _save_b2b_lead(cleaned: dict) -> str:
     placeholder = ensure_quote_placeholder_product(factory)
 
     qty = int(cleaned["quantity"])
-    payload = _flat_lead_payload(cleaned, channel="b2b_quote")
+    payload = _caneca_public_order_metadata(_flat_lead_payload(cleaned, channel="b2b_quote"))
 
     notes = (
         f"Pedido corporativo · {cleaned['organization_name']}\n"
         f"Responsável: {cleaned['customer_name']} — {cleaned['email']} / {cleaned['whatsapp']}\n"
     )
 
+    cust_text_b2b = {
+        k: cleaned[k]
+        for k in (
+            "organization_name",
+            "job_title_or_area",
+            "usage_type",
+            "artwork_need",
+            "message_or_phrase",
+            "observations",
+        )
+        if cleaned.get(k) not in (None, "")
+    }
+    extra_b2b = _text_from_optional_fields(
+        [
+            ("Empresa / instituição: ", cleaned.get("organization_name")),
+            ("Cargo / área: ", cleaned.get("job_title_or_area")),
+            ("", cleaned.get("message_or_phrase")),
+            ("", cleaned.get("observations")),
+        ]
+    )
+
+    company = _resolve_company_for_public_order(snapshot=None, line_product=placeholder)
+
     with transaction.atomic():
         code = _new_order_code()
         order = MarketplaceOrder.objects.create(
             code=code,
+            company=company,
             status=MarketplaceOrder.Status.PENDING,
             total_amount=Decimal("0"),
             notes=notes,
             metadata=payload,
         )
-        MarketplaceOrderItem.objects.create(
+        item = MarketplaceOrderItem.objects.create(
             order=order,
             product=placeholder,
             quantity=max(qty, 1),
@@ -1012,12 +1113,20 @@ def _save_b2b_lead(cleaned: dict) -> str:
             vendor=factory,
             metadata={"b2b": True},
         )
+        CustomizationRequest.objects.create(
+            order_item=item,
+            customer_text=cust_text_b2b or {},
+            extra_notes=extra_b2b,
+        )
 
     return code
 
 
 def _save_contact_lead(cleaned: dict) -> str:
-    payload = {
+    factory = ensure_factory_vendor()
+    placeholder = ensure_quote_placeholder_product(factory)
+
+    flat = {
         "channel": "contact",
         "customer_name": cleaned["customer_name"],
         "email": cleaned["email"],
@@ -1025,17 +1134,39 @@ def _save_contact_lead(cleaned: dict) -> str:
         "subject": cleaned["subject"],
         "message": cleaned["message"],
     }
+    payload = _caneca_public_order_metadata(flat)
     notes = (
         f"Contato site · {payload['subject']}\n{payload['customer_name']} ({payload['email']})\n\n{payload['message']}"
     )
-    code = _new_order_code()
+    cust_text_contact = {
+        k: flat[k]
+        for k in ("subject", "message", "customer_name", "email", "whatsapp")
+        if flat.get(k) not in (None, "")
+    }
+    company = _resolve_company_for_public_order(snapshot=None, line_product=placeholder)
+
     with transaction.atomic():
-        MarketplaceOrder.objects.create(
+        code = _new_order_code()
+        order = MarketplaceOrder.objects.create(
             code=code,
+            company=company,
             status=MarketplaceOrder.Status.PENDING,
             total_amount=Decimal("0"),
             notes=notes,
             metadata=payload,
+        )
+        item = MarketplaceOrderItem.objects.create(
+            order=order,
+            product=placeholder,
+            quantity=1,
+            unit_price=Decimal("0"),
+            vendor=factory,
+            metadata={"contact_lead": True},
+        )
+        CustomizationRequest.objects.create(
+            order_item=item,
+            customer_text=cust_text_contact or {},
+            extra_notes=str(cleaned.get("message") or "").strip(),
         )
     return code
 

@@ -16,6 +16,53 @@
 </section>
 
 <section class="panel-card mb-24">
+    <header class="widget-card-header">
+        <div>
+            <h2 style="margin:0;font-size:1rem;">Produção</h2>
+            <p style="margin:0.35rem 0 0;color:var(--shell-muted);">ProductionJob vinculado a este pedido (fila Caneca).</p>
+        </div>
+    </header>
+    {% if production_jobs %}
+    <div class="table-wrapper" style="padding: 0 var(--space-5) var(--space-5);">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Parceiro</th>
+                    <th>Fábrica interna</th>
+                    <th>Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in production_jobs %}
+                <tr>
+                    <td><code>{{ job.id }}</code></td>
+                    <td>{{ job.get_job_type_display }}</td>
+                    <td>{{ job.get_status_display }}</td>
+                    <td>{% if job.vendor %}{{ job.vendor.name }}{% else %}—{% endif %}</td>
+                    <td>{% if job.internal_factory %}{{ job.internal_factory.display_name }}{% else %}—{% endif %}</td>
+                    <td>{% if job.order_item and job.order_item.product %}{{ job.order_item.product.name }}{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="widget-card-body">
+        <p class="shell-text-muted">Nenhum job de produção ainda. Ao gerar, o pedido passa para <strong>em produção</strong> e entra na fila <a href="{% url 'admin-shell:caneca-production-list' %}">Produção</a>.</p>
+        {% if can_create_caneca_production %}
+        <form method="post" action="{% url 'admin-shell:caneca-order-create-production' order.pk %}" class="page-actions" style="margin-top: var(--space-4);">
+            {% csrf_token %}
+            <button type="submit" class="quick-action-button primary">Gerar produção</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<section class="panel-card mb-24">
     <header class="widget-card-header"><div><h2 style="margin:0;font-size:1rem;">Alterar status</h2></div></header>
     <form method="post" action="{{ status_update_url }}">
         {% csrf_token %}
@@ -129,40 +176,6 @@
         <tr><th>Postado em</th><td>{% if shipment_preparation.posted_at %}{{ shipment_preparation.posted_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>
         <tr><th>Entregue em</th><td>{% if shipment_preparation.delivered_at %}{{ shipment_preparation.delivered_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>
     </tbody></table>
-</section>
-{% endif %}
-
-{% if production_jobs %}
-<section class="table-card mb-24">
-    <div class="widget-card-header" style="padding: var(--space-5) var(--space-5) 0;">
-        <h2 style="margin:0;font-size:1rem;">Jobs de produção</h2>
-    </div>
-    <div class="table-wrapper">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tipo</th>
-                    <th>Status</th>
-                    <th>Parceiro</th>
-                    <th>Fábrica interna</th>
-                    <th>Item</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for job in production_jobs %}
-                    <tr>
-                        <td><code>{{ job.id }}</code></td>
-                        <td>{{ job.get_job_type_display }}</td>
-                        <td>{{ job.get_status_display }}</td>
-                        <td>{% if job.vendor %}{{ job.vendor.name }}{% else %}—{% endif %}</td>
-                        <td>{% if job.internal_factory %}{{ job.internal_factory.display_name }}{% else %}—{% endif %}</td>
-                        <td>{% if job.order_item and job.order_item.product %}{{ job.order_item.product.name }}{% else %}—{% endif %}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </section>
 {% endif %}
 

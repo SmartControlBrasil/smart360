@@ -418,6 +418,7 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                                 "admin-shell:caneca-order-list",
                                 "admin-shell:caneca-order-detail",
                                 "admin-shell:caneca-order-status",
+                                "admin-shell:caneca-order-create-production",
                             ],
                             "permission_domain": "dashboard",
                             "permission_action": "view",

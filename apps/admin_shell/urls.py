@@ -22,6 +22,7 @@ from apps.media_library.dashboard_views import (
 )
 from apps.caneca_de_garagem.dashboard_views import (
     CanecaGaragemDashboardView,
+    CanecaOrderCreateProductionView,
     CanecaOrderDetailView,
     CanecaOrderListView,
     CanecaOrderStatusView,
@@ -332,6 +333,11 @@ urlpatterns = [
         "dashboard/caneca/producao/",
         CanecaProductionListView.as_view(),
         name="caneca-production-list",
+    ),
+    path(
+        "dashboard/caneca/pedidos/<int:order_id>/gerar-producao/",
+        CanecaOrderCreateProductionView.as_view(),
+        name="caneca-order-create-production",
     ),
     path(
         "dashboard/caneca/pedidos/<int:order_id>/",

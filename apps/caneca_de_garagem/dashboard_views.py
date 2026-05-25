@@ -52,37 +52,48 @@ class CanecaGaragemShellMixin(ShellContextMixin):
         ]
 
 
-def _caneca_order_signal_filter() -> Q:
-    """Sinais de pedido relacionado à Caneca (metadata ou personalização ligada ao item)."""
-    return (
+# Valor gravado em MarketplaceOrder.metadata (origin/storefront).
+CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
+
+
+def _caneca_branded_metadata_q() -> Q:
+    """Pedidos originados no site público Caneca (chaves gravadas pelo fluxo público)."""
+    return Q(metadata__origin=CANECA_PUBLIC_ORIGIN_STOREFRONT) | Q(metadata__storefront=CANECA_PUBLIC_ORIGIN_STOREFRONT)
+
+
+def _caneca_marketplace_orders_filter_q() -> Q:
+    """Site Caneca: metadata marca ou sinais legados (personalização/itens/metadata antigo)."""
+    branded = _caneca_branded_metadata_q()
+    legacy_missing_brand = (
         Q(items__customization_request__isnull=False)
-        | Q(metadata__storefront="caneca_de_garagem")
-        | Q(metadata__origin="caneca_de_garagem")
-        | Q(metadata__source="caneca_de_garagem")
-        | Q(metadata__channel="caneca_de_garagem")
+        | Q(metadata__source=CANECA_PUBLIC_ORIGIN_STOREFRONT)
+        | Q(metadata__channel__in=["personalization", "b2b_quote", "contact"])
     )
+    return branded | legacy_missing_brand
 
 
 def caneca_marketplace_orders_queryset(request: HttpRequest) -> QuerySet:
     """
-    queryset base MarketplaceOrder para a Caneca.
-    - Escopo empresa ativa quando existir (mesmo critério do dashboard).
-    - Se houver pedidos compatíveis com sinais caneca, limita a eles.
-    - Caso contrário, devolve todos do escopo (fallback seguro, sem erro).
+    queryset base MarketplaceOrder para o painel Caneca.
+
+    Regra de escopo com tenant:
+    - Com empresa ativa no shell: pedidos dessa empresa **ou** pedidos com metadata
+      origin/storefront caneca_de_garagem (site público), para não esconder leads
+      quando company_id do pedido diverge do tenant (ex.: dev / primeiro Company vs tenant escolhido).
+    - Sem empresa: todos os pedidos que passarem no filtro Caneca.
+
+    Depois filtra por sinais Caneca (_caneca_marketplace_orders_filter_q).
     """
     from apps.market_core.models import MarketplaceOrder
 
-    qs = MarketplaceOrder.objects.all()
     tenant = build_shell_tenant_context(request)
     company = tenant.get("company")
+
+    qs = MarketplaceOrder.objects.all()
     if company is not None:
-        qs = qs.filter(company_id=company.id)
+        qs = qs.filter(Q(company_id=company.id) | _caneca_branded_metadata_q())
 
-    narrowed = qs.filter(_caneca_order_signal_filter()).distinct()
-    if narrowed.exists():
-        return narrowed
-
-    return qs.distinct()
+    return qs.filter(_caneca_marketplace_orders_filter_q()).distinct()
 
 
 def order_item_prefetch(with_customization: bool = True):
@@ -390,6 +401,8 @@ class CanecaOrderListView(CanecaGaragemShellMixin, ListView):
                 | Q(items__product__slug__icontains=q)
                 | Q(items__product__sku__icontains=q)
             )
+            if q.isdigit():
+                sub |= Q(pk=int(q))
             uq = (
                 Q(customer__username__icontains=q)
                 | Q(customer__email__icontains=q)

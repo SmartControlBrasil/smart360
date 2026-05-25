@@ -1,0 +1,112 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_explore_description }}{% endblock %}
+
+{% block body_class %}header-fixed{% endblock %}
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">{{ page_heading }}</h1>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'caneca_de_garagem:product_list' %}">Explorar personalizados</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 discover-item loadmore-12-item">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <div class="widget-tabs relative">
+                    <div class="tf-soft">
+                        <div class="soft-right">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton4ld" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3.125 5.625H16.875M3.125 10H16.875M3.125 14.375H10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    <span>Ordenar por: mais recentes</span>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton4ld">
+                                    <h6>Ordenar por</h6>
+                                    <a href="#" class="dropdown-item"><div class="sort-filter"><span>Mais recentes</span><span class="icon-tick"><span class="path2"></span></span></div></a>
+                                    <a href="#" class="dropdown-item"><div class="sort-filter active"><span>Menor preço</span><span class="icon-tick"><span class="path2"></span></span></div></a>
+                                    <a href="#" class="dropdown-item"><div class="sort-filter"><span>Maior preço</span><span class="icon-tick"><span class="path2"></span></span></div></a>
+                                    <a href="#" class="dropdown-item"><div class="sort-filter"><span>Entrega rápida</span><span class="icon-tick"><span class="path2"></span></span></div></a>
+                                    <h6>Opções</h6>
+                                    <a href="#" class="dropdown-item"><div class="sort-filter"><span>Entrega rápida quando disponível</span><input class="check" type="checkbox" value="checkbox" name="check_ld1" checked=""></div></a>
+                                    <a href="#" class="dropdown-item"><div class="sort-filter"><span>Mostrar apenas kits coordenados</span><input class="check" type="checkbox" value="checkbox" name="check_ld2"></div></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="widget-menu-tab">
+                        <li class="item-title"><span class="inner">Categoria</span></li>
+                        <li class="item-title active"><span class="inner">Itens</span></li>
+                        <li class="item-title"><span class="inner">Status</span></li>
+                        <li class="item-title"><span class="inner">Faixa de preço</span></li>
+                    </ul>
+                    <div class="widget-content-tab pt-10">
+                        {% for pane in explore_tab_panes %}
+                        <div class="widget-content-inner{% if pane.active_inner %} active{% endif %}">
+                            <div class="row">
+                                {% for slot in pane.slots %}
+                                <div {% if slot.wow_delay %}data-wow-delay="{{ slot.wow_delay }}" {% endif %}class="{% if slot.outer_use_wow %}wow fadeInUp {% endif %}{% if slot.outer_use_fl_item %}fl-item {% endif %}col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                                    <div class="tf-card-box style-1">
+                                        <div class="card-media">
+                                            <a href="{% url 'caneca_de_garagem:product_detail' slot.detail_slug %}">
+                                                <img src="{% static slot.card_static_path %}" alt="{{ slot.display_name }}">
+                                            </a>
+                                            <span class="wishlist-button icon-heart"></span>
+                                            <div class="button-place-bid">
+                                                <a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="tf-button"><span>Solicitar orçamento</span></a>
+                                            </div>
+                                        </div>
+                                        <h5 class="name"><a href="{% url 'caneca_de_garagem:product_detail' slot.detail_slug %}">{{ slot.display_name }}</a></h5>
+                                        <div class="author flex items-center">
+                                            <div class="avatar">
+                                                <img src="{% static slot.avatar_static_path %}" alt="">
+                                            </div>
+                                            <div class="info">
+                                                <span>Criador/Parceiro:</span>
+                                                <h6><a href="{% url 'caneca_de_garagem:author-list' %}">{{ slot.creator_name }}</a></h6>
+                                            </div>
+                                        </div>
+                                        <div class="divider"></div>
+                                        <div class="meta-info flex items-center justify-between">
+                                            <span class="text-bid">Preço base</span>
+                                            <h6 class="price">{{ slot.price_label }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 load-more mt-40">
+                <a href="{{ cta_primary_url }}" class="tf-button-loadmore tf-button style-1 h50 w232 m-auto">
+                    <span>{{ cta_primary_label }}</span><i class="icon-arrow-up-right2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

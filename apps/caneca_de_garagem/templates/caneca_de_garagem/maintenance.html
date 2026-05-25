@@ -1,0 +1,44 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Manutenção{% endblock %}
+
+{% block content %}
+<div class="section-single-page maintanance">
+    <a href="{% url 'caneca_de_garagem:home' %}">
+        <img src="{% static 'caneca_de_garagem/public/assets/images/logo/logo.png' %}" alt="Caneca de Garagem">
+    </a>
+    <div class="content">
+        <div class="widget-bg-line">
+            <div class="wraper">
+                <div class="bg-grid-line y top">
+                    <div class="bg-line"></div>
+                </div>
+                <div class="bg-grid-line x left">
+                    <div class="bg-line"></div>
+                </div>
+                <div class="bg-grid-line y bottom">
+                    <div class="bg-line"></div>
+                </div>
+                <div class="bg-grid-line x right">
+                    <div class="bg-line"></div>
+                </div>
+            </div>
+        </div>
+        <div class="status">Atualização temporária do ambiente nacional</div>
+        <h1>Manutenção</h1>
+        <p>Estamos ajustando integrações internas para expor esta área com a mesma qualidade dos pedidos físicos já atendidos pela curadoria.</p>
+        <div class="box-button">
+            <a href="{% url 'caneca_de_garagem:market-orders-area' %}" class="tf-button style-1 h50 active">Ver área de pedidos (visual)<i class="icon-arrow-up-right2"></i></a>
+            <a href="{% url 'caneca_de_garagem:home' %}" class="tf-button style-1 h50">Voltar ao início<i class="icon-arrow-up-right2"></i></a>
+        </div>
+    </div>
+    <div class="widget-social">
+        <ul class="flex justify-center">
+            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-vt"></a></li>
+            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

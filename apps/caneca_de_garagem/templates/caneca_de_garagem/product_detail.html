@@ -1,0 +1,300 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block body_class %}header-fixed counter-scroll{% endblock %}
+
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="tf-section-2 product-detail">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-6">
+                {% for thumb in detail_thumbs_static %}
+                <div data-wow-delay="0s" class="wow fadeInLeft tf-card-box style-5">
+                    <div class="card-media mb-0">
+                        <a href="{% url 'caneca_de_garagem:product_detail' product.slug %}">
+                            <img src="{% static thumb %}" alt="{{ product.name }}">
+                        </a>
+                    </div>
+                    <h6 class="price gem"><i class="icon-gem"></i>{{ product.price_label }}</h6>
+                    <div class="wishlist-button">10<i class="icon-heart"></i></div>
+                    <div class="featured-countdown">
+                        <span class="js-countdown" data-timer="7500" data-labels="d,h,m,s"></span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                <div data-wow-delay="0s" class="wow fadeInRight infor-product">
+                    <div class="text">{{ product.vendor_name }} · Caneca de Garagem <span
+                            class="icon-tick"><span class="path1"></span><span class="path2"></span></span></div>
+                    <div class="menu_card">
+                        <div class="dropdown">
+                            <div class="icon">
+                                <a href="javascript:void(0);" class="btn-link" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="icon-link-1"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'caneca_de_garagem:product_detail' product.slug %}#briefing_pedido_form"><i
+                                            class="icon-link"></i>Copiar página do briefing</a>
+                                    <a class="dropdown-item" href="{% url 'caneca_de_garagem:b2b_quote' %}"><i
+                                            class="icon-twitter"></i>Compartilhar com equipes</a>
+                                    <a class="dropdown-item mb-0" href="{% url 'caneca_de_garagem:contact' %}"><i
+                                            class="icon-report"></i>Reportar problema</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <div class="icon">
+                                <a href="javascript:void(0);" class="btn-link" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="icon-content"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'caneca_de_garagem:author-detail' product.vendor_slug %}"><i
+                                            class="icon-refresh"></i>Vitrine oficial do criador</a>
+                                    <a class="dropdown-item mb-0" href="{% url 'caneca_de_garagem:product_list' %}"><i
+                                            class="icon-report"></i>Explorar curadoria</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>{{ product.name }}</h2>
+                    <div class="author flex items-center mb-30">
+                        <div class="avatar">
+                            <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-box-05.jpg' %}"
+                                alt="{{ product.vendor_name }}">
+                        </div>
+                        <div class="info">
+                            <span>Parceiro</span>
+                            <h6><a href="{% url 'caneca_de_garagem:author-detail' product.vendor_slug %}">{{ product.vendor_name }}</a>
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="meta mb-20">
+                        <div class="meta-item view">
+                            <i class="icon-show"></i> Produção combinada até {{ product.estimated_days }} dias
+                        </div>
+                        <div class="meta-item rating">
+                            <i class="icon-link-2"></i> Item curado físico
+                        </div>
+                        <div class="meta-item favorites">
+                            <i class="icon-heart"></i> Arte personalizada
+                        </div>
+                    </div>
+                </div>
+                <div data-wow-delay="0s" class="wow fadeInRight product-item time-sales mb-28">
+                    <h6><i class="icon-clock"></i>Janelas de briefing e revisão combinadas antes da tiragem física.</h6>
+                    <div class="content">
+                        <div class="flex justify-between items-center flex-wrap gap16">
+                            <div class="text">Preço base</div>
+                            <div class="flex justify-between align-items-center w-full mt-14">
+                                <p>{{ product.price_label }} <span>{{ product.vendor_name }}</span></p>
+                                <a href="#briefing_pedido_form"
+                                    class="tf-button style-1 h50 w216">Solicitar personalização<i
+                                        class="icon-arrow-up-right2"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div data-wow-delay="0s" class="wow fadeInRight product-item description mb-28">
+                    <h6><i class="icon-description"></i>Sobre este produto</h6>
+                    <i class="icon-keyboard_arrow_down"></i>
+                    <div class="content">
+                        <p>{{ product.description }}</p>
+                    </div>
+                </div>
+                <div data-wow-delay="0s" class="wow fadeInRight product-item details mb-28">
+                    <h6><i class="icon-description"></i>Ficha rápida</h6>
+                    <i class="icon-keyboard_arrow_down"></i>
+                    <div class="content">
+                        <div class="details-item">
+                            <span>Versão do catálogo</span>
+                            <span class="tf-color">{{ product.slug }}</span>
+                        </div>
+                        <div class="details-item">
+                            <span>Laboratório / parceiro</span>
+                            <span>{{ product.vendor_name }}</span>
+                        </div>
+                        <div class="details-item mb-0">
+                            <span>Canal institucional</span>
+                            <span>Caneca de Garagem marketplace</span>
+                        </div>
+                    </div>
+                </div>
+                <div data-wow-delay="0s" class="wow fadeInRight product-item traits mb-28">
+                    <h6><i class="icon-description"></i>O que você pode solicitar nos campos seguintes</h6>
+                    <i class="icon-keyboard_arrow_down"></i>
+                    <div class="content">
+                        {% for opt in product.personalization_options %}
+                        <div class="trait-item">
+                            <p>Opção criativa {{ forloop.counter }}</p>
+                            <div class="title">{{ opt }}</div>
+                            <p>Curadoria garante tratamento físico antes de produção.</p>
+                        </div>
+                        {% endfor %}
+                        {% if not product.personalization_options %}
+                        <div class="trait-item">
+                            <p>Flexible</p>
+                            <div class="title">Composição combinada pela curadoria</div>
+                            <p>Incluímos texto, marca e variações de nome quando solicitado.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-wow-delay="0s" class="wow fadeInUp col-12 mb-72" id="briefing_pedido_form">
+            <div class="product-item offers mb-32">
+                <h6><i class="icon-description"></i>Briefing aberto ao público · sem checkout automático aqui</h6>
+                <i class="icon-keyboard_arrow_down"></i>
+                <div class="content">
+                    <div class="table-heading">
+                        <div class="column">Cliente</div>
+                        <div class="column">Contato</div>
+                        <div class="column">Quantidade base</div>
+                        <div class="column">Uso</div>
+                        <div class="column">Arte criativa?</div>
+                    </div>
+                    <div class="table-item align-items-start">
+                        <div class="column w-100 pt-28">
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-warning">{{ form.non_field_errors }}</div>
+                            {% endif %}
+                            <form method="post" id="commentform" class="comment-form w-full">
+                                {% csrf_token %}
+                                {{ form.product_slug }}
+                                {{ form.partner_slug }}
+                                <fieldset class="name pb-16">
+                                    <label>{{ form.customer_name.label }}</label>
+                                    {{ form.customer_name }}
+                                    {{ form.customer_name.errors }}
+                                </fieldset>
+                                <div class="flex gap30 flex-wrap">
+                                    <fieldset class="email flex-grow pb-16" style="min-width:260px;">
+                                        <label>{{ form.email.label }}</label>
+                                        {{ form.email }}
+                                        {{ form.email.errors }}
+                                    </fieldset>
+                                    <fieldset class="name flex-grow pb-16" style="min-width:220px;">
+                                        <label>{{ form.whatsapp.label }}</label>
+                                        {{ form.whatsapp }}
+                                        {{ form.whatsapp.errors }}
+                                    </fieldset>
+                                </div>
+                                <div class="flex gap30 flex-wrap">
+                                    <fieldset class="name flex-grow pb-16">
+                                        <label>{{ form.quantity.label }}</label>
+                                        {{ form.quantity }}
+                                        {{ form.quantity.errors }}
+                                    </fieldset>
+                                    <fieldset class="name flex-grow pb-16">
+                                        <label>{{ form.usage_type.label }}</label>
+                                        {{ form.usage_type }}
+                                        {{ form.usage_type.errors }}
+                                    </fieldset>
+                                </div>
+                                <fieldset class="message pb-16">
+                                    <label>{{ form.artwork_need.label }}</label>
+                                    {{ form.artwork_need }}
+                                    {{ form.artwork_need.errors }}
+                                </fieldset>
+                                <fieldset class="message pb-16">
+                                    <label>{{ form.message_or_phrase.label }}</label>
+                                    {{ form.message_or_phrase }}
+                                    {{ form.message_or_phrase.errors }}
+                                </fieldset>
+                                <fieldset class="message pb-20">
+                                    <label>{{ form.observations.label }}</label>
+                                    {{ form.observations }}
+                                    {{ form.observations.errors }}
+                                </fieldset>
+                                <div class="btn-submit pb-36">
+                                    <button class="tf-button style-1" type="submit">Enviar solicitação de
+                                        curadoria <i class="icon-arrow-up-right2"></i></button>
+                                    {% if whatsapp_quick_url %}
+                                    <a href="{{ whatsapp_quick_url }}" class="tf-button active ml-24" target="_blank"
+                                        rel="noopener noreferrer">Continuar pelo WhatsApp</a>
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 featured-item style-bottom pb-140">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section pb-20">
+                    <h2 class="tf-title">Personalizados correlatos</h2>
+                    <a href="{% url 'caneca_de_garagem:product_list' %}" class="">Voltar ao catálogo <i
+                            class="icon-arrow-right2"></i></a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="featured pt-10 swiper-container carousel-rel-cdg cdg-scope-related" data-swiper='{
+                    "loop":false,"slidesPerView":1,"spaceBetween":30,"observer":true,"observeParents":true,
+                    "navigation":{"clickable":true,"nextEl": ".cdg-scope-related .slider-next", "prevEl": ".cdg-scope-related .slider-prev"},
+                    "pagination":{"el":".cdg-scope-related .swiper-pagination","clickable":true},
+                    "breakpoints":{"768":{"slidesPerView":2},"1300":{"slidesPerView":3}}
+                }'>
+                    <div class="swiper-wrapper">
+                        {% for row in related_slide_items %}
+                        {% with rp=row.p %}
+                        <div class="swiper-slide">
+                            <div class="tf-card-box style-1">
+                                <div class="card-media">
+                                    <a href="{% url 'caneca_de_garagem:product_detail' rp.slug %}">
+                                        <img src="{% static row.card_static %}" alt="{{ rp.name }}">
+                                    </a>
+                                    <span class="wishlist-button icon-heart"></span>
+                                    <div class="button-place-bid">
+                                        <a href="{% url 'caneca_de_garagem:product_detail' rp.slug %}"
+                                            class="tf-button"><span>Solicitar personalização</span></a>
+                                    </div>
+                                </div>
+                                <h5 class="name"><a
+                                        href="{% url 'caneca_de_garagem:product_detail' rp.slug %}">{{ rp.name }}</a>
+                                </h5>
+                                <div class="author flex items-center">
+                                    <div class="avatar">
+                                        <img src="{% static row.avatar %}" alt="">
+                                    </div>
+                                    <div class="info">
+                                        <span>Parceiro</span>
+                                        <h6><a
+                                                href="{% url 'caneca_de_garagem:author-detail' rp.vendor_slug %}">{{ rp.vendor_name }}</a>
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="meta-info flex items-center justify-between">
+                                    <span class="text-bid">Preço base</span>
+                                    <h6 class="price gem"><i class="icon-gem"></i>{{ rp.price_label }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% endwith %}
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="slider-next swiper-button-next"></div>
+                    <div class="slider-prev swiper-button-prev"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

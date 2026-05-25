@@ -1,0 +1,227 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_explore_description }}{% endblock %}
+
+{% block body_class %}header-fixed{% endblock %}
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">{{ page_heading }}</h1>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'caneca_de_garagem:product_list' %}">Explorar personalizados</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-5 artwork loadmore-12-item-1">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="widget-category-checkbox style-1 mb-30">
+                    <h5 class="active">Status</h5>
+                    <div class="content-wg-category-checkbox">
+                        <form action="#" method="get">
+                            <label>Disponível para pedido combinado
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Fluxo rápido B2B
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Lançamentos curados
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Vitrines em destaque
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                        </form>
+                    </div>
+                </div>
+                <div class="widget-category-checkbox style-1 mb-30">
+                    <h5 class="active">Coleção</h5>
+                    <div class="content-wg-category-checkbox">
+                        <form action="#" method="get">
+                            <label>Arte personalizada
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Bares parceiros
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Festas patronais
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Shows ambientados
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Sublimação premium
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Lettering brasileiro
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Campanhas de engajamento
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                        </form>
+                    </div>
+                </div>
+                <div class="widget-category-checkbox style-1 mb-30">
+                    <h5 class="active">Faixa de preço</h5>
+                    <div class="content-wg-category-checkbox">
+                        <form action="#" method="get">
+                            <label>R$ 0 — R$ 120
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>R$ 120 — R$ 260
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>R$ 260 — R$ 420
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>R$ 420 — R$ 600
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>R$ 600 — R$ 820
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>R$ 820 — R$ 1.100
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Volumes institucionais
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                        </form>
+                    </div>
+                </div>
+                <div class="widget-category-checkbox style-1 mb-30">
+                    <h5 class="active">Origem da produção</h5>
+                    <div class="content-wg-category-checkbox">
+                        <form action="#" method="get">
+                            <label>Fundição brasileira
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Fornecedor parceiro
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>HUB Caneca integrado
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Labor artesanal
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label>Importação especial
+                                <input type="checkbox">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                        </form>
+                    </div>
+                </div>
+                <div class="widget-category-checkbox style-1">
+                    <h5 class="active">Avaliação</h5>
+                    <div class="content-wg-category-checkbox">
+                        <form action="#" method="get">
+                            <label><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star active"></i>
+                                <input type="radio" name="rating_chopp">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star"></i> &amp; acima
+                                <input type="radio" name="rating_chopp">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star"></i><i class="icon-star"></i> &amp; acima
+                                <input type="radio" name="rating_chopp">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label><i class="icon-star active"></i><i class="icon-star active"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i> &amp; acima
+                                <input type="radio" name="rating_chopp">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                            <label><i class="icon-star active"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i><i class="icon-star"></i> &amp; acima
+                                <input type="radio" name="rating_chopp">
+                                <span class="btn-checkbox"></span>
+                            </label><br>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="row">
+                    {% for slot in explore_slots %}
+                    <div {% if slot.wow_delay %}data-wow-delay="{{ slot.wow_delay }}" {% endif %}class="{% if slot.outer_use_wow %}wow fadeInUp {% endif %}fl-item-1 col-lg-4 col-md-6">
+                        <div class="tf-card-box style-4">
+                            <div class="author flex items-center">
+                                <div class="avatar">
+                                    <img src="{% static slot.avatar_static_path %}" alt="Image">
+                                </div>
+                                <div class="info">
+                                    <span>Criador/Parceiro:</span>
+                                    <h6><a href="{% url 'caneca_de_garagem:author-list' %}">{{ slot.creator_name }}</a></h6>
+                                </div>
+                            </div>
+                            <div class="card-media">
+                                <a href="{% url 'caneca_de_garagem:product_detail' slot.detail_slug %}">
+                                    <img src="{% static slot.card_static_path %}" alt="{{ slot.display_name }}">
+                                </a>
+                                <span class="wishlist-button icon-heart"></span>
+                                <div class="featured-countdown">
+                                    <span class="js-countdown" data-timer="7500" data-labels="d,h,m,s"></span>
+                                </div>
+                            </div>
+                            <h5 class="name"><a href="{% url 'caneca_de_garagem:product_detail' slot.detail_slug %}">{{ slot.display_name }}</a></h5>
+                            <div class="meta-info flex items-center justify-between">
+                                <div>
+                                    <span class="text-bid">Preço base</span>
+                                    <h6 class="price">{{ slot.price_label }}</h6>
+                                </div>
+                                <div class="button-place-bid">
+                                    <a href="{{ cta_primary_url }}" class="tf-button"><span>{{ cta_primary_label }}</span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="col-lg-12 text-center pb-56">
+                        <a href="{{ cta_primary_url }}" class="tf-button style-1 h50 w258 m-auto">{{ cta_primary_label }}<i class="icon-arrow-up-right2"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

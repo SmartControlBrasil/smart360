@@ -1,0 +1,46 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Em breve{% endblock %}
+
+{% block content %}
+<div class="section-single-page coming-soon">
+    <a href="{% url 'caneca_de_garagem:home' %}">
+        <img src="{% static 'caneca_de_garagem/public/assets/images/logo/logo.png' %}"
+            alt="Caneca de Garagem">
+    </a>
+    <div class="content">
+        <div class="widget-bg-line">
+            <div class="wraper">
+                <div class="bg-grid-line y top">
+                    <div class="bg-line"></div>
+                </div>
+                <div class="bg-grid-line x left">
+                    <div class="bg-line"></div>
+                </div>
+                <div class="bg-grid-line y bottom">
+                    <div class="bg-line"></div>
+                </div>
+                <div class="bg-grid-line x right">
+                    <div class="bg-line"></div>
+                </div>
+            </div>
+        </div>
+        <h1>Em breve</h1>
+        <p>Estamos combinando coleções físicas adicionais, integrações futuras ou áreas reservadas a parceiros selecionados.</p>
+        <fieldset class="email">
+            <input type="email" class="style-1" id="email" placeholder="Informe seu e-mail para novidades combinadas físicas*" name="email"
+                tabindex="2" value="" aria-required="true">
+        </fieldset>
+        <a href="{{ cta_url }}" class="tf-button style-1 h50">Falar agora<i class="icon-arrow-up-right2"></i></a>
+    </div>
+    <div class="widget-social">
+        <ul class="flex justify-center">
+            <li><a href="{% url 'caneca_de_garagem:home' %}" class="icon-facebook"></a></li>
+            <li><a href="{% url 'caneca_de_garagem:author-list' %}" class="icon-twitter"></a></li>
+            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-vt"></a></li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

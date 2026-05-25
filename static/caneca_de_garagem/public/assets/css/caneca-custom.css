@@ -1,0 +1,816 @@
+/* Caneca de Garagem — overlays sem alterar tema base */
+
+:root {
+  --cdg-cream: #f6ecda;
+  --cdg-highlight: #f5d887;
+  --cdg-gold-soft: rgba(228, 180, 80, 0.55);
+  --cdg-orange: #d97830;
+  --cdg-rust: #b84a20;
+  --cdg-graphite: #121212;
+  --cdg-card: rgba(42, 40, 36, 0.92);
+  --cdg-line-glow: rgba(245, 216, 135, 0.18);
+}
+
+.page-shell-cdg .cdg-brand-tagline-h {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--cdg-highlight);
+  opacity: 0.92;
+}
+
+.page-shell-cdg .cdg-brand-lockup--footer .cdg-brand-tagline-h {
+  color: var(--cdg-cream);
+  opacity: 0.82;
+}
+
+.page-shell-cdg .cdg-muted {
+  color: rgba(246, 236, 218, 0.78);
+  max-width: 640px;
+}
+
+.page-shell-cdg .cdg-muted--wide {
+  max-width: 56rem;
+}
+
+.page-shell-cdg .comment-form textarea.style-1 {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.page-shell-cdg .cdg-header-inline-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- Hero dois blocos ---------- */
+.cdg-hero {
+  position: relative;
+  padding-bottom: clamp(48px, 8vw, 110px);
+  overflow: hidden;
+}
+
+.cdg-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      ellipse 80% 50% at 70% -10%,
+      rgba(217, 120, 48, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(ellipse 55% 40% at 10% 100%, rgba(245, 216, 135, 0.08), transparent 50%);
+}
+
+.cdg-hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.cdg-hero-title {
+  font-size: clamp(1.95rem, 3.85vw, 3.05rem);
+  line-height: 1.14;
+  font-weight: 800;
+  color: var(--cdg-cream);
+  letter-spacing: -0.02em;
+  margin-bottom: 22px;
+  max-width: 18ch;
+}
+
+.cdg-hero-title em {
+  font-style: normal;
+  background: linear-gradient(105deg, var(--cdg-highlight), var(--cdg-orange));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdg-hero-title em {
+    color: var(--cdg-highlight);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+  }
+}
+
+.cdg-hero-lead {
+  font-size: 1.125rem;
+  line-height: 1.62;
+  color: rgba(246, 236, 218, 0.9);
+  max-width: 34rem;
+}
+
+.cdg-hero-microcopy {
+  margin-top: 18px;
+  padding-left: 14px;
+  border-left: 3px solid var(--cdg-orange);
+  font-size: 0.94rem;
+  line-height: 1.58;
+  color: var(--cdg-highlight);
+  font-weight: 500;
+  opacity: 0.95;
+  max-width: 32rem;
+}
+
+.cdg-hero-ctas {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.cdg-link-b2b-muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.93rem;
+  color: rgba(246, 236, 218, 0.68);
+}
+
+.cdg-link-b2b-muted a {
+  color: var(--cdg-highlight);
+  text-decoration: underline;
+}
+
+.cdg-link-b2b-muted a:hover {
+  color: var(--cdg-cream);
+}
+
+/* Card visual tipo vitrine física — usa bg-line.svg como textura autorizada na pasta images */
+.cdg-product-showcase {
+  position: relative;
+  padding: clamp(28px, 6vw, 48px);
+  border-radius: 22px;
+  background: linear-gradient(155deg, var(--cdg-card), #1a1714 55%, #0f0f0f);
+  border: 1px solid rgba(245, 216, 135, 0.2);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(246, 236, 218, 0.06);
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cdg-showcase-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-repeat: no-repeat;
+  background-position: center 40%;
+  background-size: 120% auto;
+  pointer-events: none;
+}
+
+.cdg-mug-diagram {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: end;
+  width: 100%;
+  max-width: 380px;
+}
+
+.cdg-mug-body {
+  position: relative;
+  width: clamp(148px, 28vw, 188px);
+  height: clamp(174px, 30vw, 215px);
+  margin: 0 auto 0 auto;
+  background: radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.16), transparent 52%),
+    linear-gradient(170deg, #3d3428 0%, #28231d 52%, #1a1714);
+  border-radius: 14px 14px 28px 28px;
+  border: 2px solid rgba(245, 216, 135, 0.45);
+  box-shadow: inset 0 -36px 50px rgba(0, 0, 0, 0.35),
+    -8px 12px 0 rgba(0, 0, 0, 0.35);
+}
+
+.cdg-mug-body::before {
+  content: "";
+  position: absolute;
+  right: -32px;
+  top: 25%;
+  width: 52px;
+  height: 90px;
+  border: solid 13px rgba(245, 216, 135, 0.4);
+  border-left: none;
+  border-radius: 0 50% 50% 0;
+  box-sizing: border-box;
+}
+
+.cdg-mug-front {
+  position: absolute;
+  left: 12%;
+  right: 28%;
+  top: 42%;
+  height: 32%;
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 237, 196, 0.45), transparent 72%),
+    linear-gradient(180deg, rgba(217, 120, 48, 0.35), transparent);
+  border: 1px dashed rgba(245, 216, 135, 0.5);
+}
+
+.cdg-steam-group {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -32px;
+  width: 64px;
+  height: 40px;
+  pointer-events: none;
+}
+
+.cdg-steam {
+  position: absolute;
+  bottom: 0;
+  width: 12px;
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(180deg, transparent, rgba(246, 236, 218, 0.2));
+}
+
+.cdg-steam:nth-child(1) {
+  left: 8px;
+}
+.cdg-steam:nth-child(2) {
+  left: 28px;
+  height: 85%;
+}
+.cdg-steam:nth-child(3) {
+  left: 46px;
+  height: 95%;
+}
+
+.cdg-mini-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 8px;
+}
+
+.cdg-mini-tile {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(18, 16, 14, 0.65);
+  border: 1px solid rgba(245, 216, 135, 0.25);
+}
+
+.cdg-mini-tile-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cdg-highlight);
+  margin-bottom: 4px;
+}
+
+.cdg-mini-tile-meta {
+  font-size: 0.85rem;
+  color: rgba(246, 236, 218, 0.88);
+  line-height: 1.4;
+}
+
+.cdg-showcase-chip {
+  position: absolute;
+  top: -10px;
+  right: clamp(14px, 4vw, 28px);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, var(--cdg-highlight), var(--cdg-orange));
+  color: #1a1510;
+  box-shadow: 0 8px 24px rgba(217, 120, 48, 0.35);
+  z-index: 2;
+}
+
+/* Faixa categorias */
+.cdg-categories {
+  padding: clamp(22px, 4vw, 38px) 0;
+  background: linear-gradient(90deg, rgba(217, 120, 48, 0.12), rgba(24, 22, 20, 0.95));
+  border-top: 1px solid rgba(245, 216, 135, 0.12);
+  border-bottom: 1px solid rgba(245, 216, 135, 0.12);
+}
+
+.cdg-cat-head {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.cdg-cat-head span {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(245, 216, 135, 0.32);
+  color: var(--cdg-highlight);
+}
+
+.cdg-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 18px);
+}
+
+.cdg-cat-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.cdg-category-pill {
+  flex: 1 1 160px;
+  min-width: 140px;
+  max-width: 280px;
+  padding: 16px 20px;
+  text-align: center;
+  border-radius: 18px;
+  background: rgba(18, 16, 14, 0.88);
+  border: 1px solid rgba(245, 216, 135, 0.2);
+  text-decoration: none !important;
+  color: var(--cdg-cream) !important;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+@media (max-width: 991px) {
+  .cdg-cat-grid {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .cdg-category-pill {
+    flex: 1 0 70%;
+    max-width: 85%;
+    min-width: 200px;
+  }
+}
+
+.cdg-category-pill:hover {
+  transform: translateY(-2px);
+  border-color: var(--cdg-highlight);
+}
+
+.cdg-category-pill strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: var(--cdg-highlight);
+}
+
+.cdg-category-pill small {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(246, 236, 218, 0.7);
+}
+
+.cdg-category-pill--narrow {
+  padding: 10px 16px;
+  min-width: 120px;
+  flex: 1 1 auto;
+  max-width: none;
+}
+
+/* Como funciona */
+.cdg-steps {
+  counter-reset: cdg-step;
+}
+
+.cdg-steps .cdg-step {
+  position: relative;
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(28, 26, 24, 0.88);
+  border: 1px solid rgba(245, 216, 135, 0.15);
+  height: 100%;
+}
+
+.cdg-steps .cdg-step::before {
+  counter-increment: cdg-step;
+  content: counter(cdg-step);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  font-weight: 800;
+  color: #1f1a13;
+  background: linear-gradient(135deg, var(--cdg-highlight), var(--cdg-orange));
+  box-shadow: 0 4px 14px rgba(217, 120, 48, 0.35);
+}
+
+.cdg-steps .cdg-step h3 {
+  font-size: 1.06rem;
+  margin-bottom: 10px;
+  color: var(--cdg-cream);
+}
+
+/* Seções típicas marketplace */
+.cdg-section-label {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  color: rgba(26, 18, 10, 0.95);
+  background: linear-gradient(120deg, var(--cdg-highlight), var(--cdg-orange));
+}
+
+.cdg-vendor-chip-card {
+  height: 100%;
+  padding: 28px;
+  border-radius: 22px;
+  background: rgba(26, 24, 22, 0.82);
+  border: 1px solid rgba(245, 216, 135, 0.16);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cdg-vendor-chip-card:hover {
+  border-color: rgba(245, 216, 135, 0.4);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+}
+
+.cdg-vendor-chip-card .cdg-mini-tile-meta {
+  min-height: 3.8em;
+}
+
+.cdg-vendor-name {
+  margin-bottom: 8px;
+  color: var(--cdg-highlight);
+}
+
+.cdg-finale-banner {
+  border-radius: 24px;
+  padding: clamp(36px, 6vw, 56px);
+  background: radial-gradient(circle at 10% -20%, rgba(245, 216, 135, 0.18), transparent 45%),
+    linear-gradient(125deg, #2a261f, #171512);
+  border: 1px solid rgba(245, 216, 135, 0.22);
+  text-align: center;
+}
+
+.cdg-finale-banner .tf-title-heading,
+.cdg-finale-title {
+  color: var(--cdg-cream);
+}
+
+/* Product cards físicos — foto placeholder com textura SVG */
+.cdg-thumb-physical {
+  background: radial-gradient(circle at 50% 0%, rgba(245, 216, 135, 0.08), transparent 55%), #1c1d1f;
+}
+
+.cdg-strip-narrow-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Helpers de espaçamento (compatível com tema legado Bootstrap) */
+.cdg-mb-hero-col {
+  margin-bottom: clamp(2.25rem, 5vw, 3.25rem);
+}
+
+@media (min-width: 992px) {
+  .cdg-mb-hero-lg-0 {
+    margin-bottom: 0;
+  }
+}
+
+.cdg-py-42 {
+  padding-top: 42px;
+  padding-bottom: 42px;
+}
+
+.cdg-pt-36 {
+  padding-top: 36px;
+}
+
+.cdg-pt-steps {
+  padding-top: clamp(56px, 9vw, 92px);
+}
+
+.cdg-pb-heading {
+  padding-bottom: clamp(42px, 7vw, 62px);
+}
+
+.cdg-vendor-gap {
+  margin-bottom: 28px;
+}
+
+.cdg-empty-vendors-pad {
+  padding-top: clamp(52px, 10vw, 72px);
+  padding-bottom: clamp(52px, 10vw, 72px);
+}
+
+.cdg-pb-products-head {
+  padding-bottom: clamp(36px, 6vw, 54px);
+}
+
+.cdg-pb-mini {
+  padding-bottom: 26px;
+}
+
+.cdg-card-media-round {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.cdg-btn-block {
+  display: inline-flex !important;
+  width: 100%;
+  justify-content: center !important;
+  align-items: center;
+}
+
+/* Spacing página home */
+.pt-cdg-clear {
+  padding-top: clamp(92px, 14vw, 128px);
+}
+
+@media (max-width: 991px) {
+  .cdg-hero-title {
+    max-width: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .cdg-mug-diagram {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 24px;
+  }
+
+  .cdg-mini-stack {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .cdg-showcase-chip {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Marca topo / mobile header */
+.page-shell-cdg #site-logo .main-logo.cdg-brand-lockup,
+.page-shell-cdg #site-logo-inner .cdg-brand-lockup {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.22;
+}
+
+.page-shell-cdg .cdg-brand-text {
+  font-size: clamp(1.15rem, 2.4vw, 1.42rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: inherit;
+  text-decoration: none !important;
+}
+
+.page-shell-cdg.mobile-nav-visible .mobile-main-nav .cdg-brand-lockup {
+  align-items: flex-start;
+}
+
+/* =============================================================================
+   Catálogo /caneca/produtos/ — corrige sidebar, largura útil e cards
+   Escopo: #page.market-page.cdga-catalog apenas.
+   Mantém wrap-box-card + col-item + tf-card-box.style-1 do tema visual.
+   ============================================================================= */
+
+/* Cabeçalho interno não cobre o conteúdo; fluxo normal */
+#page.market-page.cdga-catalog #market-header {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  width: 100%;
+  padding-top: 0 !important;
+  padding-bottom: 20px !important;
+  background: transparent;
+  z-index: 4;
+}
+
+#page.market-page.cdga-catalog {
+  padding-top: 88px;
+}
+
+#page.market-page.cdga-catalog .flat-tabs {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar: fluxo estável sem rodapé fixo empalmando menus */
+#page.market-page.cdga-catalog .section-menu-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 28px !important;
+}
+
+#page.market-page.cdga-catalog .section-menu-left .box-logo {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+#page.market-page.cdga-catalog .section-menu-left .box-logo .cdg-text-logo__title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+}
+
+#page.market-page.cdga-catalog .section-menu-left .box-logo .cdg-text-logo__tag {
+  font-size: 0.7rem;
+  opacity: 0.72;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+#page.market-page.cdga-catalog .section-menu-left .over-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Abas superiores: dropdown ancorado, sem cobrir lista */
+#page.market-page.cdga-catalog .widget-tabs.cdga-catalog-tabs-scope {
+  position: relative;
+  padding-top: 52px;
+}
+
+#page.market-page.cdga-catalog .widget-tabs.cdga-catalog-tabs-scope .tf-soft {
+  position: static;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+#page.market-page.cdga-catalog .widget-menu-tab {
+  position: relative;
+  z-index: 2;
+}
+
+/* Mais largura útil para 3–4 cards por linha (tema usa max-width ~1100px) */
+#page.market-page.cdga-catalog .content-tabs .wrapper-content .inner-content {
+  max-width: min(1440px, 100%);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Grade do tema visual: garante colunas estáveis e evita texto em coluna */
+#page.market-page.cdga-catalog .wrap-box-card .col-item {
+  min-width: 240px;
+}
+
+/* Imagens tipo vitrine (~235×244 tema), proporcionais e sem faixa branca vazia */
+#page.market-page.cdga-catalog .tf-card-box.style-1 .card-media {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#page.market-page.cdga-catalog .tf-card-box.style-1 .card-media img {
+  width: 100%;
+  max-width: 235px;
+  height: auto;
+  aspect-ratio: 235 / 244;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+  background-color: #1d1d1d;
+}
+
+/* Carrossel: mesma proporção de mídia */
+#page.market-page.cdga-catalog .cdg-carousel-market-scope .tf-card-box.style-4 .card-media img {
+  width: 100%;
+  max-width: 235px;
+  height: auto;
+  aspect-ratio: 235 / 244;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+  background-color: #1d1d1d;
+}
+
+#page.market-page.cdga-catalog .cdg-carousel-market-scope .tf-card-box.style-4 .card-media {
+  text-align: center;
+}
+
+/* Títulos e parceiro: texto horizontal, sem quebras agressivas */
+#page.market-page.cdga-catalog .tf-card-box .name,
+#page.market-page.cdga-catalog .tf-card-box .name a {
+  word-break: normal !important;
+  overflow-wrap: break-word;
+  line-height: 1.35;
+}
+
+#page.market-page.cdga-catalog .tf-card-box.style-1 .name a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#page.market-page.cdga-catalog .tf-card-box .author .info h6,
+#page.market-page.cdga-catalog .tf-card-box .author .info h6 a {
+  word-break: normal !important;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+}
+
+/* Preço legível ao lado do rótulo */
+#page.market-page.cdga-catalog .tf-card-box.style-1 .meta-info.flex {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+}
+
+#page.market-page.cdga-catalog .tf-card-box.style-1 .meta-info .price.gem {
+  flex-shrink: 0;
+  word-break: normal !important;
+  white-space: normal;
+}
+
+/* CTA lista (hover tema) — garante espaço ao texto longo */
+#page.market-page.cdga-catalog .tf-card-box.style-1 .button-place-bid .tf-button {
+  min-height: 44px;
+  padding-left: 18px;
+  padding-right: 18px;
+  white-space: normal;
+}
+
+/* Carrossel: meta-info com preço + CTA lado a lado com quebra suave em telas baixas */
+#page.market-page.cdga-catalog .tf-card-box.style-4 .meta-info > div:first-child {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+#page.market-page.cdga-catalog .tf-card-box.style-4 .meta-info.flex.items-center.justify-between {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+  row-gap: 12px;
+}
+
+#page.market-page.cdga-catalog .tf-card-box.style-4 .meta-info .button-place-bid {
+  flex: 1 1 220px;
+  min-width: min(260px, 100%);
+}
+
+#page.market-page.cdga-catalog .tf-card-box.style-4 .meta-info .button-place-bid .tf-button {
+  width: 100%;
+  min-height: 44px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 10px 14px;
+  white-space: normal;
+}
+
+#page.market-page.cdga-catalog .cdg-price-marker {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ddf247;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+#page.market-page.cdga-catalog .wishlist-button {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  #page.market-page.cdga-catalog {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  #page.market-page.cdga-catalog .widget-tabs.cdga-catalog-tabs-scope .tf-soft {
+    justify-content: flex-start;
+  }
+
+  #page.market-page.cdga-catalog .wrap-box-card .col-item {
+    min-width: 100%;
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  #page.market-page.cdga-catalog .wrap-box-card {
+    margin-left: 0 !important;
+  }
+}

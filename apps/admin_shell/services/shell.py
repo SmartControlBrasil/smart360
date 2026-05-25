@@ -398,7 +398,32 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                     ],
                 },
                 {"label": "Marketplace Analytical", "icon": "flask", "url_name": "admin-shell:module-page", "slug": "marketplace-analytical"},
-                {"label": "Caneca de Garagem", "icon": "bag", "url_name": "admin-shell:module-page", "slug": "caneca-de-garagem"},
+                {
+                    "label": "Caneca de Garagem",
+                    "icon": "bag",
+                    "children": [
+                        {
+                            "label": "Visão geral",
+                            "icon": "grid",
+                            "url_name": "admin-shell:caneca-dashboard",
+                            "match_names": ["admin-shell:caneca-dashboard"],
+                            "permission_domain": "dashboard",
+                            "permission_action": "view",
+                        },
+                        {
+                            "label": "Pedidos / Orçamentos",
+                            "icon": "bag",
+                            "url_name": "admin-shell:caneca-order-list",
+                            "match_names": [
+                                "admin-shell:caneca-order-list",
+                                "admin-shell:caneca-order-detail",
+                                "admin-shell:caneca-order-status",
+                            ],
+                            "permission_domain": "dashboard",
+                            "permission_action": "view",
+                        },
+                    ],
+                },
             ],
         },
         {

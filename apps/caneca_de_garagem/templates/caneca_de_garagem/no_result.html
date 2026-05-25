@@ -1,0 +1,125 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Nenhum resultado{% endblock %}
+
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="page-title no-result">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 data-wow-delay="0s" class="wow fadeInUp heading text-center">Nenhum resultado</h1>
+                <p data-wow-delay="0.1s" class="wow fadeInUp">Não encontramos combinações exatas nos personalizados públicos combinados físicos agora.
+                    <span>Experimente outro termo</span>
+                    ou fale diretamente com a curadoria.</p>
+                <div data-wow-delay="0.2s" class="wow fadeInUp widget-search">
+                    <form action="{% url 'caneca_de_garagem:product_list' %}" method="get" role="search" class="search-form relative">
+                        <input type="search" class="search-field style-2"
+                            placeholder="Buscar coleção, SKU ou tema…" value="{{ request.GET.q|default_if_none:'' }}" name="q"
+                            title="Buscar por" required="">
+                        <button class="search search-submit" type="submit" title="Buscar">
+                            <i class="icon-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section featured-item style-bottom pb-140">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section pb-20">
+                    <h2 class="tf-title ">Você pode gostar destes combinados físicos já publicados</h2>
+                    <a href="{% url 'caneca_de_garagem:market-explore' %}" class="">Ver vitrine combinada<i class="icon-arrow-right2"></i></a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="featured pt-10 swiper-container carousel" data-swiper='{
+                    "loop":false,
+                    "slidesPerView": 1,
+                    "observer": true,
+                    "observeParents": true,
+                    "spaceBetween": 30,
+                    "navigation": {
+                        "clickable": true,
+                        "nextEl": ".featured-item.style-bottom .swiper-button-next",
+                        "prevEl": ".featured-item.style-bottom .swiper-button-prev"
+                    },
+                    "pagination": {
+                        "el": ".featured-item.style-bottom .swiper-pagination",
+                        "clickable": true
+                    },
+                    "breakpoints": {
+                        "768": {
+                            "slidesPerView": 2,
+                            "spaceBetween": 30
+                        },
+                        "1024": {
+                            "slidesPerView": 3,
+                            "spaceBetween": 30
+                        },
+                        "1300": {
+                            "slidesPerView": 4,
+                            "spaceBetween": 30
+                        }
+                    }
+                }'>
+                    <div class="swiper-wrapper">
+                        {% for row in suggested_product_cards %}
+                        <div class="swiper-slide">
+                            <div class="tf-card-box style-1">
+                                <div class="card-media">
+                                    <a href="{{ row.detail_url }}">
+                                        <img src="{% static row.card_static %}" alt="{{ row.product.name }}">
+                                    </a>
+                                    <span class="wishlist-button icon-heart"></span>
+                                    <div class="button-place-bid">
+                                        <a href="{{ row.detail_url }}" class="tf-button"><span>Solicitar personalização</span></a>
+                                    </div>
+                                </div>
+                                <h5 class="name"><a href="{{ row.detail_url }}">{{ row.product.name }}</a></h5>
+                                <div class="author flex items-center">
+                                    <div class="avatar">
+                                        <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-small-07.png' %}" alt="">
+                                    </div>
+                                    <div class="info">
+                                        <span>Referência combinada física:</span>
+                                        <h6 class="gem style-1"><i class="icon-gem"></i>{{ row.product.price_label }}</h6>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="meta-info flex items-center justify-between">
+                                    <span class="text-bid">Prazo base</span>
+                                    <div class="button-place-bid">
+                                        <a href="{% url 'caneca_de_garagem:contact' %}" class="tf-button">Falar sobre prazo físico combinado<i class="icon-arrow-up-right2"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="swiper-slide">
+                            <div class="tf-card-box style-1">
+                                <div class="card-media">
+                                    <a href="{% url 'caneca_de_garagem:coming-soon' %}"><img src="{% static 'caneca_de_garagem/public/assets/images/box-item/card-item-01.jpg' %}" alt=""></a>
+                                </div>
+                                <h5 class="name"><a href="{% url 'caneca_de_garagem:coming-soon' %}">Em breve</a></h5>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

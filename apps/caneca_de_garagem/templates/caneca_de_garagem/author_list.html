@@ -1,0 +1,60 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Criadores e parceiros{% endblock %}
+
+{% block body_class %}header-fixed sticky-scroll{% endblock %}
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">Criadores em destaque
+                    <span class="dropdown" id="select-day">
+                        <span class="btn-selector tf-color">
+                            <span>Últimos 7 dias</span>
+                        </span>
+                        <ul>
+                            <li><span>Hoje</span></li>
+                            <li><span>Últimos 3 dias</span></li>
+                            <li><span>Últimos 7 dias</span></li>
+                        </ul>
+                    </span>
+                </h1>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li><a href="{% url 'caneca_de_garagem:market' %}">Marketplace</a></li>
+                    <li><a href="#">Criadores</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2">
+    <div class="themesflat-container">
+        <div class="row">
+            {% for slot in author_rank_grid %}
+            <div data-wow-delay="{{ slot.wow_delay }}" class="wow fadeInUp col-lg-4 col-md-6 mb-30">
+                <div class="tf-author-box style-2 type-1">
+                    <div class="author-avatar ">
+                        <img src="{% static slot.avatar_asset %}" alt="" class="avatar">
+                    </div>
+                    <div class="author-infor ">
+                        <h5><a href="{% url 'caneca_de_garagem:author-detail' slot.slug %}">{{ slot.name }}</a></h5>
+                        <h6 class="price gem style-1"><i class="icon-gem"></i>{{ slot.accent }}</h6>
+                    </div>
+                    <div class="order {{ slot.rank_shell_class }}">#{{ slot.rank_number }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

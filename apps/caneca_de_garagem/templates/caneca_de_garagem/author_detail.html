@@ -1,0 +1,128 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}{{ vendor_name }} · Criador/Parceiro{% endblock %}
+
+{% block body_class %}header-fixed sticky-scroll{% endblock %}
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">{{ vendor_name }}</h1>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li><a href="{% url 'caneca_de_garagem:author-list' %}">Criadores</a></li>
+                    <li>Perfil</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="themesflat-container pt-48 pb-64">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            {% if partner_is_factory %}
+            <span class="tf-button style-1 active h42 mb-32 d-inline-flex">Laboratório interno curado pela Caneca de
+                Garagem</span>
+            {% endif %}
+            <div class="heading-section pb-24">
+                <h2 class="tf-title">{{ vendor_name }}</h2>
+            </div>
+            <p class="cdg-muted" style="max-width:760px;line-height:1.7;">
+                {{ vendor_bio }}
+            </p>
+            <div class="flat-button flex flex-wrap gap16 pb-48 mt-36">
+                {% if whatsapp_quick_url %}
+                <a href="{{ whatsapp_quick_url }}" class="tf-button style-1 h48 mt-36" target="_blank"
+                    rel="noopener noreferrer">Continuar pela curadoria (WhatsApp)</a>
+                {% endif %}
+                <a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="tf-button style-1 h48 mt-36">Pedir linha corporativa</a>
+                <a href="{% url 'caneca_de_garagem:product_list' %}?q={{ vendor_slug|urlencode }}"
+                    class="tf-button active h48 mt-36">Ir para produtos combinados ao parceiro</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="themesflat-container pb-140">
+    <div class="heading-section-1 pb-48 wow fadeInUp">
+        <h2 class="tf-title pb-12">Itens relacionados ao parceiro</h2>
+        <p class="cdg-muted">Valores combinados após registrar briefing físico público nesta vitrine MVP.</p>
+    </div>
+    <div class="row">
+        {% for snap in vendor_products %}
+        <div class="col-md-6 col-xxl-3 mb-32">
+            <div class="tf-card-box style-4 h-100">
+                <div class="card-media">
+                    <a href="{% url 'caneca_de_garagem:product_detail' snap.slug %}">
+                        <img src="{% static 'caneca_de_garagem/public/assets/images/item-background/bg-line.svg' %}"
+                            alt="" class="img-fluid" style="background:#202122;padding:32px;">
+                    </a>
+                </div>
+                <h5 class="name">{{ snap.name }}</h5>
+                <p class="cdg-muted">{{ snap.price_label }}</p>
+                <a href="{% url 'caneca_de_garagem:product_detail' snap.slug %}"
+                    class="tf-button style-1">Solicitar personalização</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 cdg-muted">Este parceiro ainda não possui itens públicos na vitrine ampliada —
+            fale com a curadoria para combinar coleções combinadas físicas futuras.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="tf-section-2 pb-140">
+    <div class="themesflat-container">
+        <div class="heading-section pb-32">
+            <h2 class="tf-title pb-16">Explore também outros criadores combinados pelo ranking curatorial</h2>
+            <p class="cdg-muted">Seleção visual preservando o mesmo layout do tema marketplace original.</p>
+        </div>
+        <div class="row">
+            {% for tile in creator_style3_related %}
+            <div data-wow-delay="{{ tile.wow_delay }}" class="wow fadeInUp col-xl-2 col-sm-3 col-6 mb-30">
+                <div class="tf-author-box style-3 text-center">
+                    <div class="author-avatar ">
+                        <img src="{% static tile.avatar_asset %}" alt="{{ tile.display_name }}" class="avatar">
+                        <div class="number">{{ tile.numeric_order }}</div>
+                    </div>
+                    <div class="author-infor ">
+                        <h5><a href="{% url 'caneca_de_garagem:author-detail' tile.slug %}">{{ tile.display_name }}</a></h5>
+                        <h6 class="price gem style-1"><i class="icon-gem"></i>{{ tile.accent }}</h6>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="col-12">
+                <div class="widget-pagination pt-25">
+                    <ul class="justify-center">
+                        <li>
+                            <a href="{% url 'caneca_de_garagem:author-list' %}"><i class="icon-keyboard_arrow_left"></i></a>
+                        </li>
+                        <li class="active">
+                            <a href="{% url 'caneca_de_garagem:author-list' %}">1</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'caneca_de_garagem:coming-soon' %}">2</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'caneca_de_garagem:coming-soon' %}">3</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'caneca_de_garagem:coming-soon' %}"><i class="icon-keyboard_arrow_right"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

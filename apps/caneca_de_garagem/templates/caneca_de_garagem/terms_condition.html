@@ -1,0 +1,61 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Termos e condições{% endblock %}
+
+{% block body_class %}header-fixed sticky-scroll{% endblock %}
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">Termos e condições</h1>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li><a href="{% url 'caneca_de_garagem:author-list' %}">Criadores</a></li>
+                    <li>Contrato público MVP</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 widget-term-condition pb-140">
+    <div class="themesflat-container">
+        <div class="row flat-tabs">
+            <div class="col-md-3 col-12">
+                <div class="wrap-menu po-sticky">
+                    <div class="title">Seções rápidas</div>
+                    <ul class="menu-tab">
+                        <li class="item-title active"><span class="inner">1. Marketplace curado físico</span></li>
+                        <li class="item-title"><span class="inner">2. Produção sob demanda</span></li>
+                        <li class="item-title"><span class="inner">3. Arte, imagem e marcas</span></li>
+                        <li class="item-title"><span class="inner">4. Tiragens combinadas por parceiro</span></li>
+                        <li class="item-title"><span class="inner">5. Direito de usar o site</span></li>
+                        <li class="item-title"><span class="inner">6. Responsabilidades do cliente</span></li>
+                        <li class="item-title"><span class="inner">7. Direitos sobre conteúdo enviado</span></li>
+                        <li class="item-title"><span class="inner">8. Preferências de contato</span></li>
+                        <li class="item-title"><span class="inner">9. Mudanças e aviso legal simples</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9 col-12">
+                <div class="content-tab po-sticky-footer">
+                    {% for paragraph in cdg_terms_blocks %}
+                    <div class="content-inner{% if forloop.first %} active{% endif %}">
+                        <div class="date">Atualização interna combinada pela curadoria</div>
+                        <p>{{ paragraph }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

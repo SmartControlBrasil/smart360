@@ -66,3 +66,6 @@ ecom/Ecom_v4.1_Unzip-First/2.Development_Source_Frontend_LTR/
 *.fig
 .venv/
 test.sqlite3-journal
+
+# Temporary template sources
+open9/

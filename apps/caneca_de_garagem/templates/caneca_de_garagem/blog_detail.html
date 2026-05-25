@@ -1,0 +1,324 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} — Blog da Caneca{% endblock %}
+{% block meta_description %}{{ post.excerpt }}{% endblock %}
+
+{% block body_class %}header-fixed{% endblock %}
+{% block page_theme_class %}pt-40{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page blog-detail">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <ul class="breadcrumbs flex">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'caneca_de_garagem:blog-list' %}">Blog da Caneca</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section tf-blog-detail pb-48">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="wrapper col-md-8">
+                <div class="inner-content mr-20">
+                    <h2 class="title-post">{{ post.title }}</h2>
+                    <div class="meta-post flex justify-between mt-10 items-center">
+                        <div class="author flex items-center justify-between">
+                            <div class="avatar">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-box-01.jpg' %}"
+                                    alt="{{ post.author }}">
+                            </div>
+                            <div class="info">
+                                <span>Publicado por:</span>
+                                <h6><a href="#">{{ post.author }}</a></h6>
+                            </div>
+                        </div>
+                        <div class="meta-info flex">
+                            <div class="item art active">{{ post.category }}</div>
+                            <div class="item date">{{ post.date_display }}</div>
+                            <div class="item comment">0 Comentários</div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="title">{{ post.intro_lead }}</div>
+                    <div class="image">
+                        <img src="{% static post.hero_image_asset %}" alt="{{ post.title }}">
+                    </div>
+                    <div class="inner-post">
+                        <h3 class="heading">{{ post.section1_heading }}</h3>
+                        <p>{{ post.section1_lead_paragraph }}</p>
+                        <blockquote>
+                            <span class="icon-quote"></span>
+                            <p>{{ post.quote_text }}</p>
+                        </blockquote>
+                        <div class="image-box">
+                            <img src="{% static post.mid_image_asset %}" alt="">
+                        </div>
+                        <p>{{ post.section1_closing_paragraph }}</p>
+                    </div>
+                    <div class="inner-post style-1">
+                        <h3 class="heading ">{{ post.section2_heading }}</h3>
+                        <p>{{ post.section2_opening_paragraph }}</p>
+                        <div class="image-box">
+                            <div class="w-full">
+                                <img src="{% static post.detail_pair_assets.0 %}" alt="">
+                            </div>
+                            <div class="w-full">
+                                <img src="{% static post.detail_pair_assets.1 %}" alt="">
+                            </div>
+                        </div>
+                        <p>{{ post.section2_middle_paragraph }}</p>
+                        <p>{{ post.section2_closing_paragraph }}</p>
+                    </div>
+                    <div class="divider style-1"></div>
+                    <div class="bottom flex justify-between items-center">
+                        <div class="widget-tag flex items-center">
+                            <h3 class="title-widget">Tags:</h3>
+                            <ul class="flex flex-wrap gap4 items-center">
+                                {% for t in post.tags %}
+                                <li><a href="#">{{ t }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="widget-social">
+                            <ul class="flex">
+                                <li><a href="#" class="icon-facebook"></a></li>
+                                <li><a href="#" class="icon-twitter"></a></li>
+                                <li><a href="#" class="icon-linkedin2"></a></li>
+                                <li><a href="#" class="icon-instagram"></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="related-post">
+                        <div class="prev">
+                            {% if prev_post %}
+                            <a href="{% url 'caneca_de_garagem:blog-detail' prev_post.slug %}"><i
+                                    class="icon-keyboard_arrow_left"></i>Post anterior</a>
+                            <div class="action items-center left flex mt-16">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/blog/related-01.jpg' %}"
+                                    alt="{{ prev_post.title }}">
+                                <div class="content">
+                                    <h5>{{ prev_post.title }}</h5>
+                                    <div class="meta-info flex">
+                                        <div class="item date">{{ prev_post.date_display }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <a href="#"><i class="icon-keyboard_arrow_left"></i>Post anterior</a>
+                            <div class="action items-center left flex mt-16">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/blog/related-01.jpg' %}" alt="">
+                                <div class="content">
+                                    <h5>Primeira publicação</h5>
+                                    <div class="meta-info flex">
+                                        <div class="item date">—</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="next text-end">
+                            {% if next_post %}
+                            <a href="{% url 'caneca_de_garagem:blog-detail' next_post.slug %}">Próximo post<i
+                                    class="icon-keyboard_arrow_right"></i></a>
+                            <div class="action items-center right flex mt-16">
+                                <div class="content">
+                                    <h5>{{ next_post.title }}</h5>
+                                    <div class="meta-info flex justify-end">
+                                        <div class="item date">{{ next_post.date_display }}</div>
+                                    </div>
+                                </div>
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/blog/related-02.jpg' %}"
+                                    alt="{{ next_post.title }}">
+                            </div>
+                            {% else %}
+                            <a href="#">Próximo post<i class="icon-keyboard_arrow_right"></i></a>
+                            <div class="action items-center right flex mt-16">
+                                <div class="content">
+                                    <h5>Última publicação</h5>
+                                    <div class="meta-info flex justify-end">
+                                        <div class="item date">—</div>
+                                    </div>
+                                </div>
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/blog/related-02.jpg' %}" alt="">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="widget-comment">
+                        <h3>Comentários (5)</h3>
+                        <ul>
+                            <li class="comment-box">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-user-01.jpg' %}"
+                                    alt="">
+                                <div class="comment-right">
+                                    <div class="top flex justify-between items-center">
+                                        <div class="info">
+                                            <h5>Marina Couto</h5>
+                                        </div>
+                                        <span>Seg, 18 Mar </span>
+                                    </div>
+                                    <p class="">Precisávamos resolver embalagens para kits mistos sem surpresa visual na entrega física — o texto ajudou a alinhar expectativas antes da primeira prova.</p>
+                                    <a href="#">Responder</a>
+                                </div>
+                            </li>
+                            <li class="comment-box rep">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-user-02.jpg' %}"
+                                    alt="">
+                                <div class="comment-right">
+                                    <div class="top flex justify-between items-center">
+                                        <div class="info">
+                                            <h5>Equipe Caneca de Garagem</h5>
+                                        </div>
+                                        <span>Seg, 18 Mar </span>
+                                    </div>
+                                    <p class="">Obrigado pelo feedback! Quando há variações de nome combinamos sempre uma planilha simples antes de liberar arquivo para tiragem oficial.</p>
+                                    <a href="#">Responder</a>
+                                </div>
+                            </li>
+                            <li class="comment-box">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-user-03.jpg' %}"
+                                    alt="">
+                                <div class="comment-right">
+                                    <div class="top flex justify-between items-center">
+                                        <div class="info">
+                                            <h5>Rafael Boeira</h5>
+                                        </div>
+                                        <span>Ter, 19 Mar </span>
+                                    </div>
+                                    <p class="">Gostei do recorte sobre produção física combinada entre parceiros. Explica por que combos com curadoria saem menos tortos quando o SLA é combinado antes.</p>
+                                    <a href="#">Responder</a>
+                                </div>
+                            </li>
+                            <li class="comment-box">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-user-04.jpg' %}"
+                                    alt="">
+                                <div class="comment-right">
+                                    <div class="top flex justify-between items-center">
+                                        <div class="info">
+                                            <h5>Carolina Alves</h5>
+                                        </div>
+                                        <span>Qua, 20 Mar </span>
+                                    </div>
+                                    <p class="">Combinamos onboarding com kit físico bem acabado e o artigo registrou exatamente o que combinamos antes da primeira prova: margens seguras e versão oficial de marca.</p>
+                                    <a href="#">Responder</a>
+                                </div>
+                            </li>
+                            <li class="comment-box">
+                                <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/avatar-user-04.jpg' %}"
+                                    alt="">
+                                <div class="comment-right">
+                                    <div class="top flex justify-between items-center">
+                                        <div class="info">
+                                            <h5>Yasmin Prado</h5>
+                                        </div>
+                                        <span>Ter, 19 Mar </span>
+                                    </div>
+                                    <p class="">Útil pensar cenários de reposição sem inflar tiragem inicial. Às vezes dá para segurar urgência apenas com comunicação bem fechada com o time físico.</p>
+                                    <a href="#">Responder</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="widget-reply">
+                        <h3 class="heading">
+                            Deixe um comentário
+                        </h3>
+                        <p>Seu e-mail não será publicado. Campos marcados com * são obrigatórios.</p>
+                        <form action="#" method="get" id="commentform" class="comment-form">
+                            <div class="flex justify-between">
+                                <fieldset class="name">
+                                    <input type="text" id="name" placeholder="Seu nome*" class="style-1" name="name"
+                                        tabindex="2" value="" aria-required="true" required>
+                                </fieldset>
+                                <fieldset class="email">
+                                    <input type="email" id="email" placeholder="Endereço de e-mail*" class="style-1"
+                                        name="email" tabindex="2" value="" aria-required="true" required>
+                                </fieldset>
+                            </div>
+                            <fieldset class="message">
+                                <textarea id="message" name="message" rows="4" placeholder="Seu comentário*"
+                                    class="style-1 m-0" tabindex="4" aria-required="true" required></textarea>
+                            </fieldset>
+                            <div class="btn-submit text-center">
+                                <button class="" type="button">
+                                    Enviar comentário
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="side-bar col-md-4">
+                <div class="widget-search">
+                    <form action="{% url 'caneca_de_garagem:product_list' %}" method="get" role="search"
+                        class="search-form relative">
+                        <input type="search" id="blog_search_sidebar_detail" class="search-field style-1"
+                            placeholder="Buscar…" value="" name="q" title="Buscar por" required="">
+                        <button class="search search-submit" type="submit" title="Buscar">
+                            <i class="icon-search"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="widget widget-categories">
+                    <h5 class="title-widget">Categorias</h5>
+                    <ul>
+                        {% for cat_name, cat_count in blog_sidebar_categories %}
+                        <li>
+                            <div class="cate-item"><a href="#">{{ cat_name }}</a></div>
+                            <div class="number">{{ cat_count }}</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="widget widget-related-posts">
+                    <h5 class="title-widget">Posts relacionados</h5>
+                    <div class="related-posts-item main">
+                        <div class="card-media">
+                            <img src="{% static blog_sidebar_featured.list_image_asset %}"
+                                alt="{{ blog_sidebar_featured.title }}">
+                        </div>
+                        <div class="meta-info flex">
+                            <div class="item art active">{{ blog_sidebar_featured.category }}</div>
+                            <div class="item date">{{ blog_sidebar_featured.date_display }}</div>
+                        </div>
+                        <h5><a href="{% url 'caneca_de_garagem:blog-detail' blog_sidebar_featured.slug %}">{{ blog_sidebar_featured.title }}</a></h5>
+                    </div>
+                    {% for p in blog_sidebar_small_posts %}
+                    <div class="related-posts-item">
+                        <div class="card-media">
+                            <img src="{% static p.list_image_asset %}" alt="{{ p.title }}">
+                        </div>
+                        <div class="card-content">
+                            <h5><a href="{% url 'caneca_de_garagem:blog-detail' p.slug %}">{{ p.title }}</a></h5>
+                            <div class="item date">{{ p.date_display }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="widget widget-tag ">
+                    <h5 class="title-widget">Tags populares</h5>
+                    <ul class="flex flex-wrap">
+                        {% for t in blog_sidebar_tags %}
+                        <li><a href="#" class="box-widget-tag">{{ t }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

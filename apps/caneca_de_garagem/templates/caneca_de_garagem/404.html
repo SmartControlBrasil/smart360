@@ -1,0 +1,27 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Página não encontrada{% endblock %}
+{% block meta_description %}A página solicitada não existe ou foi movida na Caneca de Garagem.{% endblock %}
+
+{% block body_class %}header-fixed counter-scroll{% endblock %}
+{% block footer_modifier_class %}hidden{% endblock %}
+
+{% block content %}
+<div class="section-404-page relative">
+    <div class="content">
+        4<span class="tf-color">0</span>4
+    </div>
+    <h2>Ops… não encontramos esta página</h2>
+    <p>
+        A rota pode ter sido alterada ou o endereço foi digitado de outro modo.<br>
+        Volte ao início ou explore o catálogo curado.
+    </p>
+    <div class="box-button justify-center flex flex-wrap pb-60">
+        <a href="{% url 'caneca_de_garagem:home' %}" class="tf-button w320 style-1 h50">Ir ao início<i
+                class="icon-arrow-up-right2"></i></a>
+        <a href="{% url 'caneca_de_garagem:product_list' %}" class="tf-button w320 style-1 h50">Ver produtos<i
+                class="icon-arrow-up-right2"></i></a>
+    </div>
+</div>
+{% endblock %}

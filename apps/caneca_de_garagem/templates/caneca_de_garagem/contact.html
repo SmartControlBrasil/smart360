@@ -1,0 +1,151 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Contato{% endblock %}
+{% block meta_description %}Fale com a Caneca de Garagem para pedidos personalizados, brindes corporativos, parcerias e ideias criativas.{% endblock %}
+
+{% block body_class %}counter-scroll{% endblock %}
+{% block page_theme_class %}pt-40 contact-us-page relative{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">Contato</h1>
+                <p class="text-center pb-20 wow fadeInUp mt-14" data-wow-delay="0.05s">
+                    Fale com a Caneca de Garagem para pedidos personalizados, brindes corporativos, parcerias e ideias criativas.
+                </p>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'caneca_de_garagem:contact' %}">Contato</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 contact-us">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <div class="widget-gg-map">
+                    <iframe title="Mapa de referência — Caneca de Garagem"
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=-47.0623%2C-23.5735%2C-46.6185%2C-23.4785&amp;layer=mapnik"
+                        width="100%" height="460" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 widget-box-icon">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-20">Informações</h2>
+                    <p class="pb-40">Feito na garagem. Criado por gente de verdade. Personalizado para marcar momentos.</p>
+                </div>
+            </div>
+            <div data-wow-delay="0s" class="wow fadeInUp col-md-4">
+                <div class="box-icon-item">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/box-icon/address.png' %}" alt="">
+                    <div class="title"><a href="{% url 'caneca_de_garagem:contact' %}">Atendimento</a></div>
+                    <p>Atendimento para personalizados, brindes corporativos e parcerias com criadores selecionados.</p>
+                </div>
+            </div>
+            <div data-wow-delay="0.1s" class="wow fadeInUp col-md-4">
+                <div class="box-icon-item">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/box-icon/email.png' %}" alt="">
+                    <div class="title"><a href="{% url 'caneca_de_garagem:contact' %}">E-mail</a></div>
+                    <p>Use o formulário ao lado: respondemos com orientação prática após registrar sua mensagem.</p>
+                </div>
+            </div>
+            <div data-wow-delay="0.2s" class="wow fadeInUp col-md-4">
+                <div class="box-icon-item">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/box-icon/phone.png' %}" alt="">
+                    <div class="title">
+                        {% if whatsapp_quick_url %}
+                        <a href="{{ whatsapp_quick_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                        {% else %}
+                        <a href="{% url 'caneca_de_garagem:contact' %}">WhatsApp</a>
+                        {% endif %}
+                    </div>
+                    <p>
+                        {% if whatsapp_quick_url %}
+                        Fale direto com a curadoria pelo WhatsApp quando precisar de retorno ágil.
+                        {% else %}
+                        Quando o número público estiver ativo, o atalho aparece no topo do site.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 widget-box-icon">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-20">Envie sua mensagem</h2>
+                    <p class="pb-40">Tem dúvida, ideia ou prazo apertado? Escreva abaixo — retornamos com o próximo passo.</p>
+                </div>
+            </div>
+            <div class="col-12">
+                {% if form.non_field_errors %}
+                <div class="alert alert-warning mb-24">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <form method="post" id="commentform" class="comment-form">
+                    {% csrf_token %}
+                    <div class="flex gap30">
+                        <fieldset class="name">
+                            {{ form.customer_name }}
+                            {% if form.customer_name.errors %}
+                            <div class="cdg-form-field-error">{{ form.customer_name.errors }}</div>
+                            {% endif %}
+                        </fieldset>
+                        <fieldset class="email">
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="cdg-form-field-error">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </fieldset>
+                        <fieldset class="subject">
+                            {{ form.whatsapp }}
+                            {% if form.whatsapp.errors %}
+                            <div class="cdg-form-field-error">{{ form.whatsapp.errors }}</div>
+                            {% endif %}
+                        </fieldset>
+                    </div>
+                    <fieldset class="subject">
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                        <div class="cdg-form-field-error">{{ form.subject.errors }}</div>
+                        {% endif %}
+                    </fieldset>
+                    <fieldset class="message">
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                        <div class="cdg-form-field-error">{{ form.message.errors }}</div>
+                        {% endif %}
+                    </fieldset>
+                    <div class="btn-submit">
+                        <button class="tf-button style-1" type="submit">Enviar mensagem <i
+                                class="icon-arrow-up-right2"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

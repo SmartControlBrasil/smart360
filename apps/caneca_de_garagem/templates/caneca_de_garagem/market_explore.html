@@ -1,0 +1,10 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Explorar personalizados{% endblock %}
+{% block meta_description %}Explore coleções físicas combinando canecas, vestuário, brindes e kits curados antes da tiragem oficial.{% endblock %}
+{% block body_class %}dashboard1{% endblock %}
+
+{% block market_layout %}
+{% include "caneca_de_garagem/includes/cdg_market_shell_core.html" with cdg_market_active_tab="explore" %}
+{% endblock %}

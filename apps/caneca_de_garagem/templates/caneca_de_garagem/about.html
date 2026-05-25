@@ -1,0 +1,491 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Sobre a Caneca de Garagem{% endblock %}
+{% block meta_description %}Marketplace curado de presentes personalizados, artesanato criativo e sublimação — quem somos, missão, visão e valores.{% endblock %}
+
+{% block body_class %}counter-scroll{% endblock %}
+{% block page_theme_class %}pt-40 about-us-page{% endblock %}
+{% block footer_modifier_class %}no-bg{% endblock %}
+
+{% block content %}
+
+<div class="page-title about-us relative">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12 pages-title">
+                <div class="content">
+                    <h1 data-wow-delay="0s" class="wow fadeInUp">Sobre a Caneca de Garagem</h1>
+                    <p data-wow-delay="0.1s" class="wow fadeInUp">
+                        Nascemos da ideia de transformar criatividade, produção sob demanda e tecnologia em uma plataforma
+                        para produtos personalizados feitos por gente de verdade.
+                    </p>
+                    <div data-wow-delay="0.2s" class="wow fadeInUp flat-button flex justify-center">
+                        <a href="{% url 'caneca_de_garagem:product_list' %}" class="tf-button style-1 h50 w190">Explorar catálogo
+                            <i class="icon-arrow-up-right2"></i></a>
+                    </div>
+                </div>
+                <div class="icon-background">
+                    <img class="absolute item1" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item11.png' %}" alt="">
+                    <img class="absolute item2" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item10.png' %}" alt="">
+                    <img class="absolute item3" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item12.png' %}" alt="">
+                    <img class="absolute item4" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item13.png' %}" alt="">
+                </div>
+                <div class="relative">
+                    <div class="swiper-container carousel3-type2" data-swiper='{
+                        "loop":false,
+                        "slidesPerView": 1,
+                        "observer": true,
+                        "observeParents": true,
+                        "spaceBetween": 12,
+                        "breakpoints": {
+                            "768": {
+                                "slidesPerView": 2
+                            },
+                            "1024": {
+                                "slidesPerView": 3
+                            }
+                        }
+                    }'>
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="tf-card-box style-7">
+                                    <div class="card-media">
+                                        <a href="{% url 'caneca_de_garagem:product_detail' primary_product_slug %}">
+                                            <img src="{% static 'caneca_de_garagem/public/assets/images/box-item/about-us-03.jpg' %}" alt="">
+                                        </a>
+                                    </div>
+                                    <div class="button-place-bid">
+                                        <a href="{% url 'caneca_de_garagem:product_detail' primary_product_slug %}" class="tf-button"><span>Solicitar personalização</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="tf-card-box style-7">
+                                    <div class="card-media">
+                                        <a href="{% url 'caneca_de_garagem:product_list' %}">
+                                            <img src="{% static 'caneca_de_garagem/public/assets/images/box-item/about-us-01.jpg' %}" alt="">
+                                        </a>
+                                    </div>
+                                    <div class="button-place-bid">
+                                        <a href="#" data-toggle="modal" data-target="#popup_curadoria" class="tf-button"><span>Solicitar personalização</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="tf-card-box style-7">
+                                    <div class="card-media">
+                                        <a href="{% url 'caneca_de_garagem:author-list' %}">
+                                            <img src="{% static 'caneca_de_garagem/public/assets/images/box-item/about-us-02.jpg' %}" alt="">
+                                        </a>
+                                    </div>
+                                    <div class="button-place-bid">
+                                        <a href="{% url 'caneca_de_garagem:author-list' %}" class="tf-button"><span>Ver criadores e parceiros</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="tf-card-box style-7">
+                                    <div class="card-media">
+                                        <a href="{% url 'caneca_de_garagem:b2b_quote' %}">
+                                            <img src="{% static 'caneca_de_garagem/public/assets/images/box-item/about-us-01.jpg' %}" alt="">
+                                        </a>
+                                    </div>
+                                    <div class="button-place-bid">
+                                        <a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="tf-button"><span>Orçamento B2B</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 counter">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <div class="counter__body-1">
+                    <div class="counter-1">
+                        <div class="number-counter">
+                            <span class="number" data-speed="3000" data-to="99" data-inviewport="yes">99</span>K+
+                        </div>
+                        <h6 class="title">Ideias virando arte personalizada</h6>
+                    </div>
+                    <div class="space">
+                        <svg width="80" height="19" viewBox="0 0 80 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.2" x="0.75" y="9.25" width="29.5" height="0.5" stroke="white" stroke-width="0.5" stroke-dasharray="4 2"></rect>
+                            <circle opacity="0.2" cx="40" cy="9.5" r="9" stroke="white"></circle>
+                            <circle opacity="0.2" cx="40" cy="9.5" r="4.5" fill="white"></circle>
+                            <rect opacity="0.2" x="49.75" y="9.25" width="29.5" height="0.5" stroke="white" stroke-width="0.5" stroke-dasharray="4 2"></rect>
+                        </svg>
+                    </div>
+                    <div class="counter-1">
+                        <div class="number-counter">
+                            <span class="number" data-speed="3000" data-to="72" data-inviewport="yes">72</span>K+
+                        </div>
+                        <h6 class="title">Briefings combinados com curadoria</h6>
+                    </div>
+                    <div class="space">
+                        <svg width="80" height="19" viewBox="0 0 80 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.2" x="0.75" y="9.25" width="29.5" height="0.5" stroke="white" stroke-width="0.5" stroke-dasharray="4 2"></rect>
+                            <circle opacity="0.2" cx="40" cy="9.5" r="9" stroke="white"></circle>
+                            <circle opacity="0.2" cx="40" cy="9.5" r="4.5" fill="white"></circle>
+                            <rect opacity="0.2" x="49.75" y="9.25" width="29.5" height="0.5" stroke="white" stroke-width="0.5" stroke-dasharray="4 2"></rect>
+                        </svg>
+                    </div>
+                    <div class="counter-1">
+                        <div class="number-counter">
+                            <span class="number" data-speed="3000" data-to="35" data-inviewport="yes">35</span>K+
+                        </div>
+                        <h6 class="title">Criadores &amp; parceiros na rede</h6>
+                    </div>
+                    <div class="space">
+                        <svg width="80" height="19" viewBox="0 0 80 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.2" x="0.75" y="9.25" width="29.5" height="0.5" stroke="white" stroke-width="0.5" stroke-dasharray="4 2"></rect>
+                            <circle opacity="0.2" cx="40" cy="9.5" r="9" stroke="white"></circle>
+                            <circle opacity="0.2" cx="40" cy="9.5" r="4.5" fill="white"></circle>
+                            <rect opacity="0.2" x="49.75" y="9.25" width="29.5" height="0.5" stroke="white" stroke-width="0.5" stroke-dasharray="4 2"></rect>
+                        </svg>
+                    </div>
+                    <div class="counter-1">
+                        <div class="number-counter">
+                            <span class="number" data-speed="3000" data-to="128" data-inviewport="yes">128</span>K+
+                        </div>
+                        <h6 class="title">Personalizados já produzidos</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="themesflat-container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+                <div class="heading-section-1 pb-40 pt-60">
+                <p class="text-center">
+                    A Caneca de Garagem é um marketplace curado de personalizados. Começamos pela produção própria e por
+                    parceiros selecionados, conectando clientes a criadores, artesãos, designers e fornecedores capazes de
+                    transformar ideias em produtos físicos com identidade.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 widget-box-icon">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-40">Missão, visão e o que prezamos no dia a dia</h2>
+                </div>
+            </div>
+            <div data-wow-delay="0s" class="wow fadeInUp col-md-4">
+                <div class="box-icon-item">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/item-background/about-01.png' %}" alt="">
+                    <div class="title"><a href="{% url 'caneca_de_garagem:contact' %}">Missão</a></div>
+                    <p>Criar produtos personalizados que transformem memórias, marcas e momentos em presentes físicos de alto significado.</p>
+                </div>
+            </div>
+            <div data-wow-delay="0.1s" class="wow fadeInUp col-md-4">
+                <div class="box-icon-item">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/item-background/about-02.png' %}" alt="">
+                    <div class="title"><a href="{% url 'caneca_de_garagem:product_list' %}">Visão</a></div>
+                    <p>Ser uma plataforma brasileira de referência em presentes personalizados, produção sob demanda, artesanato criativo e sublimação.</p>
+                </div>
+            </div>
+            <div data-wow-delay="0.2s" class="wow fadeInUp col-md-4">
+                <div class="box-icon-item">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/item-background/about-03.png' %}" alt="">
+                    <div class="title"><a href="{% url 'caneca_de_garagem:b2b_quote' %}">Valores na prática</a></div>
+                    <p>Criatividade com propósito, qualidade no acabamento, prazo claro, atendimento humano, respeito ao trabalho autoral e tecnologia útil para vender, produzir e acompanhar pedidos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="widget-our-team">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-40">Curadoria, produção &amp; parceiros criativos</h2>
+                </div>
+            </div>
+            <div data-wow-delay="0s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-38 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-01.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Coordenação de curadoria</a></div>
+                    <div class="info">Seleção de coleções</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.1s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-38 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-02.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Produção &amp; acabamento</a></div>
+                    <div class="info">Fabricação própria</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.2s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-38 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-03.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Designer parceiro</a></div>
+                    <div class="info">Arte personalizada</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.3s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-38 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-04.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Artesão &amp; criador parceiro</a></div>
+                    <div class="info">Itens sob demanda</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.4s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-38 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-05.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Sublimação &amp; gráfica</a></div>
+                    <div class="info">Linha física viva</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.5s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-38 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-06.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Logística &amp; pós-venda</a></div>
+                    <div class="info">Acompanhamento humano</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-center">
+            <div data-wow-delay="0s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-40 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-07.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Conteúdo &amp; campanhas</a></div>
+                    <div class="info">Comunicação de coleção</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.1s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-40 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-08.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Gestão comercial</a></div>
+                    <div class="info">Volumes B2B</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.2s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-40 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-09.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Fornecedor de matéria‑prima</a></div>
+                    <div class="info">Insumos &amp; brindes</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.3s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-40 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-10.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Gestão tecnológica</a></div>
+                    <div class="info">Pedidos &amp; status</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div data-wow-delay="0.4s" class="wow fadeInUp col-md-2 col-6">
+                <div class="our-team-item pb-40 text-center">
+                    <img src="{% static 'caneca_de_garagem/public/assets/images/avatar/team-11.png' %}" alt="">
+                    <div class="name"><a href="{% url 'caneca_de_garagem:author-list' %}">Compliance &amp; qualidade</a></div>
+                    <div class="info">Padrões de entrega</div>
+                    <div class="widget-social">
+                        <ul class="flex justify-center">
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-facebook"></a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-twitter"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="tf-button style-1 h50 w190 m-auto">Quero ser parceiro<i class="icon-arrow-up-right2"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 wrap-accordion pt-80">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-40">Perguntas frequentes</h2>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="flat-accordion">
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle">
+                        <h6 class="toggle-title">1. O que diferencia uma Caneca de Garagem dos marketplaces genéricos?</h6>
+                        <div class="toggle-content">
+                            <p>Somos um marketplace de personalizados com curadoria humana: conectamos clientes a criadores selecionados, com foco em acabamento, prazo combinado e acompanhamento real do pedido — não apenas uma vitrine automatizada sem contexto físico.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle">
+                        <h6 class="toggle-title">2. Como garantem que minha arte personalizada saia como combinado?</h6>
+                        <div class="toggle-content">
+                            <p>O fluxo passa por alinhamento de briefing, prévia quando aplicável e produção com controle de qualidade. Você sempre conversa com pessoas que entendem sublimação, gravação física ou impressão especial — não apenas um formulário isolado.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle">
+                        <h6 class="toggle-title">3. Quanto tempo leva um pedido típico de produto personalizado?</h6>
+                        <div class="toggle-content">
+                            <p>O prazo varia por coleção e complexidade da personalização (quantidade de nomes variações, provas, materiais especiais). Anunciamos estimativas por produto e reforçamos combinados no primeiro contato, para você planejar datas de entrega ou eventos corporativos.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle">
+                        <h6 class="toggle-title">4. Quem são os criadores ou parceiros listados?</h6>
+                        <div class="toggle-content">
+                            <p>Integramos produção própria e criadores externos com reputação compatível — artesãos, designers gráficos, fornecedores de brindes e estúdios de impressão especializados, todos alinhados à proposta da Caneca de Garagem.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle">
+                        <h6 class="toggle-title">5. Posso acompanhar o status das minhas encomendas?</h6>
+                        <div class="toggle-content">
+                            <p>Sim. Usamos tecnologia para organizar fluxos internos de produção e manter comunicação transparente sobre etapas, sem abandonar canais humanos como WhatsApp e e‑mail sempre que você precisar de detalhes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="flat-accordion2">
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle2">
+                        <h6 class="toggle-title">6. Vocês trabalham pedidos grandes para empresas e eventos?</h6>
+                        <div class="toggle-content">
+                            <p>Sim — temos fluxo específico para orçamentos B2B, kits co-branded e campanhas com múltiplas unidades físicas ou variações de nome. Solicite pela página de linha corporativa ou fale direto pela central de contato.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle2">
+                        <h6 class="toggle-title">7. Respeito ao trabalho autoral e uso de marca do cliente?</h6>
+                        <div class="toggle-content">
+                            <p>Tratamos arquivos e identidades conforme combinado juridicamente no briefing. Materiais só entram na produção com autorização clara para reprodução; mantemos comunicação objetiva quando for necessário ajustar proporções ou limites de impressão física.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle2">
+                        <h6 class="toggle-title">8. Como funciona cobrança e formas criativas de pagamento parcelado?</h6>
+                        <div class="toggle-content">
+                            <p>O checkout e condições comerciais seguem políticas vigentes anunciadas no produto ou proposta corporativa. Para volumes grandes, podemos combinar antecipações ou marcos criativos (prova • produção • expedição) que reduzam incerteza para os dois lados.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle2">
+                        <h6 class="toggle-title">9. O que exatamente entendemos como “produto personalizado” aqui?</h6>
+                        <div class="toggle-content">
+                            <p>São objetos físicos produzidos ou finalizados com identidade própria: nomes gravados em metal, arte sublimática em cerâmica, kits com cartões dedicados, camisetas sob curadoria, brindes de eventos e outras coleções que carreguem memória ou marca institucional.</p>
+                        </div>
+                    </div>
+                    <div data-wow-delay="0s" class="wow fadeInUp flat-toggle2">
+                        <h6 class="toggle-title">10. Como entro como criador ou fornecedor no marketplace?</h6>
+                        <div class="toggle-content">
+                            <p>Use o formulário para parceiros criativos ou a linha B2B. Nossa curadoria analisa capacidade técnica, prazos médios realistas e alinhamento de qualidade física antes de publicar coleções públicas dentro da marca Caneca de Garagem.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="content">
+                    <div class="text">Ainda tem alguma dúvida?</div>
+                    <p>Não encontrou o que precisa?
+                        <a href="{% url 'caneca_de_garagem:contact' %}" class="tf-color">Fale com a curadoria</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <div class="widget-income">
+                    <div class="title">
+                        Venda, produza e acompanhe pedidos com a plataforma
+                        <span class="tf-color">Caneca de Garagem</span>
+                    </div>
+                    <p>Marketplace curado de personalizados, artesanato criativo e linhas físicas sob demanda —
+                        com criadores humanos guiando cada etapa, do briefing à entrega.</p>
+                    <a href="{% url 'caneca_de_garagem:product_list' %}" class="tf-button style-1 h50 w190">Começar agora<i class="icon-arrow-up-right2"></i></a>
+                    <div class="image">
+                        <img class="iphone" src="{% static 'caneca_de_garagem/public/assets/images/box-icon/iphone.png' %}" alt="">
+                        <img class="icon-1" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item11.png' %}" alt="">
+                        <img class="icon-2" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item12.png' %}" alt="">
+                        <img class="icon-3" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item13.png' %}" alt="">
+                        <img class="icon-4" src="{% static 'caneca_de_garagem/public/assets/images/item-background/item14.png' %}" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'caneca_de_garagem/public/assets/js/countto.js' %}"></script>
+{% endblock %}

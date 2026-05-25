@@ -1,0 +1,10 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Minha coleção{% endblock %}
+{% block meta_description %}Visualize coleções físicas combinadas antes da tiragem oficial.{% endblock %}
+{% block body_class %}dashboard1{% endblock %}
+
+{% block market_layout %}
+{% include "caneca_de_garagem/includes/cdg_market_shell_core.html" with cdg_market_active_tab="tf-collection" %}
+{% endblock %}

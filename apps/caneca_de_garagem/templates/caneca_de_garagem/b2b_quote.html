@@ -1,0 +1,104 @@
+{% extends "caneca_de_garagem/base.html" %}
+
+{% block title %}Orçamento corporativo{% endblock %}
+
+{% block content %}
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12 text-center pb-72">
+                <h1 class="heading">Pedir orçamento corporativo</h1>
+                <p class="cdg-muted">Coletamos contexto institucional, uso e quantidade — retornamos proposta unindo fábrica
+                    interna e parceiros selecionados.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="themesflat-container pb-160">
+    <div class="row justify-content-center">
+        <div class="col-xxl-8 col-lg-10">
+            <div class="comment-form">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-warning">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <fieldset class="pb-24">
+                        <label>{{ form.organization_name.label_tag }}</label>
+                        {{ form.organization_name }}
+                        {{ form.organization_name.errors }}
+                    </fieldset>
+
+                    <fieldset class="pb-24">
+                        <label>{{ form.customer_name.label_tag }}</label>
+                        {{ form.customer_name }}
+                        {{ form.customer_name.errors }}
+                    </fieldset>
+
+                    <div class="flex gap30 pb-24 flex-wrap">
+                        <fieldset class="flex-grow" style="min-width:280px;">
+                            <label>{{ form.email.label_tag }}</label>
+                            {{ form.email }}
+                            {{ form.email.errors }}
+                        </fieldset>
+                        <fieldset class="flex-grow" style="min-width:280px;">
+                            <label>{{ form.whatsapp.label_tag }}</label>
+                            {{ form.whatsapp }}
+                            {{ form.whatsapp.errors }}
+                        </fieldset>
+                    </div>
+
+                    <fieldset class="pb-24">
+                        <label>{{ form.job_title_or_area.label_tag }}</label>
+                        {{ form.job_title_or_area }}
+                        {{ form.job_title_or_area.errors }}
+                    </fieldset>
+
+                    <div class="flex gap30 pb-24 flex-wrap">
+                        <fieldset class="flex-grow" style="min-width:240px;">
+                            <label>{{ form.quantity.label_tag }}</label>
+                            {{ form.quantity }}
+                            {{ form.quantity.errors }}
+                        </fieldset>
+                        <fieldset class="flex-grow" style="min-width:240px;">
+                            <label>{{ form.usage_type.label_tag }}</label>
+                            {{ form.usage_type }}
+                            {{ form.usage_type.errors }}
+                        </fieldset>
+                    </div>
+
+                    <fieldset class="pb-24">
+                        <label>{{ form.artwork_need.label_tag }}</label>
+                        {{ form.artwork_need }}
+                        {{ form.artwork_need.errors }}
+                    </fieldset>
+
+                    <fieldset class="pb-24">
+                        <label>{{ form.message_or_phrase.label_tag }}</label>
+                        {{ form.message_or_phrase }}
+                        {{ form.message_or_phrase.errors }}
+                    </fieldset>
+
+                    <fieldset class="pb-48">
+                        <label>{{ form.observations.label_tag }}</label>
+                        {{ form.observations }}
+                        {{ form.observations.errors }}
+                    </fieldset>
+
+                    {% if whatsapp_quick_url %}
+                    <p class="cdg-muted pb-36"><a href="{{ whatsapp_quick_url }}" target="_blank"
+                            rel="noopener noreferrer">Preferir já abrir pelo WhatsApp? Toque aqui.</a></p>
+                    {% endif %}
+
+                    <button class="tf-button style-1" type="submit">
+                        Registrar pedido B2B (sem cobrança online agora)<i class="icon-arrow-up-right2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

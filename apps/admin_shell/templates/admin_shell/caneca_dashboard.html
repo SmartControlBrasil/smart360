@@ -1,0 +1,57 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+<section class="widget-card mb-24">
+    <header class="widget-card-header">
+        <div>
+            <h2>{{ page_title }}</h2>
+            <p>{{ page_description }}</p>
+        </div>
+    </header>
+    <div class="widget-card-body">
+        {% if kpis_fallback_all_zero %}
+        <p class="shell-text-muted mb-16">
+            KPIs usando models <code class="shell-text-muted">MarketplaceOrder</code>,
+            <code class="shell-text-muted">ProductionJob</code>,
+            <code class="shell-text-muted">MarketplaceProduct</code>,
+            <code class="shell-text-muted">MarketplaceVendor</code> e
+            <code class="shell-text-muted">CustomizationRequest</code> quando aplicável ao escopo de empresa — sem dados gravados aparece como zero.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="stat-grid">
+    {% for card in summary_cards %}
+    <article class="stat-card tone-{{ card.tone|default:'slate' }}">
+        <span class="stat-card-label">{{ card.label }}</span>
+        <strong>{{ card.value }}</strong>
+        {% if card.delta %}<p>{{ card.delta }}</p>{% endif %}
+    </article>
+    {% endfor %}
+</section>
+
+<section class="widget-card mt-24">
+    <header class="widget-card-header">
+        <div>
+            <h2>Próximas ações</h2>
+            <p>Atalhos operacionais. Pedidos já disponíveis; demais fluxos em evolução.</p>
+        </div>
+    </header>
+    <div class="widget-card-body">
+        <ul class="health-grid" role="list" style="list-style: none; padding: 0; margin: 0;">
+            {% for item in future_actions %}
+            <li class="health-row" style="display: flex; justify-content: space-between; gap: var(--space-4); grid-template-columns: unset;">
+                <span style="font-weight: 600;">{{ item.label }}</span>
+                {% if item.soon %}
+                <span class="status-badge status-slate">Em breve</span>
+                {% else %}
+                {% if item.route_name %}
+                <a class="quick-action-button" href="{% url item.route_name %}">Abrir</a>
+                {% endif %}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

@@ -282,6 +282,8 @@ EMAIL_USE_TLS = env("EMAIL_USE_TLS", default="False", cast=bool)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@smart360.local")
 CONTACT_EMAIL = env("CONTACT_EMAIL", default="contato@smartcontrolbrasil.com.br")
 
+CANECA_DE_GARAGEM_WHATSAPP = env("CANECA_DE_GARAGEM_WHATSAPP", default="")
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = env("DJANGO_USE_X_FORWARDED_HOST", default="False", cast=bool)
 SECURE_SSL_REDIRECT = env("DJANGO_SECURE_SSL_REDIRECT", default="False", cast=bool)

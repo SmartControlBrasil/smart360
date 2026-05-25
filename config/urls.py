@@ -94,6 +94,10 @@ urlpatterns = [
     path("marketplace/", include(("apps.marketplace_ecom.urls", "marketplace_ecom"), namespace="marketplace_ecom")),
     path("", include(("apps.users.urls", "users"), namespace="users")),
     path("livia/", include(("apps.livia_assistant.urls", "livia_assistant"), namespace="livia_assistant")),
+    path(
+        "caneca/",
+        include(("apps.caneca_de_garagem.urls", "caneca_de_garagem"), namespace="caneca_de_garagem"),
+    ),
     path("", include(("apps.institutional.urls", "institutional"), namespace="institutional")),
     path("", include("apps.admin_shell.urls")),
 ]

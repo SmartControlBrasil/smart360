@@ -1,0 +1,10 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Orçamentos ativos{% endblock %}
+{% block meta_description %}Acompanhe propostas e respostas de personalização combinadas pela curadoria física da Caneca de Garagem.{% endblock %}
+{% block body_class %}dashboard1{% endblock %}
+
+{% block market_layout %}
+{% include "caneca_de_garagem/includes/cdg_market_shell_core.html" with cdg_market_active_tab="bid" %}
+{% endblock %}

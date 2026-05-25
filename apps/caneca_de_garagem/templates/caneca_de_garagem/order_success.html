@@ -1,0 +1,42 @@
+{% extends "caneca_de_garagem/base.html" %}
+
+{% block title %}Pedido registrado{% endblock %}
+
+{% block content %}
+<div class="themesflat-container pt-140 pb-200 text-center wow fadeInUp">
+    {% if order_code %}
+    <h1 class="tf-title-heading pb-24">Combinado! código {{ order_code }}</h1>
+    <p class="cdg-muted mx-auto pb-48" style="max-width:640px;line-height:1.7;">
+        Recebemos o pedido público usando o mesmo histórico comercial consolidado pela equipe operacional —
+        guarde esse código quando quiser mencionar rápido com o time de curadoria.
+    </p>
+    {% else %}
+    <h1 class="tf-title-heading pb-24">Obrigado!</h1>
+    <p class="cdg-muted pb-48">Consulte e-mail caso tenha sido informado — ou registre novo pedido sempre que precisar de
+        suporte rápido.</p>
+    {% endif %}
+
+    <div class="flat-button flex flex-wrap gap16 justify-content-center pb-72">
+        {% if whatsapp_follow_url %}
+        <a href="{{ whatsapp_follow_url }}" class="tf-button style-1 h54" target="_blank" rel="noopener noreferrer">
+            Continuar pelo WhatsApp
+            <i class="icon-arrow-up-right2"></i>
+        </a>
+        {% elif whatsapp_quick_url %}
+        <a href="{{ whatsapp_quick_url }}" class="tf-button style-1 h54" target="_blank" rel="noopener noreferrer">
+            Abrir WhatsApp da curadoria
+            <i class="icon-arrow-up-right2"></i>
+        </a>
+        {% endif %}
+        <a href="{% url 'caneca_de_garagem:home' %}" class="tf-button active h54">Voltar ao marketplace</a>
+    </div>
+
+    {% if whatsapp_label %}
+    <p class="cdg-muted">Número configurado atualmente nos ambientes Django: {{ whatsapp_label }}</p>
+    {% endif %}
+
+    <small class="cdg-muted">Nesta iteração pública não existem gateways de cobrança: quando avançamos na produção
+        física combinamos método de pagamento humano mesmo.</small>
+</div>
+
+{% endblock %}

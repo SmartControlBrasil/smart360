@@ -20,6 +20,12 @@ from apps.media_library.dashboard_views import (
     MediaAssetListView,
     MediaAssetUpdateView,
 )
+from apps.caneca_de_garagem.dashboard_views import (
+    CanecaGaragemDashboardView,
+    CanecaOrderDetailView,
+    CanecaOrderListView,
+    CanecaOrderStatusView,
+)
 from apps.smart_system.dashboard_views import (
     SmartSystemInspectionDivisionCreateView,
     SmartSystemInspectionDivisionDetailView,
@@ -318,6 +324,18 @@ urlpatterns = [
         "dashboard/growth/proposals/<int:proposal_id>/operational-forward/",
         GrowthCommercialProposalOperationalForwardView.as_view(),
         name="growth-proposal-operational-forward",
+    ),
+    path("dashboard/caneca/", CanecaGaragemDashboardView.as_view(), name="caneca-dashboard"),
+    path("dashboard/caneca/pedidos/", CanecaOrderListView.as_view(), name="caneca-order-list"),
+    path(
+        "dashboard/caneca/pedidos/<int:order_id>/",
+        CanecaOrderDetailView.as_view(),
+        name="caneca-order-detail",
+    ),
+    path(
+        "dashboard/caneca/pedidos/<int:order_id>/status/",
+        CanecaOrderStatusView.as_view(),
+        name="caneca-order-status",
     ),
     path("dashboard/livia/", LiviaDashboardView.as_view(), name="livia-dashboard"),
     path("dashboard/livia/conversations/", LiviaConversationListView.as_view(), name="livia-conversations"),

@@ -1,0 +1,463 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{% block title %}Caneca de Garagem{% endblock %} · marketplace curado</title>
+    <meta name="description"
+        content="{% block meta_description %}Marketplace curado de presentes personalizados, artesanato criativo e sublimação.{% endblock %}">
+    <link rel="shortcut icon" href="{% static 'caneca_de_garagem/public/assets/icon/Favicon.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'caneca_de_garagem/public/assets/icon/Favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'caneca_de_garagem/public/assets/css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'caneca_de_garagem/public/assets/css/responsive.css' %}">
+    <style>
+        .cdg-text-logo {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-decoration: none;
+            color: inherit;
+            text-align: left;
+        }
+
+        .cdg-text-logo:hover {
+            opacity: 0.92;
+        }
+
+        #site-logo .cdg-text-logo__title {
+            font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        #site-logo .cdg-text-logo__tag {
+            font-size: 0.68rem;
+            font-weight: 500;
+            opacity: 0.78;
+            line-height: 1.2;
+        }
+
+        .logo-footer .cdg-text-logo__title {
+            font-size: 1.05rem;
+        }
+
+        .logo-footer .cdg-text-logo__tag {
+            font-size: 0.62rem;
+        }
+
+        .inner-mobile-nav .cdg-text-logo__title {
+            font-size: 1.1rem;
+        }
+
+        .inner-mobile-nav .cdg-text-logo__tag {
+            font-size: 0.65rem;
+        }
+
+        .inner-canvas-nav .cdg-text-logo__title {
+            font-size: 1.1rem;
+        }
+
+        .inner-canvas-nav .cdg-text-logo__tag {
+            font-size: 0.65rem;
+        }
+
+        .cdg-form-field-error {
+            color: #d97830;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .cdg-soft-note {
+            text-align: center;
+            opacity: 0.85;
+            padding-bottom: 24px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="body {% block body_class %}{% endblock %}">
+
+    <div class="preload preload-container">
+        <div class="middle">
+            <div class="bar bar1"></div>
+            <div class="bar bar2"></div>
+            <div class="bar bar3"></div>
+            <div class="bar bar4"></div>
+            <div class="bar bar5"></div>
+            <div class="bar bar6"></div>
+            <div class="bar bar7"></div>
+            <div class="bar bar8"></div>
+        </div>
+    </div>
+
+    <div id="wrapper">
+
+        {% if layout_mode == 'market' %}
+        {% block market_layout %}{% endblock %}
+        {% else %}
+
+        <div id="page" class="{% block page_theme_class %}pt-40 home-1{% endblock %}">
+
+            <header id="header_main" class="header_1 header-fixed">
+                <div class="themesflat-container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="site-header-inner">
+                                <div class="wrap-box flex">
+                                    <div id="site-logo">
+                                        <div id="site-logo-inner">
+                                            <a href="{% url 'caneca_de_garagem:home' %}" rel="home" class="main-logo cdg-text-logo">
+                                                <span class="cdg-text-logo__title">Caneca de Garagem</span>
+                                                <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="mobile-button">
+                                        <span></span>
+                                    </div>
+                                    <nav id="main-nav" class="main-nav">
+                                        <ul id="menu-primary-menu" class="menu">
+                                            <li class="menu-item{% if request.resolver_match.url_name == 'home' %} current-menu-item{% endif %}">
+                                                <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                                            </li>
+                                            <li class="menu-item{% if request.resolver_match.url_name == 'about' %} current-menu-item{% endif %}">
+                                                <a href="{% url 'caneca_de_garagem:about' %}">Sobre</a>
+                                            </li>
+                                            <li class="menu-item menu-item-has-children{% with u=request.resolver_match.url_name|default:'' %}{% if u == 'explore-canecas' or u == 'explore-long-drink' or u == 'explore-camisetas' or u == 'explore-caneca-chopp' or u == 'market' or u == 'market-explore' or u == 'market-active-quote' or u == 'market-collection' or u == 'market-favorite' or u == 'market-orders-area' or u == 'market-history' or u == 'market-create' %} current-menu-item{% endif %}{% endwith %}">
+                                                <a>Explorar</a>
+                                                <ul class="sub-menu">
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'explore-canecas' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:explore-canecas' %}">Canecas</a></li>
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'explore-long-drink' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:explore-long-drink' %}">Long Drink</a></li>
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'explore-camisetas' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:explore-camisetas' %}">Camisetas</a></li>
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'explore-caneca-chopp' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:explore-caneca-chopp' %}">Caneca de Chopp</a></li>
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'market' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:market' %}">Marketplace</a></li>
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'market-collection' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:market-collection' %}">Coleções</a></li>
+                                                    <li class="menu-item{% if request.resolver_match.url_name == 'author-list' %} current-item{% endif %}"><a
+                                                            href="{% url 'caneca_de_garagem:author-list' %}">Criadores</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="menu-item{% if request.resolver_match.url_name == 'blog-list' or request.resolver_match.url_name == 'blog-detail' %} current-menu-item{% endif %}">
+                                                <a href="{% url 'caneca_de_garagem:blog-list' %}">Blog</a>
+                                            </li>
+                                            <li class="menu-item{% if request.resolver_match.url_name == 'contact' %} current-menu-item{% endif %}">
+                                                <a href="{% url 'caneca_de_garagem:contact' %}">Contato</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                    <div class="flat-wallet flex">
+                                        {% if whatsapp_quick_url %}
+                                        <div id="cdg-header-cta">
+                                            <a href="{{ whatsapp_quick_url }}" id="connectbtn"
+                                                class="tf-button style-1" target="_blank" rel="noopener noreferrer">
+                                                <span>Falar pela curadoria</span>
+                                                <i class="icon-wa"></i>
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                        <div id="cdg-header-login" class="ml-12">
+                                            <a href="{% url 'caneca_de_garagem:login' %}" class="tf-button style-1">
+                                                <span>Entrar</span>
+                                            </a>
+                                        </div>
+                                        <div class="header-search relative">
+                                            <a href="#" class="show-search">
+                                                <i class="icon-search"></i>
+                                            </a>
+                                            <div class="top-search">
+                                                <form action="{% url 'caneca_de_garagem:product_list' %}" method="get"
+                                                    role="search" class="search-form relative">
+                                                    <input type="search" id="site_search_public" class="search-field style-1"
+                                                        placeholder="Buscar produtos ou parceiros…" value="" name="q"
+                                                        title="Buscar por" required="">
+                                                    <button class="search search-submit" type="submit"
+                                                        title="Buscar">
+                                                        <i class="icon-search"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="canvas">
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="canvas-nav-wrap">
+                    <div class="overlay-canvas-nav"></div>
+                    <div class="inner-canvas-nav">
+                        <div class="side-bar">
+                            <a href="{% url 'caneca_de_garagem:home' %}" rel="home" class="main-logo cdg-text-logo">
+                                <span class="cdg-text-logo__title">Caneca de Garagem</span>
+                                <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
+                            </a>
+                            <div class="canvas-nav-close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="white" width="20" height="20"
+                                    viewBox="0 0 122.878 122.88">
+                                    <g>
+                                        <path
+                                            d="M1.426,8.313c-1.901-1.901-1.901-4.984,0-6.886c1.901-1.902,4.984-1.902,6.886,0l53.127,53.127l53.127-53.127 c1.901-1.902,4.984-1.902,6.887,0c1.901,1.901,1.901,4.985,0,6.886L68.324,61.439l53.128,53.128c1.901,1.901,1.901,4.984,0,6.886 c-1.902,1.902-4.985,1.902-6.887,0L61.438,68.326L8.312,121.453c-1.901,1.902-4.984,1.902-6.886,0 c-1.901-1.901-1.901-4.984,0-6.886l53.127-53.128L1.426,8.313z" />
+                                    </g>
+                                </svg>
+                            </div>
+                            <div class="widget-search mt-30">
+                                <form action="{% url 'caneca_de_garagem:product_list' %}" method="get" role="search"
+                                    class="search-form relative">
+                                    <input type="search" class="search-field style-1"
+                                        placeholder="Buscar produtos ou parceiros…" value="" name="q" title="Buscar por"
+                                        required="">
+                                    <button class="search search-submit" type="submit" title="Buscar">
+                                        <i class="icon-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="widget widget-menu style-4">
+                                <h5 class="title-widget">Menu</h5>
+                                <ul>
+                                    <li><a href="{% url 'caneca_de_garagem:home' %}">Início</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:about' %}">Sobre</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:explore-canecas' %}">Canecas</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:explore-long-drink' %}">Long Drink</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:explore-camisetas' %}">Camisetas</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:explore-caneca-chopp' %}">Caneca de Chopp</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:market' %}">Marketplace</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:market-collection' %}">Coleções</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:author-list' %}">Criadores</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:blog-list' %}">Blog</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:contact' %}">Contato</a></li>
+                                    <li><a href="{% url 'caneca_de_garagem:login' %}">Entrar</a></li>
+                                </ul>
+                            </div>
+                            <div class="widget">
+                                <h5 class="title-widget">Acesso rápido</h5>
+                                <div class="widget-social">
+                                    <ul class="flex">
+                                        <li><a href="{% url 'caneca_de_garagem:contact' %}" class="icon-vt"></a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:blog-list' %}" class="icon-twitter"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-nav-wrap">
+                    <div class="overlay-mobile-nav"></div>
+                    <div class="inner-mobile-nav">
+                        <a href="{% url 'caneca_de_garagem:home' %}" rel="home" class="main-logo cdg-text-logo">
+                            <span class="cdg-text-logo__title">Caneca de Garagem</span>
+                            <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
+                        </a>
+                        <div class="mobile-nav-close">
+                            <span class="btn-close-svg" aria-hidden="true">✕</span>
+                        </div>
+                        <nav id="mobile-main-nav" class="mobile-main-nav">
+                            <ul id="menu-mobile-menu" class="menu">
+                                <li class="menu-item{% if request.resolver_match.url_name == 'home' %} current-menu-item{% endif %}">
+                                    <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                                </li>
+                                <li class="menu-item{% if request.resolver_match.url_name == 'about' %} current-menu-item{% endif %}">
+                                    <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:about' %}">Sobre</a>
+                                </li>
+                                <li class="menu-item menu-item-has-children-mobile{% with u=request.resolver_match.url_name|default:'' %}{% if u == 'explore-canecas' or u == 'explore-long-drink' or u == 'explore-camisetas' or u == 'explore-caneca-chopp' or u == 'market' or u == 'market-explore' or u == 'market-active-quote' or u == 'market-collection' or u == 'market-favorite' or u == 'market-orders-area' or u == 'market-history' or u == 'market-create' %} current-menu-item{% endif %}{% endwith %}">
+                                    <a class="item-menu-mobile">Explorar</a>
+                                    <ul class="sub-menu-mobile">
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:explore-canecas' %}">Canecas</a></li>
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:explore-long-drink' %}">Long Drink</a></li>
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:explore-camisetas' %}">Camisetas</a></li>
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:explore-caneca-chopp' %}">Caneca de Chopp</a></li>
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:market' %}">Marketplace</a></li>
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:market-collection' %}">Coleções</a></li>
+                                        <li class="menu-item"><a href="{% url 'caneca_de_garagem:author-list' %}">Criadores</a></li>
+                                    </ul>
+                                </li>
+                                <li class="menu-item{% if request.resolver_match.url_name == 'blog-list' or request.resolver_match.url_name == 'blog-detail' %} current-menu-item{% endif %}">
+                                    <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:blog-list' %}">Blog</a>
+                                </li>
+                                <li class="menu-item{% if request.resolver_match.url_name == 'contact' %} current-menu-item{% endif %}">
+                                    <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:contact' %}">Contato</a>
+                                </li>
+                                <li class="menu-item{% if request.resolver_match.url_name == 'login' %} current-menu-item{% endif %}">
+                                    <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:login' %}">Entrar</a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div class="widget-search mt-30">
+                            <form action="{% url 'caneca_de_garagem:product_list' %}" method="get" role="search"
+                                class="search-form relative">
+                                <input type="search" class="search-field style-1" placeholder="Buscar…" value=""
+                                    name="q" title="Buscar por" required="">
+                                <button class="search search-submit" type="submit" title="Buscar">
+                                    <i class="icon-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {% if messages %}
+            <div class="themesflat-container mt-40">
+                {% for message in messages %}
+                <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+
+            <footer id="footer" class="{% block footer_modifier_class %}{% endblock %}">
+                <div class="themesflat-container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="footer-content flex flex-grow">
+                                <div class="widget-logo flex-grow">
+                                    <div class="logo-footer" id="logo-footer">
+                                        <a href="{% url 'caneca_de_garagem:home' %}" class="cdg-text-logo">
+                                            <span class="cdg-text-logo__title">Caneca de Garagem</span>
+                                            <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="widget widget-menu style-1">
+                                    <h5 class="title-widget">Marketplace</h5>
+                                    <ul>
+                                        <li><a href="{% url 'caneca_de_garagem:market' %}">Marketplace (visual)</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}">Todos os personalizados</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}?q=caneca">Canecas &amp; afins</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}?q=camiseta">Vestuário sob curadoria</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}?q=kit">Kits presente</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}?q=brinde">Brindes para eventos</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:author-list' %}">Criadores &amp; parceiros</a></li>
+                                    </ul>
+                                </div>
+                                <div class="widget widget-menu style-2">
+                                    <h5 class="title-widget">Recursos</h5>
+                                    <ul>
+                                        <li><a href="{% url 'caneca_de_garagem:contact' %}">Central de contato</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}">Linha corporativa</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}">Curadoria viva</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:author-list' %}">Parceiros oficiais</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_detail' primary_product_slug %}">Solicitar personalização</a></li>
+                                    </ul>
+                                </div>
+                                <div class="widget widget-menu style-3">
+                                    <h5 class="title-widget">Conta &amp; pedidos</h5>
+                                    <ul>
+                                        <li><a href="{% url 'caneca_de_garagem:author-list' %}">Perfis de criadores</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:product_list' %}">Pedidos &amp; catálogo</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}">Volume comercial</a></li>
+                                        <li><a href="{% url 'caneca_de_garagem:contact' %}">Falar com a curadoria</a></li>
+                                    </ul>
+                                </div>
+                                <div class="widget-last">
+                                    <div class="widget-menu style-4">
+                                        <h5 class="title-widget">Caneca de Garagem</h5>
+                                        <ul>
+                                            <li><a href="{% url 'caneca_de_garagem:home' %}">Manifesto do marketplace</a></li>
+                                            <li><a href="{% url 'caneca_de_garagem:about' %}">Sobre a Caneca</a></li>
+                                            <li><a href="{% url 'caneca_de_garagem:contact' %}">Suporte humano</a></li>
+                                        </ul>
+                                    </div>
+                                    <h5 class="title-widget mt-30">Acompanhe</h5>
+                                    <div class="widget-social">
+                                        <ul class="flex">
+                                            <li><a href="{% url 'caneca_de_garagem:product_list' %}" class="icon-facebook"></a></li>
+                                            <li><a href="{% url 'caneca_de_garagem:author-list' %}" class="icon-twitter"></a></li>
+                                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}" class="icon-vt"></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>© {% now "Y" %} Caneca de Garagem — marketplace curado</p>
+                        <ul class="flex">
+                            <li><a href="{% url 'caneca_de_garagem:terms' %}">Termos</a></li>
+                            <li><a href="{% url 'caneca_de_garagem:faq' %}">FAQ</a></li>
+                            <li><a href="{% url 'caneca_de_garagem:contact' %}">Política de contato</a></li>
+                            <li><a href="{% url 'caneca_de_garagem:b2b_quote' %}">Orçamentos</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+
+        {% endif %}
+
+        <div class="modal fade popup" id="popup_curadoria" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="modal-body">
+                        <div class="image">
+                            <img src="{% static 'caneca_de_garagem/public/assets/images/backgroup-section/popup.png' %}"
+                                alt="">
+                        </div>
+                        <div class="logo-rotate">
+                            <img src="{% static 'caneca_de_garagem/public/assets/images/item-background/item6-img.png' %}"
+                                alt="">
+                        </div>
+                        <h2>Receba novidades da curadoria</h2>
+                        <p>Assine para saber quando novas coleções físicas estiverem disponíveis.</p>
+                        <fieldset class="email">
+                            <input type="email" class="style-1" id="email_popup" placeholder="Seu e-mail*" name="email_hint"
+                                tabindex="2" value="" aria-required="true" required="">
+                        </fieldset>
+                        <a href="{% url 'caneca_de_garagem:contact' %}" class="tf-button style-1 h50">Falar com a equipe<i
+                                class="icon-arrow-up-right2"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="tf-mouse tf-mouse-outer"></div>
+    <div class="tf-mouse tf-mouse-inner"></div>
+
+    <div class="progress-wrap active-progress">
+        <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
+                style="transition: stroke-dashoffset 10ms linear 0s; stroke-dasharray: 307.919, 307.919; stroke-dashoffset: 286.138;">
+            </path>
+        </svg>
+    </div>
+
+    <script src="{% static 'caneca_de_garagem/public/assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/swiper.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/count-down.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/simpleParallax.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/gsap.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/SplitText.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/wow.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/ScrollTrigger.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/gsap-animation.js' %}"></script>
+    {% if layout_mode == 'market' %}
+    <script src="{% static 'caneca_de_garagem/public/assets/js/countto.js' %}"></script>
+    {% endif %}
+    <script src="{% static 'caneca_de_garagem/public/assets/js/tsparticles.min.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/tsparticles.js' %}"></script>
+    <script src="{% static 'caneca_de_garagem/public/assets/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

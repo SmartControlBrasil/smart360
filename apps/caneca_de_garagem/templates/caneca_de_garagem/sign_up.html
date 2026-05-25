@@ -1,0 +1,88 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Cadastro{% endblock %}
+{% block meta_description %}Crie sua conta na Caneca de Garagem — demonstração visual até a integração com o painel oficial.{% endblock %}
+
+{% block body_class %}counter-scroll{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">Cadastro</h1>
+                <p class="text-center pb-20 wow fadeInUp mt-14" data-wow-delay="0.05s">
+                    Formulário alinhado ao layout do tema; os dados não são gravados até o backend de contas ser ligado.
+                </p>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li>
+                        <span>Cadastro</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 pt-60 widget-box-icon">
+    <div class="themesflat-container w920">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-16">Abrir conta</h2>
+                    <p class="pb-40">Cadastre-se para acompanhar pedidos, coleções favoritas e comunicação com a curadoria.</p>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="widget-login">
+                    <form id="commentform" class="comment-form" action="#" method="get">
+                        <fieldset class="name">
+                            <label for="signup-name">Nome completo *</label>
+                            <input type="text" id="signup-name" placeholder="Seu nome" name="name_hint" tabindex="2"
+                                value="">
+                        </fieldset>
+                        <fieldset class="email">
+                            <label for="signup-email">E-mail *</label>
+                            <input type="email" id="signup-email" placeholder="voce@exemplo.com.br" name="email_hint"
+                                tabindex="2" value="">
+                        </fieldset>
+                        <fieldset class="password">
+                            <label for="signup-password">Senha *</label>
+                            <input class="password-input" type="password" id="signup-password"
+                                placeholder="No mínimo 8 caracteres" name="password_hint" tabindex="2" value="">
+                            <i class="icon-show password-addon" id="password-addon-signup" aria-hidden="true"></i>
+                        </fieldset>
+                        <fieldset class="password">
+                            <label for="signup-password2">Confirmar senha *</label>
+                            <input class="password-input" type="password" id="signup-password2"
+                                placeholder="Repita a senha" name="password2_hint" tabindex="2" value="">
+                            <i class="icon-show password-addon" id="password-addon-signup2" aria-hidden="true"></i>
+                            <div class="widget-category-checkbox">
+                                <label>Li e concordo com os <a href="{% url 'caneca_de_garagem:terms' %}">Termos</a> e políticas comunicadas pela curadoria
+                                    <input type="checkbox" name="terms_ack">
+                                    <span class="btn-checkbox"></span>
+                                </label>
+                            </div>
+                        </fieldset>
+                        <div class="btn-submit mb-30">
+                            <a href="{% url 'caneca_de_garagem:login' %}" class="tf-button style-1 h50 w-100">Concluir cadastro (visual)<i class="icon-arrow-up-right2"></i></a>
+                        </div>
+                    </form>
+                    <div class="other">ou</div>
+                    <p class="cdg-soft-note">
+                        Convites por parceria continuam sendo tratados também pelo WhatsApp ou pelo <a href="{% url 'caneca_de_garagem:b2b_quote' %}">orçamento B2B</a>.
+                    </p>
+                    <div class="no-account">Já tem conta?
+                        <a href="{% url 'caneca_de_garagem:login' %}" class="tf-color">Entrar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

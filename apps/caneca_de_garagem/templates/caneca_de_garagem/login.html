@@ -1,0 +1,76 @@
+{% extends "caneca_de_garagem/base.html" %}
+{% load static %}
+
+{% block title %}Entrar{% endblock %}
+{% block meta_description %}Acesso à conta na Caneca de Garagem — experiência visual de demonstração.{% endblock %}
+
+{% block body_class %}counter-scroll{% endblock %}
+
+{% block content %}
+
+<div class="flat-title-page">
+    <div class="themesflat-container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="heading text-center">Entrar</h1>
+                <p class="text-center pb-20 wow fadeInUp mt-14" data-wow-delay="0.05s">
+                    Tela preparada para a futura conta de cliente; por enquanto é apenas vitrine visual.
+                </p>
+                <ul class="breadcrumbs flex justify-center">
+                    <li class="icon-keyboard_arrow_right">
+                        <a href="{% url 'caneca_de_garagem:home' %}">Início</a>
+                    </li>
+                    <li>
+                        <span>Entrar</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tf-section-2 pt-60 widget-box-icon">
+    <div class="themesflat-container w920">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="heading-section-1">
+                    <h2 class="tf-title pb-16">Acesso ao marketplace</h2>
+                    <p class="pb-40">Informe dados de exemplo; o fluxo real de cadastro será conectado depois ao painel oficial.</p>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="widget-login">
+                    <form id="commentform" class="comment-form" action="#" method="get">
+                        <fieldset class="email">
+                            <label for="login-email">E-mail *</label>
+                            <input type="email" id="login-email" placeholder="voce@exemplo.com.br" name="email_hint"
+                                tabindex="2" value="" aria-required="true">
+                        </fieldset>
+                        <fieldset class="password">
+                            <label for="login-password">Senha *</label>
+                            <input class="password-input" type="password" id="login-password"
+                                placeholder="No mínimo 8 caracteres" name="password_hint" tabindex="2" value=""
+                                aria-required="true">
+                            <i class="icon-show password-addon" id="password-addon-login" aria-hidden="true"></i>
+                            <div class="forget-password">
+                                <a href="{% url 'caneca_de_garagem:contact' %}">Esqueci a senha (falar com a curadoria)</a>
+                            </div>
+                        </fieldset>
+                        <div class="btn-submit mb-30">
+                            <a href="{% url 'caneca_de_garagem:market' %}" class="tf-button style-1 h50 w-100">Continuar para o marketplace visual<i class="icon-arrow-up-right2"></i></a>
+                        </div>
+                    </form>
+                    <div class="other">ou</div>
+                    <p class="cdg-soft-note">
+                        Login com redes sociais e Single Sign-On entram quando a infraestrutura de contas for publicada.<br>
+                        <a href="{% url 'caneca_de_garagem:coming-soon' %}">Saiba quando estiver disponível</a>.
+                    </p>
+                    <div class="no-account">Não tem conta?
+                        <a href="{% url 'caneca_de_garagem:sign-up' %}" class="tf-color">Criar cadastro</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

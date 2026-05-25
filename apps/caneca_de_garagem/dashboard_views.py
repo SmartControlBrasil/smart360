@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Prefetch, Q, QuerySet, TextField
 from django.db.models.functions import Cast
 from django.http import HttpRequest, HttpResponse
@@ -60,6 +61,9 @@ class CanecaGaragemShellMixin(ShellContextMixin):
 
 # Valor gravado em MarketplaceOrder.metadata (origin/storefront).
 CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
+
+# Namespace `admin-shell` (apps.admin_shell.urls / app_name).
+CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION = "admin-shell:caneca-order-create-production"
 
 
 def _caneca_branded_metadata_q() -> Q:
@@ -638,6 +642,7 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
             ctx["metadata_pretty"] = "—"
 
         ctx["production_jobs"] = list(order.production_jobs.all()) if hasattr(order, "production_jobs") else []
+        ctx["can_create_caneca_production"] = len(ctx["production_jobs"]) == 0
         try:
             shipment = order.shipment_preparation
         except ObjectDoesNotExist:
@@ -670,6 +675,49 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["page_title"] = f"Pedido {order.code}"
         ctx["status_update_url"] = reverse("admin-shell:caneca-order-status", kwargs={"order_id": order.pk})
         return ctx
+
+
+class CanecaOrderCreateProductionView(CanecaGaragemShellMixin, View):
+    """POST apenas: cria um ProductionJob mínimo vinculado ao pedido (escopo Caneca)."""
+
+    http_method_names = ["post"]
+
+    def post(self, request: HttpRequest, order_id: int) -> HttpResponse:
+        from apps.caneca_de_garagem.models import ProductionJob
+        from apps.market_core.models import MarketplaceOrder
+
+        qs = caneca_marketplace_orders_queryset(request)
+        order_short = get_object_or_404(qs, pk=order_id)
+
+        with transaction.atomic():
+            locked = MarketplaceOrder.objects.select_for_update().get(pk=order_short.pk)
+            if locked.production_jobs.exists():
+                messages.info(request, "Este pedido já possui produção registrada (ProductionJob). Nada foi criado.")
+                return redirect(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": locked.pk}))
+
+            first_item = locked.items.order_by("id").select_related("product", "product__vendor", "vendor").first()
+            vendor = None
+            if first_item is not None:
+                vendor = first_item.vendor
+                if vendor is None and getattr(first_item, "product", None) is not None:
+                    vendor = first_item.product.vendor
+
+            ProductionJob.objects.create(
+                order=locked,
+                order_item=first_item,
+                vendor=vendor,
+                job_type=ProductionJob.JobType.ART_PREP,
+                status=ProductionJob.Status.QUEUED,
+                notes="Job criado manualmente pelo Admin Shell (Caneca de Garagem).",
+            )
+
+            status_choices_codes = {c for c, _ in MarketplaceOrder.Status.choices}
+            if MarketplaceOrder.Status.IN_PRODUCTION in status_choices_codes:
+                locked.status = MarketplaceOrder.Status.IN_PRODUCTION
+                locked.save(update_fields=["status", "updated_at"])
+
+        messages.success(request, "Job de produção criado com sucesso.")
+        return redirect(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order_short.pk}))
 
 
 class CanecaOrderStatusView(CanecaGaragemShellMixin, View):

@@ -10,6 +10,7 @@ from apps.companies.models import Company
 from apps.market_core.models import MarketplaceOrder
 
 from apps.caneca_de_garagem import dashboard_views
+from apps.caneca_de_garagem.models import ProductionJob
 from apps.caneca_de_garagem.views import FACTORY_VENDOR_SLUG
 
 User = get_user_model()
@@ -80,3 +81,40 @@ class TestCanecaPublicOrderDashboardFlow(TestCase):
         self.assertEqual(list_resp.status_code, 200)
         detail_resp = self.client.get(detail_url)
         self.assertEqual(detail_resp.status_code, 200)
+
+    def test_create_production_job_idempotent_queue_and_detail(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+        gen_url = reverse(
+            dashboard_views.CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION,
+            kwargs={"order_id": order.pk},
+        )
+
+        self.client.force_login(self.admin)
+        r1 = self.client.post(gen_url, follow=False)
+        self.assertEqual(r1.status_code, 302)
+        self.assertEqual(ProductionJob.objects.filter(order_id=order.pk).count(), 1)
+        job = ProductionJob.objects.get(order_id=order.pk)
+        self.assertEqual(job.job_type, ProductionJob.JobType.ART_PREP)
+        self.assertEqual(job.status, ProductionJob.Status.QUEUED)
+        order.refresh_from_db()
+        self.assertEqual(order.status, MarketplaceOrder.Status.IN_PRODUCTION)
+
+        r2 = self.client.post(gen_url, follow=False)
+        self.assertEqual(r2.status_code, 302)
+        self.assertEqual(ProductionJob.objects.filter(order_id=order.pk).count(), 1)
+
+        req = _request_with_session(self.admin)
+        self.assertTrue(dashboard_views.caneca_production_orders_queryset(req).filter(pk=order.pk).exists())
+
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        body = detail.content.decode().lower()
+        self.assertIn("art preparation", body)
+        self.assertIn(str(job.id).lower(), body)
+        self.assertNotIn("gerar produção".lower(), body)

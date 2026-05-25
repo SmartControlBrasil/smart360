@@ -72,10 +72,41 @@ def sqlite_database_config():
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="change-me-in-production")
 DEBUG = env("DJANGO_DEBUG", default="False", cast=bool)
 LIVIA_ASSISTANT_ENABLED = env("LIVIA_ASSISTANT_ENABLED", default="False", cast=bool)
+CANECA_LETICIA_WIDGET_ENABLED = env("CANECA_LETICIA_WIDGET_ENABLED", default="True", cast=bool)
 LIVIA_AI_PROVIDER = env("LIVIA_AI_PROVIDER", default="fallback")
 LIVIA_AI_MODEL = env("LIVIA_AI_MODEL", default="gpt-4o-mini")
 LIVIA_AI_TEMPERATURE = env("LIVIA_AI_TEMPERATURE", default="0.4", cast=float)
 LIVIA_AI_MAX_TOKENS = env("LIVIA_AI_MAX_TOKENS", default="500", cast=int)
+
+# Textos públicos da bolha Lívia (institucional). Em /caneca/ mescla com CANECA_LETICIA_BRANDING.
+LIVIA_CHAT_DEFAULT_BRANDING = {
+    "assistant_name": "Lívia",
+    "assistant_subtitle": "Assistente da Smart Control Brasil",
+    "opening_message": "Olá, eu sou a Lívia 👋 Como posso ajudar?",
+    "toggle_label": "Fale com a Lívia",
+    "placeholder_input": "Digite sua mensagem",
+    "typing_indicator": "{name} está digitando…",
+    "aria_input_label": "Mensagem para a Lívia",
+    "cta_primary_label": "",
+    "cta_secondary_label": "",
+    "cta_tertiary_label": "",
+}
+
+CANECA_LETICIA_BRANDING = {
+    "assistant_name": "Letícia",
+    "assistant_subtitle": "Assistente virtual da Caneca de Garagem",
+    "opening_message": (
+        "Olá! Eu sou a Letícia, assistente virtual da Caneca de Garagem. "
+        "Posso te ajudar a escolher canecas, kits personalizados ou montar uma ideia para presente."
+    ),
+    "toggle_label": "Fale com a Letícia",
+    "placeholder_input": "Digite sua mensagem",
+    "typing_indicator": "{name} está digitando…",
+    "aria_input_label": "Mensagem para a Letícia",
+    "cta_primary_label": "Quero personalizar uma caneca",
+    "cta_secondary_label": "Falar sobre kits e brindes",
+    "cta_tertiary_label": "Central de contato",
+}
 ENVIRONMENT = env("DJANGO_ENV", default="development")
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=list)
 CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS", default="", cast=list)

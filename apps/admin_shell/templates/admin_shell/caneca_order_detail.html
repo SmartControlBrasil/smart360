@@ -128,6 +128,45 @@
 <section class="panel-card mb-24">
     <header class="widget-card-header">
         <div>
+            <h2 style="margin:0;font-size:1rem;">Precificação / orçamento</h2>
+            <p style="margin:0.35rem 0 0;color:var(--shell-muted);">Total atual: <strong>{{ pricing_summary.total_display }}</strong></p>
+        </div>
+    </header>
+    <div class="widget-card-body">
+        <table class="data-table"><tbody>
+            <tr><th>Valor unitário manual</th><td>{{ pricing_summary.unit_price_display }}</td></tr>
+            <tr><th>Observações</th><td>{{ pricing_summary.notes|default:"—"|linebreaksbr }}</td></tr>
+        </tbody></table>
+        {% if can_price_caneca_order %}
+        <form method="post" action="{{ order_price_url }}" style="margin-top: var(--space-4);">
+            {% csrf_token %}
+            <div class="smart-filter-bar" style="grid-template-columns: repeat(2, minmax(160px, 1fr));">
+                <div class="filter-pill">
+                    <span class="filter-label">Valor unitário</span>
+                    <input class="chip" type="text" name="unit_price" value="{{ pricing_summary.unit_price }}" placeholder="Ex.: 49,90">
+                </div>
+                <div class="filter-pill">
+                    <span class="filter-label">Valor total</span>
+                    <input class="chip" type="text" name="total_amount" value="{{ pricing_summary.total }}" placeholder="Ex.: 99,80">
+                </div>
+                <div class="filter-pill" style="grid-column: 1 / -1;">
+                    <span class="filter-label">Observações do orçamento</span>
+                    <textarea class="chip" name="pricing_notes" rows="3" style="width: 100%;">{{ pricing_summary.notes }}</textarea>
+                </div>
+            </div>
+            <div class="page-actions" style="margin-top: var(--space-4);">
+                <button type="submit" class="quick-action-button primary">Salvar orçamento</button>
+            </div>
+        </form>
+        {% else %}
+        <p class="shell-text-muted" style="margin: var(--space-4) 0 0;">Pedidos entregues ou cancelados não podem ser precificados.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="panel-card mb-24">
+    <header class="widget-card-header">
+        <div>
             <h2 style="margin:0;font-size:1rem;">Histórico operacional</h2>
         </div>
     </header>
@@ -156,7 +195,7 @@
         <tr><th>Código</th><td>{{ order.code|default:"—" }}</td></tr>
         <tr><th>ID interno</th><td><code>{{ order.id }}</code></td></tr>
         <tr><th>Status</th><td><span class="status-badge status-sky">{{ order.get_status_display }}</span></td></tr>
-        <tr><th>Total</th><td>{{ order.total_amount|default:"—" }}</td></tr>
+        <tr><th>Total</th><td>{{ pricing_summary.total_display }}</td></tr>
         <tr><th>Pedido em</th><td>{% if order.ordered_at %}{{ order.ordered_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>
         <tr><th>Criado em</th><td>{% if order.created_at %}{{ order.created_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>
         <tr><th>Atualizado em</th><td>{% if order.updated_at %}{{ order.updated_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>

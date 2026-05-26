@@ -56,6 +56,7 @@
                     <th>Produto principal</th>
                     <th>Parceiro</th>
                     <th>Qtd.</th>
+                    <th>Total</th>
                     <th>Status</th>
                     <th>Pedido em</th>
                     <th></th>
@@ -71,6 +72,7 @@
                         <td>{{ o.shell_product_label }}</td>
                         <td>{{ o.shell_vendor_label }}</td>
                         <td>{{ o.shell_qty_display }}</td>
+                        <td>{{ o.shell_price_display }}</td>
                         <td>
                             {% if o.status == "pending" %}<span class="status-badge status-indigo">{{ o.get_status_display }}</span>
                             {% elif o.status == "paid" %}<span class="status-badge status-sky">{{ o.get_status_display }}</span>
@@ -86,7 +88,7 @@
                         <td><a href="{% url 'admin-shell:caneca-order-detail' o.id %}">Ver detalhe</a></td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="10">Nenhum pedido encontrado com os filtros atuais.</td></tr>
+                    <tr><td colspan="11">Nenhum pedido encontrado com os filtros atuais.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

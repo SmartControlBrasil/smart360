@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Any
 from urllib.parse import urlencode
 
@@ -15,7 +16,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.dateparse import parse_date
+from django.utils.dateparse import parse_date, parse_datetime
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 
@@ -65,6 +66,7 @@ CANECA_PUBLIC_ORIGIN_STOREFRONT = "caneca_de_garagem"
 
 # Namespace `admin-shell` (apps.admin_shell.urls / app_name).
 CANECA_ADMIN_URL_ORDER_CREATE_PRODUCTION = "admin-shell:caneca-order-create-production"
+CANECA_ADMIN_URL_ORDER_PRICE = "admin-shell:caneca-order-price"
 CANECA_ADMIN_URL_ORDER_COMPLETE = "admin-shell:caneca-order-complete"
 CANECA_ADMIN_URL_ORDER_DELIVER = "admin-shell:caneca-order-deliver"
 CANECA_ADMIN_URL_PRODUCTION_JOB_START = "admin-shell:caneca-production-job-start"
@@ -323,6 +325,60 @@ def _qty_total(order) -> int:
     return total
 
 
+def _caneca_decimal_from_post(raw: str | None) -> Decimal | None:
+    value = (raw or "").strip()
+    if "," in value:
+        value = value.replace(".", "").replace(",", ".")
+    if not value:
+        return None
+    try:
+        parsed = Decimal(value)
+    except (InvalidOperation, ValueError):
+        return None
+    if parsed <= 0:
+        return None
+    return parsed.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def _caneca_decimal_to_metadata(value: Decimal | None) -> str:
+    return str(value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)) if value is not None else ""
+
+
+def _caneca_money_display(value) -> str:
+    if value in (None, ""):
+        return "R$ 0,00"
+    try:
+        dec = Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    except (InvalidOperation, ValueError):
+        return str(value)
+    return f"R$ {dec:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def _caneca_order_pricing_metadata(order) -> dict[str, Any]:
+    md = getattr(order, "metadata", None)
+    return md if isinstance(md, dict) else {}
+
+
+def caneca_order_price_summary(order) -> dict[str, Any]:
+    md = _caneca_order_pricing_metadata(order)
+    total_raw = md.get("caneca_manual_total") or getattr(order, "total_amount", None)
+    unit_raw = md.get("caneca_manual_unit_price") or ""
+    return {
+        "total": total_raw,
+        "unit_price": unit_raw,
+        "total_display": _caneca_money_display(total_raw),
+        "unit_price_display": _caneca_money_display(unit_raw) if unit_raw else "—",
+        "notes": md.get("caneca_pricing_notes", ""),
+        "priced_at": md.get("caneca_priced_at", ""),
+    }
+
+
+def caneca_order_can_be_priced(order) -> bool:
+    from apps.market_core.models import MarketplaceOrder
+
+    return getattr(order, "status", "") not in {MarketplaceOrder.Status.CANCELLED, MarketplaceOrder.Status.DELIVERED}
+
+
 def _caneca_shell_market_order_status_class(status_val: str) -> str:
     mp = {
         "pending": "status-indigo",
@@ -383,6 +439,15 @@ def build_caneca_order_operational_timeline(order) -> list[dict[str, Any]]:
         f"Pedido {getattr(order, 'code', '')} registrado no marketplace Caneca.",
         getattr(order, "created_at", None),
         "status-indigo",
+    )
+    priced_at_raw = _caneca_order_pricing_metadata(order).get("caneca_priced_at")
+    priced_at = parse_datetime(priced_at_raw) if isinstance(priced_at_raw, str) else None
+    _caneca_add_timeline_event(
+        events,
+        "Pedido precificado",
+        "Orçamento manual registrado para o pedido.",
+        priced_at,
+        "status-emerald",
     )
 
     items = getattr(order, "items", None)
@@ -746,6 +811,7 @@ class CanecaOrderListView(CanecaGaragemShellMixin, ListView):
                 order.shell_qty_display = getattr(fi, "quantity", 0) or 0
             else:
                 order.shell_qty_display = 0
+            order.shell_price_display = caneca_order_price_summary(order)["total_display"]
 
     def get_context_data(self, **kwargs):
         from apps.market_core.models import MarketplaceOrder
@@ -901,6 +967,9 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["shipment_preparation"] = shipment
 
         ctx["qty_total"] = _qty_total(order)
+        ctx["pricing_summary"] = caneca_order_price_summary(order)
+        ctx["can_price_caneca_order"] = caneca_order_can_be_priced(order)
+        ctx["order_price_url"] = reverse(CANECA_ADMIN_URL_ORDER_PRICE, kwargs={"order_id": order.pk})
 
         customization_rows = []
         for it in order.items.all():
@@ -928,6 +997,70 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["order_complete_url"] = reverse(CANECA_ADMIN_URL_ORDER_COMPLETE, kwargs={"order_id": order.pk})
         ctx["order_deliver_url"] = reverse(CANECA_ADMIN_URL_ORDER_DELIVER, kwargs={"order_id": order.pk})
         return ctx
+
+
+class CanecaOrderPriceView(CanecaGaragemShellMixin, View):
+    """POST apenas: registra orçamento manual simples no pedido Caneca."""
+
+    http_method_names = ["post"]
+
+    def post(self, request: HttpRequest, order_id: int) -> HttpResponse:
+        from apps.market_core.models import MarketplaceOrder
+
+        order = get_object_or_404(caneca_marketplace_orders_queryset(request), pk=order_id)
+        detail_url = reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk})
+        if not caneca_order_can_be_priced(order):
+            messages.warning(request, "Pedidos entregues ou cancelados não podem ser precificados.")
+            return redirect(detail_url)
+
+        unit_price = _caneca_decimal_from_post(request.POST.get("unit_price"))
+        manual_total = _caneca_decimal_from_post(request.POST.get("total_amount"))
+        if unit_price is None and manual_total is None:
+            messages.warning(request, "Informe um valor unitário ou total positivo para salvar o orçamento.")
+            return redirect(detail_url)
+
+        notes = (request.POST.get("pricing_notes") or "").strip()
+        with transaction.atomic():
+            locked = MarketplaceOrder.objects.select_for_update().prefetch_related("items").get(pk=order.pk)
+            if not caneca_order_can_be_priced(locked):
+                messages.warning(request, "Pedidos entregues ou cancelados não podem ser precificados.")
+                return redirect(detail_url)
+
+            first_item = locked.items.order_by("id").first()
+            quantity = Decimal(str(getattr(first_item, "quantity", 1) or 1)) if first_item is not None else Decimal("1")
+            effective_unit = unit_price
+            effective_total = manual_total
+            if effective_total is None and effective_unit is not None:
+                effective_total = (effective_unit * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            if effective_unit is None and effective_total is not None and quantity > 0:
+                effective_unit = (effective_total / quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+            if first_item is not None and effective_unit is not None:
+                first_item.unit_price = effective_unit
+                first_item.save(update_fields=["unit_price", "total_price", "updated_at"] if any(field.name == "updated_at" for field in first_item._meta.fields) else ["unit_price", "total_price"])
+                if manual_total is None:
+                    effective_total = first_item.total_price
+
+            if effective_total is not None:
+                locked.total_amount = effective_total
+
+            md = locked.metadata if isinstance(locked.metadata, dict) else {}
+            md.update(
+                {
+                    "caneca_manual_total": _caneca_decimal_to_metadata(effective_total),
+                    "caneca_manual_unit_price": _caneca_decimal_to_metadata(effective_unit),
+                    "caneca_pricing_notes": notes,
+                    "caneca_priced_at": timezone.now().isoformat(),
+                }
+            )
+            locked.metadata = md
+            update_fields = ["total_amount", "metadata"]
+            if any(field.name == "updated_at" for field in MarketplaceOrder._meta.fields):
+                update_fields.append("updated_at")
+            locked.save(update_fields=update_fields)
+
+        messages.success(request, "Orçamento salvo com sucesso.")
+        return redirect(detail_url)
 
 
 class CanecaOrderCompleteView(CanecaGaragemShellMixin, View):

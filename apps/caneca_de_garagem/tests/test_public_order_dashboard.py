@@ -463,3 +463,115 @@ class TestCanecaPublicOrderDashboardFlow(TestCase):
         self.assertIn("Pedido entregue", body)
         self.assertIn("Pedido marcado como entregue.", body)
 
+    def test_caneca_order_price_valid_value_updates_order_item_metadata_and_views(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-price", kwargs={"order_id": order.pk}),
+            data={"unit_price": "42,90", "total_amount": "", "pricing_notes": "Orçamento manual aprovado."},
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 302)
+
+        order.refresh_from_db()
+        item = order.items.get()
+        self.assertEqual(str(order.total_amount), "42.90")
+        self.assertEqual(str(item.unit_price), "42.90")
+        self.assertEqual(str(item.total_price), "42.90")
+        md = order.metadata if isinstance(order.metadata, dict) else {}
+        self.assertEqual(md.get("caneca_manual_total"), "42.90")
+        self.assertEqual(md.get("caneca_manual_unit_price"), "42.90")
+        self.assertEqual(md.get("caneca_pricing_notes"), "Orçamento manual aprovado.")
+        self.assertTrue(md.get("caneca_priced_at"))
+
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        detail_body = detail.content.decode()
+        self.assertIn("Precificação / orçamento", detail_body)
+        self.assertIn("R$ 42,90", detail_body)
+        self.assertIn("Orçamento manual aprovado.", detail_body)
+        self.assertIn("Pedido precificado", detail_body)
+
+        list_resp = self.client.get(reverse("admin-shell:caneca-order-list"))
+        self.assertEqual(list_resp.status_code, 200)
+        self.assertIn("R$ 42,90", list_resp.content.decode())
+
+    def test_caneca_order_price_rejects_invalid_negative_value(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse("admin-shell:caneca-order-price", kwargs={"order_id": order.pk}),
+            data={"unit_price": "-10", "total_amount": "", "pricing_notes": "valor inválido"},
+            follow=False,
+        )
+        self.assertEqual(resp.status_code, 302)
+        order.refresh_from_db()
+        self.assertEqual(str(order.total_amount), "0.00")
+        md = order.metadata if isinstance(order.metadata, dict) else {}
+        self.assertNotIn("caneca_priced_at", md)
+
+    def test_caneca_order_price_blocks_delivered_and_cancelled_orders(self):
+        for status in (MarketplaceOrder.Status.DELIVERED, MarketplaceOrder.Status.CANCELLED):
+            slug = "kit-presentes-personalizados"
+            anon = Client()
+            anon.post(
+                reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+                data=_minimal_personalization_post_data(slug),
+            )
+            order = MarketplaceOrder.objects.latest("id")
+            order.status = status
+            order.save(update_fields=["status", "updated_at"])
+
+            self.client.force_login(self.admin)
+            resp = self.client.post(
+                reverse("admin-shell:caneca-order-price", kwargs={"order_id": order.pk}),
+                data={"unit_price": "39,90", "total_amount": "", "pricing_notes": "bloqueado"},
+                follow=False,
+            )
+            self.assertEqual(resp.status_code, 302)
+            order.refresh_from_db()
+            self.assertEqual(str(order.total_amount), "0.00")
+            md = order.metadata if isinstance(order.metadata, dict) else {}
+            self.assertNotIn("caneca_priced_at", md)
+
+    def test_caneca_order_timeline_shows_priced_event_from_metadata(self):
+        slug = "kit-presentes-personalizados"
+        anon = Client()
+        anon.post(
+            reverse("caneca_de_garagem:product_detail", kwargs={"slug": slug}),
+            data=_minimal_personalization_post_data(slug),
+        )
+        order = MarketplaceOrder.objects.latest("id")
+        md = order.metadata if isinstance(order.metadata, dict) else {}
+        md.update(
+            {
+                "caneca_manual_total": "88.00",
+                "caneca_manual_unit_price": "88.00",
+                "caneca_pricing_notes": "metadata direto",
+                "caneca_priced_at": timezone.now().isoformat(),
+            }
+        )
+        order.metadata = md
+        order.save(update_fields=["metadata", "updated_at"])
+
+        self.client.force_login(self.admin)
+        detail = self.client.get(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
+        self.assertEqual(detail.status_code, 200)
+        body = detail.content.decode()
+        self.assertIn("Pedido precificado", body)
+        self.assertIn("R$ 88,00", body)
+

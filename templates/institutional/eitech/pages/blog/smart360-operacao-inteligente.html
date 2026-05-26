@@ -1,14 +1,17 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Dados industriais e confiabilidade: como reduzir paradas com informação melhor | Smart Control Brasil{% endblock %}
+{% block meta_description %}Reduzir paradas exige mais do que registrar ocorrências: é preciso transformar dados industriais em análise de causa, prioridade e ação técnica.{% endblock %}
+
 {% block content %}
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 m-auto text-center">
-          <h1>Smart360: visão para uma operação mais inteligente</h1>
+          <h1>Dados industriais e confiabilidade: como reduzir paradas com informação melhor</h1>
           <div class="space20"></div>
-          <p>Categoria: Smart360 • Autor: Smart Control Brasil • Artigo técnico</p>
+          <p>Categoria: Confiabilidade operacional • Autor: Smart Control Brasil • Artigo técnico</p>
         </div>
       </div>
     </div>
@@ -18,16 +21,16 @@
     <div class="row">
       <div class="col-lg-8 m-auto">
         <div class="space40"></div>
-        <p>O Smart360 é um ecossistema em desenvolvimento para centralizar operação, manutenção, dados, relatórios, automação e IA aplicada ao negócio. A proposta é criar uma base modular que permita evoluir gradualmente conforme necessidade.</p>
+        <p>Reduzir paradas exige mais do que registrar ocorrências: é preciso transformar dados industriais em análise de causa, prioridade e ação técnica.</p>
         <div class="space20"></div>
-        <p>O foco é oferecer visibilidade 360°, reduzir retrabalho e fornecer base técnica para automações e assistentes inteligentes.</p>
+        <p>Histórico de alarmes, estados de máquina, intervenções, consumo e eventos de processo ajuda a identificar padrões e direcionar manutenção, retrofit e melhorias de automação.</p>
         <div class="space24"></div>
-        <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer o Smart360 <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico técnico <i class="fa-solid fa-arrow-right"></i></a>
         <div class="space60"></div>
         <h4>Posts relacionados</h4>
         <ul>
-          <li><a href="{% url 'institutional:blog_sistemas_web_operacao_moderna' %}">Sistemas web como base da operação moderna</a></li>
-          <li><a href="{% url 'institutional:blog_organizar_dados_antes_automatizar' %}">Por que organizar dados antes de automatizar</a></li>
+          <li><a href="{% url 'institutional:blog_supervisorio_industrial_dados_tempo_real' %}">Supervisório industrial: por que sua operação precisa enxergar dados em tempo real?</a></li>
+          <li><a href="{% url 'institutional:blog_organizar_sinais_dados_antes_automatizar' %}">Por que organizar sinais e dados antes de automatizar?</a></li>
         </ul>
       </div>
     </div>

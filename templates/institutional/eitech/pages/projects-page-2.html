@@ -1,8 +1,8 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Projetos — página 2 | Smart Control Brasil{% endblock %}
-{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em cybersecurity, marketing digital, sistemas web Django/Python e inteligência artificial aplicada ao atendimento e à operação.{% endblock %}
+{% block title %}Projetos de Automação Industrial — página 2 | Smart Control Brasil{% endblock %}
+{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em inversores, servoacionamentos, robótica, supervisório, energia, painéis elétricos e automação industrial.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -34,7 +34,7 @@
           <div class="inner-header text-center heading1">
             <h1>Projetos e frentes de entrega</h1>
             <div class="space16"></div>
-            <p class="text-white-50 px-lg-5">Soluções para proteger dados, fortalecer presença digital, organizar sistemas internos e aplicar inteligência artificial de forma prática na operação.</p>
+            <p class="text-white-50 px-lg-5">Soluções para modernizar máquinas, melhorar acionamentos, integrar robôs, supervisionar processos e transformar dados industriais em decisões mais seguras.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -54,18 +54,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case09.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Cybersecurity para empresas</p>
+              <p>Inversores de frequência e eficiência energética</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Acessos compartilhados, senhas repetidas, ausência de rotina de backup e baixa cultura de segurança podem transformar pequenas falhas em grandes riscos para a operação.</p>
+              <p>Motores operando sem controle adequado de velocidade, torque ou consumo podem gerar desperdício de energia, partidas agressivas, instabilidade de processo e desgaste prematuro.</p>
               <strong>Solução</strong>
-              <p>Mapeamento dos principais pontos de exposição, análise de acessos, dados, dispositivos e rotinas digitais, com priorização de melhorias aplicáveis à realidade da empresa.</p>
+              <p>Parametrização, substituição, diagnóstico e aplicação de inversores de frequência para bombas, ventiladores, esteiras, compressores, máquinas e processos industriais.</p>
               <strong>Resultado esperado</strong>
-              <p>Menos risco silencioso, mais controle sobre acessos e dados, melhor continuidade operacional e base organizada para evoluir a segurança digital por etapas.</p>
+              <p>Mais controle sobre motores, menor consumo de energia, partidas mais suaves, maior estabilidade operacional e melhor proteção dos equipamentos.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_cybersecurity_empresas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de risco <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:inversores_eficiencia_energetica' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico técnico <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -77,18 +77,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case11.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Sites, marketing e conteúdo</p>
+              <p>Servoacionamentos e controle de movimento</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Muitas empresas têm boa execução técnica, mas não conseguem transmitir autoridade, clareza e confiança no site, nas páginas de serviço ou nos canais digitais.</p>
+              <p>Máquinas que dependem de posicionamento, velocidade, sincronismo e repetibilidade podem perder performance quando utilizam acionamentos mal dimensionados ou sem ajuste fino.</p>
               <strong>Solução</strong>
-              <p>Estruturação de conteúdo, páginas comerciais, textos institucionais, SEO e comunicação digital alinhada à realidade técnica e ao posicionamento da empresa.</p>
+              <p>Aplicação, diagnóstico e ajuste de servoacionamentos para controle de movimento, posicionamento, sincronismo, precisão e melhoria de desempenho em máquinas industriais.</p>
               <strong>Resultado esperado</strong>
-              <p>Presença digital mais profissional, mensagem mais clara para o cliente, maior confiança na marca e melhor geração de oportunidades comerciais.</p>
+              <p>Mais precisão, ciclos mais estáveis, menor variação no processo, melhor repetibilidade e maior confiabilidade em aplicações de movimento.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_sites_marketing_conteudo' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico do site <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:servoacionamentos_motion_control' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Avaliar aplicação <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -100,18 +100,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case12.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Sistemas web Django/Python</p>
+              <p>Supervisório, SCADA e dados industriais</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Quando planilhas, controles manuais e ferramentas genéricas não acompanham mais a complexidade do negócio, a operação perde velocidade, rastreabilidade e segurança.</p>
+              <p>Sem supervisão adequada, alarmes, tendências e histórico de operação, a equipe trabalha no escuro e depende de percepção manual para entender falhas e desempenho.</p>
               <strong>Solução</strong>
-              <p>Desenvolvimento de sistemas web em Django/Python, com regras de negócio bem definidas, controle de usuários, registros organizados e evolução planejada por etapas.</p>
+              <p>Integração de supervisórios, coleta de dados, alarmes, registros de eventos, tendências, indicadores e visualização operacional para máquinas e processos industriais.</p>
               <strong>Resultado esperado</strong>
-              <p>Fluxos mais auditáveis, menos tarefas repetitivas, dados centralizados e possibilidade de integração gradual com dashboards, automação e processos operacionais.</p>
+              <p>Mais visibilidade sobre a operação, decisões mais rápidas, histórico técnico confiável e melhor base para manutenção, energia, produção e melhoria contínua.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_sistemas_web_django_python' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico do sistema <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:supervisorio_scada_dados_industriais' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico do processo <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -123,18 +123,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case13.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>IA no atendimento e operação</p>
+              <p>Robótica industrial e células automatizadas</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Equipes gastam tempo com perguntas repetitivas, triagens manuais e busca por informações que deveriam estar organizadas e disponíveis rapidamente.</p>
+              <p>Processos repetitivos, manuais ou com alta exigência de precisão podem limitar produtividade, aumentar variabilidade e expor equipes a atividades de baixo valor ou maior risco.</p>
               <strong>Solução</strong>
-              <p>Aplicação prática de IA, automações e bases de conhecimento para apoiar atendimento, análise de dados, geração de respostas, relatórios e rotinas operacionais.</p>
+              <p>Estudo, integração e apoio técnico para aplicações com robôs industriais, células automatizadas, manipulação, posicionamento, paletização e sincronismo com equipamentos de linha.</p>
               <strong>Resultado esperado</strong>
-              <p>Menos ruído operacional, respostas mais rápidas, equipe focada em exceções importantes e base mais organizada antes de investir em soluções complexas.</p>
+              <p>Mais repetibilidade, produtividade, segurança operacional, padronização de processo e possibilidade de evolução para células industriais mais inteligentes.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de atendimento <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:robotica_celulas_automatizadas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Avaliar célula automatizada <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

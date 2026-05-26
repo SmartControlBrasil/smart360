@@ -1,8 +1,8 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Projetos — página 3 | Smart Control Brasil{% endblock %}
-{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em dashboards operacionais, gestão de OS e ativos, integração de dados, sistemas, backup e continuidade digital.{% endblock %}
+{% block title %}Projetos de Automação Industrial — página 3 | Smart Control Brasil{% endblock %}
+{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em gerenciamento de energia, painéis elétricos, baixa tensão, segurança de máquinas, dados industriais e continuidade operacional.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -34,7 +34,7 @@
           <div class="inner-header text-center heading1">
             <h1>Projetos e frentes de entrega</h1>
             <div class="space16"></div>
-            <p class="text-white-50 px-lg-5">Soluções para transformar dados dispersos em indicadores confiáveis, organizar ordens de serviço, integrar sistemas e fortalecer a continuidade digital da empresa.</p>
+            <p class="text-white-50 px-lg-5">Soluções para melhorar energia, painéis elétricos, segurança de máquinas, supervisão industrial e continuidade operacional em ambientes produtivos.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -54,18 +54,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case14.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Dashboards e indicadores operacionais</p>
+              <p>Gerenciamento de energia e utilidades</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Relatórios atrasados, planilhas paralelas e números divergentes dificultam a tomada de decisão e reduzem a confiança da equipe nos indicadores.</p>
+              <p>Consumo de energia sem medição clara, falta de rateio por setor, ausência de histórico e baixa visibilidade sobre perdas dificultam ações reais de eficiência energética.</p>
               <strong>Solução</strong>
-              <p>Definição de KPIs com fonte clara, modelagem dos dados, estruturação de dashboards e visualização simples para acompanhamento técnico e gerencial.</p>
+              <p>Aplicação de medidores, coleta de dados, indicadores de consumo, registros históricos e visualização de energia e utilidades para apoiar decisões técnicas e gerenciais.</p>
               <strong>Resultado esperado</strong>
-              <p>Decisões mais rápidas, indicadores mais confiáveis, acompanhamento contínuo da operação e identificação de desvios antes que eles se tornem problemas maiores.</p>
+              <p>Mais clareza sobre consumo, melhor controle de custos, identificação de desperdícios e base técnica para projetos de eficiência energética e melhoria contínua.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_dashboards_indicadores_operacionais' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Diagnosticar KPIs atuais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:gerenciamento_energia_utilidades' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Diagnosticar energia e utilidades <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -77,18 +77,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case15.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Gestão de OS e ativos</p>
+              <p>Painéis elétricos e baixa tensão</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Ordens de serviço, históricos técnicos, documentos e informações dos ativos ficam espalhados, dificultando atendimento, manutenção, cobrança e continuidade da operação.</p>
+              <p>Painéis antigos, comandos desorganizados, componentes obsoletos e baixa documentação dificultam manutenção, aumentam riscos e tornam falhas elétricas mais difíceis de diagnosticar.</p>
               <strong>Solução</strong>
-              <p>Organização de ativos, serviços, registros técnicos, documentos, prazos e histórico operacional em uma estrutura acessível e rastreável.</p>
+              <p>Adequação, modernização e organização de painéis elétricos, comandos, dispositivos de proteção, contatores, disjuntores, partidas de motores e integração com automação.</p>
               <strong>Resultado esperado</strong>
-              <p>Mais controle sobre serviços realizados, histórico confiável dos equipamentos, melhor acompanhamento das equipes e redução da dependência de informações informais.</p>
+              <p>Mais segurança, melhor manutenção, menor tempo de diagnóstico, padronização técnica e maior confiabilidade para máquinas e processos industriais.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_gestao_os_ativos' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de OS <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:paineis_eletricos_baixa_tensao' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Avaliar painel elétrico <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -100,17 +100,17 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case16.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Integração de dados e sistemas</p>
+              <p>Integração de chão de fábrica e dados industriais</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>O mesmo dado é digitado várias vezes em sistemas diferentes, aumentando erros, atrasando fechamentos e criando retrabalho entre áreas técnicas, administrativas e comerciais.</p>
+              <p>Informações de máquinas, produção, energia e manutenção ficam desconectadas, exigindo lançamentos manuais e dificultando análise de desempenho, falhas e produtividade.</p>
               <strong>Solução</strong>
-              <p>Mapeamento das fontes de dados, definição de sistemas mestres, regras de integração, formatos de troca e rotinas para reduzir lançamentos manuais.</p>
+              <p>Integração entre CLPs, IHMs, supervisórios, sensores, medidores, registros técnicos e sistemas de gestão para reduzir retrabalho e melhorar a confiabilidade das informações.</p>
               <strong>Resultado esperado</strong>
-              <p>Menos retrabalho, dados mais consistentes, fechamento mais confiável e integração gradual entre sistemas, operação e gestão.</p>
+              <p>Menos digitação manual, dados mais consistentes, melhor rastreabilidade e base técnica para indicadores, supervisão, manutenção preditiva e melhoria operacional.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_integracao_dados_sistemas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:integracao_chao_fabrica_dados_industriais' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
                 <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de integração <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
@@ -123,18 +123,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case17.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Segurança, backup e continuidade</p>
+              <p>Segurança de máquinas e continuidade operacional</p>
               <div class="space12"></div>
               <strong>Problema</strong>
-              <p>Arquivos importantes, sistemas, planilhas oficiais e rotinas digitais ficam vulneráveis quando não existe política clara de backup, acesso, recuperação e continuidade.</p>
+              <p>Máquinas sem análise adequada de riscos, comandos sem padronização e ausência de documentação técnica aumentam exposição a falhas, paradas e problemas de segurança operacional.</p>
               <strong>Solução</strong>
-              <p>Estruturação de boas práticas para backup, recuperação, controle de acessos, organização de arquivos e continuidade digital conforme a realidade e o orçamento da empresa.</p>
+              <p>Apoio técnico em adequação de comandos, dispositivos de segurança, documentação, análise de riscos, melhoria de painéis e estratégias para continuidade da operação industrial.</p>
               <strong>Resultado esperado</strong>
-              <p>Menos risco de perda de dados, mais previsibilidade em incidentes, recuperação mais segura e uma operação menos dependente de arquivos soltos ou soluções improvisadas.</p>
+              <p>Operação mais segura, maior previsibilidade em falhas, melhor resposta da manutenção e menor dependência de soluções improvisadas em máquinas críticas.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:project_seguranca_backup_continuidade' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de continuidade <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:seguranca_maquinas_continuidade_operacional' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de segurança <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

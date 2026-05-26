@@ -1,8 +1,8 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Smart Control Brasil | Engenharia, Manutenção, Automação e Sistemas{% endblock %}
-{% block meta_description %}Soluções em engenharia, manutenção, automação industrial, sistemas web, Smart360 e segurança digital para reduzir paradas, organizar processos e aumentar o controle operacional da sua empresa.{% endblock %}
+{% block title %}Smart Control Brasil | Automação Industrial, Mitsubishi, CLPs, IHMs, Inversores e Retrofit{% endblock %}
+{% block meta_description %}Automação industrial com engenharia aplicada: integração de CLPs, IHMs, inversores, servoacionamentos, painéis elétricos, retrofit de máquinas, supervisório, energia e manutenção em sistemas automatizados.{% endblock %}
 
 {% block body_extra %} class="home-page"{% endblock %}
 
@@ -35,33 +35,50 @@
     <img src="{% static 'institutional/eitech/img/elements/elements6.png' %}" alt="" class="elements6">
     <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
     <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
+
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6">
-          <div class="hero1-header heading1 ">
-            <h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Smart Control Brasil</h5>
+          <div class="hero1-header heading1">
+            <h5 data-aos="fade-left" data-aos-duration="800">
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Smart Control Brasil
+            </h5>
             <div class="space16"></div>
-            <h1 class="text-anime-style-3">Tecnologia e manutenção para operações críticas.</h1>
+
+            <h1 class="text-anime-style-3">Automação Industrial para máquinas mais produtivas, confiáveis e inteligentes.</h1>
+
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Integramos serviços técnicos, automação, sistemas web e segurança digital para organizar processos, reduzir falhas e transformar dados operacionais em decisões mais rápidas e seguras.</p>
+
+            <p data-aos="fade-left" data-aos-duration="900">
+              Integramos CLPs, IHMs, inversores, servoacionamentos, painéis elétricos, supervisórios e soluções Mitsubishi Electric para modernizar máquinas, reduzir paradas e aumentar o controle da operação industrial.
+            </p>
+
             <div class="space32"></div>
+
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn1">Solicitar diagnóstico técnico <i class="fa-solid fa-arrow-right"></i></a>
-              <a href="{% url 'institutional:smart360' %}" class="vl-btn2">Conhecer o Smart360 <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn1">
+                Solicitar diagnóstico técnico <i class="fa-solid fa-arrow-right"></i>
+              </a>
+              <a href="{% url 'institutional:service_automacao_industrial_clps' %}" class="vl-btn2">
+                Ver soluções industriais <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
+
         <div class="col-lg-1"></div>
+
         <div class="col-lg-5">
           <div class="hero-images-area">
             <div class="img1">
-              <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img1.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img1.png' %}" alt="Automação industrial Smart Control Brasil">
             </div>
             <div class="image-bg1">
               <img src="{% static 'institutional/eitech/img/all-images/bg/img-bg1.png' %}" alt="">
             </div>
             <div class="elements">
-              <img src="{% static 'institutional/eitech/img/elements/elements51.png' %}"title="Cyber" alt="" class="elements3 aniamtion-key-1">
+              <img src="{% static 'institutional/eitech/img/elements/elements51.png' %}" alt="" class="elements3 aniamtion-key-1">
               <img src="{% static 'institutional/eitech/img/elements/elements50.png' %}" alt="" class="elements2 aniamtion-key-2">
               <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
             </div>
@@ -75,56 +92,73 @@
   <!--===== ABOUT AREA STARTS =======-->
   <div class="about1-section-area sp1">
     <img src="{% static 'institutional/eitech/img/elements/elements9.png' %}" alt="" class="elements9">
+
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="about-images-area">
             <img src="{% static 'institutional/eitech/img/elements/elements10.png' %}" alt="" class="elements10">
+
             <div class="row align-items-center">
               <div class="col-lg-6 col-md-6">
                 <div class="img1 image-anime reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/about/robo01.png' %}" alt="">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/robo01.png' %}" alt="Robótica e automação industrial">
                 </div>
                 <div class="space30 d-lg-none d-block"></div>
               </div>
+
               <div class="col-lg-6 col-md-6">
                 <div class="img1 image-anime reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/about/note01.png' %}" alt="">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/note01.png' %}" alt="Programação e diagnóstico de automação">
                 </div>
                 <div class="space30"></div>
                 <div class="img1 image-anime reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/about/marketing01.png' %}" alt="">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/marketing01.png' %}" alt="Controle industrial e integração de dados">
                 </div>
               </div>
             </div>
+
             <div class="check-icons aniamtion-key-1">
               <img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">
-              <p>Manutenção, automação, dados e segurança no mesmo fluxo.</p>
+              <p>Automação, manutenção técnica e dados industriais trabalhando juntos.</p>
             </div>
           </div>
         </div>
 
         <div class="col-lg-1"></div>
+
         <div class="col-lg-5">
           <div class="about-header-area heading2">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Sobre nós</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Sobre a Smart Control
+            </h5>
+
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Integramos operação, tecnologia e gestão.</h2>
+
+            <h2 class="text-anime-style-3">Integradora de automação industrial com visão de engenharia e confiabilidade.</h2>
+
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="800">A Smart Control Brasil atua entre o problema técnico e a decisão de gestão. Mapeamos gargalos, estruturamos processos, desenvolvemos sistemas e aplicamos tecnologia para que sua empresa tenha mais previsibilidade, controle e rastreabilidade.</p>
+
+            <p data-aos="fade-left" data-aos-duration="800">
+              A Smart Control Brasil atua na modernização de máquinas, processos e sistemas industriais. Nosso trabalho une diagnóstico técnico, automação aplicada, manutenção especializada e integração de dados para entregar mais produtividade, disponibilidade e segurança operacional.
+            </p>
+
             <div class="space28"></div>
+
             <div class="row" data-aos="fade-left" data-aos-duration="900">
               <div class="col-lg-6 col-md-6">
                 <div class="progresbar">
                   <div class="progressbar">
-                    <div class="circle" data-percent="96"><canvas width="80" height="80"></canvas>
+                    <div class="circle" data-percent="96">
+                      <canvas width="80" height="80"></canvas>
                       <div class="count">96%</div>
                     </div>
                   </div>
                   <div class="content-area">
-                    <h4>Operação</h4>
+                    <h4>Controle</h4>
                     <div class="space8"></div>
-                    <p>Mais controle sobre rotinas técnicas</p>
+                    <p>Mais domínio sobre máquinas e processos</p>
                   </div>
                 </div>
               </div>
@@ -133,25 +167,34 @@
                 <div class="space28 d-md-none d-block"></div>
                 <div class="progresbar">
                   <div class="progressbar">
-                    <div class="circle" data-percent="97"><canvas width="80" height="80"></canvas>
+                    <div class="circle" data-percent="97">
+                      <canvas width="80" height="80"></canvas>
                       <div class="count">97%</div>
                     </div>
                   </div>
                   <div class="content-area">
-                    <h4>Gestão</h4>
+                    <h4>Confiabilidade</h4>
                     <div class="space8"></div>
-                    <p>Mais clareza para decidir com dados</p>
+                    <p>Menos paradas e mais previsibilidade</p>
                   </div>
                 </div>
               </div>
             </div>
+
             <div class="space28"></div>
+
             <div class="pera-box" data-aos="fade-left" data-aos-duration="1000">
-              <p>"O Smart360 é nossa plataforma própria para gestão de manutenção, ativos, clientes, dados e rotinas operacionais — criada para empresas que precisam sair da improvisação e ganhar controle."</p>
+              <p>
+                "Automação industrial não é apenas instalar componentes. É entender a máquina, o processo, a falha e o resultado esperado para entregar uma solução confiável."
+              </p>
             </div>
+
             <div class="space28"></div>
+
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Ver como podemos ajudar <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">
+                Falar com especialista <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -166,11 +209,20 @@
       <div class="row">
         <div class="col-lg-8 m-auto">
           <div class="service-header text-center heading2 space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Áreas de atuação</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Soluções industriais
+            </h5>
+
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Quatro frentes para modernizar sua operação.</h2>
+
+            <h2 class="text-anime-style-3">Da lógica de controle ao chão de fábrica conectado.</h2>
+
             <div class="space16"></div>
-            <p class="text-center">Cada frente resolve uma dor específica. Juntas, elas ajudam sua empresa a reduzir falhas, melhorar processos e crescer com mais controle.</p>
+
+            <p class="text-center">
+              Atuamos em pontos críticos da operação industrial: comando, controle, acionamento, baixa tensão, supervisão, energia, retrofit, manutenção e integração de dados.
+            </p>
           </div>
         </div>
       </div>
@@ -179,23 +231,48 @@
         <div class="col-lg-6 col-md-6" data-aos="zoom-in" data-aos-duration="800">
           <div class="service1-boxarea h-100 d-flex flex-column">
             <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt="">
             </div>
+
             <div class="arrow">
-              <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:service_automacao_industrial_clps' %}">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
+
             <div class="space24"></div>
-            <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">Manutenção Técnica e Engenharia</a>
+
+            <a href="{% url 'institutional:service_automacao_industrial_clps' %}">
+              CLPs, IHMs e Integração de Máquinas
+            </a>
+
             <div class="space16"></div>
-            <p>Organize ativos, serviços, inspeções e ordens de manutenção para reduzir paradas, retrabalho e perda de histórico técnico.</p>
+
+            <p>
+              Desenvolvimento, diagnóstico e integração de sistemas de controle para máquinas, painéis, células automatizadas e processos industriais.
+            </p>
+
             <div class="space16"></div>
+
             <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Rotinas preventivas e corretivas mais organizadas</li>
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Histórico técnico dos ativos centralizado</li>
-              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Indicadores para planejar melhor e agir antes da falha</li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                CLPs Mitsubishi MELSEC e arquiteturas de controle
+              </li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                IHMs para operação, alarmes, receitas e diagnósticos
+              </li>
+              <li>
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Integração com sensores, atuadores e redes industriais
+              </li>
             </ul>
+
             <div class="btn-area1 mt-auto">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar sobre manutenção <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">
+                Diagnosticar automação <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -203,23 +280,48 @@
         <div class="col-lg-6 col-md-6" data-aos="zoom-in" data-aos-duration="900">
           <div class="service1-boxarea h-100 d-flex flex-column">
             <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt="">
             </div>
+
             <div class="arrow">
-              <a href="{% url 'institutional:service_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
+
             <div class="space24"></div>
-            <a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação Industrial</a>
+
+            <a href="{% url 'institutional:contact' %}">
+              Inversores, Servoacionamentos e Controle de Movimento
+            </a>
+
             <div class="space16"></div>
-            <p>Melhore máquinas, linhas produtivas e processos com automação aplicada, integração de dados e controle operacional mais confiável.</p>
+
+            <p>
+              Parametrização, substituição, ajuste e diagnóstico de acionamentos industriais para melhorar velocidade, torque, precisão, posicionamento e eficiência energética.
+            </p>
+
             <div class="space16"></div>
+
             <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Melhorias em máquinas, painéis e linhas produtivas</li>
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Integração de CLPs, sensores e sistemas de gestão</li>
-              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Dados operacionais mais confiáveis para decisão</li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Inversores FREQROL para motores, bombas, ventiladores e esteiras
+              </li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Servoacionamentos para posicionamento e alta repetibilidade
+              </li>
+              <li>
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Ajustes técnicos para estabilidade, segurança e desempenho
+              </li>
             </ul>
+
             <div class="btn-area1 mt-auto">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Diagnosticar automação <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">
+                Falar sobre acionamentos <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -229,21 +331,46 @@
             <div class="icons">
               <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
             </div>
+
             <div class="arrow">
-              <a href="{% url 'institutional:smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
+
             <div class="space24"></div>
-            <a href="{% url 'institutional:smart360' %}">Sistemas Web e Smart360</a>
+
+            <a href="{% url 'institutional:contact' %}">
+              Retrofit, Painéis e Baixa Tensão
+            </a>
+
             <div class="space16"></div>
-            <p>Substitua planilhas, controles soltos e processos manuais por sistemas web sob medida e pela plataforma Smart360.</p>
+
+            <p>
+              Modernização de comandos, substituição de tecnologias obsoletas, adequação de painéis e aplicação de dispositivos de proteção, manobra e partida de motores.
+            </p>
+
             <div class="space16"></div>
+
             <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Gestão de ordens de serviço, ativos e clientes</li>
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Dashboards, relatórios e acompanhamento em tempo real</li>
-              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Sistemas Django/Python preparados para evoluir</li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Atualização de comandos, CLPs e componentes antigos
+              </li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Painéis elétricos, contatores, disjuntores e proteção
+              </li>
+              <li>
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Mais disponibilidade sem trocar a máquina inteira
+              </li>
             </ul>
+
             <div class="btn-area1 mt-auto">
-              <a href="{% url 'institutional:smart360' %}" class="vl-btn2">Conhecer o Smart360 <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">
+                Avaliar retrofit <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -253,21 +380,46 @@
             <div class="icons">
               <img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt="">
             </div>
+
             <div class="arrow">
-              <a href="{% url 'institutional:project_cybersecurity_empresas' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
+
             <div class="space24"></div>
-            <a href="{% url 'institutional:project_cybersecurity_empresas' %}">Cybersecurity e Inteligência Artificial</a>
+
+            <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">
+              Supervisório, Energia e Manutenção Automatizada
+            </a>
+
             <div class="space16"></div>
-            <p>Proteja dados, sistemas e rotinas críticas enquanto aplica IA de forma prática, responsável e conectada ao resultado da empresa.</p>
+
+            <p>
+              Diagnóstico de falhas, supervisão de processos, alarmes, tendências, indicadores, gerenciamento de energia e melhoria contínua de sistemas automatizados.
+            </p>
+
             <div class="space16"></div>
+
             <ul class="list-unstyled text-start mb-3 flex-grow-1 pillar-check-list">
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Análise de riscos, vulnerabilidades e pontos críticos</li>
-              <li class="mb-2"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">IA aplicada a tarefas repetitivas e decisões operacionais</li>
-              <li><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">Mais segurança para dados, acessos e continuidade</li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                SCADA, supervisório, alarmes e histórico operacional
+              </li>
+              <li class="mb-2">
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Medição de energia, consumo e dados de utilidades
+              </li>
+              <li>
+                <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="">
+                Manutenção com visão de TPM, RCM/MCC e confiabilidade
+              </li>
             </ul>
+
             <div class="btn-area1 mt-auto">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar sobre segurança <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">
+                Solicitar suporte técnico <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -278,53 +430,71 @@
   <!--===== WORK AREA STARTS =======-->
   <div class="work1-section-area sp1">
     <img src="{% static 'institutional/eitech/img/elements/elements11.png' %}" alt="" class="elements9">
+
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-5">
           <div class="solution-header heading2">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Por que escolher a Smart Control</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Por que automatizar
+            </h5>
+
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Operação organizada para crescer.</h2>
+
+            <h2 class="text-anime-style-3">Máquinas mais eficientes, processos mais previsíveis.</h2>
+
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="800">Ajudamos empresas a sair de controles fragmentados e processos manuais para uma gestão mais clara, integrada e orientada por dados.</p>
+
+            <p data-aos="fade-left" data-aos-duration="800">
+              Automação industrial bem aplicada reduz improviso, melhora repetibilidade, aumenta segurança operacional e cria base para decisões com dados reais de produção, manutenção e energia.
+            </p>
+
             <div class="space24"></div>
+
             <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
               <div class="progress-bar">
-                <label>Automação e Sistemas <span>96%</span></label>
+                <label>Controle de Processo <span>96%</span></label>
                 <div class="progress">
                   <div class="progress-inner" data-progress="96" style="width: 0%;"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
-                <label>Segurança Operacional <span>97%</span></label>
+                <label>Confiabilidade Operacional <span>97%</span></label>
                 <div class="progress">
                   <div class="progress-inner" data-progress="97" style="width: 0%;"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
-                <label>Gestão em Nuvem <span>99%</span></label>
+                <label>Dados Industriais <span>99%</span></label>
                 <div class="progress">
                   <div class="progress-inner" data-progress="99" style="width: 0%;"></div>
                 </div>
               </div>
             </div>
+
             <div class="space32"></div>
+
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com um especialista <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:contact' %}" class="vl-btn2">
+                Falar com especialista <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
           </div>
         </div>
+
         <div class="col-lg-2"></div>
+
         <div class="col-lg-5">
           <div class="soultions-images">
             <img src="{% static 'institutional/eitech/img/elements/elements52.png' %}" alt="" class="elements10">
             <div class="img1 reveal image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/work/dash01.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/work/dash01.png' %}" alt="Dados industriais e supervisão operacional">
             </div>
             <div class="img2 reveal image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/work/cyber01.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/work/cyber01.png' %}" alt="Controle e diagnóstico industrial">
             </div>
           </div>
         </div>
@@ -337,13 +507,19 @@
   <div class="work-others-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
     <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
     <img src="{% static 'institutional/eitech/img/elements/elements49.png' %}" alt="" class="elements1 keyframe5">
+
     <div class="container">
       <div class="row">
         <div class="col-lg-6 m-auto">
           <div class="work-header heading1 text-center space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Como atuamos</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Como atuamos
+            </h5>
+
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Da análise à evolução da operação.</h2>
+
+            <h2 class="text-anime-style-3">Do diagnóstico técnico à entrega em campo.</h2>
           </div>
         </div>
       </div>
@@ -365,23 +541,26 @@
                       <h3>01</h3>
                     </div>
                     <div class="content-area">
-                      <a href="{% url 'institutional:service_details' %}">Diagnóstico</a>
+                      <a href="{% url 'institutional:service_details' %}">Diagnóstico técnico</a>
                       <div class="space14"></div>
-                      <p>Entendemos a rotina, os gargalos e os impactos reais antes de sugerir qualquer solução técnica.</p>
+                      <p>Levantamos máquina, processo, sintomas, riscos, sinais de campo e impacto operacional antes de definir a solução.</p>
                     </div>
                   </div>
+
                   <div class="space30"></div>
+
                   <div class="card-boxarea box2" data-aos="zoom-in" data-aos-duration="900">
                     <div class="content-area">
-                      <a href="{% url 'institutional:service_details' %}">Planejamento</a>
+                      <a href="{% url 'institutional:service_details' %}">Engenharia da solução</a>
                       <div class="space14"></div>
-                      <p>Definimos prioridades, escopo e caminho de implantação com foco em resultado, segurança e viabilidade.</p>
+                      <p>Definimos arquitetura, componentes, lógica de controle, acionamentos, redes e estratégia de implantação.</p>
                     </div>
                     <div class="div text-end">
                       <h3>02</h3>
                     </div>
                   </div>
                 </div>
+
                 <div class="col-lg-4">
                   <div class="images" data-aos="zoom-in" data-aos-duration="1000">
                     <img src="{% static 'institutional/eitech/img/elements/elements12.png' %}" alt="" class="elements12">
@@ -389,27 +568,30 @@
                     <img src="{% static 'institutional/eitech/img/elements/elements14.png' %}" alt="" class="elements14">
                     <img src="{% static 'institutional/eitech/img/elements/elements15.png' %}" alt="" class="elements15">
                     <div class="img1">
-                      <img src="{% static 'institutional/eitech/img/all-images/case/case01.png' %}" alt="">
+                      <img src="{% static 'institutional/eitech/img/all-images/case/case01.png' %}" alt="Processo de automação industrial">
                     </div>
                   </div>
                 </div>
+
                 <div class="col-lg-4">
                   <div class="card-boxarea box3" data-aos="zoom-in" data-aos-duration="800">
                     <div class="div">
                       <h3>03</h3>
                     </div>
                     <div class="content-area2">
-                      <a href="{% url 'institutional:service_details' %}">Execução</a>
+                      <a href="{% url 'institutional:service_details' %}">Implantação e testes</a>
                       <div class="space14"></div>
-                      <p>Implementamos com documentação, testes e validação para que a entrega funcione na prática.</p>
+                      <p>Executamos instalação, parametrização, programação, testes funcionais e validação operacional.</p>
                     </div>
                   </div>
+
                   <div class="space30"></div>
+
                   <div class="card-boxarea box4" data-aos="zoom-in" data-aos-duration="1000">
                     <div class="content-area2">
                       <a href="{% url 'institutional:service_details' %}">Acompanhamento</a>
                       <div class="space14"></div>
-                      <p>Apoiamos a operação depois da entrega, ajustando processos e evoluindo a solução conforme a necessidade.</p>
+                      <p>Documentamos, ajustamos e apoiamos a operação para manter a solução estável, rastreável e confiável.</p>
                     </div>
                     <div class="div">
                       <h3>04</h3>
@@ -427,52 +609,88 @@
       <div class="row">
         <div class="col-lg-5">
           <div class="case-header heading2 space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Soluções</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Aplicações
+            </h5>
+
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Tecnologia para a operação real.</h2>
+
+            <h2 class="text-anime-style-3">Soluções para a operação industrial real.</h2>
           </div>
         </div>
       </div>
+
       <div class="col-lg-12">
         <div class="case-slider-widget owl-carousel">
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case02.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case02.png' %}" alt="CLPs e IHMs industriais">
             </div>
             <div class="content-area">
-              <p>Smart360</p>
+              <p>CLPs e IHMs</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_smart360' %}">Plataforma para gestão operacional, manutenção, ativos e dados</a>
+              <a href="{% url 'institutional:project_automacao_industrial_clps' %}">
+                Controle de máquinas, interfaces de operação, alarmes, receitas e integração com sensores e atuadores
+              </a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:project_automacao_industrial_clps' %}">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case03.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case03.png' %}" alt="Retrofit de máquinas industriais">
             </div>
             <div class="content-area">
-              <p>Sistemas Web</p>
+              <p>Retrofit</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_sistemas_web_django_python' %}">Sistemas em Django/Python para substituir planilhas e centralizar processos</a>
+              <a href="{% url 'institutional:contact' %}">
+                Modernização de comandos, painéis, inversores e sistemas obsoletos com foco em disponibilidade
+              </a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_sistemas_web_django_python' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:contact' %}">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/case/case04.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case04.png' %}" alt="Mitsubishi Electric automação industrial">
             </div>
             <div class="content-area">
-              <p>Automação</p>
+              <p>Mitsubishi Electric</p>
               <div class="space16"></div>
-              <a href="{% url 'institutional:project_automacao_industrial_clps' %}">Integração de máquinas, CLPs e dados para melhorar controle e rastreabilidade</a>
+              <a href="{% url 'institutional:contact' %}">
+                Integração com CLPs, IHMs, inversores, servoacionamentos, baixa tensão e soluções industriais Mitsubishi Electric
+              </a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:contact' %}">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-slider-boxarea">
+            <div class="img1 image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/case/case02.png' %}" alt="Manutenção em automação industrial">
+            </div>
+            <div class="content-area">
+              <p>Manutenção técnica</p>
+              <div class="space16"></div>
+              <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">
+                Diagnóstico de falhas, análise de paradas, suporte em campo e melhoria de sistemas automatizados
+              </a>
+              <div class="arrow">
+                <a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
@@ -487,18 +705,28 @@
       <div class="row">
         <div class="col-lg-8 m-auto">
           <div class="testimonial-header text-center heading2 space-margin60">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Nossa postura</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Nossa postura
+            </h5>
+
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">Tecnologia com foco em resultado.</h2>
+
+            <h2 class="text-anime-style-3">Automação com método, documentação e responsabilidade técnica.</h2>
+
             <div class="space16"></div>
-            <p class="text-center">Nossa entrega é guiada por princípios simples: entender antes de propor, documentar antes de escalar e aplicar tecnologia onde ela realmente resolve.</p>
+
+            <p class="text-center">
+              Trabalhamos com uma abordagem direta: entender o problema, definir a solução, executar com critério e manter rastreabilidade técnica.
+            </p>
           </div>
         </div>
       </div>
+
       <div class="row">
         <div class="col-lg-5">
           <div class="img1 image-anime reveal">
-            <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img10.png' %}" alt="Engenharia e operação Smart Control Brasil">
+            <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img10.png' %}" alt="Engenharia e automação industrial Smart Control Brasil">
           </div>
         </div>
 
@@ -510,9 +738,13 @@
                 <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>Diagnóstico vem antes da proposta. Nenhuma solução deve ser vendida sem entender rotina, urgência, impacto e prioridade do cliente.</p>
+                <p>
+                  Diagnóstico vem antes da proposta. Nenhum sistema de automação deve ser alterado sem entender máquina, processo, segurança, impacto e prioridade da operação.
+                </p>
               </div>
+
               <div class="space60"></div>
+
               <div class="testimonial-man-info-area">
                 <div class="man-images-text">
                   <div class="mans-img">
@@ -534,18 +766,22 @@
                 <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>Engenharia, software e segurança precisam conversar. Quando a operação depende de tecnologia, soluções isoladas criam falhas, retrabalho e riscos.</p>
+                <p>
+                  Automação precisa conversar com manutenção. Uma solução boa não é só funcional: ela também precisa ser segura, documentada e fácil de diagnosticar.
+                </p>
               </div>
+
               <div class="space60"></div>
+
               <div class="testimonial-man-info-area">
                 <div class="man-images-text">
                   <div class="mans-img">
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img3.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:services' %}">Conhecer nossas áreas</a>
+                    <a href="{% url 'institutional:services' %}">Conhecer soluções</a>
                     <div class="space12"></div>
-                    <p>Atuação integrada para problemas reais.</p>
+                    <p>Atuação técnica para problemas reais.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -558,18 +794,22 @@
                 <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>Rastreabilidade protege a operação. Histórico técnico, registros, indicadores e documentação ajudam sua empresa a decidir melhor e corrigir mais rápido.</p>
+                <p>
+                  Retrofit precisa preservar o que funciona e corrigir o que limita. Modernizar máquina não é desmontar história: é aumentar vida útil com inteligência.
+                </p>
               </div>
+
               <div class="space60"></div>
+
               <div class="testimonial-man-info-area">
                 <div class="man-images-text">
                   <div class="mans-img">
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:smart360' %}">Ver Smart360</a>
+                    <a href="{% url 'institutional:contact' %}">Avaliar retrofit</a>
                     <div class="space12"></div>
-                    <p>Gestão com dados, histórico e controle.</p>
+                    <p>Modernização com critério técnico.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -582,18 +822,22 @@
                 <div class="space8"></div>
                 <img src="{% static 'institutional/eitech/img/icons/quito1.svg' %}" alt="" class="quito1">
                 <img src="{% static 'institutional/eitech/img/elements/elements18.png' %}" alt="" class="elements18">
-                <p>IA precisa ter função, não apenas impacto visual. Aplicamos inteligência artificial onde ela reduz esforço, melhora análise e gera resultado mensurável.</p>
+                <p>
+                  Dados industriais só têm valor quando ajudam a decidir. Por isso, buscamos integrar automação, registros técnicos, energia e indicadores operacionais.
+                </p>
               </div>
+
               <div class="space60"></div>
+
               <div class="testimonial-man-info-area">
                 <div class="man-images-text">
                   <div class="mans-img">
                     <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
                   </div>
                   <div class="man-text">
-                    <a href="{% url 'institutional:contact' %}">Alinhar expectativas</a>
+                    <a href="{% url 'institutional:contact' %}">Planejar automação</a>
                     <div class="space12"></div>
-                    <p>Sem promessas vazias. Com método.</p>
+                    <p>Controle, rastreabilidade e resultado.</p>
                   </div>
                 </div>
                 <img src="{% static 'institutional/eitech/img/elements/elements17.png' %}" alt="">
@@ -628,27 +872,35 @@
       <div class="row">
         <div class="col-lg-5 m-auto">
           <div class="team-header space-margin60 heading2 text-center">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Especialidades</h5>
+            <h5>
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Competências técnicas
+            </h5>
+
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">Técnica, dados e crescimento conectados.</h2>
+
+            <h2 class="text-anime-style-3">Base técnica para automação industrial completa.</h2>
           </div>
         </div>
       </div>
+
       <div class="row">
         <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
           <div class="team-author-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/team/marcelo.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/team/marcelo.png' %}" alt="Engenharia de automação e confiabilidade">
             </div>
             <div class="content-area">
               <div class="text">
-                <a href="{% url 'institutional:team' %}">Eng. Confiabilidade e Inteligencia Artificial</a>
+                <a href="{% url 'institutional:team' %}">Automação e Controle</a>
                 <div class="space8"></div>
-                <h5 class="pb-2">Marcelo Custódio</h5>
-                <p>Manutenção, CLPs, processos técnicos e integração industrial</p>
+                <h5 class="pb-2">CLPs, IHMs e Redes</h5>
+                <p>Integração de máquinas, lógica de controle, supervisão local e comunicação industrial</p>
               </div>
               <div class="icons">
-                <a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+                <a href="{% url 'institutional:contact' %}">
+                  <img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt="">
+                </a>
               </div>
             </div>
             <ul>
@@ -663,17 +915,19 @@
         <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
           <div class="team-author-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/team/team-img2.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/team/team-img2.png' %}" alt="Manutenção e confiabilidade industrial">
             </div>
             <div class="content-area">
               <div class="text">
-                <a href="{% url 'institutional:team' %}">Eng. da Computação e Segurança Digital</a>
+                <a href="{% url 'institutional:team' %}">Acionamentos e Energia</a>
                 <div class="space8"></div>
-                <h5 class="pb-2">Gustavo de Oliveira</h5>
-                <p>Sistemas Django/Python, dados, dashboards e automação inteligente</p>
+                <h5 class="pb-2">Inversores, Servos e Medição</h5>
+                <p>Controle de motores, movimento, eficiência energética e dados de consumo industrial</p>
               </div>
               <div class="icons">
-                <a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+                <a href="{% url 'institutional:contact' %}">
+                  <img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt="">
+                </a>
               </div>
             </div>
             <ul>
@@ -688,17 +942,19 @@
         <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
           <div class="team-author-boxarea">
             <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/team/team-img3.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/team/team-img3.png' %}" alt="Dados e rastreabilidade industrial">
             </div>
             <div class="content-area">
               <div class="text">
-                <a href="{% url 'institutional:team' %}">Eng. de Softwares e Marketing Digital</a>
+                <a href="{% url 'institutional:team' %}">Retrofit e Confiabilidade</a>
                 <div class="space8"></div>
-                <h5 class="pb-2">Augusto Oliveira</h5>
-                <p>sites, SEO, vídeos e comunicação para gerar confiança</p>
+                <h5 class="pb-2">Manutenção e Dados</h5>
+                <p>Modernização de máquinas, análise de falhas, indicadores e melhoria da disponibilidade</p>
               </div>
               <div class="icons">
-                <a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt=""></a>
+                <a href="{% url 'institutional:contact' %}">
+                  <img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt="">
+                </a>
               </div>
             </div>
             <ul>
@@ -713,37 +969,67 @@
     </div>
   </div>
 
-  <!--===== BLOG AREA STARTS =======--> 
+  <!--===== BLOG AREA STARTS =======-->
   <div class="vl-blog-1-area sp1">
     <div class="container">
       <div class="row">
         <div class="col-lg-4 m-auto">
           <div class="vl-blog-1-section-box heading2 text-center space-margin60">
-            <h5 class="vl-section-subtitle"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Blog</h5>
+            <h5 class="vl-section-subtitle">
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>
+              Conteúdo técnico
+            </h5>
+
             <div class="space20"></div>
-            <h2 class="vl-section-title text-anime-style-3">Conteúdo técnico para decidir.</h2>
+
+            <h2 class="vl-section-title text-anime-style-3">Automação industrial sem enrolação.</h2>
           </div>
         </div>
       </div>
+
       <div class="row">
         <div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="900">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img29.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img29.png' %}" alt="Automação industrial e dados">
             </div>
+
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Artigo técnico <span> | </span></a></li>
-                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt=""> Equipe Smart Control Brasil</a></li>
+                  <li>
+                    <a href="{% url 'institutional:contact' %}">
+                      <img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt="">
+                      Artigo técnico <span> | </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'institutional:contact' %}">
+                      <img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt="">
+                      Equipe Smart Control Brasil
+                    </a>
+                  </li>
                 </ul>
               </div>
+
               <div class="space20"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_details' %}">Automação, dados e IA: como aplicar tecnologia sem desperdiçar investimento</a></h4>
+
+              <h4 class="vl-blog-1-title">
+                <a href="{% url 'institutional:blog_details' %}">
+                  Quando fazer retrofit de uma máquina industrial?
+                </a>
+              </h4>
+
               <div class="space16"></div>
-              <p>Entenda onde a tecnologia realmente gera valor e como definir os primeiros passos com segurança.</p>
+
+              <p>
+                Entenda quando modernizar comandos, painéis, CLPs, IHMs e acionamentos pode ser melhor do que substituir o equipamento inteiro.
+              </p>
+
               <div class="vl-blog-1-icon">
-                <a href="{% url 'institutional:blog_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:blog_details' %}">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
@@ -752,21 +1038,45 @@
         <div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img30.png' %}" alt="">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img30.png' %}" alt="Manutenção em sistemas automatizados">
             </div>
+
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Artigo técnico <span> | </span></a></li>
-                  <li><a href="{% url 'institutional:contact' %}"><img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt=""> Equipe Smart Control Brasil</a></li>
+                  <li>
+                    <a href="{% url 'institutional:contact' %}">
+                      <img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt="">
+                      Artigo técnico <span> | </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'institutional:contact' %}">
+                      <img src="{% static 'institutional/eitech/img/icons/user1.svg' %}" alt="">
+                      Equipe Smart Control Brasil
+                    </a>
+                  </li>
                 </ul>
               </div>
+
               <div class="space20"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_details' %}">Manutenção técnica: quando parar de improvisar e começar a controlar</a></h4>
+
+              <h4 class="vl-blog-1-title">
+                <a href="{% url 'institutional:blog_details' %}">
+                  CLP, IHM, inversor e servo: onde nascem muitas falhas de máquina?
+                </a>
+              </h4>
+
               <div class="space16"></div>
-              <p>Veja como histórico, indicadores e rotina preventiva ajudam a reduzir falhas e aumentar a previsibilidade.</p>
+
+              <p>
+                Veja como diagnóstico técnico, documentação e análise de sinais ajudam a reduzir paradas, retrabalho e perdas de produção.
+              </p>
+
               <div class="vl-blog-1-icon">
-                <a href="{% url 'institutional:blog_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{% url 'institutional:blog_details' %}">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
@@ -775,7 +1085,9 @@
         <div class="col-lg-12">
           <div class="space18"></div>
           <div class="btn-area1 text-center">
-            <a href="{% url 'institutional:blog' %}" class="vl-btn2">Ver todos os conteúdos <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="{% url 'institutional:blog' %}" class="vl-btn2">
+              Ver conteúdos técnicos <i class="fa-solid fa-arrow-right"></i>
+            </a>
           </div>
         </div>
       </div>

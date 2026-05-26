@@ -1,6 +1,9 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Inversores de frequência e eficiência energética | Smart Control Brasil{% endblock %}
+{% block meta_description %}Aplicação, parametrização e diagnóstico de inversores de frequência para controle de motores, estabilidade de processo e eficiência energética.{% endblock %}
+
 {% block content %}
 <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
   <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
@@ -8,7 +11,7 @@
   <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
   <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
   <div class="container">
-    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Cybersecurity para Empresas</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Cybersecurity para Empresas</span></a></div></div></div>
+    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Inversores de frequência e eficiência energética</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Inversores de frequência e eficiência energética</span></a></div></div></div>
   </div>
 </div>
 
@@ -19,25 +22,25 @@
         <div class="case-sider-widget-area" style="padding: 0 !important;">
           <div class="img1 image-anime reveal"><img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt=""></div>
           <div class="space32"></div>
-          <h3>Cybersecurity para Empresas</h3>
+          <h3>Frentes de aplicação</h3>
           <div class="space20"></div>
-          <p><strong>Categoria:</strong> Segurança digital</p>
-          <p><strong>Cliente:</strong> Projeto Smart Control Brasil</p>
-          <p><strong>Status:</strong> Em desenvolvimento / Frente de atuação</p>
-          <p><strong>Foco:</strong> Tecnologia aplicada, processos, dados e operação</p>
+          <p>Cada aplicação exige avaliar carga, regime de operação, proteção elétrica, comandos, comunicação e impacto energético antes de definir ajustes ou retrofit.</p>
+          <p><strong>Cliente:</strong> Smart Control Brasil</p>
+          <p><strong>Status:</strong> Frente de atuação em automação industrial</p>
+          <p><strong>Foco:</strong> Inversores de frequência, motores, torque, velocidade e consumo de energia</p>
           <div class="space20"></div>
-          <p>Diagnóstico, boas práticas, proteção de acessos, redes, dados, backups e rotinas digitais para pequenas e médias empresas que precisam reduzir riscos.</p>
+          <p>Inversores de frequência permitem controlar velocidade, torque, rampas de aceleração e consumo em motores aplicados a bombas, ventiladores, esteiras e máquinas.</p>
           <div class="space20"></div>
-          <p>A abordagem considera maturidade operacional da empresa, priorizando medidas práticas e sustentáveis para melhorar postura de segurança sem travar a rotina.</p>
+          <p>A atuação envolve diagnóstico de falhas, parametrização, substituição, revisão de aplicação, integração com CLPs e ajustes para estabilidade do processo.</p>
           <div class="space50"></div>
           <h3>Frentes de proteção</h3>
           <div class="space20"></div>
           <p>Trabalhamos proteção de acessos, senhas, redes, backups, dispositivos, permissões, conscientização e políticas mínimas de segurança para empresas menores.</p>
           <div class="space12"></div>
           <div class="row">
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Acessos e permissões</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Senhas e autenticação</li></ul></div>
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Backups e recuperação</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Segurança de rede</li></ul></div>
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Conscientização da equipe</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Rotinas de monitoramento</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Parametrização de inversores</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Controle de velocidade</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Rampas e torque</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Proteção de motores</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Integração com CLPs</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Eficiência energética</li></ul></div>
           </div>
           <div class="space32"></div>
           <div class="btn-area1">
@@ -54,8 +57,8 @@
   <div class="container">
     <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 space-margin60 text-center"><h2>Projetos relacionados</h2></div></div></div>
     <div class="row">
-      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Diagnóstico de IA, Dados e Automação</p><div class="space16"></div><a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:project_diagnostico_ia_dados_automacao' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
-      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>IA Aplicada ao Atendimento e Operação</p><div class="space16"></div><a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Ver projetos</a><div class="arrow"><a href="{% url 'institutional:project_ia_atendimento_operacao' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Diagnóstico industrial e engenharia da solução</p><div class="space16"></div><a href="{% url 'institutional:diagnostico_industrial_engenharia_solucao' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:diagnostico_industrial_engenharia_solucao' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>Servoacionamentos e controle de movimento</p><div class="space16"></div><a href="{% url 'institutional:servoacionamentos_motion_control' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:servoacionamentos_motion_control' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
     </div>
   </div>
 </div>

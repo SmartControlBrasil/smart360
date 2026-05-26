@@ -1,6 +1,9 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Segurança de máquinas e continuidade operacional | Smart Control Brasil{% endblock %}
+{% block meta_description %}Adequação de comandos, dispositivos de segurança, análise de riscos, documentação e continuidade operacional em máquinas industriais.{% endblock %}
+
 {% block content %}
 <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
   <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
@@ -8,7 +11,7 @@
   <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
   <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
   <div class="container">
-    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Segurança, Backup e Continuidade Digital</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Segurança, Backup e Continuidade Digital</span></a></div></div></div>
+    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Segurança de máquinas e continuidade operacional</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Segurança de máquinas e continuidade operacional</span></a></div></div></div>
   </div>
 </div>
 
@@ -19,25 +22,25 @@
         <div class="case-sider-widget-area" style="padding: 0 !important;">
           <div class="img1 image-anime reveal"><img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt=""></div>
           <div class="space32"></div>
-          <h3>Segurança, Backup e Continuidade Digital</h3>
+          <h3>Práticas de continuidade</h3>
           <div class="space20"></div>
-          <p><strong>Categoria:</strong> Segurança e continuidade</p>
-          <p><strong>Cliente:</strong> Projeto Smart Control Brasil</p>
-          <p><strong>Status:</strong> Frente de atuação</p>
-          <p><strong>Foco:</strong> Tecnologia aplicada, processos, dados e operação</p>
+          <p>O trabalho busca reduzir exposição a riscos, melhorar resposta da manutenção e diminuir dependência de soluções improvisadas em ativos críticos.</p>
+          <p><strong>Cliente:</strong> Smart Control Brasil</p>
+          <p><strong>Status:</strong> Frente de atuação em automação industrial</p>
+          <p><strong>Foco:</strong> Riscos, comandos, dispositivos de segurança, documentação e continuidade operacional</p>
           <div class="space20"></div>
-          <p>Estruturação de práticas de backup, controle de acesso, recuperação de dados e continuidade operacional para reduzir riscos digitais.</p>
+          <p>Máquinas sem análise adequada de riscos, comandos sem padronização e documentação frágil ficam mais expostas a falhas, acidentes e paradas longas.</p>
           <div class="space20"></div>
-          <p>Priorizamos medidas simples e consistentes para reduzir impacto de incidentes e manter a operação com maior previsibilidade.</p>
+          <p>A frente apoia adequações técnicas, revisão de comandos, dispositivos de segurança, documentação e estratégias para manter a operação previsível.</p>
           <div class="space50"></div>
           <h3>Práticas de continuidade</h3>
           <div class="space20"></div>
           <p>A frente cobre backup, acesso, recuperação, políticas simples, continuidade, proteção de dados e segurança operacional no dia a dia.</p>
           <div class="space12"></div>
           <div class="row">
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Rotina de backup</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Plano de recuperação</li></ul></div>
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Controle de acesso</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Revisão de permissões</li></ul></div>
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Continuidade operacional</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Proteção de dados</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Análise de riscos</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Dispositivos de segurança</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Comandos padronizados</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Documentação técnica</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Resposta a falhas</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Continuidade operacional</li></ul></div>
           </div>
           <div class="space32"></div>
           <div class="btn-area1">
@@ -54,8 +57,8 @@
   <div class="container">
     <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 space-margin60 text-center"><h2>Projetos relacionados</h2></div></div></div>
     <div class="row">
-      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Cybersecurity para Empresas</p><div class="space16"></div><a href="{% url 'institutional:project_cybersecurity_empresas' %}">Conhecer soluções</a><div class="arrow"><a href="{% url 'institutional:project_cybersecurity_empresas' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
-      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>Integração de Dados e Sistemas</p><div class="space16"></div><a href="{% url 'institutional:project_integracao_dados_sistemas' %}">Falar com especialista</a><div class="arrow"><a href="{% url 'institutional:project_integracao_dados_sistemas' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Inversores de frequência e eficiência energética</p><div class="space16"></div><a href="{% url 'institutional:inversores_eficiencia_energetica' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:inversores_eficiencia_energetica' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>Integração de chão de fábrica e dados industriais</p><div class="space16"></div><a href="{% url 'institutional:integracao_chao_fabrica_dados_industriais' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:integracao_chao_fabrica_dados_industriais' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
     </div>
   </div>
 </div>

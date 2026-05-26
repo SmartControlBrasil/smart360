@@ -1,6 +1,9 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Diagnóstico industrial e engenharia da solução | Smart Control Brasil{% endblock %}
+{% block meta_description %}Diagnóstico técnico para mapear falhas, sinais, comandos, painéis, riscos e oportunidades de automação industrial.{% endblock %}
+
 {% block content %}
 <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
   <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
@@ -11,9 +14,9 @@
     <div class="row">
       <div class="col-lg-8 m-auto">
         <div class="inner-header text-center heading1">
-          <h1>Diagnóstico de IA, Dados e Automação</h1>
+          <h1>Diagnóstico industrial e engenharia da solução</h1>
           <div class="space28"></div>
-          <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Diagnóstico de IA, Dados e Automação</span></a>
+          <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Diagnóstico industrial e engenharia da solução</span></a>
         </div>
       </div>
     </div>
@@ -29,16 +32,16 @@
             <img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt="">
           </div>
           <div class="space32"></div>
-          <h3>Diagnóstico de IA, Dados e Automação</h3>
+          <h3>Etapas do diagnóstico</h3>
           <div class="space20"></div>
-          <p><strong>Categoria:</strong> Consultoria e automação</p>
-          <p><strong>Cliente:</strong> Projeto Smart Control Brasil</p>
-          <p><strong>Status:</strong> Em desenvolvimento / Frente de atuação</p>
-          <p><strong>Foco:</strong> Tecnologia aplicada, processos, dados e operação</p>
+          <p>A engenharia da solução nasce de levantamento em campo, priorização por risco e impacto, definição de escopo e recomendações compatíveis com a realidade da planta.</p>
+          <p><strong>Cliente:</strong> Smart Control Brasil</p>
+          <p><strong>Status:</strong> Frente de atuação em automação industrial</p>
+          <p><strong>Foco:</strong> Falhas, comandos, painéis, acionamentos, dados e escopo técnico</p>
           <div class="space20"></div>
-          <p>Análise prática dos processos, dados e gargalos da empresa para identificar oportunidades reais de automação, sistemas, dashboards e inteligência artificial aplicada.</p>
+          <p>O diagnóstico industrial identifica a causa técnica dos problemas antes de propor automação, retrofit ou melhorias em máquinas e processos.</p>
           <div class="space20"></div>
-          <p>O trabalho prioriza ganhos de curto prazo e estrutura um plano de evolução com etapas claras, indicadores e critérios de implementação compatíveis com a rotina da operação.</p>
+          <p>A análise considera sinais de campo, lógica de controle, painéis elétricos, acionamentos, segurança de máquinas, histórico de falhas e necessidades da manutenção.</p>
           <div class="space50"></div>
           <h3>Etapas do diagnóstico</h3>
           <div class="space20"></div>
@@ -47,20 +50,20 @@
           <div class="row">
             <div class="col-lg-4 col-md-6">
               <ul class="list">
-                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Mapeamento de processos</li>
-                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Levantamento de dados</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Levantamento técnico em campo</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Mapeamento de falhas recorrentes</li>
               </ul>
             </div>
             <div class="col-lg-4 col-md-6">
               <ul class="list">
-                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Identificação de gargalos</li>
-                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Priorização de oportunidades</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Análise de comandos e painéis</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Avaliação de CLPs e IHMs</li>
               </ul>
             </div>
             <div class="col-lg-4 col-md-6">
               <ul class="list">
-                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Plano de ação por fases</li>
-                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Indicadores para acompanhamento</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Priorização por criticidade</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Plano técnico de implantação</li>
               </ul>
             </div>
           </div>
@@ -89,10 +92,10 @@
         <div class="case-slider-boxarea">
           <div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div>
           <div class="content-area">
-            <p>Smart360</p>
+            <p>Supervisão industrial e dados operacionais</p>
             <div class="space16"></div>
-            <a href="{% url 'institutional:project_smart360' %}">Ver projetos</a>
-            <div class="arrow"><a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a></div>
+            <a href="{% url 'institutional:supervisao_dados_industriais' %}">Ver projetos</a>
+            <div class="arrow"><a href="{% url 'institutional:supervisao_dados_industriais' %}"><i class="fa-solid fa-arrow-right"></i></a></div>
           </div>
         </div>
       </div>
@@ -100,10 +103,10 @@
         <div class="case-slider-boxarea">
           <div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div>
           <div class="content-area">
-            <p>IA Aplicada ao Atendimento e Operação</p>
+            <p>Robótica industrial e células automatizadas</p>
             <div class="space16"></div>
-            <a href="{% url 'institutional:project_ia_atendimento_operacao' %}">Falar com especialista</a>
-            <div class="arrow"><a href="{% url 'institutional:project_ia_atendimento_operacao' %}"><i class="fa-solid fa-arrow-right"></i></a></div>
+            <a href="{% url 'institutional:robotica_celulas_automatizadas' %}">Falar com especialista</a>
+            <div class="arrow"><a href="{% url 'institutional:robotica_celulas_automatizadas' %}"><i class="fa-solid fa-arrow-right"></i></a></div>
           </div>
         </div>
       </div>

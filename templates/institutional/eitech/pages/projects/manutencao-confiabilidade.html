@@ -1,6 +1,9 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Manutenção, retrofit e confiabilidade | Smart Control Brasil{% endblock %}
+{% block meta_description %}Modernização de máquinas, retrofit de comandos, análise de falhas, TPM, RCM/MCC e confiabilidade operacional.{% endblock %}
+
 {% block content %}
 <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
   <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
@@ -8,7 +11,7 @@
   <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
   <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
   <div class="container">
-    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Manutenção e Confiabilidade</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Manutenção e Confiabilidade</span></a></div></div></div>
+    <div class="row"><div class="col-lg-8 m-auto"><div class="inner-header text-center heading1"><h1>Manutenção, retrofit e confiabilidade</h1><div class="space28"></div><a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Manutenção, retrofit e confiabilidade</span></a></div></div></div>
   </div>
 </div>
 
@@ -19,25 +22,25 @@
         <div class="case-sider-widget-area" style="padding: 0 !important;">
           <div class="img1 image-anime reveal"><img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt=""></div>
           <div class="space32"></div>
-          <h3>Manutenção e Confiabilidade</h3>
+          <h3>Abordagem operacional</h3>
           <div class="space20"></div>
-          <p><strong>Categoria:</strong> TPM e gestão de ativos</p>
-          <p><strong>Cliente:</strong> Projeto Smart Control Brasil</p>
-          <p><strong>Status:</strong> Em desenvolvimento / Frente de atuação</p>
-          <p><strong>Foco:</strong> Tecnologia aplicada, processos, dados e operação</p>
+          <p>A prioridade é aumentar disponibilidade e segurança com ações proporcionais ao risco, criticidade do ativo e impacto real na produção.</p>
+          <p><strong>Cliente:</strong> Smart Control Brasil</p>
+          <p><strong>Status:</strong> Frente de atuação em automação industrial</p>
+          <p><strong>Foco:</strong> Retrofit, análise de falhas, TPM, RCM/MCC e disponibilidade de ativos</p>
           <div class="space20"></div>
-          <p>Estratégias de manutenção, análise de falhas, indicadores, planos preventivos e melhoria contínua para aumentar disponibilidade e reduzir paradas.</p>
+          <p>Máquinas com comandos obsoletos, falhas repetitivas e documentação incompleta exigem abordagem técnica para reduzir paradas e improvisos.</p>
           <div class="space20"></div>
-          <p>A proposta organiza histórico técnico de ativos e rotina de execução para dar previsibilidade à operação e apoiar decisões com base em dados de campo.</p>
+          <p>A frente combina retrofit, organização de registros técnicos, análise de causa, manutenção preventiva, TPM e princípios de RCM/MCC quando aplicáveis.</p>
           <div class="space50"></div>
           <h3>Abordagem operacional</h3>
           <div class="space20"></div>
           <p>A frente contempla TPM, análise de falhas, indicadores de manutenção, planos preventivos, histórico de ativos e ciclos de melhoria contínua.</p>
           <div class="space12"></div>
           <div class="row">
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Plano preventivo e rotina</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Registro de intervenções</li></ul></div>
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Indicadores de execução</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Análise de falhas</li></ul></div>
-            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Histórico por ativo</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Melhoria contínua orientada</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Retrofit de máquinas</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">TPM e rotina técnica</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Planos preventivos</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Análise de falhas</li></ul></div>
+            <div class="col-lg-4 col-md-6"><ul class="list"><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">RCM/MCC por criticidade</li><li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="">Indicadores de confiabilidade</li></ul></div>
           </div>
           <div class="space32"></div>
           <div class="btn-area1">
@@ -54,8 +57,8 @@
   <div class="container">
     <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 space-margin60 text-center"><h2>Projetos relacionados</h2></div></div></div>
     <div class="row">
-      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Automação Industrial e CLPs</p><div class="space16"></div><a href="{% url 'institutional:project_automacao_industrial_clps' %}">Ver projetos</a><div class="arrow"><a href="{% url 'institutional:project_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
-      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>Smart360</p><div class="space16"></div><a href="{% url 'institutional:project_smart360' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:project_smart360' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt=""></div><div class="content-area"><p>Automação industrial, CLPs e IHMs</p><div class="space16"></div><a href="{% url 'institutional:automacao_industrial_clps_ihms' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:automacao_industrial_clps_ihms' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
+      <div class="col-lg-6 col-md-6"><div class="case-slider-boxarea"><div class="img1 image-anime"><img src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt=""></div><div class="content-area"><p>Supervisão industrial e dados operacionais</p><div class="space16"></div><a href="{% url 'institutional:supervisao_dados_industriais' %}">Conhecer frente</a><div class="arrow"><a href="{% url 'institutional:supervisao_dados_industriais' %}"><i class="fa-solid fa-arrow-right"></i></a></div></div></div></div>
     </div>
   </div>
 </div>

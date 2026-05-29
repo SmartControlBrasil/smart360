@@ -1,0 +1,42 @@
+{% extends "client_portal/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="portal-topbar">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="portal-muted">Visão simples dos chamados e equipamentos vinculados ao seu acesso.</p>
+  </div>
+  <a class="portal-btn" href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>
+</div>
+{% if not has_scope_data %}
+  <div class="portal-empty">Nenhum dado disponível para o seu usuário neste portal. Se você esperava ver equipamentos ou chamados, solicite a vinculação da sua conta a uma empresa ou unidade.</div>
+{% endif %}
+<div class="portal-grid cards">
+  <div class="portal-card"><div class="portal-muted">Chamados abertos</div><div class="portal-kpi">{{ open_count }}</div></div>
+  <div class="portal-card"><div class="portal-muted">Em andamento</div><div class="portal-kpi">{{ in_progress_count }}</div></div>
+  <div class="portal-card"><div class="portal-muted">Concluídos</div><div class="portal-kpi">{{ completed_count }}</div></div>
+  <div class="portal-card"><div class="portal-muted">Equipamentos</div><div class="portal-kpi">{{ asset_count }}</div></div>
+  <div class="portal-card"><div class="portal-muted">Equipamentos parados</div><div class="portal-kpi">{{ stopped_asset_count }}</div></div>
+</div>
+<div class="portal-grid two" style="margin-top:16px;">
+  <div class="portal-card"><h3>Chamados por status</h3><div id="status-chart"></div></div>
+  <div class="portal-card"><h3>Chamados por tipo</h3><div id="type-chart"></div></div>
+  <div class="portal-card"><h3>Chamados por mês</h3><div id="month-chart"></div></div>
+</div>
+{{ status_chart|json_script:"status-chart-data" }}
+{{ type_chart|json_script:"type-chart-data" }}
+{{ month_chart|json_script:"month-chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  function drawChart(id, dataId, type) {
+    const data = JSON.parse(document.getElementById(dataId).textContent);
+    const options = type === 'bar'
+      ? { chart: { type: 'bar', height: 240, toolbar: { show: false } }, series: [{ name: 'Chamados', data: data.series }], xaxis: { categories: data.labels } }
+      : { chart: { type: 'donut', height: 240 }, labels: data.labels, series: data.series };
+    new ApexCharts(document.querySelector(id), options).render();
+  }
+  drawChart('#status-chart', 'status-chart-data', 'donut');
+  drawChart('#type-chart', 'type-chart-data', 'donut');
+  drawChart('#month-chart', 'month-chart-data', 'bar');
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "client_portal/base.html" %}
+{% block title %}Equipamentos{% endblock %}
+{% block content %}
+<div class="portal-topbar"><div><h1>Equipamentos</h1><p class="portal-muted">Ativos vinculados ao seu cliente/unidade.</p></div></div>
+<table class="portal-table">
+  <thead><tr><th>Nome</th><th>Unidade/site</th><th>Status</th><th>Chamados abertos</th></tr></thead>
+  <tbody>
+    {% for asset in assets %}
+      <tr><td>{{ asset.name }}<br><span class="portal-muted">{{ asset.asset_tag }}</span></td><td>{{ asset.operational_site }}</td><td>{{ asset.get_status_display }}</td><td>{{ asset.open_orders_count }}</td></tr>
+    {% empty %}
+      <tr><td colspan="4">Nenhum equipamento encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

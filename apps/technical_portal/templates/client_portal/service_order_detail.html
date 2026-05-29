@@ -1,0 +1,28 @@
+{% extends "client_portal/base.html" %}
+{% block title %}Chamado {{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="portal-topbar"><div><h1>{{ order.order_number }}</h1><p class="portal-muted">{{ order.title }}</p></div><a class="portal-btn secondary" href="{% url 'technical_portal:service-orders' %}">Voltar</a></div>
+<div class="portal-grid two">
+  <div class="portal-card">
+    <h3>Dados principais</h3>
+    <p><strong>Cliente:</strong> {{ order.client }}</p>
+    <p><strong>Unidade:</strong> {{ order.operational_site }}</p>
+    <p><strong>Equipamento:</strong> {{ order.asset|default:"-" }}</p>
+    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+    <p><strong>Prioridade:</strong> {{ order.get_priority_display }}</p>
+    <p><strong>Tipo:</strong> {{ order.get_maintenance_type_display }}</p>
+  </div>
+  <div class="portal-card">
+    <h3>Descrição</h3>
+    <p>{{ order.description|linebreaksbr }}</p>
+  </div>
+</div>
+<div class="portal-card" style="margin-top:16px;">
+  <h3>Histórico básico</h3>
+  {% for log in work_logs %}
+    <p><strong>{{ log.started_at|default:log.created_at|date:"d/m/Y H:i" }}</strong> - {{ log.notes|default:"Registro técnico" }}</p>
+  {% empty %}
+    <p class="portal-muted">Nenhum histórico técnico registrado ainda.</p>
+  {% endfor %}
+</div>
+{% endblock %}

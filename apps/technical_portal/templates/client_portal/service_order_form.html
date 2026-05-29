@@ -1,0 +1,13 @@
+{% extends "client_portal/base.html" %}
+{% block title %}Abrir chamado{% endblock %}
+{% block content %}
+<div class="portal-topbar"><div><h1>Abrir chamado</h1><p class="portal-muted">Descreva o problema para gerar uma OS real no sistema.</p></div></div>
+<div class="portal-card">
+  <form method="post" class="portal-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="portal-btn" type="submit">Abrir chamado</button>
+    <a class="portal-btn secondary" href="{% url 'technical_portal:service-orders' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

@@ -17,14 +17,14 @@
                               <li><a href="{% url 'institutional:about' %}">Sobre</a></li>
                               <li class="nav-item nav-item--has-dropdown scb-nav-dropdown">
                                 <a href="{% url 'institutional:services' %}">Soluções</a>
-                                <ul class="sub-menu solutions-dropdown">
+                                {% comment %} <ul class="sub-menu solutions-dropdown">
                                   <li><a href="{% url 'institutional:services' %}">Visão geral</a></li>
                                   <li><a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação Industrial</a></li>
                                   <li><a href="{% url 'institutional:service_inteligencia_artificial' %}">Inteligência Artificial</a></li>
                                   <li><a href="{% url 'institutional:service_details' %}">Cybersecurity</a></li>
                                   <li><a href="{% url 'institutional:smart360' %}">Sites e Sistemas</a></li>
                                   <li><a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">Manutenção Técnica / HVAC</a></li>
-                                </ul>
+                                </ul> {% endcomment %}
                               </li>
                               <li><a href="{% url 'institutional:projects' %}">Projetos</a></li>
                               <li><a href="{% url 'institutional:blog' %}">Blog</a></li>

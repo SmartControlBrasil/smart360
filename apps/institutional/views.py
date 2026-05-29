@@ -63,12 +63,15 @@ def contact(request):
             return redirect("institutional:contact")
 
         interest_label_by_value = {
-            "manutencao": "Manutenção e Confiabilidade",
-            "automacao": "Automação Industrial",
-            "smart360": "Smart360",
-            "cybersecurity": "Cybersecurity",
-            "ia": "IA e Automações",
-            "sites": "Sites e Marketing Digital",
+            "automacao": "Automação Industrial, CLPs e IHMs",
+            "robotica": "Robótica e Automação Aplicada",
+            "iot_dados": "IoT, Dados, Integração e Dashboards",
+            "produtos": "Produtos, Kits, Robôs e Componentes",
+            "retrofit": "Retrofit de Máquinas e Painéis Elétricos",
+            "manutencao": "Manutenção Técnica, TPM e Confiabilidade",
+            "acionamentos": "Inversores, Servoacionamentos e Motion Control",
+            "supervisorio": "Supervisório, Dados Industriais e Indicadores",
+            "energia": "Gerenciamento de Energia e Utilidades",
         }
         interest_display = interest_label_by_value.get(
             interest, interest or "Não informado"

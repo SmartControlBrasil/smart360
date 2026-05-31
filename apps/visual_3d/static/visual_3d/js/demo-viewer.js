@@ -5,14 +5,120 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // Importa o loader responsável por carregar o arquivo GLB da caneca.
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-// Caminho público do modelo 3D principal da caneca servido pelos arquivos estáticos do Django.
-const MODEL_URL = "/static/visual_3d/models/mug.glb";
-// Tamanho visual alvo do GLB após o cálculo automático de escala.
-const GLB_DISPLAY_SIZE = 3.2;
+// Configuração neutra usada como base para produtos que ainda não têm arte personalizada ativa.
+const NEUTRAL_ARTWORK_CONFIG = {
+  textureOffsetX: 0,
+  textureOffsetY: 0,
+  textureRepeatX: 1,
+  textureRepeatY: 1,
+  textureRotation: 0,
+  safeWidth: 0.6,
+  safeTop: 0.03,
+  safeBottom: 0.08,
+  baseOffsetX: 0,
+  startSideOffset: 0,
+  defaultOffsetX: 0,
+  defaultOffsetY: 0,
+  defaultScaleX: 1,
+  defaultScaleY: 1,
+};
+
+// Presets concentram modelo, enquadramento e posicionamento de arte por produto 3D.
+const PRODUCT_PRESETS = {
+  mug: {
+    label: "Caneca",
+    modelUrl: "/static/visual_3d/models/mug.glb",
+    baseRotationDegrees: 90,
+    displaySize: 3.2,
+    artworkEnabled: true,
+    artworkConfig: {
+      // CONFIGURAÇÃO VALIDADA DA CANECA
+      // Não alterar sem teste visual.
+      // Valores que alinharam a arte em relação à alça:
+      // textureOffsetX: 0.5
+      // textureOffsetY: -0.2
+      textureOffsetX: 0.5,
+      textureOffsetY: -0.2,
+      textureRepeatX: 1,
+      textureRepeatY: 1,
+      textureRotation: 0,
+      safeWidth: 0.6,
+      safeTop: 0.03,
+      safeBottom: 0.08,
+      baseOffsetX: 0.20,
+      startSideOffset: 0.55,
+      defaultOffsetX: 0,
+      defaultOffsetY: -1,
+      defaultScaleX: 1,
+      defaultScaleY: 1,
+    },
+  },
+  longDrink: {
+    label: "Long Drink",
+    modelUrl: "/static/visual_3d/models/long_drink_glass.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    artworkEnabled: true,
+    artworkConfig: {
+      ...NEUTRAL_ARTWORK_CONFIG,
+    },
+  },
+  beerMug: {
+    label: "Caneca de Chopp",
+    modelUrl: "/static/visual_3d/models/beer_mug_glass.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    artworkEnabled: false,
+    artworkConfig: {
+      ...NEUTRAL_ARTWORK_CONFIG,
+    },
+  },
+  cap: {
+    label: "Boné",
+    modelUrl: "/static/visual_3d/models/baseball_cap.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    artworkEnabled: false,
+    artworkConfig: {
+      ...NEUTRAL_ARTWORK_CONFIG,
+    },
+  },
+  flipFlop: {
+    label: "Chinelo",
+    modelUrl: "/static/visual_3d/models/havaianas_women_flip_flop.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    artworkEnabled: false,
+    artworkConfig: {
+      ...NEUTRAL_ARTWORK_CONFIG,
+    },
+  },
+  ceramicTile: {
+    label: "Azulejo",
+    modelUrl: "/static/visual_3d/models/art_nouveau_ceramic_tile.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    artworkEnabled: false,
+    artworkConfig: {
+      ...NEUTRAL_ARTWORK_CONFIG,
+    },
+  },
+  popcornBucket: {
+    label: "Baldinho de Pipoca",
+    modelUrl: "/static/visual_3d/models/giant_super-jumbo_movie_popcorn.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    artworkEnabled: false,
+    artworkConfig: {
+      ...NEUTRAL_ARTWORK_CONFIG,
+    },
+  },
+};
+
+// Produto atual; por padrão o visualizador abre na caneca validada.
+let currentProductKey = "mug";
 // Folga usada para posicionar a câmera sem cortar o modelo nas bordas do canvas.
 const CAMERA_FIT_PADDING = 1.35;
-// Corrige a orientação inicial do mug.glb para aproximar a alça do início da estampa.
-const MUG_MODEL_BASE_ROTATION_DEGREES = 90;
 // Valor padrão do controle manual "Girar caneca"; soma por cima da rotação base.
 const USER_MODEL_ROTATION_DEFAULT_DEGREES = 0;
 // Largura do canvas 2D interno onde a arte do usuário é composta antes de virar textura.
@@ -21,16 +127,6 @@ const ARTWORK_CANVAS_WIDTH = 2048;
 const ARTWORK_CANVAS_HEIGHT = 1024;
 // Cor de fundo aplicada no canvas da arte; vira área branca/respiro na textura.
 const ARTWORK_CANVAS_BACKGROUND = "#ffffff";
-// Fração horizontal útil do canvas usada como base para conter a arte sem ocupar tudo.
-const ARTWORK_SAFE_WIDTH = 0.6;
-// Margem superior da área útil da arte dentro do canvas intermediário.
-const ARTWORK_SAFE_TOP = 0.03;
-// Margem inferior da área útil da arte dentro do canvas intermediário.
-const ARTWORK_SAFE_BOTTOM = 0.08;
-// Deslocamento horizontal base aplicado antes do slider Posição X.
-const ARTWORK_BASE_OFFSET_X = 0.20;
-// Deslocamento extra de início lateral para aproximar a arte da região esperada da costura/alça.
-const ARTWORK_START_SIDE_OFFSET = 0.55;
 // Palavras usadas para tentar identificar meshes/materiais de alça quando o GLB vier separado.
 const HANDLE_NAME_PARTS = ["handle", "alca", "alça", "grip", "asa", "pegador"];
 
@@ -79,21 +175,27 @@ const artworkOutputs = {
 };
 // Tipos de imagem aceitos no upload para evitar arquivos incompatíveis.
 const allowedArtworkTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
-// Estado inicial dos controles de arte usados para desenhar no canvas intermediário.
-const defaultArtworkTransform = {
-  // Deslocamento horizontal inicial da arte.
-  offsetX: 0,
-  // Deslocamento vertical inicial da arte; negativo posiciona mais para baixo/alto conforme o cálculo usado.
-  offsetY: -1,
-  // Escala horizontal inicial da arte.
-  scaleX: 1,
-  // Escala vertical inicial da arte.
-  scaleY: 1,
-  // Espelhamento horizontal inicial.
-  flipX: false,
-  // Espelhamento vertical inicial; corrige a orientação visual esperada no UV atual.
-  flipY: true,
-};
+// Cria o estado inicial dos controles de arte com base no preset do produto atual.
+function buildDefaultArtworkTransform() {
+  // Lê defaults específicos do produto, com fallback seguro para a caneca.
+  const config = getCurrentArtworkConfig();
+
+  // Retorna o objeto mutável que alimenta sliders e checkboxes.
+  return {
+    // Deslocamento horizontal inicial da arte.
+    offsetX: config.defaultOffsetX ?? 0,
+    // Deslocamento vertical inicial da arte; negativo posiciona mais para baixo/alto conforme o cálculo usado.
+    offsetY: config.defaultOffsetY ?? -1,
+    // Escala horizontal inicial da arte.
+    scaleX: config.defaultScaleX ?? 1,
+    // Escala vertical inicial da arte.
+    scaleY: config.defaultScaleY ?? 1,
+    // Espelhamento horizontal inicial.
+    flipX: false,
+    // Espelhamento vertical inicial; corrige a orientação visual esperada no UV atual.
+    flipY: true,
+  };
+}
 
 // Textura ativa criada a partir do canvas intermediário.
 let artworkTexture = null;
@@ -112,7 +214,7 @@ let autoRotateEnabled = true;
 // Valor atual do slider "Girar caneca", em graus.
 let userRotationDegrees = USER_MODEL_ROTATION_DEFAULT_DEGREES;
 // Estado mutável dos controles de arte usado por redrawArtworkCanvas().
-let artworkTransform = { ...defaultArtworkTransform };
+let artworkTransform = buildDefaultArtworkTransform();
 
 // Cena principal do Three.js, onde câmera, luzes, chão e caneca são inseridos.
 const scene = new THREE.Scene();
@@ -292,6 +394,16 @@ function updateModelStatus(message, state = "idle") {
   modelStatus.dataset.state = state;
 }
 
+// Retorna o preset do produto atual, caindo para caneca se a chave for inválida.
+function getCurrentProductPreset() {
+  return PRODUCT_PRESETS[currentProductKey] || PRODUCT_PRESETS.mug;
+}
+
+// Retorna a configuração de arte do produto atual, preservando a configuração validada da caneca como fallback.
+function getCurrentArtworkConfig() {
+  return getCurrentProductPreset().artworkConfig || PRODUCT_PRESETS.mug.artworkConfig;
+}
+
 // Formata valores dos sliders removendo zeros finais para deixar a UI mais limpa.
 function formatArtworkValue(name, value) {
   // Converte para número, fixa duas casas e remove zeros desnecessários.
@@ -309,7 +421,7 @@ function syncMugRotationControl() {
 // Aplica a rotação visual do modelo, somando rotação base técnica e rotação do usuário.
 function applyModelRotation() {
   // Converte a rotação base do modelo de graus para radianos, formato usado pelo Three.js.
-  const baseRotationRadians = THREE.MathUtils.degToRad(MUG_MODEL_BASE_ROTATION_DEGREES);
+  const baseRotationRadians = THREE.MathUtils.degToRad(getCurrentProductPreset().baseRotationDegrees ?? 0);
   // Converte a rotação escolhida no slider de graus para radianos.
   const userRotationRadians = THREE.MathUtils.degToRad(userRotationDegrees);
 
@@ -410,12 +522,14 @@ function redrawArtworkCanvas() {
   const canvasWidth = artworkCanvas.width;
   // Altura real do canvas de composição.
   const canvasHeight = artworkCanvas.height;
+  // Configuração de arte específica do produto atual.
+  const config = getCurrentArtworkConfig();
   // Largura segura: fração do canvas onde a arte deve caber por padrão.
-  const safeWidth = canvasWidth * ARTWORK_SAFE_WIDTH;
+  const safeWidth = canvasWidth * (config.safeWidth ?? 0.6);
   // Altura segura: canvas menos margens superior e inferior.
-  const safeHeight = canvasHeight * (1 - ARTWORK_SAFE_TOP - ARTWORK_SAFE_BOTTOM);
+  const safeHeight = canvasHeight * (1 - (config.safeTop ?? 0.03) - (config.safeBottom ?? 0.08));
   // Posição Y inicial da área segura, calculada a partir da margem superior.
-  const safeTop = canvasHeight * ARTWORK_SAFE_TOP;
+  const safeTop = canvasHeight * (config.safeTop ?? 0.03);
   // Proporção original da imagem enviada pelo usuário.
   const imageAspect = artworkImage.naturalWidth / artworkImage.naturalHeight;
   // Proporção da área segura onde a imagem será encaixada.
@@ -445,7 +559,7 @@ function redrawArtworkCanvas() {
   // Centro X final: centro do canvas + offsets base/início + slider Posição X.
   const centerX = canvasWidth / 2 +
   // Esta soma controla a aproximação horizontal da arte em relação à costura/alça no UV.
-  (ARTWORK_BASE_OFFSET_X + ARTWORK_START_SIDE_OFFSET + artworkTransform.offsetX) * horizontalTravel;
+  ((config.baseOffsetX ?? 0) + (config.startSideOffset ?? 0) + artworkTransform.offsetX) * horizontalTravel;
   // Centro Y final: centro da área segura, invertendo o sentido visual do slider Y.
   const centerY = safeTop + safeHeight / 2 - artworkTransform.offsetY * verticalTravel;
 
@@ -483,12 +597,20 @@ function applyArtworkTransform() {
     return;
   }
 
-  // Offset UV da textura no material; mantido em zero para o canvas controlar a posição principal.
-  artworkTexture.offset.set(0.5, -0.2);
-  // Mantém uma única repetição lógica da textura no material.
-  artworkTexture.repeat.set(1, 1);
-  // Garante que não há rotação da textura no UV.
-  artworkTexture.rotation = 0;
+  // Configuração de UV específica do produto atual.
+  const config = getCurrentArtworkConfig();
+  // Offset UV da textura no material definido por preset, pois cada GLB tem UV própria.
+  artworkTexture.offset.set(
+    config.textureOffsetX ?? 0,
+    config.textureOffsetY ?? 0,
+  );
+  // Repetição lógica da textura definida por preset.
+  artworkTexture.repeat.set(
+    config.textureRepeatX ?? 1,
+    config.textureRepeatY ?? 1,
+  );
+  // Rotação da textura definida por preset.
+  artworkTexture.rotation = config.textureRotation ?? 0;
   // Redesenha a imagem no canvas com os valores atuais dos controles.
   redrawArtworkCanvas();
   // Marca a textura como atualizada após modificar offset/repeat/canvas.
@@ -498,7 +620,7 @@ function applyArtworkTransform() {
 // Reseta sliders, flips e rotação visual para os padrões atuais.
 function resetArtworkSettings({ apply = true } = {}) {
   // Restaura posição, escala e flips da arte.
-  artworkTransform = { ...defaultArtworkTransform };
+  artworkTransform = buildDefaultArtworkTransform();
   // Restaura o slider de rotação da caneca.
   resetModelRotation();
   // Atualiza inputs/outputs do HTML para refletir os padrões.
@@ -801,7 +923,7 @@ function fitModelToViewer(model) {
   // Maior eixo evita divisão por zero e define a escala proporcional.
   const largestSide = Math.max(size.x, size.y, size.z, 0.001);
   // Fator que faz o maior eixo chegar no tamanho visual alvo.
-  const scale = GLB_DISPLAY_SIZE / largestSide;
+  const scale = (getCurrentProductPreset().displaySize ?? 3.2) / largestSide;
 
   // Centraliza o GLB na origem já considerando a escala aplicada ao grupo.
   model.scale.setScalar(scale);
@@ -817,7 +939,7 @@ function fitModelToViewer(model) {
   // Centro final usado como target dos controles.
   const fittedCenter = fittedBox.getCenter(new THREE.Vector3());
   // Maior eixo final ajuda a calcular distância segura da câmera.
-  const fittedLargestSide = Math.max(fittedSize.x, fittedSize.y, fittedSize.z, GLB_DISPLAY_SIZE);
+  const fittedLargestSide = Math.max(fittedSize.x, fittedSize.y, fittedSize.z, getCurrentProductPreset().displaySize ?? 3.2);
   // FOV vertical da câmera convertido para radianos.
   const verticalFov = THREE.MathUtils.degToRad(camera.fov);
   // FOV horizontal derivado do FOV vertical e aspect ratio atual.
@@ -890,7 +1012,7 @@ function loadGlbModel() {
   // Inicia carregamento assíncrono do modelo.
   loader.load(
     // URL do arquivo GLB.
-    MODEL_URL,
+    getCurrentProductPreset().modelUrl,
     // Callback de sucesso.
     (gltf) => {
       // Guarda a cena raiz do GLB para aplicar textura/restaurar depois.

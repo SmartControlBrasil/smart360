@@ -164,6 +164,8 @@ let artworkObjectUrl = null;
 let glbModel = null;
 // Produto atualmente selecionado no viewer.
 let currentProductKey = productSelector?.value || "mug";
+// Sequência de carregamento usada para ignorar callbacks antigos de GLB.
+let modelLoadId = 0;
 // Controla se o grupo externo gira automaticamente no loop de animação.
 let autoRotateEnabled = true;
 // Valor atual do slider "Girar caneca", em graus.
@@ -742,6 +744,62 @@ function cloneStoredMaterial(material) {
   return clonedMaterial;
 }
 
+// Descarta um material e texturas internas quando o modelo deixa a cena.
+function disposeMaterial(material) {
+  if (!material) {
+    return;
+  }
+
+  if (Array.isArray(material)) {
+    material.forEach(disposeMaterial);
+    return;
+  }
+
+  [
+    "map",
+    "normalMap",
+    "roughnessMap",
+    "metalnessMap",
+    "aoMap",
+    "emissiveMap",
+    "alphaMap",
+    "bumpMap",
+    "displacementMap",
+    "envMap",
+    "lightMap",
+  ].forEach((textureKey) => {
+    if (material[textureKey]) {
+      material[textureKey].dispose();
+    }
+  });
+
+  material.dispose();
+}
+
+// Remove completamente o GLB atual da cena e libera geometria/material/texturas.
+function disposeCurrentGlbModel() {
+  if (!glbModel) {
+    return;
+  }
+
+  glbModel.traverse((child) => {
+    if (!child.isMesh) {
+      return;
+    }
+
+    if (child.geometry) {
+      child.geometry.dispose();
+    }
+
+    disposeMaterial(child.material);
+    disposeMaterial(child.userData.originalMaterial);
+    child.userData.originalMaterial = null;
+  });
+
+  modelRoot.remove(glbModel);
+  glbModel = null;
+}
+
 // Restaura todos os materiais originais do GLB depois de remover ou trocar a arte.
 function restoreGlbMaterials() {
   // Se o GLB ainda não carregou, não há materiais para restaurar.
@@ -955,6 +1013,7 @@ function showFallbackModel() {
 // Carrega o GLB da caneca e prepara diagnóstico, materiais e enquadramento.
 function loadGlbModel() {
   const preset = getCurrentProductPreset();
+  const loadId = ++modelLoadId;
 
   // Mostra estado de carregamento na UI.
   updateModelStatus(`Carregando ${preset.label}...`, "loading");
@@ -968,7 +1027,7 @@ function loadGlbModel() {
     // Callback de sucesso.
     (gltf) => {
       // Se o usuário trocou de produto durante o carregamento, ignora este resultado antigo.
-      if (preset !== getCurrentProductPreset()) {
+      if (loadId !== modelLoadId || preset !== getCurrentProductPreset()) {
         return;
       }
 
@@ -1001,6 +1060,10 @@ function loadGlbModel() {
     undefined,
     // Callback de erro: mantém fallback geométrico.
     () => {
+      if (loadId !== modelLoadId || preset !== getCurrentProductPreset()) {
+        return;
+      }
+
       // Torna fallback visível.
       showFallbackModel();
       // Informa que não há diagnóstico de GLB.
@@ -1011,27 +1074,43 @@ function loadGlbModel() {
   );
 }
 
-// Remove o GLB atual da cena antes de carregar outro produto.
-function clearLoadedModel() {
-  if (!glbModel) {
-    return;
-  }
-
-  modelRoot.remove(glbModel);
-  glbModel = null;
-}
-
 // Troca o produto ativo, limpa arte/modelo atual e carrega o GLB do preset escolhido.
 function switchProduct(nextProductKey) {
-  if (!PRODUCT_PRESETS[nextProductKey] || nextProductKey === currentProductKey) {
+  const normalizedProductKey = PRODUCT_PRESETS[nextProductKey] ? nextProductKey : "mug";
+
+  if (normalizedProductKey === currentProductKey) {
     return;
   }
 
-  resetArtwork();
-  clearLoadedModel();
+  // Atualiza o preset antes de resetar controles para que o estado novo comande a UI.
+  currentProductKey = normalizedProductKey;
+  if (productSelector) {
+    productSelector.value = currentProductKey;
+  }
+
+  // Remove qualquer arte/textura do produto anterior.
+  disposeArtworkTexture();
+  resetFallbackMaterial();
+  restoreGlbMaterials();
+  disposeCurrentGlbModel();
+
+  // O fallback só aparece se o carregamento do novo GLB falhar.
   fallbackMug.visible = false;
-  currentProductKey = nextProductKey;
-  resetModelRotation();
+  diagnosticsSummary.textContent = "Aguardando carregamento do modelo...";
+  diagnosticsBody.innerHTML = "";
+
+  if (artworkInput) {
+    artworkInput.value = "";
+  }
+
+  resetArtworkSettings({ apply: false });
+
+  if (getCurrentProductPreset().artworkEnabled) {
+    updateArtworkStatus("Nenhuma arte aplicada");
+  } else {
+    updateArtworkStatus("Arte personalizada ainda não disponível para este produto.", "warning");
+  }
+
   syncArtworkControls();
   loadGlbModel();
 }

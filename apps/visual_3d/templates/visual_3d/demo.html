@@ -1,0 +1,122 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart 3D Visualizer</title>
+  <link rel="stylesheet" href="{% static 'visual_3d/css/visual-3d.css' %}">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="visual-3d-page">
+    <section class="visual-3d-header">
+      <p class="visual-3d-eyebrow">SMART360 platform MVP</p>
+      <h1>Smart 3D Visualizer</h1>
+      <p>Um MVP reutilizavel da plataforma para visualizar produtos, equipamentos e objetos 3D em areas como Caneca de Garagem, Smart Marketplace e Smart System.</p>
+    </section>
+
+    <section class="visual-3d-viewer" aria-label="Visualizador 3D de demonstracao">
+      <div class="visual-3d-stage">
+        <div id="visual-3d-canvas" class="visual-3d-canvas"></div>
+      </div>
+
+      <aside class="visual-3d-side-panel" aria-label="Controles do visualizador 3D">
+        <div class="visual-3d-actions">
+          <label class="visual-3d-upload" for="artwork-input">
+            Aplicar arte
+            <input id="artwork-input" type="file" accept="image/png,image/jpeg,image/webp">
+          </label>
+          <button type="button" id="remove-artwork" class="visual-3d-secondary">Remover arte</button>
+          <button type="button" id="capture-preview">Capturar preview</button>
+          <button type="button" id="toggle-rotation" class="visual-3d-secondary">Pausar rotação</button>
+        </div>
+
+        <div class="visual-3d-artwork-adjustments" aria-label="Ajuste da arte">
+          <div class="visual-3d-adjustments-header">
+            <h2>Ajuste da arte</h2>
+            <button type="button" id="reset-artwork-adjustments" class="visual-3d-secondary">Resetar ajustes</button>
+          </div>
+          <div class="visual-3d-adjustments-grid">
+            <label class="visual-3d-range-control" for="mug-rotation">
+              <span>Girar caneca</span>
+              <output id="mug-rotation-value" for="mug-rotation">0°</output>
+              <input id="mug-rotation" type="range" min="-180" max="180" step="1" value="0">
+            </label>
+          </div>
+          <div class="visual-3d-toggle-grid">
+            <label class="visual-3d-toggle-control" for="artwork-flip-x">
+              <input id="artwork-flip-x" data-artwork-toggle="flipX" type="checkbox" disabled>
+              <span>Inverter horizontalmente</span>
+            </label>
+            <label class="visual-3d-toggle-control" for="artwork-flip-y">
+              <input id="artwork-flip-y" data-artwork-toggle="flipY" type="checkbox" disabled>
+              <span>Inverter verticalmente</span>
+            </label>
+          </div>
+          <div class="visual-3d-adjustments-grid">
+            <label class="visual-3d-range-control" for="artwork-offset-x">
+              <span>Posição X</span>
+              <output id="artwork-offset-x-value" for="artwork-offset-x">0</output>
+              <input id="artwork-offset-x" data-artwork-control="offsetX" type="range" min="-2" max="1" step="0.01" value="0" disabled>
+            </label>
+            <label class="visual-3d-range-control" for="artwork-offset-y">
+              <span>Posição Y</span>
+              <output id="artwork-offset-y-value" for="artwork-offset-y">0</output>
+              <input id="artwork-offset-y" data-artwork-control="offsetY" type="range" min="-1" max="1" step="0.01" value="0" disabled>
+            </label>
+            <label class="visual-3d-range-control" for="artwork-scale-x">
+              <span>Escala X</span>
+              <output id="artwork-scale-x-value" for="artwork-scale-x">1</output>
+              <input id="artwork-scale-x" data-artwork-control="scaleX" type="range" min="0.1" max="1.5" step="0.01" value="1" disabled>
+            </label>
+            <label class="visual-3d-range-control" for="artwork-scale-y">
+              <span>Escala Y</span>
+              <output id="artwork-scale-y-value" for="artwork-scale-y">1</output>
+              <input id="artwork-scale-y" data-artwork-control="scaleY" type="range" min="0.1" max="1.0" step="0.01" value="1" disabled>
+            </label>
+          </div>
+        </div>
+
+        <div class="visual-3d-status-list">
+          <p id="model-status" class="visual-3d-status" data-state="loading" role="status">Carregando modelo 3D...</p>
+          <p id="artwork-status" class="visual-3d-status" data-state="idle" role="status">Nenhuma arte aplicada</p>
+        </div>
+
+        <section class="visual-3d-diagnostics" aria-labelledby="model-diagnostics-title">
+          <h2 id="model-diagnostics-title">Diagnóstico do modelo 3D</h2>
+          <p id="model-diagnostics-summary" class="visual-3d-diagnostics-summary">Aguardando carregamento do modelo...</p>
+          <div class="visual-3d-diagnostics-table-wrap">
+            <table class="visual-3d-diagnostics-table">
+              <thead>
+                <tr>
+                  <th scope="col">Mesh</th>
+                  <th scope="col">Material</th>
+                  <th scope="col">Vértices</th>
+                  <th scope="col">Alça?</th>
+                </tr>
+              </thead>
+              <tbody id="model-diagnostics-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="visual-3d-preview" aria-live="polite">
+      <h2>Preview capturado</h2>
+      <p id="preview-empty" class="visual-3d-preview-empty">Nenhum preview capturado ainda.</p>
+      <img id="captured-preview" alt="Preview capturado do visualizador 3D">
+    </section>
+  </main>
+
+  <script type="module" src="{% static 'visual_3d/js/demo-viewer.js' %}"></script>
+</body>
+</html>

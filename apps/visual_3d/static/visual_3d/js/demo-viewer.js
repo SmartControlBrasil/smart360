@@ -391,7 +391,7 @@ function ensureArtworkCanvasTexture() {
     // No eixo vertical, prende na borda para evitar mosaico de cima para baixo.
     artworkTexture.wrapT = THREE.ClampToEdgeWrapping;
     // Centro da textura usado se rotação fosse aplicada; mantido centralizado.
-    artworkTexture.center.set(0.5, 0.5);
+    artworkTexture.center.set(0.35, 0.5);
     // Offset inicial da textura no UV.
     artworkTexture.offset.set(0, 0);
     // Sem repetição visual adicional por padrão.
@@ -462,7 +462,13 @@ function redrawArtworkCanvas() {
   // Aplica espelhamento horizontal/vertical quando os checkboxes estão ativos.
   artworkCanvasContext.scale(artworkTransform.flipX ? -1 : 1, artworkTransform.flipY ? -1 : 1);
   // Desenha a imagem centralizada na origem transformada.
-  artworkCanvasContext.drawImage(artworkImage, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+  artworkCanvasContext.drawImage(
+    artworkImage,
+    -drawWidth / 2, 
+    -drawHeight / 2,
+    drawWidth,
+    drawHeight,
+  );
   // Restaura o contexto para remover transformações antes do próximo redraw.
   artworkCanvasContext.restore();
 
@@ -478,7 +484,7 @@ function applyArtworkTransform() {
   }
 
   // Offset UV da textura no material; mantido em zero para o canvas controlar a posição principal.
-  artworkTexture.offset.set(0, 0);
+  artworkTexture.offset.set(0.5, -0.2);
   // Mantém uma única repetição lógica da textura no material.
   artworkTexture.repeat.set(1, 1);
   // Garante que não há rotação da textura no UV.

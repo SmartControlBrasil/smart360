@@ -5,14 +5,67 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // Importa o loader responsável por carregar o arquivo GLB da caneca.
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-// Caminho público do modelo 3D principal da caneca servido pelos arquivos estáticos do Django.
-const MODEL_URL = "/static/visual_3d/models/mug.glb";
-// Tamanho visual alvo do GLB após o cálculo automático de escala.
-const GLB_DISPLAY_SIZE = 3.2;
+// Configuração dos produtos disponíveis no seletor do personalizador.
+const PRODUCT_PRESETS = {
+  mug: {
+    label: "Caneca",
+    modelUrl: "/static/visual_3d/models/mug.glb",
+    baseRotationDegrees: 90,
+    displaySize: 3.2,
+    textureOffsetX: 0.25,
+    artworkEnabled: true,
+  },
+  longDrink: {
+    label: "Long Drink",
+    modelUrl: "/static/visual_3d/models/long_drink_glass.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    textureOffsetX: 0,
+    artworkEnabled: false,
+  },
+  beerMug: {
+    label: "Caneca de Chopp",
+    modelUrl: "/static/visual_3d/models/beer_mug_glass.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    textureOffsetX: 0,
+    artworkEnabled: false,
+  },
+  cap: {
+    label: "Boné",
+    modelUrl: "/static/visual_3d/models/baseball_cap.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    textureOffsetX: 0,
+    artworkEnabled: false,
+  },
+  flipFlop: {
+    label: "Chinelo",
+    modelUrl: "/static/visual_3d/models/havaianas_women_flip_flop.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    textureOffsetX: 0,
+    artworkEnabled: false,
+  },
+  tile: {
+    label: "Azulejo",
+    modelUrl: "/static/visual_3d/models/art_nouveau_ceramic_tile.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    textureOffsetX: 0,
+    artworkEnabled: false,
+  },
+  popcornBucket: {
+    label: "Baldinho de Pipoca",
+    modelUrl: "/static/visual_3d/models/giant_super-jumbo_movie_popcorn.glb",
+    baseRotationDegrees: 0,
+    displaySize: 3.2,
+    textureOffsetX: 0,
+    artworkEnabled: false,
+  },
+};
 // Folga usada para posicionar a câmera sem cortar o modelo nas bordas do canvas.
 const CAMERA_FIT_PADDING = 1.35;
-// Corrige a orientação inicial do mug.glb para aproximar a alça do início da estampa.
-const MUG_MODEL_BASE_ROTATION_DEGREES = 90;
 // Valor padrão do controle manual "Girar caneca"; soma por cima da rotação base.
 const USER_MODEL_ROTATION_DEFAULT_DEGREES = 0;
 // Largura do canvas 2D interno onde a arte do usuário é composta antes de virar textura.
@@ -50,6 +103,8 @@ const removeArtworkButton = document.getElementById("remove-artwork");
 const toggleRotationButton = document.getElementById("toggle-rotation");
 // Botão que volta controles de arte e rotação visual para o padrão.
 const resetArtworkAdjustmentsButton = document.getElementById("reset-artwork-adjustments");
+// Select visual de produtos; cada opção corresponde a uma chave de PRODUCT_PRESETS.
+const productSelector = document.getElementById("product-selector");
 // Slider do HTML que gira a caneca no eixo Y para visualização/alinhamento.
 const mugRotationInput = document.getElementById("mug-rotation");
 // Output textual que mostra em graus o valor do slider "Girar caneca".
@@ -107,6 +162,8 @@ let artworkCanvasContext = null;
 let artworkObjectUrl = null;
 // Referência ao GLB carregado; null enquanto o fallback estiver ativo ou antes do load.
 let glbModel = null;
+// Produto atualmente selecionado no viewer.
+let currentProductKey = productSelector?.value || "mug";
 // Controla se o grupo externo gira automaticamente no loop de animação.
 let autoRotateEnabled = true;
 // Valor atual do slider "Girar caneca", em graus.
@@ -292,6 +349,11 @@ function updateModelStatus(message, state = "idle") {
   modelStatus.dataset.state = state;
 }
 
+// Retorna o preset do produto atual, caindo para caneca se a chave for inválida.
+function getCurrentProductPreset() {
+  return PRODUCT_PRESETS[currentProductKey] || PRODUCT_PRESETS.mug;
+}
+
 // Formata valores dos sliders removendo zeros finais para deixar a UI mais limpa.
 function formatArtworkValue(name, value) {
   // Converte para número, fixa duas casas e remove zeros desnecessários.
@@ -309,7 +371,7 @@ function syncMugRotationControl() {
 // Aplica a rotação visual do modelo, somando rotação base técnica e rotação do usuário.
 function applyModelRotation() {
   // Converte a rotação base do modelo de graus para radianos, formato usado pelo Three.js.
-  const baseRotationRadians = THREE.MathUtils.degToRad(MUG_MODEL_BASE_ROTATION_DEGREES);
+  const baseRotationRadians = THREE.MathUtils.degToRad(getCurrentProductPreset().baseRotationDegrees);
   // Converte a rotação escolhida no slider de graus para radianos.
   const userRotationRadians = THREE.MathUtils.degToRad(userRotationDegrees);
 
@@ -330,7 +392,7 @@ function resetModelRotation() {
 // Sincroniza sliders/checkboxes com o estado atual e habilita/desabilita conforme existe arte.
 function syncArtworkControls() {
   // Só permite ajustes quando existe textura criada.
-  const hasArtwork = Boolean(artworkTexture);
+  const hasArtwork = Boolean(artworkTexture) && getCurrentProductPreset().artworkEnabled;
 
   // Percorre sliders de posição e escala.
   artworkControls.forEach((control) => {
@@ -484,7 +546,7 @@ function applyArtworkTransform() {
   }
 
   // Offset UV da textura no material; mantido em zero para o canvas controlar a posição principal.
-  artworkTexture.offset.set(0.5, -0.2);
+  artworkTexture.offset.set(getCurrentProductPreset().textureOffsetX, -0.2);
   // Mantém uma única repetição lógica da textura no material.
   artworkTexture.repeat.set(1, 1);
   // Garante que não há rotação da textura no UV.
@@ -747,6 +809,14 @@ function applyTextureToGlb(texture) {
 
 // Aplica textura ao GLB quando existe, ou ao fallback geométrico quando o GLB falhou.
 function applyTextureToActiveObject(texture) {
+  // Produtos sem arte habilitada carregam apenas o GLB por enquanto.
+  if (!getCurrentProductPreset().artworkEnabled) {
+    restoreGlbMaterials();
+    resetFallbackMaterial();
+    updateArtworkStatus("Arte personalizada ainda não disponível para este produto.", "warning");
+    return;
+  }
+
   // try/catch evita quebrar a página se o material do modelo for incompatível.
   try {
     // Prioriza o GLB real quando carregado.
@@ -801,7 +871,9 @@ function fitModelToViewer(model) {
   // Maior eixo evita divisão por zero e define a escala proporcional.
   const largestSide = Math.max(size.x, size.y, size.z, 0.001);
   // Fator que faz o maior eixo chegar no tamanho visual alvo.
-  const scale = GLB_DISPLAY_SIZE / largestSide;
+  const displaySize = getCurrentProductPreset().displaySize;
+  // Tamanho alvo depende do produto selecionado.
+  const scale = displaySize / largestSide;
 
   // Centraliza o GLB na origem já considerando a escala aplicada ao grupo.
   model.scale.setScalar(scale);
@@ -817,7 +889,7 @@ function fitModelToViewer(model) {
   // Centro final usado como target dos controles.
   const fittedCenter = fittedBox.getCenter(new THREE.Vector3());
   // Maior eixo final ajuda a calcular distância segura da câmera.
-  const fittedLargestSide = Math.max(fittedSize.x, fittedSize.y, fittedSize.z, GLB_DISPLAY_SIZE);
+  const fittedLargestSide = Math.max(fittedSize.x, fittedSize.y, fittedSize.z, displaySize);
   // FOV vertical da câmera convertido para radianos.
   const verticalFov = THREE.MathUtils.degToRad(camera.fov);
   // FOV horizontal derivado do FOV vertical e aspect ratio atual.
@@ -882,17 +954,24 @@ function showFallbackModel() {
 
 // Carrega o GLB da caneca e prepara diagnóstico, materiais e enquadramento.
 function loadGlbModel() {
+  const preset = getCurrentProductPreset();
+
   // Mostra estado de carregamento na UI.
-  updateModelStatus("Carregando modelo 3D...", "loading");
+  updateModelStatus(`Carregando ${preset.label}...`, "loading");
 
   // Loader específico para arquivos GLTF/GLB.
   const loader = new GLTFLoader();
   // Inicia carregamento assíncrono do modelo.
   loader.load(
-    // URL do arquivo GLB.
-    MODEL_URL,
+    // URL do arquivo GLB do produto selecionado.
+    preset.modelUrl,
     // Callback de sucesso.
     (gltf) => {
+      // Se o usuário trocou de produto durante o carregamento, ignora este resultado antigo.
+      if (preset !== getCurrentProductPreset()) {
+        return;
+      }
+
       // Guarda a cena raiz do GLB para aplicar textura/restaurar depois.
       glbModel = gltf.scene;
       // Salva materiais originais antes de qualquer modificação.
@@ -909,11 +988,13 @@ function loadGlbModel() {
       // Adiciona GLB ao grupo rotacionado da caneca.
       modelRoot.add(glbModel);
       // Atualiza status de sucesso.
-      updateModelStatus("Modelo carregado", "success");
+      updateModelStatus(`${preset.label} carregado`, "success");
 
-      // Se uma arte foi enviada antes do GLB terminar, aplica agora.
-      if (artworkTexture) {
+      // Se uma arte foi enviada antes do GLB terminar, aplica agora quando o produto permitir.
+      if (artworkTexture && preset.artworkEnabled) {
         applyTextureToActiveObject(artworkTexture);
+      } else if (!preset.artworkEnabled) {
+        updateArtworkStatus("Arte personalizada ainda não disponível para este produto.", "warning");
       }
     },
     // Callback de progresso não usado no momento.
@@ -925,9 +1006,34 @@ function loadGlbModel() {
       // Informa que não há diagnóstico de GLB.
       setDiagnosticsFallback();
       // Atualiza status de fallback.
-      updateModelStatus("Modelo não encontrado, usando fallback", "warning");
+      updateModelStatus(`${preset.label} não encontrado, usando fallback`, "warning");
     },
   );
+}
+
+// Remove o GLB atual da cena antes de carregar outro produto.
+function clearLoadedModel() {
+  if (!glbModel) {
+    return;
+  }
+
+  modelRoot.remove(glbModel);
+  glbModel = null;
+}
+
+// Troca o produto ativo, limpa arte/modelo atual e carrega o GLB do preset escolhido.
+function switchProduct(nextProductKey) {
+  if (!PRODUCT_PRESETS[nextProductKey] || nextProductKey === currentProductKey) {
+    return;
+  }
+
+  resetArtwork();
+  clearLoadedModel();
+  fallbackMug.visible = false;
+  currentProductKey = nextProductKey;
+  resetModelRotation();
+  syncArtworkControls();
+  loadGlbModel();
 }
 
 // Ajusta renderer e câmera ao tamanho real do container HTML.
@@ -962,6 +1068,13 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+// Select de produto carrega o GLB correspondente ao preset escolhido.
+if (productSelector) {
+  productSelector.addEventListener("change", () => {
+    switchProduct(productSelector.value);
+  });
+}
+
 // Captura a imagem atual do canvas WebGL como preview PNG.
 captureButton.addEventListener("click", () => {
   // Força render antes da captura para pegar o estado mais recente.
@@ -976,6 +1089,15 @@ captureButton.addEventListener("click", () => {
 
 // Reage quando o usuário seleciona um arquivo de arte.
 artworkInput.addEventListener("change", (event) => {
+  if (!getCurrentProductPreset().artworkEnabled) {
+    if (artworkInput) {
+      artworkInput.value = "";
+    }
+
+    updateArtworkStatus("Arte personalizada ainda não disponível para este produto.", "warning");
+    return;
+  }
+
   // Primeiro arquivo selecionado no input.
   const file = event.target.files[0];
 

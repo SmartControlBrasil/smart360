@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Smart 3D Visualizer</title>
+  <title>Caneca de Garagem | Personalizador 3D</title>
   <link rel="stylesheet" href="{% static 'visual_3d/css/visual-3d.css' %}">
   <script type="importmap">
     {
@@ -18,30 +18,67 @@
 <body>
   <main class="visual-3d-page">
     <section class="visual-3d-header">
-      <p class="visual-3d-eyebrow">SMART360 platform MVP</p>
-      <h1>Smart 3D Visualizer</h1>
-      <p>Um MVP reutilizavel da plataforma para visualizar produtos, equipamentos e objetos 3D em areas como Caneca de Garagem, Smart Marketplace e Smart System.</p>
+      <div class="cdg-brand" aria-label="Caneca de Garagem">
+        <div class="cdg-logo-text">CANECA DE GARAGEM</div>
+        <div class="cdg-logo-subtitle">Personalizador 3D</div>
+      </div>
+      <div class="visual-3d-heading-copy">
+        <p class="visual-3d-eyebrow">CANECA DE GARAGEM</p>
+        <h1>Personalizador 3D</h1>
+        <p>Envie sua arte, ajuste a posição e visualize o resultado antes da produção.</p>
+      </div>
     </section>
 
-    <section class="visual-3d-viewer" aria-label="Visualizador 3D de demonstracao">
+    <section class="visual-3d-viewer" aria-label="Personalizador 3D de produtos">
       <div class="visual-3d-stage">
         <div id="visual-3d-canvas" class="visual-3d-canvas"></div>
       </div>
 
-      <aside class="visual-3d-side-panel" aria-label="Controles do visualizador 3D">
-        <div class="visual-3d-actions">
-          <label class="visual-3d-upload" for="artwork-input">
-            Aplicar arte
-            <input id="artwork-input" type="file" accept="image/png,image/jpeg,image/webp">
-          </label>
-          <button type="button" id="remove-artwork" class="visual-3d-secondary">Remover arte</button>
-          <button type="button" id="capture-preview">Capturar preview</button>
-          <button type="button" id="toggle-rotation" class="visual-3d-secondary">Pausar rotação</button>
-        </div>
+      <aside class="visual-3d-side-panel" aria-label="Controles do personalizador 3D">
+        <section class="visual-3d-panel-section visual-3d-product-section" aria-labelledby="product-section-title">
+          <div class="visual-3d-section-header">
+            <span class="visual-3d-section-kicker">Produto</span>
+            <h2 id="product-section-title">Escolha o produto</h2>
+          </div>
+          <label class="visual-3d-select-label" for="product-selector">Produto atual</label>
+          <select id="product-selector" class="visual-3d-product-selector">
+            <option value="mug" selected>Caneca</option>
+            <option value="longDrink">Long Drink</option>
+            <option value="beerMug">Caneca de Chopp</option>
+            <option value="cap">Boné</option>
+            <option value="flipFlop">Chinelo</option>
+            <option value="tile">Azulejo</option>
+            <option value="popcornBucket">Baldinho de Pipoca</option>
+          </select>
+          <p class="visual-3d-coming-soon">Novos produtos serão adicionados em breve.</p>
+        </section>
 
-        <div class="visual-3d-artwork-adjustments" aria-label="Ajuste da arte">
+        <section class="visual-3d-panel-section" aria-labelledby="art-section-title">
+          <div class="visual-3d-section-header">
+            <span class="visual-3d-section-kicker">Arte</span>
+            <h2 id="art-section-title">Enviar e revisar</h2>
+          </div>
+          <div class="visual-3d-actions">
+            <label class="visual-3d-upload" for="artwork-input">
+              Aplicar arte
+              <input id="artwork-input" type="file" accept="image/png,image/jpeg,image/webp">
+            </label>
+            <button type="button" id="remove-artwork" class="visual-3d-secondary">Remover arte</button>
+            <button type="button" id="capture-preview">Capturar preview</button>
+            <button type="button" id="toggle-rotation" class="visual-3d-secondary">Pausar rotação</button>
+          </div>
+          <div class="visual-3d-status-list">
+            <p id="model-status" class="visual-3d-status" data-state="loading" role="status">Carregando modelo 3D...</p>
+            <p id="artwork-status" class="visual-3d-status" data-state="idle" role="status">Nenhuma arte aplicada</p>
+          </div>
+        </section>
+
+        <section class="visual-3d-panel-section visual-3d-artwork-adjustments" aria-labelledby="adjustments-section-title">
           <div class="visual-3d-adjustments-header">
-            <h2>Ajuste da arte</h2>
+            <div class="visual-3d-section-header">
+              <span class="visual-3d-section-kicker">Ajustes</span>
+              <h2 id="adjustments-section-title">Ajuste da arte</h2>
+            </div>
             <button type="button" id="reset-artwork-adjustments" class="visual-3d-secondary">Resetar ajustes</button>
           </div>
           <div class="visual-3d-adjustments-grid">
@@ -70,30 +107,35 @@
             <label class="visual-3d-range-control" for="artwork-scale-x">
               <span>Escala X</span>
               <output id="artwork-scale-x-value" for="artwork-scale-x">1</output>
-              <input id="artwork-scale-x" data-artwork-control="scaleX" type="range" min="0.1" max="2" step="0.01" value="1" disabled>
+              <input id="artwork-scale-x" data-artwork-control="scaleX" type="range" min="0.1" max="1.5" step="0.01" value="1" disabled>
             </label>
-            
             <label class="visual-3d-range-control" for="artwork-offset-y">
               <span>Posição Y</span>
               <output id="artwork-offset-y-value" for="artwork-offset-y">0</output>
               <input id="artwork-offset-y" data-artwork-control="offsetY" type="range" min="-1" max="1" step="0.01" value="0" disabled>
             </label>
-            
             <label class="visual-3d-range-control" for="artwork-scale-y">
               <span>Escala Y</span>
               <output id="artwork-scale-y-value" for="artwork-scale-y">1</output>
               <input id="artwork-scale-y" data-artwork-control="scaleY" type="range" min="0.1" max="1.0" step="0.01" value="1" disabled>
             </label>
           </div>
-        </div>
+        </section>
 
-        <div class="visual-3d-status-list">
-          <p id="model-status" class="visual-3d-status" data-state="loading" role="status">Carregando modelo 3D...</p>
-          <p id="artwork-status" class="visual-3d-status" data-state="idle" role="status">Nenhuma arte aplicada</p>
-        </div>
+        <section class="visual-3d-panel-section visual-3d-preview" aria-labelledby="preview-section-title" aria-live="polite">
+          <div class="visual-3d-section-header">
+            <span class="visual-3d-section-kicker">Preview</span>
+            <h2 id="preview-section-title">Preview capturado</h2>
+          </div>
+          <p id="preview-empty" class="visual-3d-preview-empty">Nenhum preview capturado ainda.</p>
+          <img id="captured-preview" alt="Preview capturado do personalizador 3D">
+        </section>
 
-        <section class="visual-3d-diagnostics" aria-labelledby="model-diagnostics-title">
-          <h2 id="model-diagnostics-title">Diagnóstico do modelo 3D</h2>
+        <section class="visual-3d-panel-section visual-3d-diagnostics" aria-labelledby="model-diagnostics-title">
+          <div class="visual-3d-section-header">
+            <span class="visual-3d-section-kicker">Diagnóstico</span>
+            <h2 id="model-diagnostics-title">Diagnóstico do modelo 3D</h2>
+          </div>
           <p id="model-diagnostics-summary" class="visual-3d-diagnostics-summary">Aguardando carregamento do modelo...</p>
           <div class="visual-3d-diagnostics-table-wrap">
             <table class="visual-3d-diagnostics-table">
@@ -110,12 +152,6 @@
           </div>
         </section>
       </aside>
-    </section>
-
-    <section class="visual-3d-preview" aria-live="polite">
-      <h2>Preview capturado</h2>
-      <p id="preview-empty" class="visual-3d-preview-empty">Nenhum preview capturado ainda.</p>
-      <img id="captured-preview" alt="Preview capturado do visualizador 3D">
     </section>
   </main>
 

@@ -204,6 +204,7 @@ body {
 
 .visual-3d-actions button,
 .visual-3d-upload,
+.visual-3d-action-link,
 .visual-3d-adjustments-header button {
   width: 100%;
   min-height: 42px;
@@ -221,12 +222,14 @@ body {
 
 .visual-3d-actions button:hover,
 .visual-3d-upload:hover,
+.visual-3d-action-link:hover,
 .visual-3d-adjustments-header button:hover {
   background: var(--cdg-action-hover);
 }
 
 .visual-3d-actions button:focus-visible,
 .visual-3d-upload:focus-within,
+.visual-3d-action-link:focus-visible,
 .visual-3d-adjustments-header button:focus-visible,
 .visual-3d-product-selector:focus-visible {
   outline: 3px solid rgba(240, 180, 41, 0.35);
@@ -237,6 +240,10 @@ body {
   display: none;
 }
 
+.visual-3d-action-link {
+  text-decoration: none;
+}
+
 .visual-3d-secondary {
   background: #e9eef6 !important;
   color: var(--cdg-text) !important;
@@ -244,6 +251,138 @@ body {
 
 .visual-3d-secondary:hover {
   background: #dce5f0 !important;
+}
+
+.visual-3d-artwork-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.visual-3d-editor-guide-bar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #ead7a4;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #7c5206;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 10px;
+}
+
+.visual-3d-editor-guide-bar button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 10px;
+}
+
+.visual-3d-editor-size-grid,
+.visual-3d-editor-text-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.visual-3d-editor-size-grid label,
+.visual-3d-editor-text-grid label {
+  display: grid;
+  gap: 6px;
+  color: #26344d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.visual-3d-editor-size-grid input,
+.visual-3d-editor-text-grid input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #cfd8e6;
+  border-radius: 8px;
+  color: var(--cdg-text);
+  font: inherit;
+  font-weight: 700;
+  padding: 8px 10px;
+}
+
+.visual-3d-editor-text-grid {
+  grid-template-columns: minmax(0, 1fr) 96px 54px;
+}
+
+.visual-3d-editor-text-grid input[type="color"] {
+  min-height: 38px;
+  padding: 4px;
+}
+
+.visual-3d-editor-canvas-wrap {
+  overflow: auto;
+  border: 1px solid var(--cdg-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(45deg, #e7edf6 25%, transparent 25%),
+    linear-gradient(-45deg, #e7edf6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e7edf6 75%),
+    linear-gradient(-45deg, transparent 75%, #e7edf6 75%);
+  background-color: #f8fafc;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+  background-size: 24px 24px;
+  padding: 10px;
+}
+
+.visual-3d-editor-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #cfd8e6;
+  background: transparent;
+}
+
+.visual-3d-editor-actions {
+  margin-top: 0;
+}
+
+.visual-3d-editor-page {
+  width: min(100% - 20px, 1320px);
+}
+
+.visual-3d-editor-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  border: 1px solid rgba(219, 226, 238, 0.95);
+  border-radius: 12px;
+  background: var(--cdg-panel);
+  box-shadow: var(--cdg-shadow);
+}
+
+.visual-3d-editor-workspace {
+  min-width: 0;
+  background: #101722;
+  padding: 12px;
+}
+
+.visual-3d-editor-panel {
+  border-top: 1px solid var(--cdg-border);
+}
+
+.visual-3d-editor-back-link {
+  display: block;
+  color: var(--cdg-action);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.visual-3d-editor-back-link:hover {
+  color: var(--cdg-action-hover);
+  text-decoration: underline;
 }
 
 .visual-3d-actions button:disabled,
@@ -505,6 +644,10 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .visual-3d-editor-guide-bar {
+    grid-template-columns: 1fr auto;
+  }
+
   .visual-3d-adjustments-header {
     align-items: center;
     grid-template-columns: 1fr auto;
@@ -516,6 +659,24 @@ body {
 }
 
 @media (min-width: 980px) {
+  .visual-3d-editor-shell {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 380px);
+    min-height: min(76svh, 720px);
+  }
+
+  .visual-3d-editor-workspace {
+    display: grid;
+    align-items: center;
+    min-height: min(76svh, 720px);
+  }
+
+  .visual-3d-editor-panel {
+    max-height: min(76svh, 720px);
+    overflow-y: auto;
+    border-top: 0;
+    border-left: 1px solid var(--cdg-border);
+  }
+
   .visual-3d-page {
     padding: 42px 0;
   }

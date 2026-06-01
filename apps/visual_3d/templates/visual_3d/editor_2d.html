@@ -1,0 +1,101 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Caneca de Garagem | Criador de Arte 2D</title>
+  <link rel="stylesheet" href="{% static 'visual_3d/css/visual-3d.css' %}">
+</head>
+<body>
+  <main class="visual-3d-page visual-3d-editor-page">
+    <section class="visual-3d-header">
+      <div class="cdg-brand" aria-label="Caneca de Garagem">
+        <div class="cdg-logo-text">CANECA DE GARAGEM</div>
+        <div class="cdg-logo-subtitle">Criador de Arte</div>
+      </div>
+      <div class="visual-3d-heading-copy">
+        <p class="visual-3d-eyebrow">CANECA DE GARAGEM</p>
+        <h1>Criador de Arte 2D</h1>
+        <p>Monte sua arte e envie para visualização 3D.</p>
+      </div>
+    </section>
+
+    <section class="visual-3d-editor-shell" aria-label="Criador de arte 2D">
+      <div class="visual-3d-editor-workspace">
+        <div class="visual-3d-editor-canvas-wrap">
+          <canvas id="artwork-editor-canvas" width="1200" height="800"></canvas>
+        </div>
+      </div>
+
+      <aside class="visual-3d-side-panel visual-3d-editor-panel" aria-label="Ferramentas do criador de arte">
+        <section class="visual-3d-panel-section visual-3d-artwork-editor" aria-labelledby="artwork-editor-title">
+          <div class="visual-3d-section-header">
+            <span class="visual-3d-section-kicker">Editor 2D</span>
+            <h2 id="artwork-editor-title">Ferramentas da arte</h2>
+          </div>
+
+          <div class="visual-3d-editor-guide-bar">
+            <span>Guia atual: <strong id="artwork-editor-current-product">Caneca</strong></span>
+            <button type="button" id="artwork-editor-toggle-guides" class="visual-3d-secondary" aria-pressed="true">Ocultar guias</button>
+          </div>
+
+          <label class="visual-3d-select-label" for="artwork-editor-product-selector">Produto da arte</label>
+          <select id="artwork-editor-product-selector" class="visual-3d-product-selector">
+            <option value="mug" selected>Caneca</option>
+            <option value="longDrink">Long Drink</option>
+            <option value="cap">Boné</option>
+          </select>
+
+          <div class="visual-3d-editor-size-grid">
+            <label for="artwork-editor-width">
+              <span>Largura</span>
+              <input id="artwork-editor-width" type="number" min="200" max="4000" step="50" value="1200">
+            </label>
+            <label for="artwork-editor-height">
+              <span>Altura</span>
+              <input id="artwork-editor-height" type="number" min="200" max="4000" step="50" value="800">
+            </label>
+          </div>
+
+          <div class="visual-3d-editor-text-grid">
+            <label for="artwork-editor-text-input">
+              <span>Texto</span>
+              <input id="artwork-editor-text-input" type="text" placeholder="Digite seu texto">
+            </label>
+            <label for="artwork-editor-font-size">
+              <span>Tamanho</span>
+              <input id="artwork-editor-font-size" type="number" min="8" max="300" value="72">
+            </label>
+            <label for="artwork-editor-text-color">
+              <span>Cor</span>
+              <input id="artwork-editor-text-color" type="color" value="#111111">
+            </label>
+          </div>
+
+          <div class="visual-3d-actions visual-3d-editor-actions">
+            <label class="visual-3d-upload" for="artwork-editor-image-input">
+              Adicionar imagem
+              <input id="artwork-editor-image-input" type="file" accept="image/png,image/jpeg,image/webp">
+            </label>
+            <button type="button" id="artwork-editor-add-text" class="visual-3d-secondary">Adicionar texto</button>
+            <button type="button" id="artwork-editor-duplicate" class="visual-3d-secondary">Duplicar selecionado</button>
+            <button type="button" id="artwork-editor-center" class="visual-3d-secondary">Centralizar selecionado</button>
+            <button type="button" id="artwork-editor-bring-forward" class="visual-3d-secondary">Trazer para frente</button>
+            <button type="button" id="artwork-editor-send-backward" class="visual-3d-secondary">Enviar para trás</button>
+            <button type="button" id="artwork-editor-remove-selected" class="visual-3d-secondary">Remover selecionado</button>
+            <button type="button" id="artwork-editor-clear" class="visual-3d-secondary">Limpar prancheta</button>
+            <button type="button" id="artwork-editor-apply">Aplicar no 3D</button>
+          </div>
+
+          <p id="artwork-editor-status" class="visual-3d-status" data-state="idle" role="status">Editor 2D pronto</p>
+          <a href="{% url 'visual_3d:demo' %}" class="visual-3d-editor-back-link">Voltar ao visualizador 3D</a>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+  <script src="{% static 'visual_3d/js/artwork-editor-2d.js' %}"></script>
+</body>
+</html>

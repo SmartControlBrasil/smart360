@@ -29,6 +29,71 @@
     },
   };
 
+  const ARTWORK_EDITOR_TEMPLATES = {
+    mug: [
+      {
+        key: "mug-photo-title",
+        label: "Foto + título",
+        objects: [
+          { type: "textbox", text: "MINHA CANECA", leftPct: 0.5, topPct: 0.13, widthPct: 0.72, fill: "#111827", fontSize: 72, fontWeight: "800", textAlign: "center" },
+          { type: "rect", leftPct: 0.5, topPct: 0.48, widthPct: 0.5, heightPct: 0.42, fill: "rgba(255,255,255,0.76)", stroke: "#1f5fbf", strokeWidth: 5, rx: 22, ry: 22 },
+          { type: "textbox", text: "Sua foto aqui", leftPct: 0.5, topPct: 0.48, widthPct: 0.38, fill: "#1f5fbf", fontSize: 48, fontWeight: "800", textAlign: "center" },
+          { type: "textbox", text: "Feita na Caneca de Garagem", leftPct: 0.5, topPct: 0.82, widthPct: 0.68, fill: "#374151", fontSize: 34, fontWeight: "700", textAlign: "center" },
+        ],
+      },
+      {
+        key: "mug-center-logo",
+        label: "Logo central",
+        objects: [
+          { type: "circle", leftPct: 0.5, topPct: 0.42, radiusPct: 0.18, fill: "#f0b429", stroke: "#111827", strokeWidth: 6 },
+          { type: "textbox", text: "LOGO", leftPct: 0.5, topPct: 0.42, widthPct: 0.36, fill: "#111827", fontSize: 84, fontWeight: "900", textAlign: "center" },
+          { type: "textbox", text: "Sua marca aqui", leftPct: 0.5, topPct: 0.68, widthPct: 0.58, fill: "#111827", fontSize: 42, fontWeight: "700", textAlign: "center" },
+        ],
+      },
+      {
+        key: "mug-phrase",
+        label: "Frase grande",
+        objects: [
+          { type: "textbox", text: "CAFÉ,\nCORAGEM\nE GARAGEM", leftPct: 0.5, topPct: 0.42, widthPct: 0.72, fill: "#111827", fontSize: 72, fontWeight: "900", textAlign: "center" },
+          { type: "rect", leftPct: 0.5, topPct: 0.76, widthPct: 0.38, heightPct: 0.05, fill: "#f0b429", rx: 18, ry: 18 },
+          { type: "textbox", text: "assine aqui", leftPct: 0.5, topPct: 0.86, widthPct: 0.48, fill: "#374151", fontSize: 30, fontWeight: "700", textAlign: "center" },
+        ],
+      },
+    ],
+    longDrink: [
+      {
+        key: "longdrink-vertical-logo",
+        label: "Logo vertical",
+        objects: [
+          { type: "rect", leftPct: 0.5, topPct: 0.42, widthPct: 0.44, heightPct: 0.42, fill: "rgba(255,255,255,0.72)", stroke: "#1f5fbf", strokeWidth: 5, rx: 28, ry: 28 },
+          { type: "textbox", text: "LOGO\nAQUI", leftPct: 0.5, topPct: 0.42, widthPct: 0.34, fill: "#1f5fbf", fontSize: 76, fontWeight: "900", textAlign: "center" },
+          { type: "textbox", text: "Long Drink personalizado", leftPct: 0.5, topPct: 0.72, widthPct: 0.56, fill: "#111827", fontSize: 42, fontWeight: "700", textAlign: "center" },
+        ],
+      },
+      {
+        key: "longdrink-party",
+        label: "Festa",
+        objects: [
+          { type: "circle", leftPct: 0.24, topPct: 0.2, radiusPct: 0.06, fill: "#f0b429", opacity: 0.85 },
+          { type: "circle", leftPct: 0.78, topPct: 0.33, radiusPct: 0.05, fill: "#1f5fbf", opacity: 0.8 },
+          { type: "circle", leftPct: 0.28, topPct: 0.72, radiusPct: 0.04, fill: "#ef4444", opacity: 0.8 },
+          { type: "textbox", text: "BRINDE\nESPECIAL", leftPct: 0.5, topPct: 0.46, widthPct: 0.62, fill: "#111827", fontSize: 88, fontWeight: "900", textAlign: "center" },
+          { type: "textbox", text: "nome do evento", leftPct: 0.5, topPct: 0.68, widthPct: 0.54, fill: "#374151", fontSize: 38, fontWeight: "700", textAlign: "center" },
+        ],
+      },
+    ],
+    cap: [
+      {
+        key: "cap-front-logo",
+        label: "Logo frontal",
+        objects: [
+          { type: "rect", leftPct: 0.5, topPct: 0.5, widthPct: 0.36, heightPct: 0.44, fill: "rgba(255,255,255,0.76)", stroke: "#111827", strokeWidth: 4, rx: 18, ry: 18 },
+          { type: "textbox", text: "LOGO", leftPct: 0.5, topPct: 0.5, widthPct: 0.28, fill: "#111827", fontSize: 54, fontWeight: "900", textAlign: "center" },
+        ],
+      },
+    ],
+  };
+
   const editorCanvasElement = document.getElementById("artwork-editor-canvas");
   const widthInput = document.getElementById("artwork-editor-width");
   const heightInput = document.getElementById("artwork-editor-height");
@@ -39,6 +104,8 @@
   const textColorInput = document.getElementById("artwork-editor-text-color");
   const currentProductLabel = document.getElementById("artwork-editor-current-product");
   const productSelector = document.getElementById("artwork-editor-product-selector");
+  const templateSelect = document.getElementById("artwork-editor-template-select");
+  const applyTemplateButton = document.getElementById("artwork-editor-apply-template");
   const toggleGuidesButton = document.getElementById("artwork-editor-toggle-guides");
   const addTextButton = document.getElementById("artwork-editor-add-text");
   const duplicateButton = document.getElementById("artwork-editor-duplicate");
@@ -468,6 +535,146 @@
     }
   }
 
+  function populateTemplateSelect() {
+    if (!templateSelect) {
+      return;
+    }
+
+    const templates = ARTWORK_EDITOR_TEMPLATES[currentProductGuideKey] || [];
+    templateSelect.innerHTML = "";
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Template...";
+    templateSelect.appendChild(emptyOption);
+
+    templates.forEach((template) => {
+      const option = document.createElement("option");
+      option.value = template.key;
+      option.textContent = template.label;
+      templateSelect.appendChild(option);
+    });
+
+    templateSelect.disabled = templates.length === 0;
+
+    if (applyTemplateButton) {
+      applyTemplateButton.disabled = templates.length === 0;
+    }
+  }
+
+  function getSelectedTemplate() {
+    const templateKey = templateSelect?.value;
+    const templates = ARTWORK_EDITOR_TEMPLATES[currentProductGuideKey] || [];
+
+    return templates.find((template) => template.key === templateKey) || null;
+  }
+
+  function resolveTemplateValue(definition, key, pctKey, canvasSize, fallback = 0) {
+    if (Number.isFinite(Number(definition[pctKey]))) {
+      return canvasSize * Number(definition[pctKey]);
+    }
+
+    if (Number.isFinite(Number(definition[key]))) {
+      return Number(definition[key]);
+    }
+
+    return fallback;
+  }
+
+  function createFabricObjectFromTemplate(definition) {
+    const canvasWidth = artworkCanvas.getWidth();
+    const canvasHeight = artworkCanvas.getHeight();
+    const left = resolveTemplateValue(definition, "left", "leftPct", canvasWidth, canvasWidth / 2);
+    const top = resolveTemplateValue(definition, "top", "topPct", canvasHeight, canvasHeight / 2);
+    const width = resolveTemplateValue(definition, "width", "widthPct", canvasWidth, undefined);
+    const height = resolveTemplateValue(definition, "height", "heightPct", canvasHeight, undefined);
+    const baseOptions = {
+      left,
+      top,
+      fill: definition.fill ?? "#111111",
+      stroke: definition.stroke,
+      strokeWidth: definition.strokeWidth ?? 0,
+      angle: definition.angle ?? 0,
+      opacity: definition.opacity ?? 1,
+      originX: definition.originX || "center",
+      originY: definition.originY || "center",
+      cornerStyle: "circle",
+      transparentCorners: false,
+    };
+
+    if (definition.type === "rect") {
+      return new window.fabric.Rect({
+        ...baseOptions,
+        width: width ?? 220,
+        height: height ?? 140,
+        rx: definition.rx ?? 0,
+        ry: definition.ry ?? 0,
+      });
+    }
+
+    if (definition.type === "circle") {
+      const radius = Number.isFinite(Number(definition.radiusPct))
+        ? Math.min(canvasWidth, canvasHeight) * Number(definition.radiusPct)
+        : Number(definition.radius ?? 80);
+
+      return new window.fabric.Circle({
+        ...baseOptions,
+        radius,
+      });
+    }
+
+    if (definition.type === "text") {
+      return new window.fabric.IText(definition.text || "Seu texto", {
+        ...baseOptions,
+        fontFamily: definition.fontFamily || "Arial",
+        fontSize: definition.fontSize ?? 48,
+        fontWeight: definition.fontWeight || "700",
+        textAlign: definition.textAlign || "center",
+      });
+    }
+
+    return new window.fabric.Textbox(definition.text || "Seu texto", {
+      ...baseOptions,
+      width: width ?? canvasWidth * 0.5,
+      fontFamily: definition.fontFamily || "Arial",
+      fontSize: definition.fontSize ?? 48,
+      fontWeight: definition.fontWeight || "700",
+      textAlign: definition.textAlign || "center",
+    });
+  }
+
+  function applySelectedTemplate() {
+    const template = getSelectedTemplate();
+
+    if (!template) {
+      updateEditorStatus("Selecione um template", "warning");
+      return;
+    }
+
+    if (getUserObjects().length > 0 && !window.confirm("Aplicar este template vai limpar a prancheta. Continuar?")) {
+      return;
+    }
+
+    getUserObjects().forEach((object) => artworkCanvas.remove(object));
+    artworkCanvas.discardActiveObject();
+
+    const createdObjects = template.objects
+      .map(createFabricObjectFromTemplate)
+      .filter(Boolean);
+
+    createdObjects.forEach((object) => artworkCanvas.add(object));
+    guideObjects.forEach((object) => artworkCanvas.bringToFront(object));
+
+    if (createdObjects.length) {
+      updateCanvasAndSelection(createdObjects[0]);
+    } else {
+      artworkCanvas.requestRenderAll();
+      updateObjectPropertiesPanel();
+    }
+
+    updateEditorStatus("Template aplicado.", "success");
+  }
+
   function setArtworkEditorProduct(productKey) {
     currentProductGuideKey = ARTWORK_EDITOR_PRODUCT_GUIDES[productKey] ? productKey : "mug";
     const config = getGuideConfig(currentProductGuideKey);
@@ -492,8 +699,10 @@
       productSelector.value = currentProductGuideKey;
     }
 
+    populateTemplateSelect();
     drawGuideObjects(config);
     setGuideVisibility(guidesVisible);
+    updateObjectPropertiesPanel();
     updateEditorStatus(`Guias ajustadas para ${config.label}`, "idle");
   }
 
@@ -768,6 +977,8 @@
     if (productSelector) {
       productSelector.value = currentProductGuideKey;
     }
+
+    populateTemplateSelect();
   }
 
   function importArtworkProjectJson(json) {
@@ -955,6 +1166,7 @@
   heightInput?.addEventListener("change", () => resizeArtworkCanvas({ redrawGuides: true }));
   imageInput?.addEventListener("change", (event) => addImageFromFile(event.target.files[0]));
   addImageButton?.addEventListener("click", () => imageInput?.click());
+  applyTemplateButton?.addEventListener("click", applySelectedTemplate);
   productSelector?.addEventListener("change", () => setArtworkEditorProduct(productSelector.value));
   toggleGuidesButton?.addEventListener("click", toggleGuides);
   addTextButton?.addEventListener("click", addTextObject);
@@ -976,6 +1188,8 @@
   window.visual3dArtworkEditor2d = {
     setProduct: setArtworkEditorProduct,
     toggleGuides,
+    populateTemplateSelect,
+    applySelectedTemplate,
     addTextObject,
     duplicateSelectedObject,
     centerSelectedObject,

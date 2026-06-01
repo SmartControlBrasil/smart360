@@ -445,6 +445,18 @@ body {
   width: 82px;
 }
 
+.visual-3d-editor-template-group select {
+  min-width: 150px;
+  max-width: 170px;
+}
+
+.visual-3d-editor-template-group button:disabled,
+.visual-3d-editor-template-group select:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+
 .visual-3d-editor-toolbar-group input[type="color"] {
   width: 44px;
   padding: 4px;

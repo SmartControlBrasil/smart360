@@ -55,6 +55,13 @@
   const importJsonInput = document.getElementById("artwork-editor-import-json-file");
   const downloadPngButton = document.getElementById("artwork-editor-download-png");
   const statusElement = document.getElementById("artwork-editor-status");
+  const objectXInput = document.getElementById("artwork-editor-object-x");
+  const objectYInput = document.getElementById("artwork-editor-object-y");
+  const objectWidthInput = document.getElementById("artwork-editor-object-width");
+  const objectHeightInput = document.getElementById("artwork-editor-object-height");
+  const objectAngleInput = document.getElementById("artwork-editor-object-angle");
+  const lockObjectButton = document.getElementById("artwork-editor-lock-object");
+  const selectionStatusElement = document.getElementById("artwork-editor-selection-status");
 
   if (!editorCanvasElement) {
     return;
@@ -88,6 +95,7 @@
   let guideObjects = [];
   let guidesVisible = true;
   let currentProductGuideKey = "mug";
+  let isUpdatingObjectProperties = false;
 
   function clampCanvasSize(value, fallback) {
     const numberValue = Number(value);
@@ -121,6 +129,198 @@
     return artworkCanvas.getActiveObject();
   }
 
+  function getActiveUserObject() {
+    const activeObject = getActiveObject();
+
+    if (!activeObject || activeObject.isGuide) {
+      return null;
+    }
+
+    return activeObject;
+  }
+
+  function getObjectTypeLabel(object) {
+    if (!object) {
+      return "Nenhum objeto selecionado";
+    }
+
+    if (object.type === "activeSelection") {
+      return "Seleção";
+    }
+
+    if (object.type === "i-text" || object.type === "textbox" || object.type === "text") {
+      return "Texto";
+    }
+
+    if (object.type === "image") {
+      return "Imagem";
+    }
+
+    return "Objeto";
+  }
+
+  function getPropertyInputs() {
+    return [objectXInput, objectYInput, objectWidthInput, objectHeightInput, objectAngleInput].filter(Boolean);
+  }
+
+  function setPropertyInputsDisabled(disabled, { disableSize = false } = {}) {
+    getPropertyInputs().forEach((input) => {
+      input.disabled = disabled;
+    });
+
+    if (objectWidthInput) {
+      objectWidthInput.disabled = disabled || disableSize;
+    }
+
+    if (objectHeightInput) {
+      objectHeightInput.disabled = disabled || disableSize;
+    }
+
+    if (lockObjectButton) {
+      lockObjectButton.disabled = disabled;
+    }
+  }
+
+  function updateObjectPropertiesPanel() {
+    const object = getActiveUserObject();
+    isUpdatingObjectProperties = true;
+
+    if (!object) {
+      setPropertyInputsDisabled(true);
+      getPropertyInputs().forEach((input) => {
+        input.value = "";
+      });
+
+      if (selectionStatusElement) {
+        selectionStatusElement.textContent = "Nenhum objeto selecionado";
+      }
+
+      if (lockObjectButton) {
+        lockObjectButton.setAttribute("aria-pressed", "false");
+      }
+
+      isUpdatingObjectProperties = false;
+      return;
+    }
+
+    const isSelection = object.type === "activeSelection";
+    setPropertyInputsDisabled(false, { disableSize: isSelection });
+
+    if (objectXInput) {
+      objectXInput.value = Math.round(object.left ?? 0);
+    }
+
+    if (objectYInput) {
+      objectYInput.value = Math.round(object.top ?? 0);
+    }
+
+    if (objectWidthInput) {
+      objectWidthInput.value = Math.round(object.getScaledWidth());
+    }
+
+    if (objectHeightInput) {
+      objectHeightInput.value = Math.round(object.getScaledHeight());
+    }
+
+    if (objectAngleInput) {
+      objectAngleInput.value = Math.round(object.angle || 0);
+    }
+
+    if (selectionStatusElement) {
+      selectionStatusElement.textContent = getObjectTypeLabel(object);
+    }
+
+    if (lockObjectButton) {
+      const isLocked = Boolean(object.isArtworkLocked);
+      lockObjectButton.setAttribute("aria-pressed", String(isLocked));
+      setButtonAccessibleLabel(lockObjectButton, isLocked ? "Desbloquear objeto" : "Bloquear objeto");
+    }
+
+    isUpdatingObjectProperties = false;
+  }
+
+  function setObjectScaledDimension(object, dimension, value) {
+    const desiredSize = Number(value);
+
+    if (!Number.isFinite(desiredSize) || desiredSize <= 0) {
+      return;
+    }
+
+    const baseSize = dimension === "width" ? object.width : object.height;
+
+    if (!baseSize) {
+      return;
+    }
+
+    if (dimension === "width") {
+      object.scaleX = desiredSize / baseSize;
+    } else {
+      object.scaleY = desiredSize / baseSize;
+    }
+  }
+
+  function applyObjectPropertyChange() {
+    if (isUpdatingObjectProperties) {
+      return;
+    }
+
+    const object = getActiveUserObject();
+
+    if (!object) {
+      return;
+    }
+
+    if (objectXInput && objectXInput.value !== "") {
+      object.left = Number(objectXInput.value);
+    }
+
+    if (objectYInput && objectYInput.value !== "") {
+      object.top = Number(objectYInput.value);
+    }
+
+    if (object.type !== "activeSelection") {
+      if (objectWidthInput && objectWidthInput.value !== "") {
+        setObjectScaledDimension(object, "width", objectWidthInput.value);
+      }
+
+      if (objectHeightInput && objectHeightInput.value !== "") {
+        setObjectScaledDimension(object, "height", objectHeightInput.value);
+      }
+    }
+
+    if (objectAngleInput && objectAngleInput.value !== "") {
+      object.angle = Number(objectAngleInput.value);
+    }
+
+    object.setCoords();
+    artworkCanvas.requestRenderAll();
+    updateObjectPropertiesPanel();
+  }
+
+  function setObjectLockState(object, isLocked) {
+    object.isArtworkLocked = isLocked;
+    object.lockMovementX = isLocked;
+    object.lockMovementY = isLocked;
+    object.lockScalingX = isLocked;
+    object.lockScalingY = isLocked;
+    object.lockRotation = isLocked;
+    object.hasControls = !isLocked;
+  }
+
+  function toggleLockSelectedObject() {
+    const object = getActiveUserObject();
+
+    if (!object) {
+      return;
+    }
+
+    setObjectLockState(object, !object.isArtworkLocked);
+    object.setCoords();
+    artworkCanvas.requestRenderAll();
+    updateObjectPropertiesPanel();
+    updateEditorStatus(object.isArtworkLocked ? "Objeto bloqueado" : "Objeto desbloqueado", "success");
+  }
+
   function updateCanvasAndSelection(object) {
     if (object) {
       object.setCoords();
@@ -128,6 +328,7 @@
     }
 
     artworkCanvas.requestRenderAll();
+    updateObjectPropertiesPanel();
   }
 
   function setButtonAccessibleLabel(button, label) {
@@ -471,6 +672,7 @@
     selectedObjects.forEach((object) => artworkCanvas.remove(object));
     artworkCanvas.discardActiveObject();
     artworkCanvas.requestRenderAll();
+    updateObjectPropertiesPanel();
     updateEditorStatus("Objeto removido", "success");
   }
 
@@ -479,6 +681,7 @@
     artworkCanvas.discardActiveObject();
     artworkCanvas.setBackgroundColor(null, () => {
       drawGuideObjects(getGuideConfig());
+      updateObjectPropertiesPanel();
       updateEditorStatus("Prancheta limpa", "success");
     });
   }
@@ -598,6 +801,7 @@
         drawGuideObjects(getGuideConfig());
         setGuideVisibility(guidesVisible);
         artworkCanvas.requestRenderAll();
+        updateObjectPropertiesPanel();
         setEditorStatus("Projeto carregado.", "success");
       });
       return true;
@@ -729,6 +933,24 @@
     }
   }
 
+  [
+    "selection:created",
+    "selection:updated",
+    "selection:cleared",
+    "object:moving",
+    "object:scaling",
+    "object:rotating",
+    "object:modified",
+  ].forEach((eventName) => {
+    artworkCanvas.on(eventName, updateObjectPropertiesPanel);
+  });
+
+  getPropertyInputs().forEach((input) => {
+    input.addEventListener("input", applyObjectPropertyChange);
+    input.addEventListener("change", applyObjectPropertyChange);
+  });
+
+  lockObjectButton?.addEventListener("click", toggleLockSelectedObject);
   widthInput?.addEventListener("change", () => resizeArtworkCanvas({ redrawGuides: true }));
   heightInput?.addEventListener("change", () => resizeArtworkCanvas({ redrawGuides: true }));
   imageInput?.addEventListener("change", (event) => addImageFromFile(event.target.files[0]));
@@ -773,5 +995,6 @@
 
   setArtworkEditorProduct("mug");
   setGuideVisibility(true);
+  updateObjectPropertiesPanel();
   updateEditorStatus("Editor 2D pronto", "idle");
 })();

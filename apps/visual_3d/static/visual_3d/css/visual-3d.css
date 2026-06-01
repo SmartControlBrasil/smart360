@@ -483,6 +483,56 @@ body {
   padding: 0 14px;
 }
 
+.visual-3d-editor-properties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px;
+}
+
+.visual-3d-editor-properties label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.visual-3d-editor-properties input {
+  width: 72px;
+  min-height: 32px;
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--cdg-text);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 8px;
+}
+
+.visual-3d-editor-properties input:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.visual-3d-editor-properties .visual-3d-icon-button[aria-pressed="true"] {
+  background: var(--cdg-brand);
+  color: #1b1300;
+}
+
+#artwork-editor-selection-status {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .visual-3d-editor-workspace {
   width: 100%;
   overflow: auto;

@@ -22,76 +22,73 @@
     </section>
 
     <section class="visual-3d-editor-shell" aria-label="Criador de arte 2D">
-      <div class="visual-3d-editor-workspace">
-        <div class="visual-3d-editor-canvas-wrap">
-          <canvas id="artwork-editor-canvas" width="1200" height="800"></canvas>
+      <header class="visual-3d-editor-toolbar">
+        <div class="visual-3d-editor-toolbar-row">
+          <div class="visual-3d-editor-toolbar-group">
+            <span class="visual-3d-toolbar-label">Produto</span>
+            <select id="artwork-editor-product-selector" class="visual-3d-product-selector">
+              <option value="mug" selected>Caneca</option>
+              <option value="longDrink">Long Drink</option>
+              <option value="cap">Boné</option>
+            </select>
+            <span class="visual-3d-editor-current-guide">Guia: <strong id="artwork-editor-current-product">Caneca</strong></span>
+            <button type="button" id="artwork-editor-toggle-guides" class="visual-3d-icon-button visual-3d-secondary" title="Ocultar guias" aria-label="Ocultar guias" aria-pressed="true"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="visual-3d-sr-only">Ocultar guias</span></button>
+          </div>
+
+          <div class="visual-3d-editor-toolbar-group">
+            <span class="visual-3d-toolbar-label">Arquivo</span>
+            <button type="button" id="artwork-editor-save-local" class="visual-3d-icon-button visual-3d-secondary" title="Salvar neste navegador" aria-label="Salvar neste navegador"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 3h12l2 2v16H5z"/><path d="M8 3v6h8V3"/><path d="M8 17h8"/></svg><span class="visual-3d-sr-only">Salvar neste navegador</span></button>
+            <button type="button" id="artwork-editor-load-local" class="visual-3d-icon-button visual-3d-secondary" title="Carregar projeto salvo" aria-label="Carregar projeto salvo"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v9a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z"/><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h4"/></svg><span class="visual-3d-sr-only">Carregar projeto salvo</span></button>
+            <button type="button" id="artwork-editor-download-json" class="visual-3d-icon-button visual-3d-secondary" title="Baixar JSON" aria-label="Baixar JSON"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg><span class="visual-3d-sr-only">Baixar JSON</span></button>
+            <button type="button" id="artwork-editor-import-json" class="visual-3d-icon-button visual-3d-secondary" title="Importar JSON" aria-label="Importar JSON"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg><span class="visual-3d-sr-only">Importar JSON</span></button>
+            <button type="button" id="artwork-editor-download-png" class="visual-3d-icon-button visual-3d-secondary" title="Baixar PNG" aria-label="Baixar PNG"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="m8 13 2.5-3 3 4 2-2.5L21 17"/><path d="M12 18v4"/><path d="m9 20 3 3 3-3"/></svg><span class="visual-3d-sr-only">Baixar PNG</span></button>
+          </div>
+
+          <div class="visual-3d-editor-toolbar-group">
+            <span class="visual-3d-toolbar-label">Prancheta</span>
+            <label for="artwork-editor-width">Largura</label>
+            <input id="artwork-editor-width" type="number" min="200" max="4000" step="50" value="1200">
+            <label for="artwork-editor-height">Altura</label>
+            <input id="artwork-editor-height" type="number" min="200" max="4000" step="50" value="800">
+          </div>
+
+          <div class="visual-3d-editor-toolbar-group">
+            <span class="visual-3d-toolbar-label">Inserir</span>
+            <button type="button" id="artwork-editor-add-image" class="visual-3d-icon-button visual-3d-secondary" title="Adicionar imagem" aria-label="Adicionar imagem"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 16-5-5L5 22"/></svg><span class="visual-3d-sr-only">Adicionar imagem</span></button>
+            <input id="artwork-editor-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            <input id="artwork-editor-text-input" type="text" placeholder="Texto">
+            <input id="artwork-editor-font-size" type="number" min="8" max="300" value="72">
+            <input id="artwork-editor-text-color" type="color" value="#111111">
+            <button type="button" id="artwork-editor-add-text" class="visual-3d-icon-button visual-3d-secondary" title="Adicionar texto" aria-label="Adicionar texto"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M12 5v14"/><path d="M8 19h8"/></svg><span class="visual-3d-sr-only">Adicionar texto</span></button>
+          </div>
+
+          <div class="visual-3d-editor-toolbar-group">
+            <span class="visual-3d-toolbar-label">Editar</span>
+            <button type="button" id="artwork-editor-duplicate" class="visual-3d-icon-button visual-3d-secondary" title="Duplicar selecionado" aria-label="Duplicar selecionado"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><rect x="3" y="3" width="13" height="13" rx="2"/></svg><span class="visual-3d-sr-only">Duplicar selecionado</span></button>
+            <button type="button" id="artwork-editor-center" class="visual-3d-icon-button visual-3d-secondary" title="Centralizar selecionado" aria-label="Centralizar selecionado"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg><span class="visual-3d-sr-only">Centralizar selecionado</span></button>
+            <button type="button" id="artwork-editor-bring-forward" class="visual-3d-icon-button visual-3d-secondary" title="Trazer para frente" aria-label="Trazer para frente"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m7 21 5-5 5 5"/></svg><span class="visual-3d-sr-only">Trazer para frente</span></button>
+            <button type="button" id="artwork-editor-send-backward" class="visual-3d-icon-button visual-3d-secondary" title="Enviar para trás" aria-label="Enviar para trás"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m7 18 5 5 5-5"/></svg><span class="visual-3d-sr-only">Enviar para trás</span></button>
+            <button type="button" id="artwork-editor-remove-selected" class="visual-3d-icon-button visual-3d-secondary visual-3d-icon-button-danger" title="Remover selecionado" aria-label="Remover selecionado"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m6 6 1 16h10l1-16"/><path d="M10 11v6"/><path d="M14 11v6"/></svg><span class="visual-3d-sr-only">Remover selecionado</span></button>
+            <button type="button" id="artwork-editor-clear" class="visual-3d-icon-button visual-3d-secondary visual-3d-icon-button-danger" title="Limpar prancheta" aria-label="Limpar prancheta"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 3 5 5L10 19H5l-3-3z"/><path d="m12 7 5 5"/><path d="M10 19h11"/></svg><span class="visual-3d-sr-only">Limpar prancheta</span></button>
+          </div>
+
+          <div class="visual-3d-editor-toolbar-group visual-3d-editor-toolbar-primary">
+            <button type="button" id="artwork-editor-apply" class="visual-3d-editor-apply-button" title="Aplicar no 3D" aria-label="Aplicar no 3D"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5z"/><path d="M3 7v10l9 5 9-5V7"/><path d="M12 12v10"/></svg><span>Aplicar 3D</span></button>
+            <a href="{% url 'visual_3d:demo' %}" class="visual-3d-editor-back-link" title="Voltar ao visualizador 3D" aria-label="Voltar ao visualizador 3D"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-2"/><path d="m17 3 4 2-4 2-4-2z"/></svg><span>Voltar 3D</span></a>
+          </div>
         </div>
-      </div>
 
-      <aside class="visual-3d-side-panel visual-3d-editor-panel" aria-label="Ferramentas do criador de arte">
-        <section class="visual-3d-panel-section visual-3d-artwork-editor" aria-labelledby="artwork-editor-title">
-          <div class="visual-3d-section-header">
-            <span class="visual-3d-section-kicker">Editor 2D</span>
-            <h2 id="artwork-editor-title">Ferramentas da arte</h2>
+        <p id="artwork-editor-status" class="visual-3d-editor-status" data-status="info" role="status">Editor 2D pronto</p>
+        <input id="artwork-editor-import-json-file" type="file" accept="application/json,.json" hidden>
+      </header>
+
+      <main class="visual-3d-editor-workspace">
+        <div class="visual-3d-editor-canvas-stage">
+          <div class="visual-3d-editor-canvas-wrap">
+            <canvas id="artwork-editor-canvas" width="1200" height="800"></canvas>
           </div>
-
-          <div class="visual-3d-editor-guide-bar">
-            <span>Guia atual: <strong id="artwork-editor-current-product">Caneca</strong></span>
-            <button type="button" id="artwork-editor-toggle-guides" class="visual-3d-secondary" aria-pressed="true">Ocultar guias</button>
-          </div>
-
-          <label class="visual-3d-select-label" for="artwork-editor-product-selector">Produto da arte</label>
-          <select id="artwork-editor-product-selector" class="visual-3d-product-selector">
-            <option value="mug" selected>Caneca</option>
-            <option value="longDrink">Long Drink</option>
-            <option value="cap">Boné</option>
-          </select>
-
-          <div class="visual-3d-editor-size-grid">
-            <label for="artwork-editor-width">
-              <span>Largura</span>
-              <input id="artwork-editor-width" type="number" min="200" max="4000" step="50" value="1200">
-            </label>
-            <label for="artwork-editor-height">
-              <span>Altura</span>
-              <input id="artwork-editor-height" type="number" min="200" max="4000" step="50" value="800">
-            </label>
-          </div>
-
-          <div class="visual-3d-editor-text-grid">
-            <label for="artwork-editor-text-input">
-              <span>Texto</span>
-              <input id="artwork-editor-text-input" type="text" placeholder="Digite seu texto">
-            </label>
-            <label for="artwork-editor-font-size">
-              <span>Tamanho</span>
-              <input id="artwork-editor-font-size" type="number" min="8" max="300" value="72">
-            </label>
-            <label for="artwork-editor-text-color">
-              <span>Cor</span>
-              <input id="artwork-editor-text-color" type="color" value="#111111">
-            </label>
-          </div>
-
-          <div class="visual-3d-actions visual-3d-editor-actions">
-            <label class="visual-3d-upload" for="artwork-editor-image-input">
-              Adicionar imagem
-              <input id="artwork-editor-image-input" type="file" accept="image/png,image/jpeg,image/webp">
-            </label>
-            <button type="button" id="artwork-editor-add-text" class="visual-3d-secondary">Adicionar texto</button>
-            <button type="button" id="artwork-editor-duplicate" class="visual-3d-secondary">Duplicar selecionado</button>
-            <button type="button" id="artwork-editor-center" class="visual-3d-secondary">Centralizar selecionado</button>
-            <button type="button" id="artwork-editor-bring-forward" class="visual-3d-secondary">Trazer para frente</button>
-            <button type="button" id="artwork-editor-send-backward" class="visual-3d-secondary">Enviar para trás</button>
-            <button type="button" id="artwork-editor-remove-selected" class="visual-3d-secondary">Remover selecionado</button>
-            <button type="button" id="artwork-editor-clear" class="visual-3d-secondary">Limpar prancheta</button>
-            <button type="button" id="artwork-editor-apply">Aplicar no 3D</button>
-          </div>
-
-          <p id="artwork-editor-status" class="visual-3d-status" data-state="idle" role="status">Editor 2D pronto</p>
-          <a href="{% url 'visual_3d:demo' %}" class="visual-3d-editor-back-link">Voltar ao visualizador 3D</a>
-        </section>
-      </aside>
+        </div>
+      </main>
     </section>
   </main>
 

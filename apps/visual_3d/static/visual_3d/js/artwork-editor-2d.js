@@ -1,4 +1,7 @@
 (() => {
+  const ARTWORK_EDITOR_STORAGE_KEY = "caneca-garagem-artwork-editor-project-v1";
+  const ARTWORK_EDITOR_FILE_VERSION = 1;
+
   const ARTWORK_EDITOR_PRODUCT_GUIDES = {
     mug: {
       label: "Caneca",
@@ -30,6 +33,7 @@
   const widthInput = document.getElementById("artwork-editor-width");
   const heightInput = document.getElementById("artwork-editor-height");
   const imageInput = document.getElementById("artwork-editor-image-input");
+  const addImageButton = document.getElementById("artwork-editor-add-image");
   const textInput = document.getElementById("artwork-editor-text-input");
   const fontSizeInput = document.getElementById("artwork-editor-font-size");
   const textColorInput = document.getElementById("artwork-editor-text-color");
@@ -44,23 +48,35 @@
   const removeSelectedButton = document.getElementById("artwork-editor-remove-selected");
   const clearButton = document.getElementById("artwork-editor-clear");
   const applyButton = document.getElementById("artwork-editor-apply");
+  const saveLocalButton = document.getElementById("artwork-editor-save-local");
+  const loadLocalButton = document.getElementById("artwork-editor-load-local");
+  const downloadJsonButton = document.getElementById("artwork-editor-download-json");
+  const importJsonButton = document.getElementById("artwork-editor-import-json");
+  const importJsonInput = document.getElementById("artwork-editor-import-json-file");
+  const downloadPngButton = document.getElementById("artwork-editor-download-png");
   const statusElement = document.getElementById("artwork-editor-status");
 
   if (!editorCanvasElement) {
     return;
   }
 
-  function updateEditorStatus(message, state = "idle") {
+  function setEditorStatus(message, type = "info") {
     if (!statusElement) {
+      const logger = type === "error" ? console.error : type === "warning" ? console.warn : console.info;
+      logger("[artwork-editor-2d]", message);
       return;
     }
 
     statusElement.textContent = message;
-    statusElement.dataset.state = state;
+    statusElement.dataset.status = type;
+  }
+
+  function updateEditorStatus(message, state = "info") {
+    setEditorStatus(message, state === "idle" ? "info" : state);
   }
 
   if (!window.fabric) {
-    updateEditorStatus("Fabric.js não carregou", "error");
+    setEditorStatus("Fabric.js não carregou", "error");
     return;
   }
 
@@ -112,6 +128,20 @@
     }
 
     artworkCanvas.requestRenderAll();
+  }
+
+  function setButtonAccessibleLabel(button, label) {
+    if (!button) {
+      return;
+    }
+
+    button.setAttribute("aria-label", label);
+    button.setAttribute("title", label);
+
+    const srText = button.querySelector(".visual-3d-sr-only");
+    if (srText) {
+      srText.textContent = label;
+    }
   }
 
   function markGuideObject(object) {
@@ -203,7 +233,7 @@
     });
 
     if (toggleGuidesButton) {
-      toggleGuidesButton.textContent = guidesVisible ? "Ocultar guias" : "Mostrar guias";
+      setButtonAccessibleLabel(toggleGuidesButton, guidesVisible ? "Ocultar guias" : "Mostrar guias");
       toggleGuidesButton.setAttribute("aria-pressed", String(guidesVisible));
     }
 
@@ -493,32 +523,28 @@
     window.location.href = "/visual-3d/demo/";
   }
 
-  function exportArtworkProjectJson() {
-    return JSON.stringify({
-      productKey: currentProductGuideKey,
-      width: artworkCanvas.getWidth(),
-      height: artworkCanvas.getHeight(),
-      canvas: artworkCanvas.toJSON(),
-    });
-  }
-
-  function importArtworkProjectJson(json) {
-    const project = typeof json === "string" ? JSON.parse(json) : json;
+  function exportFabricJsonWithoutGuides() {
+    const wasGuidesVisible = guidesVisible;
 
     clearGuideObjects();
+    const fabricJson = artworkCanvas.toJSON();
+    drawGuideObjects(getGuideConfig());
+    setGuideVisibility(wasGuidesVisible);
+    return fabricJson;
+  }
 
-    if (project.productKey) {
-      currentProductGuideKey = ARTWORK_EDITOR_PRODUCT_GUIDES[project.productKey] ? project.productKey : "mug";
-    }
+  function exportArtworkProjectJson() {
+    return {
+      version: ARTWORK_EDITOR_FILE_VERSION,
+      productKey: currentProductGuideKey || "mug",
+      width: artworkCanvas.getWidth(),
+      height: artworkCanvas.getHeight(),
+      guidesVisible,
+      fabric: exportFabricJsonWithoutGuides(),
+    };
+  }
 
-    if (project.width) {
-      artworkCanvas.setWidth(clampCanvasSize(project.width, artworkCanvas.getWidth()));
-    }
-
-    if (project.height) {
-      artworkCanvas.setHeight(clampCanvasSize(project.height, artworkCanvas.getHeight()));
-    }
-
+  function updateCanvasSizeInputs() {
     if (widthInput) {
       widthInput.value = artworkCanvas.getWidth();
     }
@@ -526,11 +552,146 @@
     if (heightInput) {
       heightInput.value = artworkCanvas.getHeight();
     }
+  }
 
-    artworkCanvas.loadFromJSON(project.canvas || project, () => {
-      drawGuideObjects(getGuideConfig());
-      updateEditorStatus("Projeto carregado", "success");
-    });
+  function syncProductControlsFromProject(productKey) {
+    currentProductGuideKey = ARTWORK_EDITOR_PRODUCT_GUIDES[productKey] ? productKey : "mug";
+    const config = getGuideConfig(currentProductGuideKey);
+
+    if (currentProductLabel) {
+      currentProductLabel.textContent = config.label;
+    }
+
+    if (productSelector) {
+      productSelector.value = currentProductGuideKey;
+    }
+  }
+
+  function importArtworkProjectJson(json) {
+    try {
+      const project = typeof json === "string" ? JSON.parse(json) : json;
+
+      if (!project || typeof project !== "object") {
+        throw new Error("Projeto inválido.");
+      }
+
+      if (project.version !== ARTWORK_EDITOR_FILE_VERSION) {
+        throw new Error("Versão de projeto incompatível.");
+      }
+
+      const fabricJson = project.fabric;
+
+      if (!fabricJson || typeof fabricJson !== "object") {
+        throw new Error("Arquivo sem dados Fabric válidos.");
+      }
+
+      guidesVisible = project.guidesVisible !== false;
+      artworkCanvas.discardActiveObject();
+      getUserObjects().forEach((object) => artworkCanvas.remove(object));
+      clearGuideObjects();
+      syncProductControlsFromProject(project.productKey || "mug");
+      artworkCanvas.setWidth(clampCanvasSize(project.width, getGuideConfig().width));
+      artworkCanvas.setHeight(clampCanvasSize(project.height, getGuideConfig().height));
+      updateCanvasSizeInputs();
+
+      artworkCanvas.loadFromJSON(fabricJson, () => {
+        drawGuideObjects(getGuideConfig());
+        setGuideVisibility(guidesVisible);
+        artworkCanvas.requestRenderAll();
+        setEditorStatus("Projeto carregado.", "success");
+      });
+      return true;
+    } catch (error) {
+      console.error("[artwork-editor-2d] import failed", error);
+      setEditorStatus("Não foi possível importar o projeto.", "error");
+      return false;
+    }
+  }
+
+  function saveProjectToLocalStorage() {
+    try {
+      localStorage.setItem(ARTWORK_EDITOR_STORAGE_KEY, JSON.stringify(exportArtworkProjectJson()));
+      setEditorStatus("Projeto salvo neste navegador.", "success");
+    } catch (error) {
+      console.error("[artwork-editor-2d] save local failed", error);
+      setEditorStatus("Não foi possível salvar neste navegador.", "error");
+    }
+  }
+
+  function loadProjectFromLocalStorage() {
+    const raw = localStorage.getItem(ARTWORK_EDITOR_STORAGE_KEY);
+
+    if (!raw) {
+      setEditorStatus("Nenhum projeto salvo neste navegador.", "warning");
+      return;
+    }
+
+    try {
+      importArtworkProjectJson(JSON.parse(raw));
+    } catch (error) {
+      console.error("[artwork-editor-2d] load local failed", error);
+      setEditorStatus("Projeto salvo inválido.", "error");
+    }
+  }
+
+  function buildTimestampedFilename(extension) {
+    const now = new Date();
+    const pad = (value) => value.toString().padStart(2, "0");
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+    return `caneca-garagem-arte-${stamp}.${extension}`;
+  }
+
+  function downloadUrl(url, filename) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  function downloadProjectJson() {
+    const blob = new Blob([JSON.stringify(exportArtworkProjectJson(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    downloadUrl(url, buildTimestampedFilename("json"));
+    URL.revokeObjectURL(url);
+    setEditorStatus("JSON baixado.", "success");
+  }
+
+  function importProjectJsonFromFile(file) {
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      try {
+        if (importArtworkProjectJson(JSON.parse(reader.result))) {
+          setEditorStatus("JSON importado.", "success");
+        }
+      } catch (error) {
+        console.error("[artwork-editor-2d] json import failed", error);
+        setEditorStatus("JSON inválido.", "error");
+      }
+
+      if (importJsonInput) {
+        importJsonInput.value = "";
+      }
+    };
+
+    reader.onerror = () => {
+      setEditorStatus("Não foi possível ler o JSON.", "error");
+    };
+
+    reader.readAsText(file);
+  }
+
+  function downloadArtworkPng() {
+    downloadUrl(exportArtworkPngDataUrl(), buildTimestampedFilename("png"));
+    setEditorStatus("PNG baixado.", "success");
   }
 
   function isTypingTarget(target) {
@@ -571,6 +732,7 @@
   widthInput?.addEventListener("change", () => resizeArtworkCanvas({ redrawGuides: true }));
   heightInput?.addEventListener("change", () => resizeArtworkCanvas({ redrawGuides: true }));
   imageInput?.addEventListener("change", (event) => addImageFromFile(event.target.files[0]));
+  addImageButton?.addEventListener("click", () => imageInput?.click());
   productSelector?.addEventListener("change", () => setArtworkEditorProduct(productSelector.value));
   toggleGuidesButton?.addEventListener("click", toggleGuides);
   addTextButton?.addEventListener("click", addTextObject);
@@ -581,6 +743,12 @@
   removeSelectedButton?.addEventListener("click", removeSelectedObject);
   clearButton?.addEventListener("click", clearArtworkCanvas);
   applyButton?.addEventListener("click", applyArtworkToViewer);
+  saveLocalButton?.addEventListener("click", saveProjectToLocalStorage);
+  loadLocalButton?.addEventListener("click", loadProjectFromLocalStorage);
+  downloadJsonButton?.addEventListener("click", downloadProjectJson);
+  importJsonButton?.addEventListener("click", () => importJsonInput?.click());
+  importJsonInput?.addEventListener("change", (event) => importProjectJsonFromFile(event.target.files[0]));
+  downloadPngButton?.addEventListener("click", downloadArtworkPng);
   document.addEventListener("keydown", handleEditorShortcut);
 
   window.visual3dArtworkEditor2d = {
@@ -593,6 +761,11 @@
     sendSelectedBackward,
     removeSelectedObject,
     clearArtworkCanvas,
+    saveProjectToLocalStorage,
+    loadProjectFromLocalStorage,
+    downloadProjectJson,
+    importProjectJsonFromFile,
+    downloadArtworkPng,
     exportArtworkProjectJson,
     importArtworkProjectJson,
     exportArtworkPngDataUrl,

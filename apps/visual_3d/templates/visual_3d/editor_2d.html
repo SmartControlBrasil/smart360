@@ -7,23 +7,14 @@
   <title>Caneca de Garagem | Criador de Arte 2D</title>
   <link rel="stylesheet" href="{% static 'visual_3d/css/visual-3d.css' %}">
 </head>
-<body>
-  <main class="visual-3d-page visual-3d-editor-page">
-    <section class="visual-3d-header">
-      <div class="cdg-brand" aria-label="Caneca de Garagem">
-        <div class="cdg-logo-text">CANECA DE GARAGEM</div>
-        <div class="cdg-logo-subtitle">Criador de Arte</div>
+<body class="visual-3d-editor-body">
+  <main class="visual-3d-editor-fullscreen" aria-label="Criador de arte 2D">
+    <header class="visual-3d-editor-topbar visual-3d-editor-toolbar">
+      <div class="visual-3d-editor-app-title">
+        <strong>Caneca de Garagem</strong>
+        <span>Criador 2D</span>
       </div>
-      <div class="visual-3d-heading-copy">
-        <p class="visual-3d-eyebrow">CANECA DE GARAGEM</p>
-        <h1>Criador de Arte 2D</h1>
-        <p>Monte sua arte e envie para visualização 3D.</p>
-      </div>
-    </section>
-
-    <section class="visual-3d-editor-shell" aria-label="Criador de arte 2D">
-      <header class="visual-3d-editor-toolbar">
-        <div class="visual-3d-editor-toolbar-row">
+      <div class="visual-3d-editor-toolbar-row">
           <div class="visual-3d-editor-toolbar-group">
             <span class="visual-3d-toolbar-label">Produto</span>
             <select id="artwork-editor-product-selector" class="visual-3d-product-selector">
@@ -72,6 +63,8 @@
 
           <div class="visual-3d-editor-toolbar-group">
             <span class="visual-3d-toolbar-label">Editar</span>
+            <button type="button" id="artwork-editor-undo" class="visual-3d-icon-button visual-3d-secondary" title="Desfazer" aria-label="Desfazer" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-2"/></svg><span class="visual-3d-sr-only">Desfazer</span></button>
+            <button type="button" id="artwork-editor-redo" class="visual-3d-icon-button visual-3d-secondary" title="Refazer" aria-label="Refazer" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h2"/></svg><span class="visual-3d-sr-only">Refazer</span></button>
             <button type="button" id="artwork-editor-duplicate" class="visual-3d-icon-button visual-3d-secondary" title="Duplicar selecionado" aria-label="Duplicar selecionado"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><rect x="3" y="3" width="13" height="13" rx="2"/></svg><span class="visual-3d-sr-only">Duplicar selecionado</span></button>
             <button type="button" id="artwork-editor-center" class="visual-3d-icon-button visual-3d-secondary" title="Centralizar selecionado" aria-label="Centralizar selecionado"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg><span class="visual-3d-sr-only">Centralizar selecionado</span></button>
             <button type="button" id="artwork-editor-bring-forward" class="visual-3d-icon-button visual-3d-secondary" title="Trazer para frente" aria-label="Trazer para frente"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m7 21 5-5 5 5"/></svg><span class="visual-3d-sr-only">Trazer para frente</span></button>
@@ -86,8 +79,11 @@
           </div>
         </div>
 
-        <p id="artwork-editor-status" class="visual-3d-editor-status" data-status="info" role="status">Editor 2D pronto</p>
-        <section class="visual-3d-editor-properties" aria-label="Propriedades do objeto selecionado">
+      <p id="artwork-editor-status" class="visual-3d-editor-status" data-status="info" role="status">Editor 2D pronto</p>
+      <input id="artwork-editor-import-json-file" type="file" accept="application/json,.json" hidden>
+    </header>
+
+    <section class="visual-3d-editor-properties visual-3d-editor-properties-compact" aria-label="Propriedades do objeto selecionado">
           <span class="visual-3d-toolbar-label">Selecionado</span>
           <label>X <input id="artwork-editor-object-x" type="number" step="1" disabled></label>
           <label>Y <input id="artwork-editor-object-y" type="number" step="1" disabled></label>
@@ -96,17 +92,16 @@
           <label>Rotação <input id="artwork-editor-object-angle" type="number" step="1" disabled></label>
           <button type="button" id="artwork-editor-lock-object" class="visual-3d-icon-button visual-3d-secondary" title="Bloquear/desbloquear objeto" aria-label="Bloquear/desbloquear objeto" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span class="visual-3d-sr-only">Bloquear/desbloquear objeto</span></button>
           <span id="artwork-editor-selection-status">Nenhum objeto selecionado</span>
-        </section>
-        <input id="artwork-editor-import-json-file" type="file" accept="application/json,.json" hidden>
-      </header>
+    </section>
 
-      <main class="visual-3d-editor-workspace">
+    <section class="visual-3d-editor-canvas-area">
+      <div class="visual-3d-editor-canvas-scroll">
         <div class="visual-3d-editor-canvas-stage">
           <div class="visual-3d-editor-canvas-wrap">
             <canvas id="artwork-editor-canvas" width="1200" height="800"></canvas>
           </div>
         </div>
-      </main>
+      </div>
     </section>
   </main>
 

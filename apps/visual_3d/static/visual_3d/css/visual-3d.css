@@ -441,6 +441,12 @@ body {
   color: var(--cdg-text);
 }
 
+.visual-3d-icon-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .visual-3d-editor-toolbar-group input[type="number"] {
   width: 82px;
 }
@@ -918,5 +924,224 @@ body {
   .visual-3d-toggle-grid,
   .visual-3d-adjustments-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Fullscreen 2D artwork editor */
+.visual-3d-editor-body {
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.visual-3d-editor-fullscreen {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  width: 100%;
+  min-height: 100svh;
+  margin: 0;
+  background: #0f172a;
+  color: var(--cdg-text);
+}
+
+.visual-3d-editor-topbar.visual-3d-editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 8px 22px rgba(7, 12, 22, 0.22);
+  padding: 6px 10px;
+}
+
+.visual-3d-editor-app-title {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 5px;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.visual-3d-editor-app-title strong {
+  color: var(--cdg-brand);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.visual-3d-editor-app-title span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-row {
+  gap: 5px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group {
+  gap: 5px;
+  border-radius: 8px;
+  padding: 4px 6px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-icon-button {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  border-radius: 7px;
+  padding: 0;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-icon-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar input,
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar select {
+  height: 30px;
+  min-height: 30px;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group input[type="number"] {
+  width: 68px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group input[type="color"] {
+  width: 36px;
+  padding: 3px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-template-group select {
+  min-width: 132px;
+  max-width: 152px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-toolbar-label {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-current-guide,
+.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group label {
+  font-size: 11px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-apply-button {
+  height: 32px;
+  min-height: 32px;
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 0 10px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-back-link {
+  min-height: 30px;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-status {
+  margin: 5px 0 0;
+  border-radius: 7px;
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 5px 8px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-properties {
+  width: 100%;
+  margin: 0;
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+  background: rgba(30, 41, 59, 0.96);
+  gap: 6px;
+  padding: 5px 10px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-properties label {
+  gap: 4px;
+  font-size: 11px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-properties input {
+  width: 64px;
+  height: 28px;
+  min-height: 28px;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 0 6px;
+}
+
+.visual-3d-editor-fullscreen #artwork-editor-selection-status {
+  font-size: 11px;
+}
+
+.visual-3d-editor-canvas-area {
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.visual-3d-editor-canvas-scroll {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 12px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-canvas-stage {
+  display: flex;
+  min-height: 100%;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-canvas-wrap {
+  max-width: none;
+  margin: 0;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.visual-3d-editor-fullscreen .visual-3d-editor-canvas-wrap canvas {
+  width: auto;
+  max-width: none;
+  height: auto;
+}
+
+@media (max-width: 720px) {
+  .visual-3d-editor-topbar.visual-3d-editor-toolbar {
+    padding: 6px;
+  }
+
+  .visual-3d-editor-app-title {
+    margin-bottom: 4px;
+  }
+
+  .visual-3d-editor-fullscreen .visual-3d-editor-toolbar-row {
+    gap: 4px;
+  }
+
+  .visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group {
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .visual-3d-editor-canvas-scroll {
+    padding: 8px;
   }
 }

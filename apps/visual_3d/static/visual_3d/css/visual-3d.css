@@ -928,220 +928,488 @@ body {
 }
 
 /* Fullscreen 2D artwork editor */
-.visual-3d-editor-body {
+html,
+body.visual-3d-editor-body {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: #0f172a;
+}
+
+body.visual-3d-editor-body {
+  margin: 0;
+  background: #07111f;
 }
 
 .visual-3d-editor-fullscreen {
-  display: grid;
-  grid-template-rows: auto auto 1fr;
   width: 100%;
-  min-height: 100svh;
-  margin: 0;
-  background: #0f172a;
+  height: 100vh;
+  height: 100svh;
+  display: grid;
+  grid-template-rows: 28px auto 32px minmax(0, 1fr);
+  overflow: hidden;
+  background: #07111f;
   color: var(--cdg-text);
 }
 
-.visual-3d-editor-topbar.visual-3d-editor-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  border-right: 0;
-  border-left: 0;
-  border-radius: 0;
-  background: rgba(15, 23, 42, 0.98);
-  box-shadow: 0 8px 22px rgba(7, 12, 22, 0.22);
-  padding: 6px 10px;
-}
-
-.visual-3d-editor-app-title {
+.visual-3d-editor-menubar {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 10px;
   display: flex;
-  gap: 8px;
-  align-items: baseline;
-  margin-bottom: 5px;
-  color: #fff;
-  line-height: 1.1;
+  align-items: center;
+  gap: 14px;
+  background: #f8fafc;
+  color: #111827;
+  border-bottom: 1px solid #d1d5db;
+  z-index: 100;
 }
 
-.visual-3d-editor-app-title strong {
-  color: var(--cdg-brand);
-  font-size: 12px;
+.visual-3d-editor-brand {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.visual-3d-editor-brand strong {
+  color: #9a5f00;
+  font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.visual-3d-editor-app-title span {
-  color: rgba(255, 255, 255, 0.72);
+.visual-3d-editor-brand span {
+  color: #475569;
   font-size: 11px;
   font-weight: 800;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-row {
-  gap: 5px;
+.visual-3d-editor-menu-list {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  gap: 2px;
+  overflow-x: auto;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group {
-  gap: 5px;
-  border-radius: 8px;
-  padding: 4px 6px;
+.visual-3d-menu {
+  position: relative;
+  flex: 0 0 auto;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-icon-button {
-  width: 30px;
-  min-width: 30px;
-  height: 30px;
-  min-height: 30px;
-  border-radius: 7px;
-  padding: 0;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-icon-button svg {
-  width: 15px;
-  height: 15px;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar input,
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar select {
-  height: 30px;
-  min-height: 30px;
-  border-radius: 7px;
-  font-size: 12px;
+.visual-3d-menu-trigger {
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
   padding: 0 8px;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group input[type="number"] {
-  width: 68px;
+.visual-3d-menu-trigger:hover,
+.visual-3d-menu.is-open .visual-3d-menu-trigger {
+  background: #e5e7eb;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group input[type="color"] {
-  width: 36px;
-  padding: 3px;
+.visual-3d-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 200;
+  display: none;
+  min-width: 220px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  color: #111827;
+  padding: 6px;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-template-group select {
-  min-width: 132px;
-  max-width: 152px;
+.visual-3d-menu.is-open .visual-3d-menu-dropdown {
+  display: block;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-toolbar-label {
-  font-size: 9px;
-  letter-spacing: 0.08em;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-editor-current-guide,
-.visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group label {
-  font-size: 11px;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-editor-apply-button {
-  height: 32px;
-  min-height: 32px;
-  border-radius: 8px;
-  font-size: 12px;
-  padding: 0 10px;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-editor-back-link {
-  min-height: 30px;
-  border-radius: 7px;
-  font-size: 12px;
-  padding: 6px 8px;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-editor-status {
-  margin: 5px 0 0;
-  border-radius: 7px;
-  font-size: 11px;
-  line-height: 1.2;
-  padding: 5px 8px;
-}
-
-.visual-3d-editor-fullscreen .visual-3d-editor-properties {
+.visual-3d-menu-dropdown button,
+.visual-3d-menu-dropdown .visual-3d-menu-item {
+  display: flex;
   width: 100%;
-  margin: 0;
-  border-right: 0;
-  border-left: 0;
-  border-radius: 0;
-  background: rgba(30, 41, 59, 0.96);
-  gap: 6px;
+  min-height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.25;
   padding: 5px 10px;
+  text-align: left;
+  text-decoration: none;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-properties label {
-  gap: 4px;
+.visual-3d-menu-dropdown button:hover,
+.visual-3d-menu-dropdown .visual-3d-menu-item:hover {
+  background: #f1f5f9;
+}
+
+.visual-3d-menu-dropdown button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.visual-3d-menu-dropdown button:disabled:hover,
+.visual-3d-menu-help .visual-3d-menu-item:hover {
+  background: transparent;
+}
+
+.visual-3d-menu-dropdown span {
+  color: #64748b;
   font-size: 11px;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-properties input {
-  width: 64px;
+.visual-3d-menu-help .visual-3d-menu-item {
+  cursor: default;
+  justify-content: flex-start;
+}
+
+.visual-3d-menu-separator {
+  height: 1px;
+  margin: 5px 0;
+  background: #e5e7eb;
+}
+
+.visual-3d-menu-field {
+  display: grid;
+  gap: 4px;
+  padding: 5px 10px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.visual-3d-menu-field input {
+  width: 100%;
+  height: 28px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #111827;
+  font-size: 12px;
+  padding: 0 7px;
+}
+
+.visual-3d-menu-field input[type="color"] {
+  padding: 2px;
+}
+
+.visual-3d-editor-contextbar.visual-3d-editor-toolbar {
+  position: relative;
+  top: auto;
+  z-index: 45;
+  min-height: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, .2);
+  border-radius: 0;
+  background: #0f172a;
+  box-shadow: none;
+  padding: 4px 8px;
+}
+
+.visual-3d-editor-contextbar .visual-3d-editor-toolbar-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.visual-3d-editor-toolbar-group {
+  padding: 3px 5px;
+  gap: 5px;
+  border-radius: 7px;
+}
+
+.visual-3d-editor-contextbar .visual-3d-editor-toolbar-group {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.visual-3d-editor-toolbar-primary,
+.visual-3d-editor-contextbar .visual-3d-editor-toolbar-primary {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.visual-3d-icon-button,
+.visual-3d-editor-fullscreen .visual-3d-icon-button,
+.visual-3d-editor-contextbar .visual-3d-icon-button {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  border-radius: 7px;
+}
+
+.visual-3d-icon-button svg,
+.visual-3d-editor-fullscreen .visual-3d-icon-button svg,
+.visual-3d-editor-contextbar .visual-3d-icon-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.visual-3d-editor-toolbar input,
+.visual-3d-editor-toolbar select,
+.visual-3d-editor-contextbar input,
+.visual-3d-editor-contextbar select {
   height: 28px;
   min-height: 28px;
+  max-width: 170px;
+  border: 1px solid rgba(203, 213, 225, 0.65);
   border-radius: 7px;
+  background: #fff;
+  color: var(--cdg-text);
   font-size: 12px;
-  padding: 0 6px;
+  font-weight: 800;
+  padding: 0 7px;
 }
 
-.visual-3d-editor-fullscreen #artwork-editor-selection-status {
+.visual-3d-editor-template-group select {
+  min-width: 132px;
+  max-width: 150px;
+}
+
+.visual-3d-toolbar-label {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.visual-3d-editor-zoom-group {
+  white-space: nowrap;
+}
+
+.visual-3d-editor-zoom-label {
+  min-width: 42px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.visual-3d-editor-apply-button,
+.visual-3d-editor-contextbar .visual-3d-editor-apply-button {
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cdg-brand);
+  color: #1b1300;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.visual-3d-editor-back-link,
+.visual-3d-editor-contextbar .visual-3d-editor-back-link {
+  height: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  color: #dbeafe;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 10px;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.visual-3d-editor-back-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.visual-3d-editor-contextbar .visual-3d-editor-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.visual-3d-editor-properties {
+  height: 32px;
+  min-height: 32px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, .2);
+  border-radius: 0;
+  background: #1e293b;
+  padding: 3px 8px;
+}
+
+.visual-3d-editor-properties label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.78);
   font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.visual-3d-editor-properties input {
+  width: 58px;
+  height: 24px;
+  min-height: 24px;
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--cdg-text);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 0 5px;
+}
+
+.visual-3d-editor-properties input:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.visual-3d-editor-properties .visual-3d-icon-button[aria-pressed="true"] {
+  background: var(--cdg-brand) !important;
+  color: #1b1300 !important;
+}
+
+.visual-3d-editor-properties.is-empty .visual-3d-toolbar-label,
+.visual-3d-editor-properties.is-empty label,
+.visual-3d-editor-properties.is-empty button {
+  display: none;
+}
+
+.visual-3d-editor-properties.is-empty #artwork-editor-selection-status {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+#artwork-editor-selection-status {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .visual-3d-editor-canvas-area {
-  width: 100%;
   min-height: 0;
+  width: 100%;
   overflow: hidden;
+  background: #07111f;
 }
 
 .visual-3d-editor-canvas-scroll {
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding: 12px;
+  padding: 24px;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-canvas-stage {
-  display: flex;
+.visual-3d-editor-canvas-stage {
+  min-width: 100%;
   min-height: 100%;
-  align-items: flex-start;
-  justify-content: center;
+  display: grid;
+  place-items: start center;
+}
+
+.visual-3d-editor-canvas-spacer {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.visual-3d-editor-canvas-scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+.visual-3d-editor-canvas-wrap {
+  overflow: visible;
+  max-width: none;
+  border: 1px solid var(--cdg-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(45deg, #e7edf6 25%, transparent 25%),
+    linear-gradient(-45deg, #e7edf6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e7edf6 75%),
+    linear-gradient(-45deg, transparent 75%, #e7edf6 75%);
+  background-color: #f8fafc;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+  background-size: 24px 24px;
   padding: 0;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-canvas-wrap {
+.visual-3d-editor-canvas-wrap canvas,
+.visual-3d-editor-canvas-wrap .canvas-container {
+  display: block;
+  width: auto !important;
   max-width: none;
+  height: auto !important;
   margin: 0;
-  border-radius: 8px;
-  padding: 8px;
+  transition: none;
 }
 
-.visual-3d-editor-fullscreen .visual-3d-editor-canvas-wrap canvas {
-  width: auto;
-  max-width: none;
-  height: auto;
+.visual-3d-editor-canvas-wrap canvas {
+  border: 1px solid #cfd8e6;
+  background: transparent;
 }
 
-@media (max-width: 720px) {
-  .visual-3d-editor-topbar.visual-3d-editor-toolbar {
-    padding: 6px;
+@media (max-width: 760px) {
+  .visual-3d-editor-menubar {
+    gap: 10px;
   }
 
-  .visual-3d-editor-app-title {
-    margin-bottom: 4px;
-  }
-
-  .visual-3d-editor-fullscreen .visual-3d-editor-toolbar-row {
-    gap: 4px;
-  }
-
-  .visual-3d-editor-fullscreen .visual-3d-editor-toolbar-group {
-    gap: 4px;
-    padding: 4px;
+  .visual-3d-editor-brand span {
+    display: none;
   }
 
   .visual-3d-editor-canvas-scroll {
-    padding: 8px;
+    padding: 12px;
+  }
+
+  .visual-3d-editor-toolbar-primary,
+  .visual-3d-editor-contextbar .visual-3d-editor-toolbar-primary {
+    margin-left: 0;
   }
 }

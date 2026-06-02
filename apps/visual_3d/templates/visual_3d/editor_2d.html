@@ -37,6 +37,9 @@
             <button type="button" id="artwork-editor-undo" disabled>Desfazer <span>Ctrl+Z</span></button>
             <button type="button" id="artwork-editor-redo" disabled>Refazer <span>Ctrl+Shift+Z</span></button>
             <div class="visual-3d-menu-separator"></div>
+            <button type="button" id="artwork-editor-copy">Copiar <span>Ctrl+C</span></button>
+            <button type="button" id="artwork-editor-paste">Colar <span>Ctrl+V</span></button>
+            <div class="visual-3d-menu-separator"></div>
             <button type="button" id="artwork-editor-duplicate">Duplicar selecionado <span>Ctrl+D</span></button>
             <button type="button" id="artwork-editor-remove-selected">Remover selecionado <span>Del</span></button>
             <button type="button" id="artwork-editor-clear">Limpar prancheta</button>
@@ -52,6 +55,8 @@
             <button type="button" data-editor-click="artwork-editor-zoom-fit">Ajustar à tela <span>Ctrl+1</span></button>
             <div class="visual-3d-menu-separator"></div>
             <button type="button" id="artwork-editor-toggle-guides" aria-pressed="true">Ocultar guias</button>
+            <button type="button" id="artwork-editor-toggle-grid" aria-pressed="false">Mostrar grade</button>
+            <button type="button" id="artwork-editor-toggle-snap" aria-pressed="true">Desativar snap</button>
             <div class="visual-3d-menu-separator"></div>
             <label class="visual-3d-menu-field">Largura <input id="artwork-editor-width" type="number" min="200" max="4000" step="50" value="1200"></label>
             <label class="visual-3d-menu-field">Altura <input id="artwork-editor-height" type="number" min="200" max="4000" step="50" value="800"></label>
@@ -63,6 +68,13 @@
           <div class="visual-3d-menu-dropdown">
             <button type="button" id="artwork-editor-center">Centralizar selecionado</button>
             <button type="button" data-editor-click="artwork-editor-lock-object">Bloquear/desbloquear</button>
+            <div class="visual-3d-menu-separator"></div>
+            <button type="button" id="artwork-editor-align-left">Alinhar à esquerda</button>
+            <button type="button" id="artwork-editor-align-center">Alinhar ao centro</button>
+            <button type="button" id="artwork-editor-align-right">Alinhar à direita</button>
+            <button type="button" id="artwork-editor-align-top">Alinhar ao topo</button>
+            <button type="button" id="artwork-editor-align-middle">Alinhar ao meio</button>
+            <button type="button" id="artwork-editor-align-bottom">Alinhar à base</button>
             <div class="visual-3d-menu-separator"></div>
             <button type="button" id="artwork-editor-bring-forward">Trazer para frente</button>
             <button type="button" id="artwork-editor-send-backward">Enviar para trás</button>
@@ -94,6 +106,8 @@
           <div class="visual-3d-menu-dropdown visual-3d-menu-help">
             <span class="visual-3d-menu-item">Ctrl+Z: desfazer</span>
             <span class="visual-3d-menu-item">Ctrl+Shift+Z ou Ctrl+Y: refazer</span>
+            <span class="visual-3d-menu-item">Ctrl+C: copiar</span>
+            <span class="visual-3d-menu-item">Ctrl+V: colar</span>
             <span class="visual-3d-menu-item">Del: remover selecionado</span>
             <span class="visual-3d-menu-item">Ctrl+D: duplicar</span>
             <span class="visual-3d-menu-item">Ctrl+Enter: aplicar no 3D</span>

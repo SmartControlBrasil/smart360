@@ -123,8 +123,18 @@
   const addTextButton = document.getElementById("artwork-editor-add-text");
   const undoButton = document.getElementById("artwork-editor-undo");
   const redoButton = document.getElementById("artwork-editor-redo");
+  const copyButton = document.getElementById("artwork-editor-copy");
+  const pasteButton = document.getElementById("artwork-editor-paste");
   const duplicateButton = document.getElementById("artwork-editor-duplicate");
   const centerButton = document.getElementById("artwork-editor-center");
+  const alignLeftButton = document.getElementById("artwork-editor-align-left");
+  const alignCenterButton = document.getElementById("artwork-editor-align-center");
+  const alignRightButton = document.getElementById("artwork-editor-align-right");
+  const alignTopButton = document.getElementById("artwork-editor-align-top");
+  const alignMiddleButton = document.getElementById("artwork-editor-align-middle");
+  const alignBottomButton = document.getElementById("artwork-editor-align-bottom");
+  const toggleGridButton = document.getElementById("artwork-editor-toggle-grid");
+  const toggleSnapButton = document.getElementById("artwork-editor-toggle-snap");
   const bringForwardButton = document.getElementById("artwork-editor-bring-forward");
   const sendBackwardButton = document.getElementById("artwork-editor-send-backward");
   const removeSelectedButton = document.getElementById("artwork-editor-remove-selected");
@@ -176,7 +186,13 @@
     selection: true,
   });
   let guideObjects = [];
+  let gridObjects = [];
   let guidesVisible = true;
+  let copiedArtworkObject = null;
+  let gridVisible = false;
+  let snapEnabled = true;
+  const GRID_SIZE = 50;
+  const SNAP_THRESHOLD = 8;
   let currentProductGuideKey = "mug";
   let isUpdatingObjectProperties = false;
   let undoStack = [];
@@ -633,6 +649,92 @@
     return guideObject;
   }
 
+  function clearGridObjects() {
+    gridObjects.forEach((object) => artworkCanvas.remove(object));
+    gridObjects = [];
+  }
+
+  function addGridObject(object) {
+    object.set({
+      selectable: false,
+      evented: false,
+      excludeFromExport: true,
+      visible: gridVisible,
+    });
+    object.isGuide = true;
+    object.isGrid = true;
+    gridObjects.push(object);
+    artworkCanvas.add(object);
+    artworkCanvas.sendToBack(object);
+    return object;
+  }
+
+  function arrangeGuideLayers() {
+    gridObjects.forEach((object) => artworkCanvas.sendToBack(object));
+    guideObjects.forEach((object) => artworkCanvas.bringToFront(object));
+  }
+
+  function drawGridObjects() {
+    clearGridObjects();
+
+    if (!gridVisible) {
+      artworkCanvas.requestRenderAll();
+      return;
+    }
+
+    const width = artworkCanvas.getWidth();
+    const height = artworkCanvas.getHeight();
+    const gridStroke = "rgba(148, 163, 184, 0.32)";
+
+    for (let x = GRID_SIZE; x < width; x += GRID_SIZE) {
+      addGridObject(new window.fabric.Line([x, 0, x, height], {
+        stroke: gridStroke,
+        strokeWidth: 1,
+      }));
+    }
+
+    for (let y = GRID_SIZE; y < height; y += GRID_SIZE) {
+      addGridObject(new window.fabric.Line([0, y, width, y], {
+        stroke: gridStroke,
+        strokeWidth: 1,
+      }));
+    }
+
+    arrangeGuideLayers();
+    artworkCanvas.requestRenderAll();
+  }
+
+  function updateGridButtonLabel() {
+    if (!toggleGridButton) {
+      return;
+    }
+
+    toggleGridButton.textContent = gridVisible ? "Ocultar grade" : "Mostrar grade";
+    toggleGridButton.setAttribute("aria-pressed", String(gridVisible));
+  }
+
+  function updateSnapButtonLabel() {
+    if (!toggleSnapButton) {
+      return;
+    }
+
+    toggleSnapButton.textContent = snapEnabled ? "Desativar snap" : "Ativar snap";
+    toggleSnapButton.setAttribute("aria-pressed", String(snapEnabled));
+  }
+
+  function toggleGrid() {
+    gridVisible = !gridVisible;
+    updateGridButtonLabel();
+    drawGridObjects();
+    updateEditorStatus(gridVisible ? "Grade ativada." : "Grade ocultada.", gridVisible ? "success" : "idle");
+  }
+
+  function toggleSnap() {
+    snapEnabled = !snapEnabled;
+    updateSnapButtonLabel();
+    updateEditorStatus(snapEnabled ? "Snap ativado." : "Snap desativado.", snapEnabled ? "success" : "idle");
+  }
+
   function drawGuideObjects(config = getGuideConfig()) {
     const width = artworkCanvas.getWidth();
     const height = artworkCanvas.getHeight();
@@ -725,6 +827,8 @@
     if (heightInput) {
       heightInput.value = height;
     }
+
+    drawGridObjects();
 
     if (redrawGuides) {
       drawGuideObjects(getGuideConfig());
@@ -903,6 +1007,7 @@
     }
 
     populateTemplateSelect();
+    drawGridObjects();
     drawGuideObjects(config);
     setGuideVisibility(guidesVisible);
     updateObjectPropertiesPanel();
@@ -986,6 +1091,165 @@
     updateEditorStatus("Texto adicionado à prancheta", "success");
   }
 
+  function copySelectedObject() {
+    const activeObject = getActiveUserObject();
+
+    if (!activeObject) {
+      updateEditorStatus("Nenhum objeto selecionado", "warning");
+      return;
+    }
+
+    activeObject.clone((clone) => {
+      copiedArtworkObject = clone;
+      updateEditorStatus("Objeto copiado.", "success");
+    }, ["isArtworkLocked"]);
+  }
+
+  function pasteCopiedObject() {
+    if (!copiedArtworkObject) {
+      updateEditorStatus("Nenhum objeto copiado.", "warning");
+      return;
+    }
+
+    copiedArtworkObject.clone((clone) => {
+      artworkCanvas.discardActiveObject();
+
+      if (clone.type === "activeSelection") {
+        const clonedObjects = clone.getObjects().filter((object) => !object.isGuide);
+        const selection = new window.fabric.ActiveSelection([], { canvas: artworkCanvas });
+
+        clonedObjects.forEach((object) => {
+          object.set({
+            left: (object.left ?? 0) + 24,
+            top: (object.top ?? 0) + 24,
+            evented: true,
+          });
+          artworkCanvas.add(object);
+          selection.addWithUpdate(object);
+        });
+
+        if (clonedObjects.length) {
+          artworkCanvas.setActiveObject(selection);
+        }
+      } else {
+        clone.set({
+          left: (clone.left ?? 0) + 24,
+          top: (clone.top ?? 0) + 24,
+          evented: true,
+        });
+        artworkCanvas.add(clone);
+        updateCanvasAndSelection(clone);
+      }
+
+      arrangeGuideLayers();
+      artworkCanvas.requestRenderAll();
+      pushHistorySnapshot();
+      updateEditorStatus("Objeto colado.", "success");
+    }, ["isArtworkLocked"]);
+  }
+
+  function alignSelectedObject(horizontal, vertical, statusMessage) {
+    const object = getActiveUserObject();
+
+    if (!object) {
+      updateEditorStatus("Nenhum objeto selecionado", "warning");
+      return;
+    }
+
+    const scaledWidth = object.getScaledWidth();
+    const scaledHeight = object.getScaledHeight();
+    const currentCenter = object.getCenterPoint();
+    let nextCenterX = currentCenter.x;
+    let nextCenterY = currentCenter.y;
+
+    if (horizontal === "left") {
+      nextCenterX = scaledWidth / 2;
+    } else if (horizontal === "center") {
+      nextCenterX = artworkCanvas.getWidth() / 2;
+    } else if (horizontal === "right") {
+      nextCenterX = artworkCanvas.getWidth() - scaledWidth / 2;
+    }
+
+    if (vertical === "top") {
+      nextCenterY = scaledHeight / 2;
+    } else if (vertical === "middle") {
+      nextCenterY = artworkCanvas.getHeight() / 2;
+    } else if (vertical === "bottom") {
+      nextCenterY = artworkCanvas.getHeight() - scaledHeight / 2;
+    }
+
+    object.setPositionByOrigin(new window.fabric.Point(nextCenterX, nextCenterY), "center", "center");
+    object.setCoords();
+    artworkCanvas.requestRenderAll();
+    updateObjectPropertiesPanel();
+    pushHistorySnapshot();
+    updateEditorStatus(statusMessage, "success");
+  }
+
+  function alignSelectedLeft() {
+    alignSelectedObject("left", null, "Objeto alinhado à esquerda.");
+  }
+
+  function alignSelectedCenter() {
+    alignSelectedObject("center", null, "Objeto alinhado ao centro.");
+  }
+
+  function alignSelectedRight() {
+    alignSelectedObject("right", null, "Objeto alinhado à direita.");
+  }
+
+  function alignSelectedTop() {
+    alignSelectedObject(null, "top", "Objeto alinhado ao topo.");
+  }
+
+  function alignSelectedMiddle() {
+    alignSelectedObject(null, "middle", "Objeto alinhado ao meio.");
+  }
+
+  function alignSelectedBottom() {
+    alignSelectedObject(null, "bottom", "Objeto alinhado à base.");
+  }
+
+  function snapObjectDuringMove(object) {
+    if (!snapEnabled || !object || object.isGuide) {
+      return;
+    }
+
+    const nearestLeft = Math.round((object.left ?? 0) / GRID_SIZE) * GRID_SIZE;
+    const nearestTop = Math.round((object.top ?? 0) / GRID_SIZE) * GRID_SIZE;
+
+    if (Math.abs((object.left ?? 0) - nearestLeft) <= SNAP_THRESHOLD) {
+      object.left = nearestLeft;
+    }
+
+    if (Math.abs((object.top ?? 0) - nearestTop) <= SNAP_THRESHOLD) {
+      object.top = nearestTop;
+    }
+
+    const centerPoint = object.getCenterPoint();
+    const canvasCenterX = artworkCanvas.getWidth() / 2;
+    const canvasCenterY = artworkCanvas.getHeight() / 2;
+    let nextCenterX = centerPoint.x;
+    let nextCenterY = centerPoint.y;
+    let shouldSnapCenter = false;
+
+    if (Math.abs(centerPoint.x - canvasCenterX) <= SNAP_THRESHOLD) {
+      nextCenterX = canvasCenterX;
+      shouldSnapCenter = true;
+    }
+
+    if (Math.abs(centerPoint.y - canvasCenterY) <= SNAP_THRESHOLD) {
+      nextCenterY = canvasCenterY;
+      shouldSnapCenter = true;
+    }
+
+    if (shouldSnapCenter) {
+      object.setPositionByOrigin(new window.fabric.Point(nextCenterX, nextCenterY), "center", "center");
+    }
+
+    object.setCoords();
+  }
+
   function duplicateSelectedObject() {
     const activeObject = getActiveObject();
 
@@ -1024,7 +1288,7 @@
         updateCanvasAndSelection(clone);
       }
 
-      guideObjects.forEach((object) => artworkCanvas.bringToFront(object));
+      arrangeGuideLayers();
       artworkCanvas.requestRenderAll();
       pushHistorySnapshot();
       updateEditorStatus("Objeto duplicado", "success");
@@ -1059,7 +1323,7 @@
     }
 
     artworkCanvas.bringForward(activeObject);
-    guideObjects.forEach((object) => artworkCanvas.bringToFront(object));
+    arrangeGuideLayers();
     artworkCanvas.requestRenderAll();
     pushHistorySnapshot();
     updateEditorStatus("Objeto movido para frente", "success");
@@ -1074,7 +1338,7 @@
     }
 
     artworkCanvas.sendBackwards(activeObject);
-    guideObjects.forEach((object) => artworkCanvas.bringToFront(object));
+    arrangeGuideLayers();
     artworkCanvas.requestRenderAll();
     pushHistorySnapshot();
     updateEditorStatus("Objeto enviado para trás", "success");
@@ -1104,6 +1368,7 @@
     isRestoringHistory = false;
     artworkCanvas.discardActiveObject();
     artworkCanvas.setBackgroundColor(null, () => {
+      drawGridObjects();
       drawGuideObjects(getGuideConfig());
       updateObjectPropertiesPanel();
       pushHistorySnapshot();
@@ -1112,9 +1377,10 @@
   }
 
   function withGuidesHidden(callback) {
-    const previousVisibility = guideObjects.map((object) => object.visible);
+    const hiddenObjects = [...guideObjects, ...gridObjects];
+    const previousVisibility = hiddenObjects.map((object) => object.visible);
 
-    guideObjects.forEach((object) => {
+    hiddenObjects.forEach((object) => {
       object.visible = false;
     });
     artworkCanvas.renderAll();
@@ -1122,7 +1388,7 @@
     try {
       return callback();
     } finally {
-      guideObjects.forEach((object, index) => {
+      hiddenObjects.forEach((object, index) => {
         object.visible = previousVisibility[index];
       });
       artworkCanvas.renderAll();
@@ -1217,12 +1483,14 @@
       artworkCanvas.discardActiveObject();
       getUserObjects().forEach((object) => artworkCanvas.remove(object));
       clearGuideObjects();
+      clearGridObjects();
       syncProductControlsFromProject(project.productKey || "mug");
       artworkCanvas.setWidth(clampCanvasSize(project.width, getGuideConfig().width));
       artworkCanvas.setHeight(clampCanvasSize(project.height, getGuideConfig().height));
       updateCanvasSizeInputs();
 
       artworkCanvas.loadFromJSON(fabricJson, () => {
+        drawGridObjects();
         drawGuideObjects(getGuideConfig());
         setGuideVisibility(guidesVisible);
         artworkCanvas.requestRenderAll();
@@ -1382,6 +1650,18 @@
       return;
     }
 
+    if (isModifierPressed && key === "c") {
+      event.preventDefault();
+      copySelectedObject();
+      return;
+    }
+
+    if (isModifierPressed && key === "v") {
+      event.preventDefault();
+      pasteCopiedObject();
+      return;
+    }
+
     if (isModifierPressed && (key === "+" || key === "=")) {
       event.preventDefault();
       zoomInEditor();
@@ -1423,6 +1703,10 @@
       applyArtworkToViewer();
     }
   }
+
+  artworkCanvas.on("object:moving", (event) => {
+    snapObjectDuringMove(event.target);
+  });
 
   [
     "selection:created",
@@ -1491,6 +1775,16 @@
   lockObjectButton?.addEventListener("click", toggleLockSelectedObject);
   undoButton?.addEventListener("click", undoEditorChange);
   redoButton?.addEventListener("click", redoEditorChange);
+  copyButton?.addEventListener("click", copySelectedObject);
+  pasteButton?.addEventListener("click", pasteCopiedObject);
+  alignLeftButton?.addEventListener("click", alignSelectedLeft);
+  alignCenterButton?.addEventListener("click", alignSelectedCenter);
+  alignRightButton?.addEventListener("click", alignSelectedRight);
+  alignTopButton?.addEventListener("click", alignSelectedTop);
+  alignMiddleButton?.addEventListener("click", alignSelectedMiddle);
+  alignBottomButton?.addEventListener("click", alignSelectedBottom);
+  toggleGridButton?.addEventListener("click", toggleGrid);
+  toggleSnapButton?.addEventListener("click", toggleSnap);
   widthInput?.addEventListener("change", () => {
     resizeArtworkCanvas({ redrawGuides: true });
     pushHistorySnapshot();
@@ -1533,6 +1827,16 @@
     toggleGuides,
     undoEditorChange,
     redoEditorChange,
+    copySelectedObject,
+    pasteCopiedObject,
+    alignSelectedLeft,
+    alignSelectedCenter,
+    alignSelectedRight,
+    alignSelectedTop,
+    alignSelectedMiddle,
+    alignSelectedBottom,
+    toggleGrid,
+    toggleSnap,
     zoomInEditor,
     zoomOutEditor,
     resetEditorZoom,
@@ -1556,6 +1860,8 @@
     exportArtworkPngDataUrl,
   };
 
+  updateGridButtonLabel();
+  updateSnapButtonLabel();
   setArtworkEditorProduct("mug");
   setGuideVisibility(true);
   updateObjectPropertiesPanel();

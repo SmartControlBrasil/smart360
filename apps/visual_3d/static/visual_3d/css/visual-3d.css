@@ -954,21 +954,27 @@ body.visual-3d-editor-body {
 .visual-3d-editor-menubar {
   height: 28px;
   min-height: 28px;
-  padding: 0 10px;
+  max-height: 28px;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  overflow: visible;
   background: #f8fafc;
   color: #111827;
   border-bottom: 1px solid #d1d5db;
+  position: relative;
   z-index: 100;
 }
 
 .visual-3d-editor-brand {
-  display: flex;
   flex: 0 0 auto;
+  display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   white-space: nowrap;
 }
 
@@ -986,11 +992,12 @@ body.visual-3d-editor-body {
 }
 
 .visual-3d-editor-menu-list {
-  display: flex;
+  flex: 1 1 auto;
   min-width: 0;
-  align-items: stretch;
+  display: flex;
+  align-items: center;
   gap: 2px;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .visual-3d-menu {
@@ -1000,12 +1007,14 @@ body.visual-3d-editor-body {
 
 .visual-3d-menu-trigger {
   height: 28px;
+  padding: 0 8px;
   border: 0;
   background: transparent;
   color: inherit;
-  cursor: pointer;
   font-size: 13px;
-  padding: 0 8px;
+  line-height: 28px;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .visual-3d-menu-trigger:hover,
@@ -1017,9 +1026,12 @@ body.visual-3d-editor-body {
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: 200;
+  z-index: 300;
   display: none;
   min-width: 220px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid #cbd5e1;
   background: #fff;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
@@ -1395,15 +1407,22 @@ body.visual-3d-editor-body {
   background: transparent;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .visual-3d-editor-menubar {
-    gap: 10px;
+    gap: 6px;
   }
 
   .visual-3d-editor-brand span {
     display: none;
   }
 
+  .visual-3d-menu-trigger {
+    padding: 0 6px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 760px) {
   .visual-3d-editor-canvas-scroll {
     padding: 12px;
   }
@@ -1411,5 +1430,12 @@ body.visual-3d-editor-body {
   .visual-3d-editor-toolbar-primary,
   .visual-3d-editor-contextbar .visual-3d-editor-toolbar-primary {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .visual-3d-editor-menu-list .visual-3d-menu:nth-child(6),
+  .visual-3d-editor-menu-list .visual-3d-menu:nth-child(7) {
+    display: none;
   }
 }

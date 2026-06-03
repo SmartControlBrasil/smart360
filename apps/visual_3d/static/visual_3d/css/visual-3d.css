@@ -1218,6 +1218,24 @@ body.visual-3d-editor-body {
   max-width: 150px;
 }
 
+.visual-3d-editor-mini-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.visual-3d-editor-mini-field span {
+  color: #475569;
+}
+
+.visual-3d-editor-mini-field input {
+  width: 56px;
+  height: 24px;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
 .visual-3d-toolbar-label {
   color: rgba(255, 255, 255, 0.72);
   font-size: 10px;

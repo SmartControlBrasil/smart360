@@ -107,6 +107,24 @@
             <button type="button" id="artwork-editor-text-align-right">Alinhar texto à direita</button>
             <button type="button" id="artwork-editor-text-uppercase">Caixa alta</button>
             <div class="visual-3d-menu-separator"></div>
+            <button type="button" id="artwork-editor-text-shadow-toggle">Ativar/desativar sombra</button>
+            <button type="button" id="artwork-editor-text-shadow-soft">Sombra leve</button>
+            <button type="button" id="artwork-editor-text-shadow-medium">Sombra média</button>
+            <button type="button" id="artwork-editor-text-shadow-strong">Sombra forte</button>
+            <button type="button" id="artwork-editor-text-shadow-remove">Remover sombra</button>
+            <div class="visual-3d-menu-separator"></div>
+            <button type="button" id="artwork-editor-text-outline-thin">Contorno fino</button>
+            <button type="button" id="artwork-editor-text-outline-medium">Contorno médio</button>
+            <button type="button" id="artwork-editor-text-outline-strong">Contorno forte</button>
+            <button type="button" id="artwork-editor-text-outline-remove">Remover contorno</button>
+            <div class="visual-3d-menu-separator"></div>
+            <button type="button" id="artwork-editor-text-letter-spacing-increase">Aumentar espaçamento entre letras</button>
+            <button type="button" id="artwork-editor-text-letter-spacing-decrease">Diminuir espaçamento entre letras</button>
+            <button type="button" id="artwork-editor-text-letter-spacing-reset">Resetar espaçamento entre letras</button>
+            <button type="button" id="artwork-editor-text-line-height-increase">Aumentar espaçamento entre linhas</button>
+            <button type="button" id="artwork-editor-text-line-height-decrease">Diminuir espaçamento entre linhas</button>
+            <button type="button" id="artwork-editor-text-line-height-reset">Resetar espaçamento entre linhas</button>
+            <div class="visual-3d-menu-separator"></div>
             <button type="button" id="artwork-editor-add-text">Adicionar texto</button>
             <button type="button" id="artwork-editor-apply-template">Aplicar template selecionado</button>
           </div>
@@ -160,6 +178,17 @@
           <select id="artwork-editor-font-family" class="visual-3d-editor-font-select">
             <option value="Arial">Arial</option>
           </select>
+        </div>
+
+        <div class="visual-3d-editor-toolbar-group">
+          <label class="visual-3d-editor-mini-field">
+            <span>Letras</span>
+            <input id="artwork-editor-letter-spacing" type="number" min="-200" max="1000" step="10" value="0">
+          </label>
+          <label class="visual-3d-editor-mini-field">
+            <span>Linha</span>
+            <input id="artwork-editor-line-height" type="number" min="0.5" max="3" step="0.1" value="1.16">
+          </label>
         </div>
 
 

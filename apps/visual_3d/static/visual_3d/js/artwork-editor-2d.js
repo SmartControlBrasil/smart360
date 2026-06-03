@@ -32,6 +32,40 @@
     "Trebuchet MS",
     "Comic Sans MS",
   ];
+  const ARTWORK_EDITOR_TEXT_SHADOWS = {
+    soft: {
+      color: "rgba(0,0,0,0.35)",
+      blur: 4,
+      offsetX: 2,
+      offsetY: 2,
+    },
+    medium: {
+      color: "rgba(0,0,0,0.45)",
+      blur: 8,
+      offsetX: 4,
+      offsetY: 4,
+    },
+    strong: {
+      color: "rgba(0,0,0,0.6)",
+      blur: 12,
+      offsetX: 6,
+      offsetY: 6,
+    },
+  };
+  const ARTWORK_EDITOR_TEXT_OUTLINES = {
+    thin: {
+      stroke: "#111827",
+      strokeWidth: 1,
+    },
+    medium: {
+      stroke: "#111827",
+      strokeWidth: 3,
+    },
+    strong: {
+      stroke: "#111827",
+      strokeWidth: 5,
+    },
+  };
   const ARTWORK_EDITOR_COLOR_PALETTE = [
     "#000000", "#1f2937", "#374151", "#4b5563", "#6b7280", "#9ca3af", "#d1d5db", "#ffffff",
     "#7f1d1d", "#dc2626", "#f97316", "#facc15", "#84cc16", "#22c55e", "#14b8a6", "#06b6d4",
@@ -143,6 +177,8 @@
   const fontSizeInput = document.getElementById("artwork-editor-font-size");
   const textColorInput = document.getElementById("artwork-editor-text-color");
   const fontFamilySelect = document.getElementById("artwork-editor-font-family");
+  const letterSpacingInput = document.getElementById("artwork-editor-letter-spacing");
+  const lineHeightInput = document.getElementById("artwork-editor-line-height");
   const currentProductLabel = document.getElementById("artwork-editor-current-product");
   const productSelector = document.getElementById("artwork-editor-product-selector");
   const templateSelect = document.getElementById("artwork-editor-template-select");
@@ -183,6 +219,21 @@
   const textAlignCenterButton = document.getElementById("artwork-editor-text-align-center");
   const textAlignRightButton = document.getElementById("artwork-editor-text-align-right");
   const textUppercaseButton = document.getElementById("artwork-editor-text-uppercase");
+  const textShadowToggleButton = document.getElementById("artwork-editor-text-shadow-toggle");
+  const textShadowSoftButton = document.getElementById("artwork-editor-text-shadow-soft");
+  const textShadowMediumButton = document.getElementById("artwork-editor-text-shadow-medium");
+  const textShadowStrongButton = document.getElementById("artwork-editor-text-shadow-strong");
+  const textShadowRemoveButton = document.getElementById("artwork-editor-text-shadow-remove");
+  const textOutlineThinButton = document.getElementById("artwork-editor-text-outline-thin");
+  const textOutlineMediumButton = document.getElementById("artwork-editor-text-outline-medium");
+  const textOutlineStrongButton = document.getElementById("artwork-editor-text-outline-strong");
+  const textOutlineRemoveButton = document.getElementById("artwork-editor-text-outline-remove");
+  const textLetterSpacingIncreaseButton = document.getElementById("artwork-editor-text-letter-spacing-increase");
+  const textLetterSpacingDecreaseButton = document.getElementById("artwork-editor-text-letter-spacing-decrease");
+  const textLetterSpacingResetButton = document.getElementById("artwork-editor-text-letter-spacing-reset");
+  const textLineHeightIncreaseButton = document.getElementById("artwork-editor-text-line-height-increase");
+  const textLineHeightDecreaseButton = document.getElementById("artwork-editor-text-line-height-decrease");
+  const textLineHeightResetButton = document.getElementById("artwork-editor-text-line-height-reset");
   const elementDecorativeStripeButton = document.getElementById("artwork-editor-element-decorative-stripe");
   const elementSimpleFrameButton = document.getElementById("artwork-editor-element-simple-frame");
   const elementRoundedFrameButton = document.getElementById("artwork-editor-element-rounded-frame");
@@ -288,6 +339,8 @@
   let editorZoom = 1;
   let resizeZoomTimer = null;
   let defaultTextFontFamily = "Arial";
+  let defaultTextCharSpacing = 0;
+  let defaultTextLineHeight = 1.16;
 
   function clampCanvasSize(value, fallback) {
     const numberValue = Number(value);
@@ -307,6 +360,16 @@
     }
 
     return Math.min(Math.max(Math.round(numberValue), 8), 300);
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const numberValue = Number(value);
+
+    if (!Number.isFinite(numberValue)) {
+      return fallback;
+    }
+
+    return Math.min(Math.max(numberValue, min), max);
   }
 
   function populateFontFamilySelect() {
@@ -467,6 +530,9 @@
     if (textItalicButton) {
       textItalicButton.classList.toggle("is-active", first?.fontStyle === "italic");
     }
+    if (textShadowToggleButton) {
+      textShadowToggleButton.classList.toggle("is-active", Boolean(first?.shadow));
+    }
 
     [textAlignLeftButton, textAlignCenterButton, textAlignRightButton].forEach((button) => {
       button?.classList.remove("is-active");
@@ -484,6 +550,22 @@
     if (fontSizeInput && first?.fontSize) {
       fontSizeInput.value = clampFontSize(first.fontSize);
     }
+
+    if (letterSpacingInput) {
+      if (first) {
+        letterSpacingInput.value = clampNumber(first.charSpacing ?? 0, -200, 1000, 0);
+      } else {
+        letterSpacingInput.value = defaultTextCharSpacing;
+      }
+    }
+
+    if (lineHeightInput) {
+      if (first) {
+        lineHeightInput.value = clampNumber(first.lineHeight ?? 1.16, 0.5, 3, 1.16).toFixed(2);
+      } else {
+        lineHeightInput.value = Number(defaultTextLineHeight).toFixed(2);
+      }
+    }
   }
 
   function applyTextStyleToSelection(stylePatch) {
@@ -495,6 +577,12 @@
       }
       if (stylePatch && stylePatch.fontSize && fontSizeInput) {
         fontSizeInput.value = clampFontSize(stylePatch.fontSize);
+      }
+      if (stylePatch && Object.prototype.hasOwnProperty.call(stylePatch, "charSpacing")) {
+        defaultTextCharSpacing = clampNumber(stylePatch.charSpacing, -200, 1000, defaultTextCharSpacing);
+      }
+      if (stylePatch && Object.prototype.hasOwnProperty.call(stylePatch, "lineHeight")) {
+        defaultTextLineHeight = clampNumber(stylePatch.lineHeight, 0.5, 3, defaultTextLineHeight);
       }
       updateEditorStatus("Selecione um texto para aplicar o estilo.", "warning");
       updateTextControlsFromSelection();
@@ -513,6 +601,12 @@
     }
     if (stylePatch && stylePatch.fontSize && fontSizeInput) {
       fontSizeInput.value = clampFontSize(stylePatch.fontSize);
+    }
+    if (stylePatch && Object.prototype.hasOwnProperty.call(stylePatch, "charSpacing")) {
+      defaultTextCharSpacing = clampNumber(stylePatch.charSpacing, -200, 1000, defaultTextCharSpacing);
+    }
+    if (stylePatch && Object.prototype.hasOwnProperty.call(stylePatch, "lineHeight")) {
+      defaultTextLineHeight = clampNumber(stylePatch.lineHeight, 0.5, 3, defaultTextLineHeight);
     }
 
     artworkCanvas.requestRenderAll();
@@ -559,6 +653,215 @@
     updateEditorStatus("Texto convertido para caixa alta.", "success");
   }
 
+  function getFirstSelectedTextObject() {
+    return getActiveTextObjects()[0] || null;
+  }
+
+  function applyTextSpacingToSelection(spacingPatch) {
+    const textObjects = getActiveTextObjects();
+    const safePatch = {};
+
+    if (Object.prototype.hasOwnProperty.call(spacingPatch || {}, "charSpacing")) {
+      safePatch.charSpacing = clampNumber(spacingPatch.charSpacing, -200, 1000, defaultTextCharSpacing);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(spacingPatch || {}, "lineHeight")) {
+      safePatch.lineHeight = clampNumber(spacingPatch.lineHeight, 0.5, 3, defaultTextLineHeight);
+    }
+
+    if (!textObjects.length) {
+      if (Object.prototype.hasOwnProperty.call(safePatch, "charSpacing")) {
+        defaultTextCharSpacing = safePatch.charSpacing;
+      }
+      if (Object.prototype.hasOwnProperty.call(safePatch, "lineHeight")) {
+        defaultTextLineHeight = safePatch.lineHeight;
+      }
+      updateEditorStatus("Selecione um texto para aplicar espaçamento.", "warning");
+      updateTextControlsFromSelection();
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      if (Object.prototype.hasOwnProperty.call(safePatch, "charSpacing")) {
+        object.set("charSpacing", safePatch.charSpacing);
+      }
+      if (Object.prototype.hasOwnProperty.call(safePatch, "lineHeight")) {
+        object.set("lineHeight", safePatch.lineHeight);
+      }
+      object.setCoords();
+    });
+
+    if (Object.prototype.hasOwnProperty.call(safePatch, "charSpacing")) {
+      defaultTextCharSpacing = safePatch.charSpacing;
+    }
+    if (Object.prototype.hasOwnProperty.call(safePatch, "lineHeight")) {
+      defaultTextLineHeight = safePatch.lineHeight;
+    }
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-spacing");
+    scheduleAutoSaveArtworkProject("text-spacing");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+  }
+
+  function increaseLetterSpacing() {
+    const first = getFirstSelectedTextObject();
+    const base = first ? clampNumber(first.charSpacing ?? 0, -200, 1000, 0) : defaultTextCharSpacing;
+    applyTextSpacingToSelection({ charSpacing: base + 50 });
+  }
+
+  function decreaseLetterSpacing() {
+    const first = getFirstSelectedTextObject();
+    const base = first ? clampNumber(first.charSpacing ?? 0, -200, 1000, 0) : defaultTextCharSpacing;
+    applyTextSpacingToSelection({ charSpacing: base - 50 });
+  }
+
+  function resetLetterSpacing() {
+    applyTextSpacingToSelection({ charSpacing: 0 });
+  }
+
+  function increaseLineHeight() {
+    const first = getFirstSelectedTextObject();
+    const base = first ? clampNumber(first.lineHeight ?? 1.16, 0.5, 3, 1.16) : defaultTextLineHeight;
+    applyTextSpacingToSelection({ lineHeight: base + 0.1 });
+  }
+
+  function decreaseLineHeight() {
+    const first = getFirstSelectedTextObject();
+    const base = first ? clampNumber(first.lineHeight ?? 1.16, 0.5, 3, 1.16) : defaultTextLineHeight;
+    applyTextSpacingToSelection({ lineHeight: base - 0.1 });
+  }
+
+  function resetLineHeight() {
+    applyTextSpacingToSelection({ lineHeight: 1.16 });
+  }
+
+  function applyTextShadowToSelection(presetKey) {
+    const textObjects = getActiveTextObjects();
+    const preset = ARTWORK_EDITOR_TEXT_SHADOWS[presetKey];
+
+    if (!preset) {
+      updateEditorStatus("Preset de sombra inválido.", "warning");
+      return;
+    }
+
+    if (!textObjects.length) {
+      updateEditorStatus("Selecione um texto para aplicar sombra.", "warning");
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      object.set("shadow", new window.fabric.Shadow({
+        color: preset.color,
+        blur: preset.blur,
+        offsetX: preset.offsetX,
+        offsetY: preset.offsetY,
+      }));
+      object.setCoords();
+    });
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-shadow");
+    scheduleAutoSaveArtworkProject("text-shadow");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+    updateEditorStatus(`Sombra ${presetKey} aplicada ao texto.`, "success");
+  }
+
+  function removeTextShadowFromSelection() {
+    const textObjects = getActiveTextObjects();
+
+    if (!textObjects.length) {
+      updateEditorStatus("Selecione um texto para remover sombra.", "warning");
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      object.set("shadow", null);
+      object.setCoords();
+    });
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-shadow-remove");
+    scheduleAutoSaveArtworkProject("text-shadow-remove");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+    updateEditorStatus("Sombra removida do texto.", "success");
+  }
+
+  function toggleTextShadow() {
+    const textObjects = getActiveTextObjects();
+
+    if (!textObjects.length) {
+      updateEditorStatus("Selecione um texto para aplicar sombra.", "warning");
+      return;
+    }
+
+    if (textObjects[0].shadow) {
+      removeTextShadowFromSelection();
+      return;
+    }
+
+    applyTextShadowToSelection("medium");
+  }
+
+  function applyTextOutlineToSelection(presetKey) {
+    const textObjects = getActiveTextObjects();
+    const preset = ARTWORK_EDITOR_TEXT_OUTLINES[presetKey];
+
+    if (!preset) {
+      updateEditorStatus("Preset de contorno inválido.", "warning");
+      return;
+    }
+
+    if (!textObjects.length) {
+      updateEditorStatus("Selecione um texto para aplicar contorno.", "warning");
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      object.set({
+        stroke: preset.stroke,
+        strokeWidth: preset.strokeWidth,
+      });
+      object.setCoords();
+    });
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-outline");
+    scheduleAutoSaveArtworkProject("text-outline");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+    updateColorStatusFromSelection();
+    updateEditorStatus(`Contorno ${presetKey} aplicado ao texto.`, "success");
+  }
+
+  function removeTextOutlineFromSelection() {
+    const textObjects = getActiveTextObjects();
+
+    if (!textObjects.length) {
+      updateEditorStatus("Selecione um texto para remover contorno.", "warning");
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      object.set({
+        stroke: null,
+        strokeWidth: 0,
+      });
+      object.setCoords();
+    });
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-outline-remove");
+    scheduleAutoSaveArtworkProject("text-outline-remove");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+    updateColorStatusFromSelection();
+    updateEditorStatus("Contorno removido do texto.", "success");
+  }
+
   function isImageObject(object) {
     return object && object.type === "image";
   }
@@ -600,6 +903,9 @@
   function applyStrokeColorToObject(object, color) {
     if (!object || object.isGuide) return false;
     if (isImageObject(object)) return false;
+    if (isTextObject(object) && (!object.strokeWidth || Number(object.strokeWidth) <= 0)) {
+      object.set("strokeWidth", 2);
+    }
     if (typeof object.stroke === "undefined" && typeof object.strokeWidth === "undefined") return false;
     object.set("stroke", color);
     if (!object.strokeWidth || Number(object.strokeWidth) <= 0) {
@@ -1500,6 +1806,8 @@
       fill,
       fontFamily: defaultTextFontFamily,
       fontSize,
+      charSpacing: defaultTextCharSpacing,
+      lineHeight: defaultTextLineHeight,
       fontWeight: "700",
       textAlign: "center",
       cornerStyle: "circle",
@@ -2684,6 +2992,21 @@
   textAlignCenterButton?.addEventListener("click", () => setSelectedTextAlign("center"));
   textAlignRightButton?.addEventListener("click", () => setSelectedTextAlign("right"));
   textUppercaseButton?.addEventListener("click", applyUppercaseToText);
+  textShadowToggleButton?.addEventListener("click", toggleTextShadow);
+  textShadowSoftButton?.addEventListener("click", () => applyTextShadowToSelection("soft"));
+  textShadowMediumButton?.addEventListener("click", () => applyTextShadowToSelection("medium"));
+  textShadowStrongButton?.addEventListener("click", () => applyTextShadowToSelection("strong"));
+  textShadowRemoveButton?.addEventListener("click", removeTextShadowFromSelection);
+  textOutlineThinButton?.addEventListener("click", () => applyTextOutlineToSelection("thin"));
+  textOutlineMediumButton?.addEventListener("click", () => applyTextOutlineToSelection("medium"));
+  textOutlineStrongButton?.addEventListener("click", () => applyTextOutlineToSelection("strong"));
+  textOutlineRemoveButton?.addEventListener("click", removeTextOutlineFromSelection);
+  textLetterSpacingIncreaseButton?.addEventListener("click", increaseLetterSpacing);
+  textLetterSpacingDecreaseButton?.addEventListener("click", decreaseLetterSpacing);
+  textLetterSpacingResetButton?.addEventListener("click", resetLetterSpacing);
+  textLineHeightIncreaseButton?.addEventListener("click", increaseLineHeight);
+  textLineHeightDecreaseButton?.addEventListener("click", decreaseLineHeight);
+  textLineHeightResetButton?.addEventListener("click", resetLineHeight);
   fontFamilySelect?.addEventListener("change", () => {
     const selectedFont = fontFamilySelect.value || "Arial";
     defaultTextFontFamily = selectedFont;
@@ -2703,6 +3026,16 @@
       applyTextStyleToSelection({ fontSize: nextSize });
       updateEditorStatus(`Tamanho aplicado: ${nextSize}px`, "success");
     }
+  });
+  letterSpacingInput?.addEventListener("change", () => {
+    const nextValue = clampNumber(letterSpacingInput.value, -200, 1000, defaultTextCharSpacing);
+    letterSpacingInput.value = nextValue;
+    applyTextSpacingToSelection({ charSpacing: nextValue });
+  });
+  lineHeightInput?.addEventListener("change", () => {
+    const nextValue = clampNumber(lineHeightInput.value, 0.5, 3, defaultTextLineHeight);
+    lineHeightInput.value = Number(nextValue).toFixed(2);
+    applyTextSpacingToSelection({ lineHeight: nextValue });
   });
   duplicateButton?.addEventListener("click", duplicateSelectedObject);
   centerButton?.addEventListener("click", centerSelectedObject);

@@ -281,6 +281,8 @@
   const finishSubmitButton = document.getElementById("artwork-editor-finish-submit");
   const finishSuccessMessage = document.getElementById("artwork-editor-finish-success");
   const finishOrderNumberMessage = document.getElementById("artwork-editor-finish-order-number");
+  const backProductLink = document.getElementById("artwork-editor-back-product-link");
+  const backSiteLink = document.getElementById("artwork-editor-back-site-link");
   let activeEditorTool = "select";
 
   if (!editorCanvasElement) {
@@ -417,6 +419,31 @@
     } catch (error) {
       console.warn("[artwork-editor-2d] não foi possível salvar entrypoint", error);
     }
+  }
+
+  function resolveCanecaProductUrl() {
+    const fallback = "/caneca-de-garagem/produtos/";
+    const source = String(customizerEntrypoint.source || "").trim();
+    const slug = String(customizerEntrypoint.productSlug || "").trim();
+
+    if (source === "caneca_product" && slug) {
+      return `/caneca-de-garagem/produtos/${encodeURIComponent(slug)}/`;
+    }
+
+    return fallback;
+  }
+
+  function syncBackNavigationLinks() {
+    if (!backProductLink || !backSiteLink) {
+      return;
+    }
+
+    const productUrl = resolveCanecaProductUrl();
+    const fromCanecaProduct = productUrl !== "/caneca-de-garagem/produtos/";
+    backProductLink.href = productUrl;
+    backProductLink.hidden = !fromCanecaProduct;
+    backSiteLink.href = "/caneca-de-garagem/produtos/";
+    backSiteLink.hidden = fromCanecaProduct;
   }
 
   function clampNumber(value, min, max, fallback) {
@@ -3377,6 +3404,7 @@
   updateGridButtonLabel();
   updateSnapButtonLabel();
   readCustomizerEntrypointFromUrl();
+  syncBackNavigationLinks();
   populateFontFamilySelect();
   setActiveEditorTool("select");
   setArtworkEditorProduct(customizerEntrypoint.product || "mug");

@@ -109,7 +109,7 @@
                                 <div class="wrap-box flex">
                                     <div id="site-logo">
                                         <div id="site-logo-inner">
-                                            <a href="{% url 'caneca_de_garagem:home' %}" rel="home" class="main-logo cdg-text-logo">
+                                            <a href="/caneca-de-garagem/" rel="home" class="main-logo cdg-text-logo">
                                                 <span class="cdg-text-logo__title">Caneca de Garagem</span>
                                                 <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
                                             </a>
@@ -164,9 +164,26 @@
                                         </div>
                                         {% endif %}
                                         <div id="cdg-header-login" class="ml-12">
-                                            <a href="{% url 'caneca_de_garagem:login' %}" class="tf-button style-1">
+                                            {% if request.user.is_authenticated %}
+                                            {# TODO: quando client_portal estiver pronto, trocar "Minha conta" para o painel dedicado do cliente. #}
+                                            {# TODO: quando artisan_portal estiver pronto, separar navegação de produção autorizada para artesãos. #}
+                                            <a href="/caneca-de-garagem/" class="tf-button style-1">
+                                                <span>Minha conta</span>
+                                            </a>
+                                            <form method="post"
+                                                action="{% url 'users:logout' %}?next=/caneca-de-garagem/"
+                                                style="display:inline-block; margin-left: 8px;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="tf-button style-1">
+                                                    <span>Sair</span>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <a href="{% url 'users:login' %}?next={{ request.get_full_path|urlencode }}"
+                                                class="tf-button style-1">
                                                 <span>Entrar</span>
                                             </a>
+                                            {% endif %}
                                         </div>
                                         <div class="header-search relative">
                                             <a href="#" class="show-search">
@@ -198,7 +215,7 @@
                     <div class="overlay-canvas-nav"></div>
                     <div class="inner-canvas-nav">
                         <div class="side-bar">
-                            <a href="{% url 'caneca_de_garagem:home' %}" rel="home" class="main-logo cdg-text-logo">
+                            <a href="/caneca-de-garagem/" rel="home" class="main-logo cdg-text-logo">
                                 <span class="cdg-text-logo__title">Caneca de Garagem</span>
                                 <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
                             </a>
@@ -236,7 +253,19 @@
                                     <li><a href="{% url 'caneca_de_garagem:author-list' %}">Criadores</a></li>
                                     <li><a href="{% url 'caneca_de_garagem:blog-list' %}">Blog</a></li>
                                     <li><a href="{% url 'caneca_de_garagem:contact' %}">Contato</a></li>
-                                    <li><a href="{% url 'caneca_de_garagem:login' %}">Entrar</a></li>
+                                    {% if request.user.is_authenticated %}
+                                    <li><a href="/caneca-de-garagem/">Minha conta</a></li>
+                                    <li>
+                                        <form method="post"
+                                            action="{% url 'users:logout' %}?next=/caneca-de-garagem/">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">Sair</button>
+                                        </form>
+                                    </li>
+                                    {% else %}
+                                    <li><a href="{% url 'users:login' %}?next={{ request.get_full_path|urlencode }}">Entrar</a></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                             <div class="widget">
@@ -254,7 +283,7 @@
                 <div class="mobile-nav-wrap">
                     <div class="overlay-mobile-nav"></div>
                     <div class="inner-mobile-nav">
-                        <a href="{% url 'caneca_de_garagem:home' %}" rel="home" class="main-logo cdg-text-logo">
+                        <a href="/caneca-de-garagem/" rel="home" class="main-logo cdg-text-logo">
                             <span class="cdg-text-logo__title">Caneca de Garagem</span>
                             <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
                         </a>
@@ -287,9 +316,24 @@
                                 <li class="menu-item{% if request.resolver_match.url_name == 'contact' %} current-menu-item{% endif %}">
                                     <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:contact' %}">Contato</a>
                                 </li>
-                                <li class="menu-item{% if request.resolver_match.url_name == 'login' %} current-menu-item{% endif %}">
-                                    <a class="item-menu-mobile" href="{% url 'caneca_de_garagem:login' %}">Entrar</a>
+                                {% if request.user.is_authenticated %}
+                                <li class="menu-item">
+                                    <a class="item-menu-mobile" href="/caneca-de-garagem/">Minha conta</a>
                                 </li>
+                                <li class="menu-item">
+                                    <form method="post"
+                                        action="{% url 'users:logout' %}?next=/caneca-de-garagem/">
+                                        {% csrf_token %}
+                                        <button type="submit" class="item-menu-mobile"
+                                            style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">Sair</button>
+                                    </form>
+                                </li>
+                                {% else %}
+                                <li class="menu-item">
+                                    <a class="item-menu-mobile"
+                                        href="{% url 'users:login' %}?next={{ request.get_full_path|urlencode }}">Entrar</a>
+                                </li>
+                                {% endif %}
                             </ul>
                         </nav>
                         <div class="widget-search mt-30">
@@ -323,7 +367,7 @@
                             <div class="footer-content flex flex-grow">
                                 <div class="widget-logo flex-grow">
                                     <div class="logo-footer" id="logo-footer">
-                                        <a href="{% url 'caneca_de_garagem:home' %}" class="cdg-text-logo">
+                                        <a href="/caneca-de-garagem/" class="cdg-text-logo">
                                             <span class="cdg-text-logo__title">Caneca de Garagem</span>
                                             <span class="cdg-text-logo__tag">Marketplace de personalizados</span>
                                         </a>

@@ -1261,6 +1261,24 @@ if (backToEditorLink) {
   backToEditorLink.href = pendingEntrypointUrl || fallbackEditorUrl;
 }
 
+function resolveBackToProductUrl() {
+  if (pendingSource === "caneca_product" && pendingProductSlug) {
+    return `/caneca-de-garagem/produtos/${encodeURIComponent(pendingProductSlug)}/`;
+  }
+  return "/caneca-de-garagem/produtos/";
+}
+
+const backToProductLink = document.getElementById("visual-3d-back-product-link");
+const backToSiteLink = document.getElementById("visual-3d-back-site-link");
+if (backToProductLink && backToSiteLink) {
+  const productUrl = resolveBackToProductUrl();
+  const fromCanecaProduct = productUrl !== "/caneca-de-garagem/produtos/";
+  backToProductLink.href = productUrl;
+  backToProductLink.hidden = !fromCanecaProduct;
+  backToSiteLink.href = "/caneca-de-garagem/produtos/";
+  backToSiteLink.hidden = fromCanecaProduct;
+}
+
 // Estado inicial: controles desabilitados até existir arte.
 syncArtworkControls();
 // Aplica rotação base inicial do modelo/fallback.

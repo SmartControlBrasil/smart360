@@ -88,6 +88,10 @@ def editor_2d_finish(request):
 
     product_key = str(payload.get("productKey") or "").strip()
     product_label = str(payload.get("productLabel") or "").strip()
+    product_slug = str(payload.get("productSlug") or "").strip()
+    source = str(payload.get("source") or "").strip() or "visual_3d_editor_2d"
+    customizer_entrypoint_url = str(payload.get("customizerEntrypointUrl") or "").strip()
+    origin_payload = str(payload.get("origin") or "").strip()
     customer_name = str(payload.get("customerName") or "").strip()
     customer_whatsapp = str(payload.get("customerWhatsapp") or "").strip()
     customer_email = str(payload.get("customerEmail") or "").strip()
@@ -115,15 +119,21 @@ def editor_2d_finish(request):
             product = _resolve_product_for_finish(product_key, product_label)
             company = _resolve_company_for_order(product)
             order_code = _new_order_code()
+            resolved_origin = origin_payload or ("marketplace_customizer" if source == "caneca_product" else "visual_3d_editor_2d")
+            resolved_created_from = customizer_entrypoint_url or "/visual-3d/editor-2d/"
             order_metadata = {
-                "origin": "visual_3d_editor_2d",
+                "origin": resolved_origin,
                 "storefront": "caneca_de_garagem",
                 "channel": "visual_3d_editor_2d_finish",
-                "created_from": "/visual-3d/editor-2d/",
+                "created_from": resolved_created_from,
+                "source": source,
                 "productKey": product_key,
                 "productLabel": product_label,
+                "productSlug": product_slug,
                 "product_key": product_key,
                 "product_label": product_label,
+                "product_slug": product_slug,
+                "customizer_entrypoint": customizer_entrypoint_url,
                 "customer_name": customer_name,
                 "whatsapp": customer_whatsapp,
                 "customer_email": customer_email,
@@ -150,6 +160,8 @@ def editor_2d_finish(request):
                 vendor=product.vendor,
                 metadata={
                     "channel": "visual_3d_editor_2d_finish",
+                    "source": source,
+                    "productSlug": product_slug,
                     "previewDataUrl": preview_data_url,
                     "editableProjectJson": editable_project_json,
                 },
@@ -162,6 +174,10 @@ def editor_2d_finish(request):
                     "customer_email": customer_email,
                     "productKey": product_key,
                     "productLabel": product_label,
+                    "productSlug": product_slug,
+                    "source": source,
+                    "origin": resolved_origin,
+                    "customizerEntrypointUrl": customizer_entrypoint_url,
                     "quantity": quantity,
                     "previewDataUrl": preview_data_url,
                     "editableProjectJson": editable_project_json,

@@ -93,6 +93,120 @@ CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT: dict[str, str] = {
     "delivered": "Entregue",
     "cancelled": "Cancelado",
 }
+CANECA_OPERATIONAL_STATUS_CHOICES: list[tuple[str, str]] = [
+    ("new", "Novo"),
+    ("review", "Em análise"),
+    ("waiting_payment", "Aguardando pagamento"),
+    ("paid", "Pago"),
+    ("in_production", "Em produção"),
+    ("ready", "Pronto para retirada/envio"),
+    ("finished", "Finalizado"),
+    ("cancelled", "Cancelado"),
+]
+CANECA_OPERATIONAL_STATUS_LABELS: dict[str, str] = dict(CANECA_OPERATIONAL_STATUS_CHOICES)
+CANECA_OPERATIONAL_TO_BASE_STATUS: dict[str, str] = {
+    "new": "pending",
+    "review": "pending",
+    "waiting_payment": "pending",
+    "paid": "paid",
+    "in_production": "in_production",
+    "ready": "shipped",
+    "finished": "delivered",
+    "cancelled": "cancelled",
+}
+CANECA_BASE_TO_OPERATIONAL_STATUS: dict[str, str] = {
+    "pending": "new",
+    "paid": "paid",
+    "in_production": "in_production",
+    "shipped": "ready",
+    "delivered": "finished",
+    "cancelled": "cancelled",
+}
+
+
+def _caneca_operational_status_label(status_code: str) -> str:
+    if not status_code:
+        return "Novo"
+    return CANECA_OPERATIONAL_STATUS_LABELS.get(status_code, status_code.replace("_", " ").title())
+
+
+def _caneca_operational_status_badge_class(status_code: str) -> str:
+    mapping = {
+        "new": "status-indigo",
+        "review": "status-indigo",
+        "waiting_payment": "status-amber",
+        "paid": "status-sky",
+        "in_production": "status-amber",
+        "ready": "status-teal",
+        "finished": "status-emerald",
+        "cancelled": "status-slate",
+    }
+    return mapping.get(status_code or "", "status-slate")
+
+
+def get_caneca_operational_status(order) -> str:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    current = str(md.get("caneca_operational_status") or "").strip()
+    if current in CANECA_OPERATIONAL_STATUS_LABELS:
+        return current
+    base = str(getattr(order, "status", "") or "").strip()
+    return CANECA_BASE_TO_OPERATIONAL_STATUS.get(base, "new")
+
+
+def _caneca_operational_status_history_from_metadata(order) -> list[dict[str, str]]:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    raw_history = md.get("caneca_operational_status_history")
+    if not isinstance(raw_history, list):
+        return []
+    rows: list[dict[str, str]] = []
+    for row in raw_history:
+        if not isinstance(row, dict):
+            continue
+        from_status = str(row.get("from") or "").strip()
+        to_status = str(row.get("to") or "").strip()
+        if not to_status:
+            continue
+        rows.append(
+            {
+                "from_label": _caneca_operational_status_label(from_status),
+                "to_label": _caneca_operational_status_label(to_status),
+                "at": str(row.get("at") or "").strip(),
+                "source": str(row.get("source") or "").strip() or "admin_panel",
+            }
+        )
+    return rows
+
+
+def set_caneca_operational_status(order, new_status: str, user=None) -> tuple[str, str, str, str]:
+    normalized = str(new_status or "").strip()
+    if normalized not in CANECA_OPERATIONAL_STATUS_LABELS:
+        raise ValueError("Status operacional inválido.")
+
+    old_operational = get_caneca_operational_status(order)
+    old_base = str(getattr(order, "status", "") or "").strip()
+    mapped_base = CANECA_OPERATIONAL_TO_BASE_STATUS.get(normalized, "pending")
+
+    metadata = order.metadata if isinstance(order.metadata, dict) else {}
+    metadata["caneca_operational_status"] = normalized
+
+    history = metadata.get("caneca_operational_status_history")
+    if not isinstance(history, list):
+        history = []
+    if old_operational != normalized:
+        history.append(
+            {
+                "from": old_operational,
+                "to": normalized,
+                "at": timezone.now().isoformat(),
+                "source": "admin_panel",
+                "user_id": getattr(user, "id", None) if user is not None else None,
+            }
+        )
+    metadata["caneca_operational_status_history"] = history
+
+    order.status = mapped_base
+    order.metadata = metadata
+    return old_operational, normalized, old_base, mapped_base
 
 
 def _caneca_status_label(status_code: str) -> str:
@@ -298,6 +412,7 @@ def _metadata_text_value(md: dict[str, Any], keys: tuple[str, ...]) -> str:
 
 def _extract_order_origin_label(order) -> str:
     md = order.metadata if isinstance(order.metadata, dict) else {}
+    source = _metadata_text_value(md, ("source",))
     origin_value = _metadata_text_value(
         md,
         (
@@ -307,6 +422,8 @@ def _extract_order_origin_label(order) -> str:
             "created_from",
         ),
     ).lower()
+    if origin_value == "marketplace_customizer" or source == "caneca_product":
+        return "Marketplace / Personalizador"
     if "visual_3d_editor_2d" in origin_value or "editor-2d" in origin_value:
         return "Editor 2D"
     if origin_value == CANECA_PUBLIC_ORIGIN_STOREFRONT:
@@ -326,6 +443,21 @@ def _extract_preview_data_url(order, line_items_detail: list[dict[str, Any]] | N
             preview = _metadata_text_value(customer_text, ("preview_data_url", "previewDataUrl"))
             if preview:
                 return preview
+    return ""
+
+
+def _extract_order_product_slug(order, line_items_detail: list[dict[str, Any]] | None = None) -> str:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    slug = _metadata_text_value(md, ("product_slug", "productSlug"))
+    if slug:
+        return slug
+    for row in line_items_detail or []:
+        cust_req = row.get("customization_request")
+        customer_text = getattr(cust_req, "customer_text", None) if cust_req is not None else None
+        if isinstance(customer_text, dict):
+            slug = _metadata_text_value(customer_text, ("product_slug", "productSlug"))
+            if slug:
+                return slug
     return ""
 
 
@@ -476,9 +608,13 @@ def _normalize_whatsapp_phone(raw_phone: str) -> str:
     digits = "".join(ch for ch in (raw_phone or "") if ch.isdigit())
     if not digits:
         return ""
+    if len(digits) < 10:
+        return ""
     if len(digits) in {10, 11} and not digits.startswith("55"):
         digits = f"55{digits}"
-    if len(digits) < 12:
+    if not digits.startswith("55"):
+        return ""
+    if len(digits) not in {12, 13}:
         return ""
     return digits
 
@@ -507,9 +643,18 @@ def _extract_caneca_product_label(order) -> str:
 def build_caneca_customer_message(order) -> dict[str, Any]:
     md = order.metadata if isinstance(order.metadata, dict) else {}
     pricing_summary = caneca_order_price_summary(order)
+    pricing_block = md.get("pricing") if isinstance(md.get("pricing"), dict) else {}
+
+    pricing_unit_raw = pricing_block.get("unit_price")
+    pricing_total_raw = pricing_block.get("total_price")
+    pricing_note = str(pricing_block.get("commercial_note") or "").strip()
 
     total_raw = pricing_summary.get("total")
     unit_raw = pricing_summary.get("unit_price")
+    if pricing_total_raw not in (None, ""):
+        total_raw = pricing_total_raw
+    if pricing_unit_raw not in (None, ""):
+        unit_raw = pricing_unit_raw
     has_price = False
     try:
         has_price = Decimal(str(total_raw)) > 0 and Decimal(str(unit_raw)) > 0
@@ -527,9 +672,9 @@ def build_caneca_customer_message(order) -> dict[str, Any]:
     except (TypeError, ValueError):
         quantity = 1
 
-    unit_display = pricing_summary.get("unit_price_display") or "A definir"
-    total_display = pricing_summary.get("total_display") or "A definir"
-    commercial_note = str(md.get("caneca_pricing_notes") or "").strip()
+    unit_display = _caneca_money_display(unit_raw) if has_price else "A definir"
+    total_display = _caneca_money_display(total_raw) if has_price else "A definir"
+    commercial_note = pricing_note or str(md.get("caneca_pricing_notes") or "").strip()
 
     lines = [
         f"Olá, {customer_name}! Recebemos sua arte no Caneca de Garagem.",
@@ -553,7 +698,8 @@ def build_caneca_customer_message(order) -> dict[str, Any]:
 
     normalized_phone = _normalize_whatsapp_phone(customer_phone if customer_phone != "—" else "")
     whatsapp_url = ""
-    if normalized_phone:
+    has_valid_whatsapp = bool(normalized_phone)
+    if has_valid_whatsapp and has_price:
         whatsapp_url = f"https://wa.me/{normalized_phone}?text={quote(message_text)}"
 
     warning = ""
@@ -561,10 +707,11 @@ def build_caneca_customer_message(order) -> dict[str, Any]:
         warning = "Defina a precificação comercial antes de enviar a mensagem ao cliente."
 
     return {
-        "text": message_text,
+        "message": message_text,
         "whatsapp_url": whatsapp_url,
+        "has_pricing": has_price,
+        "has_valid_whatsapp": has_valid_whatsapp,
         "warning": warning,
-        "has_price": has_price,
     }
 
 
@@ -1031,6 +1178,8 @@ class CanecaOrderListView(CanecaGaragemShellMixin, ListView):
                 order.shell_product_label = getattr(fi.product, "name", "") or "—"
             else:
                 order.shell_product_label = "—"
+            md = order.metadata if isinstance(order.metadata, dict) else {}
+            order.shell_product_slug = _metadata_text_value(md, ("product_slug", "productSlug")) or "—"
             vend = getattr(fi, "vendor", None) if fi else None
             if vend is None and fi is not None and getattr(fi, "product", None):
                 vend = getattr(fi.product, "vendor", None)
@@ -1044,6 +1193,10 @@ class CanecaOrderListView(CanecaGaragemShellMixin, ListView):
                 order.shell_qty_display = 0
             order.shell_price_display = caneca_order_price_summary(order)["total_display"]
             order.shell_origin_label = _extract_order_origin_label(order)
+            op_status = get_caneca_operational_status(order)
+            order.shell_operational_status = op_status
+            order.shell_operational_status_label = _caneca_operational_status_label(op_status)
+            order.shell_operational_status_class = _caneca_operational_status_badge_class(op_status)
 
     def get_context_data(self, **kwargs):
         from apps.market_core.models import MarketplaceOrder
@@ -1199,11 +1352,7 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["pricing_summary"] = caneca_order_price_summary(order)
         ctx["can_price_caneca_order"] = caneca_order_can_be_priced(order)
         ctx["order_price_url"] = reverse(CANECA_ADMIN_URL_ORDER_PRICE, kwargs={"order_id": order.pk})
-        customer_message = build_caneca_customer_message(order)
-        ctx["customer_message_text"] = customer_message["text"]
-        ctx["customer_message_warning"] = customer_message["warning"]
-        ctx["customer_message_has_price"] = customer_message["has_price"]
-        ctx["customer_whatsapp_url"] = customer_message["whatsapp_url"]
+        ctx["caneca_customer_message"] = build_caneca_customer_message(order)
 
         customization_rows = []
         for it in order.items.all():
@@ -1223,8 +1372,16 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
             )
         ctx["line_items_detail"] = customization_rows
         ctx["order_origin_label"] = _extract_order_origin_label(order)
+        ctx["order_product_slug"] = _extract_order_product_slug(order, customization_rows)
         ctx["order_preview_data_url"] = _extract_preview_data_url(order, customization_rows)
         ctx["order_has_editable_project"] = _has_editable_project(order, customization_rows)
+        operational_status = get_caneca_operational_status(order)
+        ctx["caneca_operational_status"] = operational_status
+        ctx["caneca_operational_status_label"] = _caneca_operational_status_label(operational_status)
+        ctx["caneca_operational_status_badge_class"] = _caneca_operational_status_badge_class(operational_status)
+        ctx["caneca_operational_status_choices"] = CANECA_OPERATIONAL_STATUS_CHOICES
+        ctx["caneca_operational_status_history"] = _caneca_operational_status_history_from_metadata(order)
+
         ctx["order_current_status_label"] = _caneca_status_label(order.status)
         ctx["order_status_history"] = _caneca_status_history_from_metadata(order)
 
@@ -1501,7 +1658,7 @@ class CanecaProductionJobStatusView(CanecaGaragemShellMixin, View):
 
 
 class CanecaOrderStatusView(CanecaGaragemShellMixin, View):
-    """POST apenas: altera MarketplaceOrder.status com choices válidas."""
+    """POST apenas: altera status operacional Caneca e sincroniza status base."""
 
     http_method_names = ["post"]
 
@@ -1513,8 +1670,7 @@ class CanecaOrderStatusView(CanecaGaragemShellMixin, View):
         order = get_object_or_404(qs, pk=order_id)
         raw = (request.POST.get("status") or "").strip()
 
-        labels = dict(MarketplaceOrder.Status.choices)
-        if raw not in labels:
+        if raw not in CANECA_OPERATIONAL_STATUS_LABELS:
             messages.warning(request, "Status não reconhecido. Nenhuma alteração foi gravada.")
             return redirect(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
 
@@ -1527,25 +1683,28 @@ class CanecaOrderStatusView(CanecaGaragemShellMixin, View):
                 "production_jobs",
             ).get(pk=order.pk)
 
-            prev = locked.status
-            locked.status = raw
+            prev_operational, new_operational, prev_base, new_base = set_caneca_operational_status(
+                locked,
+                raw,
+                user=getattr(request, "user", None),
+            )
+
             metadata = locked.metadata if isinstance(locked.metadata, dict) else {}
             history = metadata.get("status_history")
             if not isinstance(history, list):
                 history = []
-
-            if prev != raw:
+            if prev_base != new_base:
                 history.append(
                     {
-                        "from": prev,
-                        "to": raw,
+                        "from": prev_base,
+                        "to": new_base,
                         "at": timezone.now().isoformat(),
                         "source": "admin_panel",
                     }
                 )
                 metadata["status_history"] = history
 
-            if prev != MarketplaceOrder.Status.PAID and raw == MarketplaceOrder.Status.PAID:
+            if prev_base != MarketplaceOrder.Status.PAID and new_base == MarketplaceOrder.Status.PAID:
                 production_job = locked.production_jobs.order_by("id").first()
                 if production_job is None:
                     first_item = locked.items.order_by("id").first()
@@ -1581,21 +1740,21 @@ class CanecaOrderStatusView(CanecaGaragemShellMixin, View):
             update_fields = ["status", "metadata", "updated_at"]
             locked.save(update_fields=update_fields)
 
-        if prev != raw:
+        if prev_operational != new_operational:
             if production_created:
                 messages.success(
                     request,
-                    f'Status atualizado de "{_caneca_status_label(prev)}" para "{_caneca_status_label(raw)}". Produção criada e enfileirada.',
+                    f'Status atualizado de "{_caneca_operational_status_label(prev_operational)}" para "{_caneca_operational_status_label(new_operational)}". Produção criada e enfileirada.',
                 )
-            elif raw == MarketplaceOrder.Status.PAID and production_job is not None:
+            elif new_base == MarketplaceOrder.Status.PAID and production_job is not None:
                 messages.success(
                     request,
-                    f'Status atualizado de "{_caneca_status_label(prev)}" para "{_caneca_status_label(raw)}". Produção já vinculada ao pedido.',
+                    f'Status atualizado de "{_caneca_operational_status_label(prev_operational)}" para "{_caneca_operational_status_label(new_operational)}". Produção já vinculada ao pedido.',
                 )
             else:
                 messages.success(
                     request,
-                    f'Status atualizado de "{_caneca_status_label(prev)}" para "{_caneca_status_label(raw)}".',
+                    f'Status atualizado de "{_caneca_operational_status_label(prev_operational)}" para "{_caneca_operational_status_label(new_operational)}".',
                 )
         else:
             messages.success(request, "Status mantido.")

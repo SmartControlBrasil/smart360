@@ -109,7 +109,7 @@
     <header class="widget-card-header"><div><h2 style="margin:0;font-size:1rem;">Status operacional</h2></div></header>
     <div class="widget-card-body" style="padding-top: 0;">
         <p class="shell-text-muted" style="margin: 0 0 var(--space-3);">Status atual:</p>
-        <span class="status-badge status-sky">{{ order_current_status_label }}</span>
+        <span class="status-badge {{ caneca_operational_status_badge_class }}">{{ caneca_operational_status_label }}</span>
     </div>
     <form method="post" action="{{ status_update_url }}">
         {% csrf_token %}
@@ -117,8 +117,8 @@
             <div class="filter-pill">
                 <span class="filter-label">Novo status</span>
                 <select class="filter-select" name="status">
-                    {% for code, label in order_status_choices %}
-                        <option value="{{ code }}" {% if order.status == code %}selected{% endif %}>{{ label }}</option>
+                    {% for code, label in caneca_operational_status_choices %}
+                        <option value="{{ code }}" {% if caneca_operational_status == code %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -129,16 +129,16 @@
     </form>
 </section>
 
-{% if order_status_history %}
+{% if caneca_operational_status_history %}
 <section class="panel-card mb-24">
-    <header class="widget-card-header"><div><h2 style="margin:0;font-size:1rem;">Histórico de status</h2></div></header>
+    <header class="widget-card-header"><div><h2 style="margin:0;font-size:1rem;">Histórico de status operacional</h2></div></header>
     <div class="widget-card-body">
         <div style="display: grid; gap: 0.6rem;">
-            {% for item in order_status_history %}
+            {% for item in caneca_operational_status_history %}
             <div style="display: grid; grid-template-columns: minmax(160px, 220px) 1fr; gap: 0.8rem;">
                 <span class="shell-text-muted">{{ item.at|default:"—" }}</span>
                 <div>
-                    <strong>{{ item.from }}</strong> → <strong>{{ item.to }}</strong>
+                    <strong>{{ item.from_label }}</strong> → <strong>{{ item.to_label }}</strong>
                     <span class="shell-text-muted">({{ item.source }})</span>
                 </div>
             </div>
@@ -200,15 +200,13 @@
         </div>
     </header>
     <div class="widget-card-body">
-        {% if customer_message_warning %}
-        <p class="shell-text-muted" style="margin: 0 0 var(--space-3);">{{ customer_message_warning }}</p>
-        {% endif %}
+        {% if caneca_customer_message.has_pricing %}
         <textarea
             id="caneca-customer-message"
             class="chip caneca-customer-message-textarea"
             readonly
             rows="10"
-        >{{ customer_message_text }}</textarea>
+        >{{ caneca_customer_message.message }}</textarea>
         <div class="page-actions caneca-customer-message-actions">
             <button
                 type="button"
@@ -218,11 +216,11 @@
             >
                 Copiar mensagem
             </button>
-            {% if customer_whatsapp_url %}
+            {% if caneca_customer_message.whatsapp_url %}
             <a
                 id="caneca-open-whatsapp"
                 class="quick-action-button primary"
-                href="{{ customer_whatsapp_url }}"
+                href="{{ caneca_customer_message.whatsapp_url }}"
                 target="_blank"
                 rel="noopener noreferrer"
             >
@@ -230,6 +228,9 @@
             </a>
             {% endif %}
         </div>
+        {% else %}
+        <p class="shell-text-muted" style="margin: 0;">Defina a precificação comercial antes de enviar a mensagem ao cliente.</p>
+        {% endif %}
     </div>
 </section>
 
@@ -265,6 +266,7 @@
         <tr><th>ID interno</th><td><code>{{ order.id }}</code></td></tr>
         <tr><th>Status</th><td><span class="status-badge status-sky">{{ order.get_status_display }}</span></td></tr>
         <tr><th>Origem</th><td>{{ order_origin_label }}</td></tr>
+        <tr><th>Slug do produto</th><td>{{ order_product_slug|default:"—" }}</td></tr>
         <tr><th>Total</th><td>{{ pricing_summary.total_display }}</td></tr>
         <tr><th>Pedido em</th><td>{% if order.ordered_at %}{{ order.ordered_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>
         <tr><th>Criado em</th><td>{% if order.created_at %}{{ order.created_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td></tr>

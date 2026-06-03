@@ -3,9 +3,14 @@
   const ARTWORK_EDITOR_SESSION_PROJECT_KEY = "caneca-garagem-artwork-editor-session-project-v1";
   const ARTWORK_EDITOR_FINISH_STORAGE_KEY = "caneca-garagem-finish-request-v1";
   const ARTWORK_EDITOR_FINISH_PREVIEW_KEY = "caneca-garagem-finish-preview-v1";
+  const ARTWORK_EDITOR_ENTRYPOINT_STORAGE_KEY = "caneca-garagem-customizer-entrypoint-v1";
   const PENDING_ARTWORK_DATA_URL_KEY = "caneca-garagem-pending-artwork-data-url";
   const PENDING_ARTWORK_PROJECT_KEY = "caneca-garagem-pending-artwork-project-v1";
   const PENDING_PRODUCT_KEY = "caneca-garagem-pending-product-key";
+  const PENDING_SOURCE_KEY = "caneca-garagem-pending-source";
+  const PENDING_PRODUCT_SLUG_KEY = "caneca-garagem-pending-product-slug";
+  const PENDING_PRODUCT_LABEL_KEY = "caneca-garagem-pending-product-label";
+  const PENDING_ENTRYPOINT_URL_KEY = "caneca-garagem-pending-entrypoint-url";
   const ARTWORK_EDITOR_FILE_VERSION = 1;
   const ARTWORK_EDITOR_HISTORY_LIMIT = 50;
   const EDITOR_ZOOM_MIN = 0.15;
@@ -342,6 +347,14 @@
   const GRID_SIZE = 50;
   const SNAP_THRESHOLD = 8;
   let currentProductGuideKey = "mug";
+  let customizerEntrypoint = {
+    product: null,
+    source: null,
+    productSlug: null,
+    productLabel: null,
+    entrypointUrl: `${window.location.pathname}${window.location.search}`,
+  };
+  let hasExplicitProductFromUrl = false;
   let isUpdatingObjectProperties = false;
   let undoStack = [];
   let redoStack = [];
@@ -373,6 +386,37 @@
     }
 
     return Math.min(Math.max(Math.round(numberValue), 8), 300);
+  }
+
+  function normalizeEditorProductKey(productKey) {
+    return ARTWORK_EDITOR_PRODUCT_GUIDES[productKey] ? productKey : "mug";
+  }
+
+  function readCustomizerEntrypointFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const rawProduct = String(params.get("product") || "").trim();
+    const hasProductParam = rawProduct.length > 0;
+    const normalizedProduct = normalizeEditorProductKey(rawProduct || "mug");
+    const source = String(params.get("source") || "").trim();
+    const productSlug = String(params.get("product_slug") || "").trim();
+    const productLabel = String(params.get("product_label") || "").trim();
+
+    hasExplicitProductFromUrl = hasProductParam;
+    customizerEntrypoint = {
+      product: normalizedProduct,
+      source: source || null,
+      productSlug: productSlug || null,
+      productLabel: productLabel || null,
+      entrypointUrl: `${window.location.pathname}${window.location.search}`,
+    };
+
+    try {
+      const serialized = JSON.stringify(customizerEntrypoint);
+      sessionStorage.setItem(ARTWORK_EDITOR_ENTRYPOINT_STORAGE_KEY, serialized);
+      localStorage.setItem(ARTWORK_EDITOR_ENTRYPOINT_STORAGE_KEY, serialized);
+    } catch (error) {
+      console.warn("[artwork-editor-2d] não foi possível salvar entrypoint", error);
+    }
   }
 
   function clampNumber(value, min, max, fallback) {
@@ -1726,7 +1770,7 @@
   }
 
   function setArtworkEditorProduct(productKey) {
-    currentProductGuideKey = ARTWORK_EDITOR_PRODUCT_GUIDES[productKey] ? productKey : "mug";
+    currentProductGuideKey = normalizeEditorProductKey(productKey);
     const config = getGuideConfig(currentProductGuideKey);
 
     artworkCanvas.discardActiveObject();
@@ -1747,6 +1791,11 @@
 
     if (productSelector && productSelector.value !== currentProductGuideKey) {
       productSelector.value = currentProductGuideKey;
+    }
+
+    customizerEntrypoint.product = currentProductGuideKey;
+    if (!customizerEntrypoint.productLabel) {
+      customizerEntrypoint.productLabel = config.label || null;
     }
 
     populateTemplateSelect();
@@ -2546,8 +2595,14 @@
     sessionStorage.setItem(PENDING_ARTWORK_DATA_URL_KEY, dataUrl);
     sessionStorage.setItem(PENDING_ARTWORK_PROJECT_KEY, JSON.stringify(project));
     sessionStorage.setItem(PENDING_PRODUCT_KEY, productKey);
+    sessionStorage.setItem(PENDING_SOURCE_KEY, customizerEntrypoint.source || "visual_3d_editor_2d");
+    sessionStorage.setItem(PENDING_PRODUCT_SLUG_KEY, customizerEntrypoint.productSlug || "");
+    sessionStorage.setItem(PENDING_PRODUCT_LABEL_KEY, customizerEntrypoint.productLabel || getGuideConfig(productKey).label || "");
+    sessionStorage.setItem(PENDING_ENTRYPOINT_URL_KEY, customizerEntrypoint.entrypointUrl || `${window.location.pathname}${window.location.search}`);
     updateEditorStatus("Arte enviada para visualização 3D.", "success");
-    window.location.href = "/visual-3d/demo/";
+    const demoUrl = new URL("/visual-3d/demo/", window.location.origin);
+    demoUrl.searchParams.set("product", productKey);
+    window.location.href = demoUrl.toString();
   }
 
   function getCurrentProductInfo() {
@@ -2555,7 +2610,11 @@
     const productConfig = getGuideConfig(productKey);
     return {
       productKey,
-      productLabel: productConfig.label || "Caneca",
+      productLabel: customizerEntrypoint.productLabel || productConfig.label || "Caneca",
+      productSlug: customizerEntrypoint.productSlug || "",
+      source: customizerEntrypoint.source || "visual_3d_editor_2d",
+      customizerEntrypointUrl: customizerEntrypoint.entrypointUrl || `${window.location.pathname}${window.location.search}`,
+      origin: customizerEntrypoint.source === "caneca_product" ? "marketplace_customizer" : "visual_3d_editor_2d",
     };
   }
 
@@ -2649,6 +2708,10 @@
     return {
       productKey: productInfo.productKey,
       productLabel: productInfo.productLabel,
+      productSlug: productInfo.productSlug,
+      source: productInfo.source,
+      customizerEntrypointUrl: productInfo.customizerEntrypointUrl,
+      origin: productInfo.origin,
       quantity,
       customerName,
       customerWhatsapp,
@@ -2759,7 +2822,7 @@
   }
 
   function syncProductControlsFromProject(productKey) {
-    currentProductGuideKey = ARTWORK_EDITOR_PRODUCT_GUIDES[productKey] ? productKey : "mug";
+    currentProductGuideKey = normalizeEditorProductKey(productKey);
     const config = getGuideConfig(currentProductGuideKey);
 
     if (currentProductLabel) {
@@ -2769,6 +2832,8 @@
     if (productSelector) {
       productSelector.value = currentProductGuideKey;
     }
+
+    customizerEntrypoint.product = currentProductGuideKey;
 
     populateTemplateSelect();
   }
@@ -2813,7 +2878,10 @@
       getUserObjects().forEach((object) => artworkCanvas.remove(object));
       clearGuideObjects();
       clearGridObjects();
-      syncProductControlsFromProject(project.productKey || "mug");
+      const productKeyFromProject = hasExplicitProductFromUrl
+        ? normalizeEditorProductKey(customizerEntrypoint.product || "mug")
+        : (project.productKey || "mug");
+      syncProductControlsFromProject(productKeyFromProject);
       artworkCanvas.setWidth(clampCanvasSize(project.width, getGuideConfig().width));
       artworkCanvas.setHeight(clampCanvasSize(project.height, getGuideConfig().height));
       updateCanvasSizeInputs();
@@ -3308,9 +3376,10 @@
 
   updateGridButtonLabel();
   updateSnapButtonLabel();
+  readCustomizerEntrypointFromUrl();
   populateFontFamilySelect();
   setActiveEditorTool("select");
-  setArtworkEditorProduct("mug");
+  setArtworkEditorProduct(customizerEntrypoint.product || "mug");
   setGuideVisibility(true);
   updateObjectPropertiesPanel();
   updateTextControlsFromSelection();

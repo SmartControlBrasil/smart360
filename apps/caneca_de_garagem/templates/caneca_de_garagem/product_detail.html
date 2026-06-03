@@ -95,8 +95,11 @@
                             <div class="text">Preço base</div>
                             <div class="flex justify-between align-items-center w-full mt-14">
                                 <p>{{ product.price_label }} <span>{{ product.vendor_name }}</span></p>
+                                <a href="{% url 'visual_3d:editor_2d' %}?product={% if 'long' in product.slug|lower and 'drink' in product.slug|lower %}longDrink{% elif 'bone' in product.slug|lower or 'bon' in product.slug|lower %}cap{% elif 'long' in product.name|lower and 'drink' in product.name|lower %}longDrink{% elif 'bone' in product.name|lower or 'bon' in product.name|lower %}cap{% else %}mug{% endif %}&source=caneca_product&product_slug={{ product.slug|urlencode }}&product_label={{ product.name|urlencode }}"
+                                    class="tf-button style-1 h50 w216">Personalizar agora<i
+                                        class="icon-arrow-up-right2"></i></a>
                                 <a href="#briefing_pedido_form"
-                                    class="tf-button style-1 h50 w216">Solicitar personalização<i
+                                    class="tf-button active h50 w216">Solicitar personalização<i
                                         class="icon-arrow-up-right2"></i></a>
                             </div>
                         </div>

@@ -291,6 +291,8 @@
                                                                 <h6 class="price gem"><span class="cdg-price-marker" aria-hidden="true"></span>{{ row.price_display|default:"Sob orçamento" }}</h6>
                                                             </div>
                                                             <div class="button-place-bid">
+                                                                <a href="{% url 'visual_3d:editor_2d' %}?product={% if 'long' in row.product.slug|lower and 'drink' in row.product.slug|lower %}longDrink{% elif 'bone' in row.product.slug|lower or 'bon' in row.product.slug|lower %}cap{% elif 'long' in row.product.name|lower and 'drink' in row.product.name|lower %}longDrink{% elif 'bone' in row.product.name|lower or 'bon' in row.product.name|lower %}cap{% else %}mug{% endif %}&source=caneca_product&product_slug={{ row.product.slug|urlencode }}&product_label={{ row.product.name|urlencode }}"
+                                                                    class="tf-button active"><span>Personalizar</span></a>
                                                                 <a href="{% url 'caneca_de_garagem:product_detail' row.product.slug %}"
                                                                     class="tf-button"><span>Solicitar personalização</span></a>
                                                             </div>
@@ -325,6 +327,8 @@
                                         </a>
                                         <span class="wishlist-button icon-heart"></span>
                                         <div class="button-place-bid">
+                                            <a href="{% url 'visual_3d:editor_2d' %}?product={% if 'long' in prod.slug|lower and 'drink' in prod.slug|lower %}longDrink{% elif 'bone' in prod.slug|lower or 'bon' in prod.slug|lower %}cap{% elif 'long' in prod.name|lower and 'drink' in prod.name|lower %}longDrink{% elif 'bone' in prod.name|lower or 'bon' in prod.name|lower %}cap{% else %}mug{% endif %}&source=caneca_product&product_slug={{ prod.slug|urlencode }}&product_label={{ prod.name|urlencode }}"
+                                                class="tf-button active"><span>Personalizar</span></a>
                                             <a href="{% url 'caneca_de_garagem:product_detail' prod.slug %}"
                                                 class="tf-button"><span>Solicitar personalização</span></a>
                                         </div>

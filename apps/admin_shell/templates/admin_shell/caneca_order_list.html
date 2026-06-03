@@ -54,10 +54,11 @@
                     <th>E-mail</th>
                     <th>WhatsApp / tel.</th>
                     <th>Produto principal</th>
+                    <th>Slug produto</th>
                     <th>Parceiro</th>
                     <th>Qtd.</th>
                     <th>Total</th>
-                    <th>Status</th>
+                    <th>Status operacional</th>
                     <th>Origem</th>
                     <th>Pedido em</th>
                     <th></th>
@@ -71,17 +72,12 @@
                         <td>{{ o.shell_display_customer_email }}</td>
                         <td>{{ o.shell_display_customer_phone }}</td>
                         <td>{{ o.shell_product_label }}</td>
+                        <td>{{ o.shell_product_slug }}</td>
                         <td>{{ o.shell_vendor_label }}</td>
                         <td>{{ o.shell_qty_display }}</td>
                         <td>{{ o.shell_price_display }}</td>
                         <td>
-                            {% if o.status == "pending" %}<span class="status-badge status-indigo">{{ o.get_status_display }}</span>
-                            {% elif o.status == "paid" %}<span class="status-badge status-sky">{{ o.get_status_display }}</span>
-                            {% elif o.status == "in_production" %}<span class="status-badge status-amber">{{ o.get_status_display }}</span>
-                            {% elif o.status == "shipped" %}<span class="status-badge status-teal">{{ o.get_status_display }}</span>
-                            {% elif o.status == "delivered" %}<span class="status-badge status-emerald">{{ o.get_status_display }}</span>
-                            {% elif o.status == "cancelled" %}<span class="status-badge status-slate">{{ o.get_status_display }}</span>
-                            {% else %}<span class="status-badge status-slate">{{ o.get_status_display }}</span>{% endif %}
+                            <span class="status-badge {{ o.shell_operational_status_class }}">{{ o.shell_operational_status_label }}</span>
                         </td>
                         <td>{{ o.shell_origin_label }}</td>
                         <td>
@@ -90,7 +86,7 @@
                         <td><a href="{% url 'admin-shell:caneca-order-detail' o.id %}">Ver detalhe</a></td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="12">Nenhum pedido encontrado com os filtros atuais.</td></tr>
+                    <tr><td colspan="13">Nenhum pedido encontrado com os filtros atuais.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

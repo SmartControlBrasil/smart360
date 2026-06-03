@@ -5,174 +5,14 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // Importa o loader responsável por carregar o arquivo GLB da caneca.
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-// Configuração neutra usada como base para produtos que ainda não têm arte personalizada ativa.
-const NEUTRAL_ARTWORK_CONFIG = {
-  textureOffsetX: 0,
-  textureOffsetY: 0,
-  textureRepeatX: 1,
-  textureRepeatY: 1,
-  textureRotation: 0,
-  safeWidth: 0.6,
-  safeTop: 0.03,
-  safeBottom: 0.08,
-  baseOffsetX: 0,
-  startSideOffset: 0,
-  defaultOffsetX: 0,
-  defaultOffsetY: 0,
-  defaultScaleX: 1,
-  defaultScaleY: 1,
-};
-
-// Presets concentram modelo, enquadramento e posicionamento de arte por produto 3D.
-const PRODUCT_PRESETS = {
-  mug: {
-    label: "Caneca",
-    modelUrl: "/static/visual_3d/models/mug.glb",
-    baseRotationDegrees: 90,
-    displaySize: 3.2,
-    artworkEnabled: true,
-    artworkConfig: {
-      // CONFIGURAÇÃO VALIDADA DA CANECA
-      // Não alterar sem teste visual.
-      // Valores que alinharam a arte em relação à alça:
-      // textureOffsetX: 0.5
-      // textureOffsetY: -0.2
-      textureOffsetX: 0.5,
-      textureOffsetY: -0.2,
-      textureRepeatX: 1,
-      textureRepeatY: 1,
-      textureRotation: 0,
-      textureCenterX: 0.35,
-      textureCenterY: 0.5,
-      safeWidth: 0.6,
-      safeTop: 0.03,
-      safeBottom: 0.08,
-      baseOffsetX: 0.20,
-      startSideOffset: 0.55,
-      defaultOffsetX: 0,
-      defaultOffsetY: -1,
-      defaultScaleX: 1,
-      defaultScaleY: 1,
-    },
-  },
-  longDrink: {
-    label: "Long Drink",
-    modelUrl: "/static/visual_3d/models/long_drink_glass.glb",
-    baseRotationDegrees: 0,
-    displaySize: 3.2,
-    artworkEnabled: true,
-    artworkConfig: {
-      textureOffsetX: 0,
-      textureOffsetY: 0,
-      textureRepeatX: 1,
-      textureRepeatY: 1,
-      textureRotation: 0,
-      textureCenterX: 0.5,
-      textureCenterY: 0.5,
-      safeWidth: 0.42,
-      safeTop: 0.22,
-      safeBottom: 0.18,
-      baseOffsetX: 0,
-      startSideOffset: 0,
-      defaultOffsetX: 0,
-      defaultOffsetY: -0.04,
-      defaultScaleX: 0.55,
-      defaultScaleY: 0.72,
-      generateCylindricalUv: true,
-      generatedUvAxis: "z",
-      textureCanvasWidth: 4096,
-      textureCanvasHeight: 2048,
-    },
-    artworkTargetNames: ["Object_2", "Object_0"],
-  },
-  beerMug: {
-    label: "Caneca de Chopp",
-    modelUrl: "/static/visual_3d/models/beer_mug_glass.glb",
-    baseRotationDegrees: 0,
-    displaySize: 3.2,
-    artworkEnabled: false,
-    artworkConfig: {
-      ...NEUTRAL_ARTWORK_CONFIG,
-    },
-  },
-  cap: {
-    label: "Boné",
-    modelUrl: "/static/visual_3d/models/baseball_cap.glb",
-    baseRotationDegrees: 0,
-    displaySize: 3.2,
-    artworkEnabled: true,
-    artworkConfig: {
-      textureOffsetX: 0,
-      textureOffsetY: 0,
-      textureRepeatX: 1,
-      textureRepeatY: 1,
-      textureRotation: 0,
-      defaultOffsetX: 0,
-      defaultOffsetY: 0,
-      defaultScaleX: 1,
-      defaultScaleY: 1,
-      artworkProjection: "frontPatch",
-      useFrontPatchMesh: true,
-      artworkCanvasBackground: null,
-      patchWidth: 0.42,
-      patchHeight: 0.24,
-      patchRaycastEnabled: true,
-      patchRayOriginX: 0,
-      patchRayOriginY: 0.35,
-      patchRayOriginZ: 2.2,
-      patchRayDirectionX: 0,
-      patchRayDirectionY: 0,
-      patchRayDirectionZ: -1,
-      patchSurfaceOffset: 0.015,
-      patchOffsetU: 0,
-      patchOffsetV: 0,
-      patchPositionX: 0,
-      patchPositionY: 0.36,
-      patchPositionZ: 0.64,
-      patchRotationX: 0,
-      patchRotationY: 0,
-      patchRotationZ: 0,
-      patchControlHorizontalAxis: "x",
-      patchControlVerticalAxis: "y",
-    },
-    artworkTargetNames: ["mainCap", "baseballCap"],
-  },
-  flipFlop: {
-    label: "Chinelo",
-    modelUrl: "/static/visual_3d/models/havaianas_women_flip_flop.glb",
-    baseRotationDegrees: 0,
-    displaySize: 3.2,
-    artworkEnabled: false,
-    artworkConfig: {
-      ...NEUTRAL_ARTWORK_CONFIG,
-    },
-  },
-  ceramicTile: {
-    label: "Azulejo",
-    modelUrl: "/static/visual_3d/models/art_nouveau_ceramic_tile.glb",
-    baseRotationDegrees: 0,
-    displaySize: 3.2,
-    artworkEnabled: false,
-    artworkConfig: {
-      ...NEUTRAL_ARTWORK_CONFIG,
-    },
-  },
-  popcornBucket: {
-    label: "Baldinho de Pipoca",
-    modelUrl: "/static/visual_3d/models/giant_super-jumbo_movie_popcorn.glb",
-    baseRotationDegrees: 0,
-    displaySize: 3.2,
-    artworkEnabled: false,
-    artworkConfig: {
-      ...NEUTRAL_ARTWORK_CONFIG,
-    },
-  },
-};
-
-// Produto atual; por padrão o visualizador abre na caneca validada.
-let currentProductKey = "mug";
+// Caminho público do modelo 3D principal da caneca servido pelos arquivos estáticos do Django.
+const MODEL_URL = "/static/visual_3d/models/mug.glb";
+// Tamanho visual alvo do GLB após o cálculo automático de escala.
+const GLB_DISPLAY_SIZE = 3.2;
 // Folga usada para posicionar a câmera sem cortar o modelo nas bordas do canvas.
 const CAMERA_FIT_PADDING = 1.35;
+// Corrige a orientação inicial do mug.glb para aproximar a alça do início da estampa.
+const MUG_MODEL_BASE_ROTATION_DEGREES = 90;
 // Valor padrão do controle manual "Girar caneca"; soma por cima da rotação base.
 const USER_MODEL_ROTATION_DEFAULT_DEGREES = 0;
 // Largura do canvas 2D interno onde a arte do usuário é composta antes de virar textura.
@@ -181,12 +21,26 @@ const ARTWORK_CANVAS_WIDTH = 2048;
 const ARTWORK_CANVAS_HEIGHT = 1024;
 // Cor de fundo aplicada no canvas da arte; vira área branca/respiro na textura.
 const ARTWORK_CANVAS_BACKGROUND = "#ffffff";
-// Liga logs técnicos temporários da aplicação de arte quando for necessário investigar meshes/UVs.
-const DEBUG_ARTWORK = false;
-// Aplica uma textura de grade UV no boné para diagnosticar orientação/ilhas do GLB.
-const DEBUG_UV_MAP = false;
+// Fração horizontal útil do canvas usada como base para conter a arte sem ocupar tudo.
+const ARTWORK_SAFE_WIDTH = 0.6;
+// Margem superior da área útil da arte dentro do canvas intermediário.
+const ARTWORK_SAFE_TOP = 0.03;
+// Margem inferior da área útil da arte dentro do canvas intermediário.
+const ARTWORK_SAFE_BOTTOM = 0.08;
+// Deslocamento horizontal base aplicado antes do slider Posição X.
+const ARTWORK_BASE_OFFSET_X = 0.20;
+// Deslocamento extra de início lateral para aproximar a arte da região esperada da costura/alça.
+const ARTWORK_START_SIDE_OFFSET = 0.55;
 // Palavras usadas para tentar identificar meshes/materiais de alça quando o GLB vier separado.
 const HANDLE_NAME_PARTS = ["handle", "alca", "alça", "grip", "asa", "pegador"];
+const PENDING_ARTWORK_DATA_URL_KEY = "caneca-garagem-pending-artwork-data-url";
+const PENDING_ARTWORK_PROJECT_KEY = "caneca-garagem-pending-artwork-project-v1";
+const PENDING_PRODUCT_KEY = "caneca-garagem-pending-product-key";
+const PENDING_SOURCE_KEY = "caneca-garagem-pending-source";
+const PENDING_PRODUCT_SLUG_KEY = "caneca-garagem-pending-product-slug";
+const PENDING_PRODUCT_LABEL_KEY = "caneca-garagem-pending-product-label";
+const PENDING_ENTRYPOINT_URL_KEY = "caneca-garagem-pending-entrypoint-url";
+const DEBUG_PENDING_ARTWORK = false;
 
 // Elemento HTML que recebe o canvas WebGL criado pelo Three.js.
 const container = document.getElementById("visual-3d-canvas");
@@ -198,14 +52,13 @@ const previewImage = document.getElementById("captured-preview");
 const previewEmpty = document.getElementById("preview-empty");
 // Input file usado para selecionar PNG/JPEG/WebP da arte.
 const artworkInput = document.getElementById("artwork-input");
+const productSelector = document.getElementById("product-selector");
 // Botão que remove a arte aplicada e restaura materiais originais.
 const removeArtworkButton = document.getElementById("remove-artwork");
 // Botão que pausa ou retoma a rotação automática do objeto.
 const toggleRotationButton = document.getElementById("toggle-rotation");
 // Botão que volta controles de arte e rotação visual para o padrão.
 const resetArtworkAdjustmentsButton = document.getElementById("reset-artwork-adjustments");
-// Select que escolhe qual preset/modelo 3D deve ser carregado.
-const productSelector = document.getElementById("product-selector");
 // Slider do HTML que gira a caneca no eixo Y para visualização/alinhamento.
 const mugRotationInput = document.getElementById("mug-rotation");
 // Output textual que mostra em graus o valor do slider "Girar caneca".
@@ -235,27 +88,21 @@ const artworkOutputs = {
 };
 // Tipos de imagem aceitos no upload para evitar arquivos incompatíveis.
 const allowedArtworkTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
-// Cria o estado inicial dos controles de arte com base no preset do produto atual.
-function buildDefaultArtworkTransform() {
-  // Lê defaults específicos do produto, com fallback seguro para a caneca.
-  const config = getCurrentArtworkConfig();
-
-  // Retorna o objeto mutável que alimenta sliders e checkboxes.
-  return {
-    // Deslocamento horizontal inicial da arte.
-    offsetX: config.defaultOffsetX ?? 0,
-    // Deslocamento vertical inicial da arte; negativo posiciona mais para baixo/alto conforme o cálculo usado.
-    offsetY: config.defaultOffsetY ?? -1,
-    // Escala horizontal inicial da arte.
-    scaleX: config.defaultScaleX ?? 1,
-    // Escala vertical inicial da arte.
-    scaleY: config.defaultScaleY ?? 1,
-    // Espelhamento horizontal inicial.
-    flipX: false,
-    // Espelhamento vertical inicial; corrige a orientação visual esperada no UV atual.
-    flipY: true,
-  };
-}
+// Estado inicial dos controles de arte usados para desenhar no canvas intermediário.
+const defaultArtworkTransform = {
+  // Deslocamento horizontal inicial da arte.
+  offsetX: 0,
+  // Deslocamento vertical inicial da arte; negativo posiciona mais para baixo/alto conforme o cálculo usado.
+  offsetY: -1,
+  // Escala horizontal inicial da arte.
+  scaleX: 1,
+  // Escala vertical inicial da arte.
+  scaleY: 1,
+  // Espelhamento horizontal inicial.
+  flipX: false,
+  // Espelhamento vertical inicial; corrige a orientação visual esperada no UV atual.
+  flipY: true,
+};
 
 // Textura ativa criada a partir do canvas intermediário.
 let artworkTexture = null;
@@ -269,16 +116,24 @@ let artworkCanvasContext = null;
 let artworkObjectUrl = null;
 // Referência ao GLB carregado; null enquanto o fallback estiver ativo ou antes do load.
 let glbModel = null;
-// Patch frontal usado por produtos como Boné, sem alterar o material global do GLB.
-let artworkPatchMesh = null;
-// Identificador incremental para ignorar callbacks antigos do GLTFLoader após troca de produto.
-let modelLoadId = 0;
 // Controla se o grupo externo gira automaticamente no loop de animação.
 let autoRotateEnabled = true;
 // Valor atual do slider "Girar caneca", em graus.
 let userRotationDegrees = USER_MODEL_ROTATION_DEFAULT_DEGREES;
 // Estado mutável dos controles de arte usado por redrawArtworkCanvas().
-let artworkTransform = buildDefaultArtworkTransform();
+let artworkTransform = { ...defaultArtworkTransform };
+let pendingArtworkDataUrlToApply = null;
+let pendingArtworkProductKey = null;
+let currentProductKey = productSelector?.value || "mug";
+let isModelLoadSettled = false;
+let pendingSource = null;
+let pendingProductSlug = null;
+let pendingProductLabel = null;
+let pendingEntrypointUrl = null;
+
+function normalizeViewerProductKey(productKey) {
+  return productSelector?.querySelector(`option[value="${productKey}"]`) ? productKey : "mug";
+}
 
 // Cena principal do Three.js, onde câmera, luzes, chão e caneca são inseridos.
 const scene = new THREE.Scene();
@@ -442,6 +297,122 @@ floor.receiveShadow = true;
 // Adiciona o piso à cena.
 scene.add(floor);
 
+
+function logPendingArtworkDebug() {
+  if (!DEBUG_PENDING_ARTWORK) {
+    return;
+  }
+
+  console.log("[visual3d-pending-artwork]", {
+    hasPendingArtwork: Boolean(pendingArtworkDataUrlToApply),
+    pendingArtworkProductKey,
+    currentProductKey,
+    ready: isCurrentProductReadyForArtwork(),
+  });
+}
+
+function readPendingArtworkFromSessionStorage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryProduct = normalizeViewerProductKey(String(urlParams.get("product") || "").trim());
+  pendingArtworkDataUrlToApply = sessionStorage.getItem(PENDING_ARTWORK_DATA_URL_KEY);
+  pendingArtworkProductKey = normalizeViewerProductKey(
+    queryProduct || String(sessionStorage.getItem(PENDING_PRODUCT_KEY) || "").trim(),
+  );
+  pendingSource = String(sessionStorage.getItem(PENDING_SOURCE_KEY) || "").trim() || null;
+  pendingProductSlug = String(sessionStorage.getItem(PENDING_PRODUCT_SLUG_KEY) || "").trim() || null;
+  pendingProductLabel = String(sessionStorage.getItem(PENDING_PRODUCT_LABEL_KEY) || "").trim() || null;
+  pendingEntrypointUrl = String(sessionStorage.getItem(PENDING_ENTRYPOINT_URL_KEY) || "").trim() || null;
+
+  if (pendingArtworkProductKey && productSelector?.querySelector(`option[value="${pendingArtworkProductKey}"]`)) {
+    productSelector.value = pendingArtworkProductKey;
+    currentProductKey = pendingArtworkProductKey;
+  }
+}
+
+function isCurrentProductReadyForArtwork() {
+  return Boolean(isModelLoadSettled && (glbModel || fallbackMug.visible || scene));
+}
+
+function clearPendingArtworkSessionStorage() {
+  sessionStorage.removeItem(PENDING_ARTWORK_DATA_URL_KEY);
+  sessionStorage.removeItem(PENDING_PRODUCT_KEY);
+  sessionStorage.removeItem(PENDING_SOURCE_KEY);
+  sessionStorage.removeItem(PENDING_PRODUCT_SLUG_KEY);
+  sessionStorage.removeItem(PENDING_PRODUCT_LABEL_KEY);
+  sessionStorage.removeItem(PENDING_ENTRYPOINT_URL_KEY);
+  pendingArtworkDataUrlToApply = null;
+  pendingArtworkProductKey = null;
+  pendingSource = null;
+  pendingProductSlug = null;
+  pendingProductLabel = null;
+  pendingEntrypointUrl = null;
+}
+
+function applyArtworkFromDataUrl(dataUrl, { onSuccess = null, onError = null } = {}) {
+  if (!dataUrl) {
+    if (typeof onError === "function") {
+      onError();
+    }
+    return;
+  }
+
+  updateArtworkStatus("Carregando arte do criador 2D...", "loading");
+  disposeArtworkTexture();
+
+  const nextImage = new Image();
+
+  nextImage.onload = () => {
+    artworkImage = nextImage;
+    ensureArtworkCanvasTexture();
+    resetArtworkSettings({ apply: false });
+    applyArtworkTransform();
+    syncArtworkControls();
+    applyTextureToActiveObject(artworkTexture);
+
+    if (artworkStatus.dataset.state !== "error") {
+      updateArtworkStatus("Arte do criador 2D aplicada com sucesso", "success");
+
+      if (typeof onSuccess === "function") {
+        onSuccess();
+      }
+    } else if (typeof onError === "function") {
+      onError();
+    }
+  };
+
+  nextImage.onerror = () => {
+    resetArtwork();
+    updateArtworkStatus("Não foi possível aplicar a arte do criador 2D", "error");
+
+    if (typeof onError === "function") {
+      onError();
+    }
+  };
+
+  nextImage.src = dataUrl;
+}
+
+function tryApplyPendingArtworkWhenReady() {
+  if (!pendingArtworkDataUrlToApply) {
+    return;
+  }
+
+  if (pendingArtworkProductKey && productSelector?.querySelector(`option[value="${pendingArtworkProductKey}"]`) && currentProductKey !== pendingArtworkProductKey) {
+    productSelector.value = pendingArtworkProductKey;
+    currentProductKey = pendingArtworkProductKey;
+  }
+
+  logPendingArtworkDebug();
+
+  if (!isCurrentProductReadyForArtwork()) {
+    return;
+  }
+
+  applyArtworkFromDataUrl(pendingArtworkDataUrlToApply, {
+    onSuccess: clearPendingArtworkSessionStorage,
+  });
+}
+
 // Atualiza o texto de status da arte e uma flag visual via data-state.
 function updateArtworkStatus(message, state = "idle") {
   // Mostra a mensagem para o usuário.
@@ -456,30 +427,6 @@ function updateModelStatus(message, state = "idle") {
   modelStatus.textContent = message;
   // Armazena estado para CSS/semântica visual.
   modelStatus.dataset.state = state;
-}
-
-// Retorna o preset do produto atual, caindo para caneca se a chave for inválida.
-function getCurrentProductPreset() {
-  return PRODUCT_PRESETS[currentProductKey] || PRODUCT_PRESETS.mug;
-}
-
-// Retorna a configuração de arte do produto atual, preservando a configuração validada da caneca como fallback.
-function getCurrentArtworkConfig() {
-  return getCurrentProductPreset().artworkConfig || PRODUCT_PRESETS.mug.artworkConfig;
-}
-
-// Log técnico de arte controlado por flag para não poluir o console em uso normal.
-function debugArtworkLog(...args) {
-  if (DEBUG_ARTWORK) {
-    console.log("[visual3d-artwork]", ...args);
-  }
-}
-
-// Tabela técnica de arte controlada por flag para diagnóstico de meshes.
-function debugArtworkTable(rows) {
-  if (DEBUG_ARTWORK) {
-    console.table(rows);
-  }
 }
 
 // Formata valores dos sliders removendo zeros finais para deixar a UI mais limpa.
@@ -499,7 +446,7 @@ function syncMugRotationControl() {
 // Aplica a rotação visual do modelo, somando rotação base técnica e rotação do usuário.
 function applyModelRotation() {
   // Converte a rotação base do modelo de graus para radianos, formato usado pelo Three.js.
-  const baseRotationRadians = THREE.MathUtils.degToRad(getCurrentProductPreset().baseRotationDegrees ?? 0);
+  const baseRotationRadians = THREE.MathUtils.degToRad(MUG_MODEL_BASE_ROTATION_DEGREES);
   // Converte a rotação escolhida no slider de graus para radianos.
   const userRotationRadians = THREE.MathUtils.degToRad(userRotationDegrees);
 
@@ -556,22 +503,16 @@ function syncArtworkControls() {
 
 // Garante que o canvas intermediário e a CanvasTexture existam antes de aplicar arte.
 function ensureArtworkCanvasTexture() {
-  const config = getCurrentArtworkConfig();
-  const canvasWidth = config.textureCanvasWidth ?? ARTWORK_CANVAS_WIDTH;
-  const canvasHeight = config.textureCanvasHeight ?? ARTWORK_CANVAS_HEIGHT;
-
   // Cria o canvas 2D uma única vez por arte carregada.
   if (!artworkCanvas) {
     // Canvas em memória, não aparece diretamente na página.
     artworkCanvas = document.createElement("canvas");
+    // Define largura de alta resolução para a textura.
+    artworkCanvas.width = ARTWORK_CANVAS_WIDTH;
+    // Define altura de alta resolução para a textura.
+    artworkCanvas.height = ARTWORK_CANVAS_HEIGHT;
     // Contexto usado para desenhar fundo, imagem, escala e flips.
     artworkCanvasContext = artworkCanvas.getContext("2d");
-  }
-
-  if (artworkCanvas.width !== canvasWidth || artworkCanvas.height !== canvasHeight) {
-    // Define resolução interna da textura conforme o produto atual.
-    artworkCanvas.width = canvasWidth;
-    artworkCanvas.height = canvasHeight;
   }
 
   // Cria a textura Three.js apontando para o canvas se ainda não existir.
@@ -580,14 +521,6 @@ function ensureArtworkCanvasTexture() {
     artworkTexture = new THREE.CanvasTexture(artworkCanvas);
     // Define espaço de cor correto para imagens comuns da web.
     artworkTexture.colorSpace = THREE.SRGBColorSpace;
-    // Melhora nitidez em superfícies inclinadas/curvas.
-    artworkTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    // Usa mipmaps de alta qualidade quando a textura é vista em perspectiva.
-    artworkTexture.minFilter = THREE.LinearMipmapLinearFilter;
-    // Mantém ampliação suave da textura.
-    artworkTexture.magFilter = THREE.LinearFilter;
-    // Gera mipmaps a partir do canvas de alta resolução.
-    artworkTexture.generateMipmaps = true;
     // flipY false evita inversão vertical automática na textura do Three.js.
     artworkTexture.flipY = false;
     // RepeatWrapping permite que o deslocamento horizontal atravesse a costura do UV.
@@ -603,25 +536,6 @@ function ensureArtworkCanvasTexture() {
   }
 }
 
-// Converte os controles visuais para os eixos reais da textura de cada produto.
-function getArtworkTransformForTexture(config, state) {
-  if (!config.swapArtworkControls) {
-    return {
-      offsetX: state.offsetX,
-      offsetY: state.offsetY,
-      scaleX: state.scaleX,
-      scaleY: state.scaleY,
-    };
-  }
-
-  return {
-    offsetX: state.offsetY,
-    offsetY: state.offsetX,
-    scaleX: state.scaleY,
-    scaleY: state.scaleX,
-  };
-}
-
 // Redesenha a arte no canvas intermediário com posição, escala e flips atuais.
 function redrawArtworkCanvas() {
   // Sem imagem ou contexto, não há o que desenhar.
@@ -633,18 +547,12 @@ function redrawArtworkCanvas() {
   const canvasWidth = artworkCanvas.width;
   // Altura real do canvas de composição.
   const canvasHeight = artworkCanvas.height;
-  // Configuração de arte específica do produto atual.
-  const config = getCurrentArtworkConfig();
-  // Patch frontal usa os sliders no mesh, então o canvas fica centralizado/neutro.
-  const textureTransform = config.useFrontPatchMesh
-    ? { offsetX: 0, offsetY: 0, scaleX: 1, scaleY: 1 }
-    : getArtworkTransformForTexture(config, artworkTransform);
   // Largura segura: fração do canvas onde a arte deve caber por padrão.
-  const safeWidth = canvasWidth * (config.safeWidth ?? 0.6);
+  const safeWidth = canvasWidth * ARTWORK_SAFE_WIDTH;
   // Altura segura: canvas menos margens superior e inferior.
-  const safeHeight = canvasHeight * (1 - (config.safeTop ?? 0.03) - (config.safeBottom ?? 0.08));
+  const safeHeight = canvasHeight * (1 - ARTWORK_SAFE_TOP - ARTWORK_SAFE_BOTTOM);
   // Posição Y inicial da área segura, calculada a partir da margem superior.
-  const safeTop = canvasHeight * (config.safeTop ?? 0.03);
+  const safeTop = canvasHeight * ARTWORK_SAFE_TOP;
   // Proporção original da imagem enviada pelo usuário.
   const imageAspect = artworkImage.naturalWidth / artworkImage.naturalHeight;
   // Proporção da área segura onde a imagem será encaixada.
@@ -664,9 +572,9 @@ function redrawArtworkCanvas() {
   }
 
   // Largura final desenhada: base proporcional multiplicada pela Escala X.
-  const drawWidth = baseWidth * Math.max(textureTransform.scaleX, 0.01);
+  const drawWidth = baseWidth * Math.max(artworkTransform.scaleX, 0.01);
   // Altura final desenhada: base proporcional multiplicada pela Escala Y.
-  const drawHeight = baseHeight * Math.max(textureTransform.scaleY, 0.01);
+  const drawHeight = baseHeight * Math.max(artworkTransform.scaleY, 0.01);
   // Curso horizontal do slider; garante deslocamento útil mesmo quando a arte é larga.
   const horizontalTravel = Math.max((canvasWidth - Math.min(drawWidth, canvasWidth)) / 2, canvasWidth * 0.2);
   // Curso vertical do slider; evita deslocamento exagerado quando a arte é pequena.
@@ -674,21 +582,16 @@ function redrawArtworkCanvas() {
   // Centro X final: centro do canvas + offsets base/início + slider Posição X.
   const centerX = canvasWidth / 2 +
   // Esta soma controla a aproximação horizontal da arte em relação à costura/alça no UV.
-  ((config.baseOffsetX ?? 0) + (config.startSideOffset ?? 0) + textureTransform.offsetX) * horizontalTravel;
+  (ARTWORK_BASE_OFFSET_X + ARTWORK_START_SIDE_OFFSET + artworkTransform.offsetX) * horizontalTravel;
   // Centro Y final: centro da área segura, invertendo o sentido visual do slider Y.
-  const centerY = safeTop + safeHeight / 2 - textureTransform.offsetY * verticalTravel;
+  const centerY = safeTop + safeHeight / 2 - artworkTransform.offsetY * verticalTravel;
 
   // Limpa tudo antes de redesenhar, evitando rastros de frames anteriores.
   artworkCanvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-  // Define o fundo por produto; null preserva transparência, usado no patch do boné.
-  const canvasBackground = Object.hasOwn(config, "artworkCanvasBackground")
-    ? config.artworkCanvasBackground
-    : ARTWORK_CANVAS_BACKGROUND;
-  // Preenche apenas quando o produto pede fundo branco/respiro.
-  if (typeof canvasBackground === "string") {
-    artworkCanvasContext.fillStyle = canvasBackground;
-    artworkCanvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
-  }
+  // Define o fundo branco/transparente configurado para a textura.
+  artworkCanvasContext.fillStyle = ARTWORK_CANVAS_BACKGROUND;
+  // Preenche o canvas inteiro; áreas sem arte viram respiro branco na caneca.
+  artworkCanvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
   // Salva o estado do contexto antes de aplicar translate/scale.
   artworkCanvasContext.save();
   // Move a origem do desenho para o centro calculado da arte.
@@ -717,29 +620,21 @@ function applyArtworkTransform() {
     return;
   }
 
-  // Configuração de UV específica do produto atual.
-  const config = getCurrentArtworkConfig();
-  // Offset UV da textura no material definido por preset, pois cada GLB tem UV própria.
-  artworkTexture.offset.set(
-    config.textureOffsetX ?? 0,
-    config.textureOffsetY ?? 0,
-  );
-  // Repetição lógica da textura definida por preset.
-  artworkTexture.repeat.set(
-    config.textureRepeatX ?? 1,
-    config.textureRepeatY ?? 1,
-  );
-  // Centro da textura definido por preset para rotação correta por produto.
-  artworkTexture.center.set(
-    config.textureCenterX ?? 0.35,
-    config.textureCenterY ?? 0.5,
-  );
-  // Rotação da textura definida por preset.
-  artworkTexture.rotation = config.textureRotation ?? 0;
+  // CONFIGURAÇÃO VALIDADA EM PRODUÇÃO
+// Não alterar artworkTexture.offset sem novo teste visual.
+// Valores atuais alinham corretamente a arte da caneca em relação à alça.
+// Referência Git:
+// tag: caneca-offset-ok
+// tag: visualizador-troca-produtos-ok
+
+  // Offset UV da textura no material; mantido em zero para o canvas controlar a posição principal.
+  artworkTexture.offset.set(0.5, -0.2);
+  // Mantém uma única repetição lógica da textura no material.
+  artworkTexture.repeat.set(1, 1);
+  // Garante que não há rotação da textura no UV.
+  artworkTexture.rotation = 0;
   // Redesenha a imagem no canvas com os valores atuais dos controles.
   redrawArtworkCanvas();
-  // Atualiza posição/escala do patch quando o produto usa arte frontal independente.
-  updateArtworkPatchTransform();
   // Marca a textura como atualizada após modificar offset/repeat/canvas.
   artworkTexture.needsUpdate = true;
 }
@@ -747,7 +642,7 @@ function applyArtworkTransform() {
 // Reseta sliders, flips e rotação visual para os padrões atuais.
 function resetArtworkSettings({ apply = true } = {}) {
   // Restaura posição, escala e flips da arte.
-  artworkTransform = buildDefaultArtworkTransform();
+  artworkTransform = { ...defaultArtworkTransform };
   // Restaura o slider de rotação da caneca.
   resetModelRotation();
   // Atualiza inputs/outputs do HTML para refletir os padrões.
@@ -831,169 +726,6 @@ function getMaterialNames(material) {
   return materialList(material).map((item) => item?.name || "sem nome").join(", ");
 }
 
-// Lista tipos/classes de materiais associados ao mesh para diagnóstico técnico.
-function getMaterialTypes(material) {
-  return materialList(material).map((item) => item?.type || "sem tipo").join(", ");
-}
-
-// Indica se algum material do mesh recebeu textura map.
-function getMaterialHasMap(material) {
-  return materialList(material).some((item) => Boolean(item?.map));
-}
-
-// Lista cores base dos materiais para diagnosticar quando um material escurece a arte.
-function getMaterialColors(material) {
-  return materialList(material).map((item) => item?.color ? `#${item.color.getHexString()}` : "sem cor").join(", ");
-}
-
-// Monta diagnóstico detalhado de meshes para entender UV/material por produto.
-function getArtworkMeshDiagnostics(model) {
-  const diagnostics = [];
-
-  model.traverse((child) => {
-    if (!child.isMesh) {
-      return;
-    }
-
-    diagnostics.push({
-      mesh: child.name || "sem nome",
-      material: getMaterialNames(child.material),
-      materialType: getMaterialTypes(child.material),
-      visible: child.visible,
-      hasUv: Boolean(child.geometry?.attributes?.uv),
-      vertices: child.geometry?.attributes?.position?.count ?? 0,
-      receivedMap: getMaterialHasMap(child.material),
-    });
-  });
-
-  return diagnostics;
-}
-
-// Verifica se o mesh atual corresponde aos alvos de arte definidos pelo preset.
-function meshMatchesArtworkTarget(mesh, targetNames) {
-  if (!targetNames) {
-    return true;
-  }
-
-  return (
-    targetNames.includes(mesh.name) ||
-    targetNames.includes(mesh.parent?.name) ||
-    targetNames.includes(mesh.geometry?.name)
-  );
-}
-
-// Gera UV cilindrico no proprio mesh quando o GLB nao traz TEXCOORD_0.
-function ensureCylindricalUvForMesh(mesh, axis = "y") {
-  const geometry = mesh.geometry;
-  const position = geometry?.attributes?.position;
-
-  if (!geometry || !position) {
-    console.warn("[visual3d-artwork] cannot generate cylindrical UV without position attribute", mesh.name || "sem nome");
-    return false;
-  }
-
-  geometry.computeBoundingBox();
-  const box = geometry.boundingBox;
-  const axisKey = ["x", "y", "z"].includes(axis) ? axis : "y";
-  const minAxis = box.min[axisKey];
-  const height = Math.max(box.max[axisKey] - minAxis, 0.0001);
-  const uvs = new Float32Array(position.count * 2);
-
-  for (let index = 0; index < position.count; index += 1) {
-    const x = position.getX(index);
-    const y = position.getY(index);
-    const z = position.getZ(index);
-    const axisValue = axisKey === "x" ? x : axisKey === "z" ? z : y;
-    const angle = axisKey === "x"
-      ? Math.atan2(z, y)
-      : axisKey === "z"
-        ? Math.atan2(y, x)
-        : Math.atan2(z, x);
-    const u = (angle + Math.PI) / (Math.PI * 2);
-    const v = (axisValue - minAxis) / height;
-
-    uvs[index * 2] = u;
-    uvs[index * 2 + 1] = v;
-  }
-
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.attributes.uv.needsUpdate = true;
-  return true;
-}
-
-// Rotaciona UV planar em quartos de volta quando um preset precisar corrigir orientação.
-function rotateGeneratedPlanarUv(u, v, degrees = 0) {
-  // Normaliza o ângulo para facilitar comparação com 0/90/180/270 graus.
-  const normalizedDegrees = ((Math.round(degrees / 90) * 90) % 360 + 360) % 360;
-
-  if (normalizedDegrees === 90) {
-    return [v, 1 - u];
-  }
-
-  if (normalizedDegrees === 180) {
-    return [1 - u, 1 - v];
-  }
-
-  if (normalizedDegrees === 270) {
-    return [1 - v, u];
-  }
-
-  return [u, v];
-}
-
-// Gera UV planar no proprio mesh quando o GLB nao traz TEXCOORD_0 util para arte frontal.
-function ensurePlanarUvForMesh(mesh, config = {}) {
-  const geometry = mesh.geometry;
-  const position = geometry?.attributes?.position;
-
-  if (!geometry || !position) {
-    console.warn("[visual3d-artwork] cannot generate planar UV without position attribute", mesh.name || "sem nome");
-    return false;
-  }
-
-  if (!mesh.userData.originalUv) {
-    mesh.userData.originalUv = geometry.attributes.uv?.clone() || null;
-  }
-
-  geometry.computeBoundingBox();
-  const box = geometry.boundingBox;
-  const horizontalAxis = config.planarUvHorizontalAxis || "x";
-  const verticalAxis = config.planarUvVerticalAxis || "y";
-  const horizontalIndex = ["x", "y", "z"].indexOf(horizontalAxis);
-  const verticalIndex = ["x", "y", "z"].indexOf(verticalAxis);
-  const horizontalMin = box.min[horizontalAxis];
-  const verticalMin = box.min[verticalAxis];
-  const horizontalSize = Math.max(box.max[horizontalAxis] - horizontalMin, 0.0001);
-  const verticalSize = Math.max(box.max[verticalAxis] - verticalMin, 0.0001);
-  const uvs = new Float32Array(position.count * 2);
-
-  for (let index = 0; index < position.count; index += 1) {
-    let u = (position.getComponent(index, horizontalIndex) - horizontalMin) / horizontalSize;
-    let v = (position.getComponent(index, verticalIndex) - verticalMin) / verticalSize;
-
-    if (config.swapGeneratedUvAxes) {
-      [u, v] = [v, u];
-    }
-
-    if (config.flipGeneratedUvX) {
-      u = 1 - u;
-    }
-
-    if (config.flipGeneratedUvY) {
-      v = 1 - v;
-    }
-
-    [u, v] = rotateGeneratedPlanarUv(u, v, config.generatedUvRotation ?? 0);
-
-    uvs[index * 2] = u;
-    uvs[index * 2 + 1] = v;
-  }
-
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.attributes.uv.needsUpdate = true;
-  return true;
-}
-
 // Mostra diagnóstico específico quando o GLB falha e o fallback geométrico é usado.
 function setDiagnosticsFallback() {
   // Mensagem na página explicando que não há GLB para inspecionar.
@@ -1063,19 +795,6 @@ function renderModelDiagnostics(model) {
 
 // Clona um material do GLB/fallback e troca seu map pela textura da arte.
 function cloneMaterialWithTexture(material, texture) {
-  // Alguns produtos precisam de material plano para a arte não sumir em sombra/PBR escuro.
-  if (getCurrentArtworkConfig().artworkMaterialMode === "flatVisible") {
-    return new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true,
-      opacity: 1,
-      side: THREE.DoubleSide,
-      depthTest: true,
-      depthWrite: true,
-      toneMapped: false,
-    });
-  }
-
   // Clonar evita modificar diretamente o material original armazenado.
   const nextMaterial = material.clone();
 
@@ -1087,27 +806,6 @@ function cloneMaterialWithTexture(material, texture) {
   // Se o material tem cor base, força branco para a arte não ser tingida.
   if (nextMaterial.color) {
     nextMaterial.color.set(0xffffff);
-  }
-
-  // Materiais de vidro podem deixar a arte invisível; o clone texturizado precisa ser sólido.
-  nextMaterial.transparent = false;
-  // Garante opacidade total no material que recebe a arte.
-  nextMaterial.opacity = 1;
-  // Mantém escrita no depth buffer para o mesh texturizado aparecer corretamente.
-  nextMaterial.depthWrite = true;
-  // Mantém teste de profundidade normal no material aplicado.
-  nextMaterial.depthTest = true;
-  // Renderiza ambos os lados quando o GLB tiver faces/UVs com orientação pouco previsível.
-  nextMaterial.side = THREE.DoubleSide;
-
-  // MeshPhysicalMaterial de vidro pode usar transmission; zerar isso deixa a textura visível.
-  if ("transmission" in nextMaterial) {
-    nextMaterial.transmission = 0;
-  }
-
-  // Remove alphaMap herdado que poderia mascarar a arte em materiais transparentes.
-  if ("alphaMap" in nextMaterial) {
-    nextMaterial.alphaMap = null;
   }
 
   // Informa ao Three.js que o material clonado mudou.
@@ -1126,81 +824,6 @@ function cloneStoredMaterial(material) {
   return clonedMaterial;
 }
 
-// Descarta material e mapas para liberar recursos do modelo antigo ao trocar produto.
-function disposeMaterial(material) {
-  // Sem material não há nada para descartar.
-  if (!material) {
-    return;
-  }
-
-  // Arrays de materiais são comuns em alguns GLBs; descarta cada item.
-  if (Array.isArray(material)) {
-    material.forEach(disposeMaterial);
-    return;
-  }
-
-  // Libera mapas usados pelo material quando existirem.
-  [
-    "map",
-    "normalMap",
-    "roughnessMap",
-    "metalnessMap",
-    "aoMap",
-    "emissiveMap",
-    "alphaMap",
-    "bumpMap",
-    "displacementMap",
-    "envMap",
-    "lightMap",
-  ].forEach((textureKey) => {
-    if (material[textureKey]) {
-      material[textureKey].dispose();
-    }
-  });
-
-  // Libera o material em si na GPU.
-  material.dispose();
-}
-
-// Descarta geometria/material de um objeto 3D carregado por GLB.
-function disposeModelResources(model) {
-  // Percorre todos os filhos do modelo antigo.
-  model.traverse((child) => {
-    // Só meshes possuem geometria/material para descartar.
-    if (!child.isMesh) {
-      return;
-    }
-
-    // Libera geometria da GPU.
-    if (child.geometry) {
-      child.geometry.dispose();
-    }
-
-    // Libera material atual e backup original, se houver.
-    disposeMaterial(child.material);
-    disposeMaterial(child.userData.originalMaterial);
-    child.userData.originalMaterial = null;
-  });
-}
-
-// Remove o GLB atual da cena antes de carregar outro produto.
-function disposeCurrentGlbModel() {
-  // Sem GLB carregado, apenas garante estado nulo.
-  if (!glbModel) {
-    glbModel = null;
-    return;
-  }
-
-  // Remove patch frontal antes de trocar ou descartar o modelo.
-  disposeArtworkPatch();
-  // Remove o modelo antigo do grupo visível.
-  modelRoot.remove(glbModel);
-  // Libera recursos associados ao modelo antigo.
-  disposeModelResources(glbModel);
-  // Zera referência para impedir que o fluxo antigo continue usando o modelo removido.
-  glbModel = null;
-}
-
 // Restaura todos os materiais originais do GLB depois de remover ou trocar a arte.
 function restoreGlbMaterials() {
   // Se o GLB ainda não carregou, não há materiais para restaurar.
@@ -1215,11 +838,6 @@ function restoreGlbMaterials() {
       return;
     }
 
-    if (child.userData.originalUv) {
-      child.geometry.setAttribute("uv", child.userData.originalUv.clone());
-      child.geometry.attributes.uv.needsUpdate = true;
-    }
-
     // Se o mesh usa múltiplos materiais, restaura cada um individualmente.
     if (Array.isArray(child.userData.originalMaterial)) {
       child.material = child.userData.originalMaterial.map(cloneStoredMaterial);
@@ -1231,179 +849,8 @@ function restoreGlbMaterials() {
   });
 }
 
-// Remove o patch frontal usado por produtos que não devem pintar o material global.
-function disposeArtworkPatch() {
-  if (!artworkPatchMesh) {
-    return;
-  }
-
-  modelRoot.remove(artworkPatchMesh);
-  artworkPatchMesh.geometry?.dispose();
-  artworkPatchMesh.material?.dispose();
-  artworkPatchMesh = null;
-}
-
-// Retorna meshes candidatos para ancorar o patch na superfície real do GLB.
-function getPatchTargetMeshes() {
-  if (!glbModel) {
-    return [];
-  }
-
-  const preset = getCurrentProductPreset();
-  const targetNames = preset.artworkTargetNames || null;
-  const targetMeshes = [];
-  const fallbackMeshes = [];
-
-  glbModel.traverse((child) => {
-    if (!child.isMesh || !child.visible || child === artworkPatchMesh) {
-      return;
-    }
-
-    fallbackMeshes.push(child);
-
-    if (!targetNames || meshMatchesArtworkTarget(child, targetNames)) {
-      targetMeshes.push(child);
-    }
-  });
-
-  return targetMeshes.length ? targetMeshes : fallbackMeshes;
-}
-
-// Encontra o ponto da superfície do boné onde o patch frontal deve encostar.
-function findPatchSurfaceHit(config) {
-  const targetMeshes = getPatchTargetMeshes();
-
-  if (!targetMeshes.length) {
-    return null;
-  }
-
-  modelRoot.updateMatrixWorld(true);
-  glbModel.updateMatrixWorld(true);
-
-  const origin = new THREE.Vector3(
-    config.patchRayOriginX ?? 0,
-    config.patchRayOriginY ?? 0.35,
-    config.patchRayOriginZ ?? 2.2,
-  );
-  const direction = new THREE.Vector3(
-    config.patchRayDirectionX ?? 0,
-    config.patchRayDirectionY ?? 0,
-    config.patchRayDirectionZ ?? -1,
-  ).normalize();
-  const raycaster = new THREE.Raycaster(origin, direction);
-  const intersections = raycaster.intersectObjects(targetMeshes, true);
-
-  return intersections.find((hit) => hit.object !== artworkPatchMesh) || null;
-}
-
-// Aplica a posição manual configurada quando o raycast não encontra a superfície do boné.
-function applyManualPatchTransform(config) {
-  artworkPatchMesh.position.set(
-    config.patchPositionX ?? 0,
-    config.patchPositionY ?? 0.36,
-    config.patchPositionZ ?? 0.64,
-  );
-  artworkPatchMesh.rotation.set(
-    config.patchRotationX ?? 0,
-    config.patchRotationY ?? 0,
-    config.patchRotationZ ?? 0,
-  );
-}
-
-// Atualiza posição e escala do patch frontal a partir dos controles existentes.
-function updateArtworkPatchTransform() {
-  if (!artworkPatchMesh) {
-    return;
-  }
-
-  const config = getCurrentArtworkConfig();
-  const offsetX = artworkTransform.offsetX ?? 0;
-  const offsetY = artworkTransform.offsetY ?? 0;
-  const scaleX = Math.max(artworkTransform.scaleX ?? 1, 0.01);
-  const scaleY = Math.max(artworkTransform.scaleY ?? 1, 0.01);
-  const hit = config.patchRaycastEnabled ? findPatchSurfaceHit(config) : null;
-  let localX = new THREE.Vector3(1, 0, 0);
-  let localY = new THREE.Vector3(0, 1, 0);
-  let normal = null;
-
-  if (hit?.face) {
-    normal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
-    const worldPosition = hit.point.clone().add(normal.clone().multiplyScalar(config.patchSurfaceOffset ?? 0.015));
-    const parentQuaternion = new THREE.Quaternion();
-    const patchQuaternion = new THREE.Quaternion();
-
-    modelRoot.getWorldQuaternion(parentQuaternion);
-    patchQuaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-    patchQuaternion.premultiply(parentQuaternion.invert());
-
-    artworkPatchMesh.position.copy(modelRoot.worldToLocal(worldPosition));
-    artworkPatchMesh.quaternion.copy(patchQuaternion);
-
-    localX.applyQuaternion(artworkPatchMesh.quaternion).normalize();
-    localY.applyQuaternion(artworkPatchMesh.quaternion).normalize();
-    artworkPatchMesh.position.add(localX.clone().multiplyScalar(config.patchOffsetU ?? 0));
-    artworkPatchMesh.position.add(localY.clone().multiplyScalar(config.patchOffsetV ?? 0));
-    artworkPatchMesh.position.add(localX.clone().multiplyScalar(offsetX));
-    artworkPatchMesh.position.add(localY.clone().multiplyScalar(offsetY));
-  } else {
-    console.warn("[visual3d-artwork] cap patch raycast missed; using manual fallback");
-    applyManualPatchTransform(config);
-    artworkPatchMesh.position.x += offsetX;
-    artworkPatchMesh.position.y += offsetY;
-  }
-
-  artworkPatchMesh.scale.set(scaleX, scaleY, 1);
-
-  debugArtworkLog("cap patch raycast", {
-    origin: new THREE.Vector3(
-      config.patchRayOriginX ?? 0,
-      config.patchRayOriginY ?? 0.35,
-      config.patchRayOriginZ ?? 2.2,
-    ),
-    direction: new THREE.Vector3(
-      config.patchRayDirectionX ?? 0,
-      config.patchRayDirectionY ?? 0,
-      config.patchRayDirectionZ ?? -1,
-    ).normalize(),
-    hit: Boolean(hit),
-    hitPoint: hit?.point,
-    hitObject: hit?.object?.name,
-    hitParent: hit?.object?.parent?.name,
-    normal,
-  });
-}
-
-// Aplica a arte em um plano frontal transparente, sem mexer no material do boné.
-function applyTextureToFrontPatch(texture) {
-  const config = getCurrentArtworkConfig();
-
-  disposeArtworkPatch();
-
-  const patchWidth = config.patchWidth ?? 0.42;
-  const patchHeight = config.patchHeight ?? 0.24;
-  const patchGeometry = new THREE.PlaneGeometry(patchWidth, patchHeight);
-  const patchMaterial = new THREE.MeshBasicMaterial({
-    map: texture,
-    transparent: true,
-    opacity: 1,
-    side: THREE.DoubleSide,
-    depthTest: true,
-    depthWrite: false,
-    toneMapped: false,
-  });
-
-  artworkPatchMesh = new THREE.Mesh(patchGeometry, patchMaterial);
-  artworkPatchMesh.name = "CapFrontArtworkPatch";
-  artworkPatchMesh.renderOrder = 30;
-  updateArtworkPatchTransform();
-  modelRoot.add(artworkPatchMesh);
-}
-
 // Aplica a CanvasTexture nos meshes imprimíveis do GLB.
 function applyTextureToGlb(texture) {
-  const preset = getCurrentProductPreset();
-  const config = getCurrentArtworkConfig();
-  const targetNames = preset.artworkTargetNames || null;
   // Lista de meshes que receberão a textura.
   const printableMeshes = [];
 
@@ -1411,11 +858,6 @@ function applyTextureToGlb(texture) {
   glbModel.traverse((child) => {
     // Ignora objetos não renderizáveis ou sem material.
     if (!child.isMesh || !child.material) {
-      return;
-    }
-
-    // Quando o preset define alvo, aplica somente nos meshes/nodes indicados.
-    if (!meshMatchesArtworkTarget(child, targetNames)) {
       return;
     }
 
@@ -1428,65 +870,8 @@ function applyTextureToGlb(texture) {
     printableMeshes.push(child);
   });
 
-  const planarUvDiagnostics = new Map();
-
-  if (config.generatePlanarUv) {
-    printableMeshes.forEach((mesh) => {
-      const hadUvBefore = Boolean(mesh.geometry?.attributes?.uv);
-      const shouldGeneratePlanarUv = config.forceGeneratedPlanarUv || !hadUvBefore;
-      let generatedUv = false;
-
-      if (shouldGeneratePlanarUv) {
-        generatedUv = ensurePlanarUvForMesh(mesh, config);
-      }
-
-      planarUvDiagnostics.set(mesh.uuid, {
-        hadUvBefore,
-        forceGeneratedPlanarUv: Boolean(config.forceGeneratedPlanarUv),
-        generatedUv,
-      });
-    });
-  }
-
-  if (config.generateCylindricalUv) {
-    printableMeshes.forEach((mesh) => {
-      if (!mesh.geometry?.attributes?.uv) {
-        ensureCylindricalUvForMesh(mesh, config.generatedUvAxis);
-      }
-    });
-  }
-
-  // Mostra no console quais meshes serão texturizados no produto atual.
-  debugArtworkLog("printable meshes", {
-    productKey: currentProductKey,
-    count: printableMeshes.length,
-  });
-  debugArtworkTable(printableMeshes.map((mesh) => ({
-    productKey: currentProductKey,
-    mesh: mesh.name || "sem nome",
-    parent: mesh.parent?.name || "sem pai",
-    material: getMaterialNames(mesh.material),
-    materialType: getMaterialTypes(mesh.material),
-    materialColor: getMaterialColors(mesh.material),
-    visible: mesh.visible,
-    hasUvBefore: planarUvDiagnostics.get(mesh.uuid)?.hadUvBefore ?? Boolean(mesh.geometry?.attributes?.uv),
-    hasUv: Boolean(mesh.geometry?.attributes?.uv),
-    forceGeneratedPlanarUv: planarUvDiagnostics.get(mesh.uuid)?.forceGeneratedPlanarUv ?? false,
-    generatedUv: planarUvDiagnostics.get(mesh.uuid)?.generatedUv ?? false,
-    vertices: getMeshVertexCount(mesh),
-    receivedMap: getMaterialHasMap(mesh.material),
-    treatedAsHandle: meshLooksLikeHandle(mesh) ? "sim" : "não",
-  })));
-
   // Sem mesh compatível, sinaliza erro para o fluxo de aplicação.
   if (!printableMeshes.length) {
-    if (DEBUG_ARTWORK) {
-      console.error("[visual3d-artwork] no printable meshes found", {
-        productKey: currentProductKey,
-        artworkEnabled: getCurrentProductPreset().artworkEnabled,
-        artworkConfig: getCurrentArtworkConfig(),
-      });
-    }
     throw new Error("No compatible GLB material found.");
   }
 
@@ -1504,241 +889,16 @@ function applyTextureToGlb(texture) {
   });
 }
 
-// Cria uma textura visual com grade, direção U/V e rótulos para inspecionar UVs do GLB.
-function createUvDebugTexture() {
-  const canvas = document.createElement("canvas");
-  const size = 1024;
-  const gridSize = 8;
-  const cellSize = size / gridSize;
-  const context = canvas.getContext("2d");
-
-  canvas.width = size;
-  canvas.height = size;
-  context.fillStyle = "#f8fafc";
-  context.fillRect(0, 0, size, size);
-
-  for (let row = 0; row < gridSize; row += 1) {
-    for (let column = 0; column < gridSize; column += 1) {
-      const hue = Math.round((column / gridSize) * 260 + (row / gridSize) * 60);
-      context.fillStyle = `hsl(${hue}, 85%, ${row % 2 === column % 2 ? 78 : 66}%)`;
-      context.fillRect(column * cellSize, row * cellSize, cellSize, cellSize);
-      context.strokeStyle = "rgba(15, 23, 42, 0.55)";
-      context.lineWidth = 3;
-      context.strokeRect(column * cellSize, row * cellSize, cellSize, cellSize);
-      context.fillStyle = "#0f172a";
-      context.font = "bold 36px sans-serif";
-      context.fillText(`${String.fromCharCode(65 + row)}${column + 1}`, column * cellSize + 18, row * cellSize + 48);
-    }
-  }
-
-  context.fillStyle = "rgba(255, 255, 255, 0.82)";
-  context.fillRect(0, 0, size, 96);
-  context.fillRect(0, size - 96, size, 96);
-  context.fillRect(0, 0, 112, size);
-  context.fillRect(size - 128, 0, 128, size);
-
-  context.fillStyle = "#111827";
-  context.font = "bold 54px sans-serif";
-  context.fillText("U 0 -> 1", 350, 70);
-  context.save();
-  context.translate(70, 650);
-  context.rotate(-Math.PI / 2);
-  context.fillText("V 0 -> 1", 0, 0);
-  context.restore();
-
-  context.font = "bold 42px sans-serif";
-  context.fillText("TOP", 465, 145);
-  context.fillText("BOTTOM", 405, size - 32);
-  context.save();
-  context.translate(44, 550);
-  context.rotate(-Math.PI / 2);
-  context.fillText("LEFT", 0, 0);
-  context.restore();
-  context.save();
-  context.translate(size - 48, 450);
-  context.rotate(Math.PI / 2);
-  context.fillText("RIGHT", 0, 0);
-  context.restore();
-
-  context.strokeStyle = "#ef4444";
-  context.lineWidth = 12;
-  context.beginPath();
-  context.moveTo(36, size / 2);
-  context.lineTo(size - 36, size / 2);
-  context.moveTo(size - 78, size / 2 - 34);
-  context.lineTo(size - 36, size / 2);
-  context.lineTo(size - 78, size / 2 + 34);
-  context.stroke();
-
-  context.strokeStyle = "#2563eb";
-  context.beginPath();
-  context.moveTo(size / 2, size - 36);
-  context.lineTo(size / 2, 36);
-  context.moveTo(size / 2 - 34, 78);
-  context.lineTo(size / 2, 36);
-  context.lineTo(size / 2 + 34, 78);
-  context.stroke();
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.needsUpdate = true;
-  return texture;
-}
-
-// Calcula e registra os limites UV de um mesh para diagnosticar se ha ilhas úteis para logo frontal.
-function logUvBoundsForMesh(mesh) {
-  const uv = mesh.geometry?.attributes?.uv;
-
-  if (!uv) {
-    console.warn("[visual3d-uv] mesh without UV", {
-      mesh: mesh.name || "sem nome",
-      parent: mesh.parent?.name || "sem pai",
-    });
-    return null;
-  }
-
-  let minU = Infinity;
-  let maxU = -Infinity;
-  let minV = Infinity;
-  let maxV = -Infinity;
-
-  for (let index = 0; index < uv.count; index += 1) {
-    const u = uv.getX(index);
-    const v = uv.getY(index);
-    minU = Math.min(minU, u);
-    maxU = Math.max(maxU, u);
-    minV = Math.min(minV, v);
-    maxV = Math.max(maxV, v);
-  }
-
-  const bounds = {
-    mesh: mesh.name || "sem nome",
-    parent: mesh.parent?.name || "sem pai",
-    minU,
-    maxU,
-    minV,
-    maxV,
-    uvCount: uv.count,
-  };
-
-  console.log("[visual3d-uv] uv bounds", bounds);
-  return bounds;
-}
-
-// Aplica a grade UV no produto atual para diagnosticar orientação e compartilhamento de UV do boné.
-function applyUvDebugTextureToCurrentProduct() {
-  if (!DEBUG_UV_MAP || currentProductKey !== "cap" || !glbModel) {
-    return;
-  }
-
-  const preset = getCurrentProductPreset();
-  const targetNames = preset.artworkTargetNames || null;
-  const targetMeshes = [];
-  const fallbackMeshes = [];
-
-  glbModel.traverse((child) => {
-    if (!child.isMesh || !child.material || !child.visible || child === artworkPatchMesh) {
-      return;
-    }
-
-    fallbackMeshes.push(child);
-
-    if (!targetNames || meshMatchesArtworkTarget(child, targetNames)) {
-      targetMeshes.push(child);
-    }
-  });
-
-  if (targetNames && !targetMeshes.length) {
-    console.warn("[visual3d-uv] no target mesh found for cap", { targetNames });
-  }
-
-  const printableMeshes = targetMeshes.length ? targetMeshes : fallbackMeshes;
-  const uvDebugTexture = createUvDebugTexture();
-
-  console.table(fallbackMeshes.map((mesh) => {
-    const bounds = logUvBoundsForMesh(mesh);
-
-    return {
-      mesh: mesh.name || "sem nome",
-      parent: mesh.parent?.name || "sem pai",
-      material: getMaterialNames(mesh.material),
-      materialType: getMaterialTypes(mesh.material),
-      hasUv: Boolean(mesh.geometry?.attributes?.uv),
-      minU: bounds?.minU ?? null,
-      maxU: bounds?.maxU ?? null,
-      minV: bounds?.minV ?? null,
-      maxV: bounds?.maxV ?? null,
-      uvCount: bounds?.uvCount ?? 0,
-      positionCount: mesh.geometry?.attributes?.position?.count ?? 0,
-      selectedAsArtworkTarget: printableMeshes.includes(mesh),
-    };
-  }));
-
-  printableMeshes.forEach((mesh) => {
-    console.log("[visual3d-uv] applying UV debug texture", {
-      currentProductKey,
-      mesh: mesh.name || "sem nome",
-      parent: mesh.parent?.name || "sem pai",
-      material: getMaterialNames(mesh.material),
-      hasUv: Boolean(mesh.geometry?.attributes?.uv),
-      vertices: mesh.geometry?.attributes?.position?.count ?? 0,
-    });
-
-    if (Array.isArray(mesh.material)) {
-      mesh.material = mesh.material.map((material) => cloneMaterialWithTexture(material, uvDebugTexture));
-    } else {
-      mesh.material = cloneMaterialWithTexture(mesh.material, uvDebugTexture);
-    }
-  });
-}
-
 // Aplica textura ao GLB quando existe, ou ao fallback geométrico quando o GLB falhou.
 function applyTextureToActiveObject(texture) {
-  // Diagnóstico da tentativa de aplicação da arte no produto atual.
-  debugArtworkLog("applying artwork", {
-    productKey: currentProductKey,
-    artworkEnabled: getCurrentProductPreset().artworkEnabled,
-    artworkConfig: getCurrentArtworkConfig(),
-  });
-
-  const config = getCurrentArtworkConfig();
-
-  // Produtos sem arte habilitada não recebem textura por enquanto.
-  if (!getCurrentProductPreset().artworkEnabled) {
-    updateArtworkStatus("Arte personalizada ainda não disponível para este produto.", "warning");
-    return;
-  }
-
   // try/catch evita quebrar a página se o material do modelo for incompatível.
   try {
     // Prioriza o GLB real quando carregado.
     if (glbModel) {
-      debugArtworkTable(getArtworkMeshDiagnostics(glbModel));
-
       // Remove textura anterior antes de aplicar uma nova.
       restoreGlbMaterials();
-
-      if (config.useFrontPatchMesh) {
-        applyTextureToFrontPatch(texture);
-        debugArtworkLog("artwork applied to front patch", {
-          productKey: currentProductKey,
-          artworkConfig: getCurrentArtworkConfig(),
-        });
-        return;
-      }
-
-      // Garante que produtos com material.map não mantenham patch de outro produto.
-      disposeArtworkPatch();
       // Aplica a textura aos meshes imprimíveis do GLB.
       applyTextureToGlb(texture);
-      debugArtworkLog("artwork applied to GLB", {
-        productKey: currentProductKey,
-        artworkConfig: getCurrentArtworkConfig(),
-      });
       return;
     }
 
@@ -1758,8 +918,6 @@ function applyTextureToActiveObject(texture) {
 function resetArtwork() {
   // Libera textura, canvas e imagem carregada.
   disposeArtworkTexture();
-  // Remove patch frontal, se ele estiver em uso.
-  disposeArtworkPatch();
   // Remove map do fallback, se ele estiver em uso.
   resetFallbackMaterial();
   // Restaura materiais originais do GLB.
@@ -1787,7 +945,7 @@ function fitModelToViewer(model) {
   // Maior eixo evita divisão por zero e define a escala proporcional.
   const largestSide = Math.max(size.x, size.y, size.z, 0.001);
   // Fator que faz o maior eixo chegar no tamanho visual alvo.
-  const scale = (getCurrentProductPreset().displaySize ?? 3.2) / largestSide;
+  const scale = GLB_DISPLAY_SIZE / largestSide;
 
   // Centraliza o GLB na origem já considerando a escala aplicada ao grupo.
   model.scale.setScalar(scale);
@@ -1803,7 +961,7 @@ function fitModelToViewer(model) {
   // Centro final usado como target dos controles.
   const fittedCenter = fittedBox.getCenter(new THREE.Vector3());
   // Maior eixo final ajuda a calcular distância segura da câmera.
-  const fittedLargestSide = Math.max(fittedSize.x, fittedSize.y, fittedSize.z, getCurrentProductPreset().displaySize ?? 3.2);
+  const fittedLargestSide = Math.max(fittedSize.x, fittedSize.y, fittedSize.z, GLB_DISPLAY_SIZE);
   // FOV vertical da câmera convertido para radianos.
   const verticalFov = THREE.MathUtils.degToRad(camera.fov);
   // FOV horizontal derivado do FOV vertical e aspect ratio atual.
@@ -1866,33 +1024,19 @@ function showFallbackModel() {
   fallbackMug.visible = true;
 }
 
-// Carrega o GLB do produto atual e prepara diagnóstico, materiais e enquadramento.
+// Carrega o GLB da caneca e prepara diagnóstico, materiais e enquadramento.
 function loadGlbModel() {
   // Mostra estado de carregamento na UI.
   updateModelStatus("Carregando modelo 3D...", "loading");
-
-  // Captura o preset/URL deste carregamento para evitar usar uma constante fixa da caneca.
-  const preset = getCurrentProductPreset();
-  const modelUrl = preset.modelUrl;
-  const loadId = ++modelLoadId;
-  console.log("[visual_3d] current preset", preset);
-  console.log("[visual_3d] loading model", modelUrl);
 
   // Loader específico para arquivos GLTF/GLB.
   const loader = new GLTFLoader();
   // Inicia carregamento assíncrono do modelo.
   loader.load(
     // URL do arquivo GLB.
-    modelUrl,
+    MODEL_URL,
     // Callback de sucesso.
     (gltf) => {
-      // Ignora callbacks antigos caso o usuário tenha trocado produto antes do load terminar.
-      if (loadId !== modelLoadId) {
-        disposeModelResources(gltf.scene);
-        return;
-      }
-
-      console.log("[visual_3d] loaded model", modelUrl);
       // Guarda a cena raiz do GLB para aplicar textura/restaurar depois.
       glbModel = gltf.scene;
       // Salva materiais originais antes de qualquer modificação.
@@ -1912,65 +1056,28 @@ function loadGlbModel() {
       updateModelStatus("Modelo carregado", "success");
 
       // Se uma arte foi enviada antes do GLB terminar, aplica agora.
+      isModelLoadSettled = true;
+
       if (artworkTexture) {
         applyTextureToActiveObject(artworkTexture);
       }
 
-      // Quando habilitado, sobrepõe uma grade UV no boné para diagnóstico visual.
-      applyUvDebugTextureToCurrentProduct();
+      tryApplyPendingArtworkWhenReady();
     },
     // Callback de progresso não usado no momento.
     undefined,
     // Callback de erro: mantém fallback geométrico.
-    (error) => {
-      // Ignora erro de carregamento antigo depois de troca de produto.
-      if (loadId !== modelLoadId) {
-        return;
-      }
-
-      console.error("[visual_3d] failed to load model", modelUrl, error);
+    () => {
       // Torna fallback visível.
       showFallbackModel();
       // Informa que não há diagnóstico de GLB.
       setDiagnosticsFallback();
       // Atualiza status de fallback.
       updateModelStatus("Modelo não encontrado, usando fallback", "warning");
+      isModelLoadSettled = true;
+      tryApplyPendingArtworkWhenReady();
     },
   );
-}
-
-// Sincroniza o editor 2D com o produto ativo quando a API global já existe.
-function syncArtworkEditorProduct() {
-  if (window.visual3dArtworkEditor2d?.setProduct) {
-    window.visual3dArtworkEditor2d.setProduct(currentProductKey);
-  }
-}
-
-function switchProduct(productKey) {
-  console.log("[visual_3d] switchProduct", productKey);
-  // Usa a chave recebida quando existir; caso contrário volta para a caneca.
-  currentProductKey = PRODUCT_PRESETS[productKey] ? productKey : "mug";
-  console.log("[visual_3d] current preset", getCurrentProductPreset());
-
-  // Mantém o select sincronizado caso a chave inválida caia para caneca.
-  if (productSelector && productSelector.value !== currentProductKey) {
-    productSelector.value = currentProductKey;
-  }
-
-  // Remove arte ativa antes de trocar de modelo para não reaplicar textura antiga indevidamente.
-  resetArtwork();
-  // Remove completamente o GLB anterior da cena.
-  disposeCurrentGlbModel();
-  // Esconde fallback enquanto tenta carregar o GLB do novo produto.
-  fallbackMug.visible = false;
-  // Aplica rotação base do preset novo.
-  applyModelRotation();
-  // Carrega o modelo associado ao preset atual.
-  loadGlbModel();
-  // Atualiza habilitação/valores dos controles de arte.
-  syncArtworkControls();
-  // Sincroniza a prancheta 2D com o produto selecionado, se o editor já estiver carregado.
-  syncArtworkEditorProduct();
 }
 
 // Ajusta renderer e câmera ao tamanho real do container HTML.
@@ -2017,26 +1124,35 @@ captureButton.addEventListener("click", () => {
   previewEmpty.hidden = true;
 });
 
-// Carrega uma imagem de qualquer origem segura do navegador e aplica pelo fluxo atual de textura.
-function loadArtworkImageSource(source, { objectUrl = null, loadingMessage = "Carregando imagem..." } = {}) {
-  // Sem origem válida, limpa estado para evitar textura quebrada.
-  if (!source) {
+// Reage quando o usuário seleciona um arquivo de arte.
+artworkInput.addEventListener("change", (event) => {
+  // Primeiro arquivo selecionado no input.
+  const file = event.target.files[0];
+
+  // Sem arquivo, remove arte atual e encerra.
+  if (!file) {
     resetArtwork();
-    updateArtworkStatus("Imagem inválida", "error");
+    return;
+  }
+
+  // Bloqueia formatos fora da lista permitida.
+  if (!allowedArtworkTypes.has(file.type)) {
+    resetArtwork();
+    updateArtworkStatus("Formato inválido", "error");
     return;
   }
 
   // Informa ao usuário que a imagem será processada.
-  updateArtworkStatus(loadingMessage, "loading");
+  updateArtworkStatus("Carregando imagem...", "loading");
   // Libera textura/canvas/URL anteriores antes de carregar nova arte.
   disposeArtworkTexture();
-  // Guarda URL temporária apenas quando veio do input file, para revogar depois.
-  artworkObjectUrl = objectUrl;
+  // Cria URL temporária para o navegador carregar o arquivo local.
+  artworkObjectUrl = URL.createObjectURL(file);
 
   // Image() permite saber dimensões naturais antes de desenhar no canvas.
   const nextImage = new Image();
 
-  // Executa quando o navegador termina de carregar a imagem.
+  // Executa quando o navegador termina de carregar a imagem do upload.
   nextImage.onload = () => {
     // Guarda a imagem carregada como arte ativa.
     artworkImage = nextImage;
@@ -2063,78 +1179,8 @@ function loadArtworkImageSource(source, { objectUrl = null, loadingMessage = "Ca
     updateArtworkStatus("Formato inválido", "error");
   };
 
-  // Dispara o carregamento da imagem a partir da origem recebida.
-  nextImage.src = source;
-}
-
-// API mínima para o editor 2D enviar um PNG transparente ao renderizador 3D.
-window.visual3dApplyArtworkFromDataUrl = function visual3dApplyArtworkFromDataUrl(dataUrl) {
-  if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:image/")) {
-    updateArtworkStatus("Imagem do editor inválida", "error");
-    return;
-  }
-
-  loadArtworkImageSource(dataUrl, {
-    loadingMessage: "Aplicando arte do editor 2D...",
-  });
-};
-
-function applyPendingProductFromSessionStorage() {
-  const pendingProductKey = sessionStorage.getItem("caneca-garagem-pending-product-key");
-
-  if (!pendingProductKey) {
-    return;
-  }
-
-  sessionStorage.removeItem("caneca-garagem-pending-product-key");
-
-  if (!PRODUCT_PRESETS[pendingProductKey]) {
-    console.log("[visual_3d] pending product ignored", pendingProductKey);
-    return;
-  }
-
-  currentProductKey = pendingProductKey;
-
-  if (productSelector) {
-    productSelector.value = currentProductKey;
-  }
-}
-
-function applyPendingArtworkFromSessionStorage() {
-  const pendingArtworkDataUrl = sessionStorage.getItem("caneca-garagem-pending-artwork-data-url");
-
-  if (!pendingArtworkDataUrl) {
-    return;
-  }
-
-  sessionStorage.removeItem("caneca-garagem-pending-artwork-data-url");
-  window.visual3dApplyArtworkFromDataUrl(pendingArtworkDataUrl);
-}
-
-// Reage quando o usuário seleciona um arquivo de arte.
-artworkInput.addEventListener("change", (event) => {
-  // Primeiro arquivo selecionado no input.
-  const file = event.target.files[0];
-
-  // Sem arquivo, remove arte atual e encerra.
-  if (!file) {
-    resetArtwork();
-    return;
-  }
-
-  // Bloqueia formatos fora da lista permitida.
-  if (!allowedArtworkTypes.has(file.type)) {
-    resetArtwork();
-    updateArtworkStatus("Formato inválido", "error");
-    return;
-  }
-
-  // Cria URL temporária e usa o mesmo fluxo que o editor 2D usa com dataURL.
-  const nextObjectUrl = URL.createObjectURL(file);
-  loadArtworkImageSource(nextObjectUrl, {
-    objectUrl: nextObjectUrl,
-    loadingMessage: "Carregando imagem...",
-  });
+  // Dispara o carregamento da imagem a partir da URL temporária.
+  nextImage.src = artworkObjectUrl;
 });
 
 // Botão "Remover arte" volta tudo para estado sem textura.
@@ -2175,13 +1221,6 @@ artworkControls.forEach((control) => {
   });
 });
 
-// Select de produto recarrega o GLB correspondente ao preset escolhido.
-if (productSelector) {
-  productSelector.addEventListener("change", () => {
-    switchProduct(productSelector.value);
-  });
-}
-
 // Checkboxes de flip redesenham a arte com escala 2D negativa quando ativados.
 artworkToggles.forEach((control) => {
   // Evento change dispara quando checkbox é marcado/desmarcado.
@@ -2194,8 +1233,34 @@ artworkToggles.forEach((control) => {
 });
 
 
-// Se veio do Criador 2D, seleciona o produto antes de carregar o GLB.
-applyPendingProductFromSessionStorage();
+window.visual3dApplyArtworkFromDataUrl = (dataUrl) => applyArtworkFromDataUrl(dataUrl);
+productSelector?.addEventListener("change", () => {
+  currentProductKey = productSelector.value || "mug";
+  tryApplyPendingArtworkWhenReady();
+});
+readPendingArtworkFromSessionStorage();
+tryApplyPendingArtworkWhenReady();
+
+const backToEditorLink = document.querySelector('a[href="/visual-3d/editor-2d/"]');
+if (backToEditorLink) {
+  let fallbackEditorUrl = "/visual-3d/editor-2d/";
+  if (pendingArtworkProductKey || pendingSource || pendingProductSlug || pendingProductLabel) {
+    const params = new URLSearchParams();
+    params.set("product", normalizeViewerProductKey(pendingArtworkProductKey || currentProductKey || "mug"));
+    if (pendingSource) {
+      params.set("source", pendingSource);
+    }
+    if (pendingProductSlug) {
+      params.set("product_slug", pendingProductSlug);
+    }
+    if (pendingProductLabel) {
+      params.set("product_label", pendingProductLabel);
+    }
+    fallbackEditorUrl = `/visual-3d/editor-2d/?${params.toString()}`;
+  }
+  backToEditorLink.href = pendingEntrypointUrl || fallbackEditorUrl;
+}
+
 // Estado inicial: controles desabilitados até existir arte.
 syncArtworkControls();
 // Aplica rotação base inicial do modelo/fallback.
@@ -2209,12 +1274,8 @@ if ("ResizeObserver" in window) {
   resizeObserver.observe(container);
 }
 
-// Sincroniza o editor 2D com o produto inicial, quando disponível.
-syncArtworkEditorProduct();
 // Inicia carregamento do modelo GLB.
 loadGlbModel();
-// Se veio do Criador 2D, consome a arte pendente e remove do sessionStorage.
-applyPendingArtworkFromSessionStorage();
 // Também ajusta renderer em resize da janela.
 window.addEventListener("resize", resizeRenderer);
 // Faz um resize inicial para configurar canvas/câmera.

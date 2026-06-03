@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -94,6 +94,40 @@ CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT: dict[str, str] = {
     "cancelled": "Cancelado",
 }
 
+
+def _caneca_status_label(status_code: str) -> str:
+    if not status_code:
+        return "—"
+    return CANECA_DISPLAY_MARKETPLACE_ORDER_STATUS_PT.get(status_code, status_code.replace("_", " ").title())
+
+
+def _caneca_status_history_from_metadata(order) -> list[dict[str, str]]:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    raw_history = md.get("status_history")
+    if not isinstance(raw_history, list):
+        return []
+
+    rows: list[dict[str, str]] = []
+    for row in raw_history:
+        if not isinstance(row, dict):
+            continue
+        from_status = str(row.get("from") or "").strip()
+        to_status = str(row.get("to") or "").strip()
+        happened_at = str(row.get("at") or "").strip()
+        source = str(row.get("source") or "").strip() or "admin_panel"
+        if not to_status:
+            continue
+        rows.append(
+            {
+                "from": _caneca_status_label(from_status),
+                "to": _caneca_status_label(to_status),
+                "at": happened_at,
+                "source": source,
+            }
+        )
+    return rows
+
+
 def _caneca_branded_metadata_q() -> Q:
     """Pedidos originados no site público Caneca (chaves gravadas pelo fluxo público)."""
     return Q(metadata__origin=CANECA_PUBLIC_ORIGIN_STOREFRONT) | Q(metadata__storefront=CANECA_PUBLIC_ORIGIN_STOREFRONT)
@@ -106,6 +140,8 @@ def _caneca_marketplace_orders_filter_q() -> Q:
         Q(items__customization_request__isnull=False)
         | Q(metadata__source=CANECA_PUBLIC_ORIGIN_STOREFRONT)
         | Q(metadata__channel__in=["personalization", "b2b_quote", "contact"])
+        | Q(metadata__origin="visual_3d_editor_2d")
+        | Q(metadata__channel="visual_3d_editor_2d_finish")
     )
     return branded | legacy_missing_brand
 
@@ -252,6 +288,75 @@ def _metadata_contact(order) -> tuple[str, str]:
     return name, phone
 
 
+def _metadata_text_value(md: dict[str, Any], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        value = md.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+def _extract_order_origin_label(order) -> str:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    origin_value = _metadata_text_value(
+        md,
+        (
+            "origin",
+            "storefront",
+            "channel",
+            "created_from",
+        ),
+    ).lower()
+    if "visual_3d_editor_2d" in origin_value or "editor-2d" in origin_value:
+        return "Editor 2D"
+    if origin_value == CANECA_PUBLIC_ORIGIN_STOREFRONT:
+        return "Caneca site"
+    return "Caneca"
+
+
+def _extract_preview_data_url(order, line_items_detail: list[dict[str, Any]] | None = None) -> str:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    preview = _metadata_text_value(md, ("preview_data_url", "previewDataUrl"))
+    if preview:
+        return preview
+    for row in line_items_detail or []:
+        cust_req = row.get("customization_request")
+        customer_text = getattr(cust_req, "customer_text", None) if cust_req is not None else None
+        if isinstance(customer_text, dict):
+            preview = _metadata_text_value(customer_text, ("preview_data_url", "previewDataUrl"))
+            if preview:
+                return preview
+    return ""
+
+
+def _has_editable_project(order, line_items_detail: list[dict[str, Any]] | None = None) -> bool:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    if md.get("editable_project_json") is not None or md.get("editableProjectJson") is not None:
+        return True
+    for row in line_items_detail or []:
+        cust_req = row.get("customization_request")
+        customer_text = getattr(cust_req, "customer_text", None) if cust_req is not None else None
+        if isinstance(customer_text, dict):
+            if customer_text.get("editable_project_json") is not None or customer_text.get("editableProjectJson") is not None:
+                return True
+    return False
+
+
+def _sanitize_metadata_for_display(order) -> str:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    if not md:
+        return "—"
+
+    cleaned = dict(md)
+    for key in ("previewDataUrl", "preview_data_url", "editableProjectJson", "editable_project_json"):
+        if key in cleaned:
+            cleaned[key] = "[omitted]"
+    try:
+        return json.dumps(cleaned, indent=2, ensure_ascii=False)
+    except (TypeError, ValueError):
+        return "—"
+
+
 def _customer_display_parts(order) -> tuple[str, str, str]:
     """Cliente: nome para exibir, e-mail, telefone/metadata."""
     cust = getattr(order, "customer", None)
@@ -340,6 +445,19 @@ def _caneca_decimal_from_post(raw: str | None) -> Decimal | None:
     return parsed.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
+def _caneca_quantity_from_post(raw: str | None) -> int | None:
+    value = (raw or "").strip()
+    if not value:
+        return None
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed < 1:
+        return None
+    return parsed
+
+
 def _caneca_decimal_to_metadata(value: Decimal | None) -> str:
     return str(value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)) if value is not None else ""
 
@@ -354,6 +472,102 @@ def _caneca_money_display(value) -> str:
     return f"R$ {dec:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+def _normalize_whatsapp_phone(raw_phone: str) -> str:
+    digits = "".join(ch for ch in (raw_phone or "") if ch.isdigit())
+    if not digits:
+        return ""
+    if len(digits) in {10, 11} and not digits.startswith("55"):
+        digits = f"55{digits}"
+    if len(digits) < 12:
+        return ""
+    return digits
+
+
+def _extract_caneca_product_label(order) -> str:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    product_label = _metadata_text_value(
+        md,
+        (
+            "product_label",
+            "productLabel",
+            "product_name",
+            "productName",
+        ),
+    )
+    if product_label:
+        return product_label
+    first_item = _first_line_item(order)
+    if first_item is not None and getattr(first_item, "product", None) is not None:
+        name = str(getattr(first_item.product, "name", "") or "").strip()
+        if name:
+            return name
+    return "Caneca personalizada"
+
+
+def build_caneca_customer_message(order) -> dict[str, Any]:
+    md = order.metadata if isinstance(order.metadata, dict) else {}
+    pricing_summary = caneca_order_price_summary(order)
+
+    total_raw = pricing_summary.get("total")
+    unit_raw = pricing_summary.get("unit_price")
+    has_price = False
+    try:
+        has_price = Decimal(str(total_raw)) > 0 and Decimal(str(unit_raw)) > 0
+    except (InvalidOperation, TypeError, ValueError):
+        has_price = False
+
+    customer_name, _email, customer_phone = _customer_display_parts(order)
+    if customer_name == "—":
+        customer_name = "Cliente"
+
+    product_label = _extract_caneca_product_label(order)
+    quantity = pricing_summary.get("quantity_display") or pricing_summary.get("quantity") or 1
+    try:
+        quantity = max(int(quantity), 1)
+    except (TypeError, ValueError):
+        quantity = 1
+
+    unit_display = pricing_summary.get("unit_price_display") or "A definir"
+    total_display = pricing_summary.get("total_display") or "A definir"
+    commercial_note = str(md.get("caneca_pricing_notes") or "").strip()
+
+    lines = [
+        f"Olá, {customer_name}! Recebemos sua arte no Caneca de Garagem.",
+        "",
+        f"Produto: {product_label}",
+        f"Quantidade: {quantity}",
+        f"Valor unitário: {unit_display}",
+        f"Total: {total_display}",
+    ]
+    if commercial_note:
+        lines.extend(["", f"Observações: {commercial_note}"])
+    lines.extend(
+        [
+            "",
+            "Sua arte foi analisada e está pronta para seguir para produção após confirmação do pagamento.",
+            "",
+            "Podemos seguir com o pedido?",
+        ]
+    )
+    message_text = "\n".join(lines)
+
+    normalized_phone = _normalize_whatsapp_phone(customer_phone if customer_phone != "—" else "")
+    whatsapp_url = ""
+    if normalized_phone:
+        whatsapp_url = f"https://wa.me/{normalized_phone}?text={quote(message_text)}"
+
+    warning = ""
+    if not has_price:
+        warning = "Defina a precificação comercial antes de enviar a mensagem ao cliente."
+
+    return {
+        "text": message_text,
+        "whatsapp_url": whatsapp_url,
+        "warning": warning,
+        "has_price": has_price,
+    }
+
+
 def _caneca_order_pricing_metadata(order) -> dict[str, Any]:
     md = getattr(order, "metadata", None)
     return md if isinstance(md, dict) else {}
@@ -361,12 +575,29 @@ def _caneca_order_pricing_metadata(order) -> dict[str, Any]:
 
 def caneca_order_price_summary(order) -> dict[str, Any]:
     md = _caneca_order_pricing_metadata(order)
-    total_raw = md.get("caneca_manual_total") or getattr(order, "total_amount", None)
+    total_raw = md.get("caneca_manual_total")
+    if not total_raw:
+        total_amount = getattr(order, "total_amount", None)
+        total_raw = total_amount if total_amount not in (None, Decimal("0.00")) else ""
     unit_raw = md.get("caneca_manual_unit_price") or ""
+    qty_raw = md.get("caneca_manual_quantity")
+    if qty_raw in (None, "", 0):
+        first_item = _first_line_item(order)
+        qty_raw = getattr(first_item, "quantity", 1) if first_item is not None else 1
+    try:
+        qty_int = max(int(qty_raw), 1)
+    except (TypeError, ValueError):
+        qty_int = 1
+
+    total_display = _caneca_money_display(total_raw) if total_raw not in ("", None) else "A definir"
+    if total_display == "R$ 0,00":
+        total_display = "A definir"
     return {
         "total": total_raw,
         "unit_price": unit_raw,
-        "total_display": _caneca_money_display(total_raw),
+        "quantity": qty_int,
+        "quantity_display": qty_int,
+        "total_display": total_display,
         "unit_price_display": _caneca_money_display(unit_raw) if unit_raw else "—",
         "notes": md.get("caneca_pricing_notes", ""),
         "priced_at": md.get("caneca_priced_at", ""),
@@ -812,6 +1043,7 @@ class CanecaOrderListView(CanecaGaragemShellMixin, ListView):
             else:
                 order.shell_qty_display = 0
             order.shell_price_display = caneca_order_price_summary(order)["total_display"]
+            order.shell_origin_label = _extract_order_origin_label(order)
 
     def get_context_data(self, **kwargs):
         from apps.market_core.models import MarketplaceOrder
@@ -942,10 +1174,7 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["display_customer_email"] = email
         ctx["display_customer_phone"] = phone
 
-        try:
-            ctx["metadata_pretty"] = json.dumps(order.metadata or {}, indent=2, ensure_ascii=False)
-        except (TypeError, ValueError):
-            ctx["metadata_pretty"] = "—"
+        ctx["metadata_pretty"] = _sanitize_metadata_for_display(order)
 
         ctx["production_jobs"] = list(order.production_jobs.all()) if hasattr(order, "production_jobs") else []
         ctx["operational_timeline"] = build_caneca_order_operational_timeline(order)
@@ -970,6 +1199,11 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
         ctx["pricing_summary"] = caneca_order_price_summary(order)
         ctx["can_price_caneca_order"] = caneca_order_can_be_priced(order)
         ctx["order_price_url"] = reverse(CANECA_ADMIN_URL_ORDER_PRICE, kwargs={"order_id": order.pk})
+        customer_message = build_caneca_customer_message(order)
+        ctx["customer_message_text"] = customer_message["text"]
+        ctx["customer_message_warning"] = customer_message["warning"]
+        ctx["customer_message_has_price"] = customer_message["has_price"]
+        ctx["customer_whatsapp_url"] = customer_message["whatsapp_url"]
 
         customization_rows = []
         for it in order.items.all():
@@ -988,8 +1222,13 @@ class CanecaOrderDetailView(CanecaGaragemShellMixin, DetailView):
                 }
             )
         ctx["line_items_detail"] = customization_rows
+        ctx["order_origin_label"] = _extract_order_origin_label(order)
+        ctx["order_preview_data_url"] = _extract_preview_data_url(order, customization_rows)
+        ctx["order_has_editable_project"] = _has_editable_project(order, customization_rows)
+        ctx["order_current_status_label"] = _caneca_status_label(order.status)
+        ctx["order_status_history"] = _caneca_status_history_from_metadata(order)
 
-        ctx["order_status_choices"] = list(MarketplaceOrder.Status.choices)
+        ctx["order_status_choices"] = [(code, _caneca_status_label(code)) for code, _ in MarketplaceOrder.Status.choices]
         ctx["page_actions"] = self.get_page_actions_orders()
         ctx["page_description"] = f"Pedido {order.code} · status atual {order.get_status_display()}"
         ctx["page_title"] = f"Pedido {order.code}"
@@ -1014,9 +1253,9 @@ class CanecaOrderPriceView(CanecaGaragemShellMixin, View):
             return redirect(detail_url)
 
         unit_price = _caneca_decimal_from_post(request.POST.get("unit_price"))
-        manual_total = _caneca_decimal_from_post(request.POST.get("total_amount"))
-        if unit_price is None and manual_total is None:
-            messages.warning(request, "Informe um valor unitário ou total positivo para salvar o orçamento.")
+        quantity_input = _caneca_quantity_from_post(request.POST.get("quantity"))
+        if unit_price is None or quantity_input is None:
+            messages.warning(request, "Informe quantidade e valor unitário válidos.")
             return redirect(detail_url)
 
         notes = (request.POST.get("pricing_notes") or "").strip()
@@ -1027,30 +1266,58 @@ class CanecaOrderPriceView(CanecaGaragemShellMixin, View):
                 return redirect(detail_url)
 
             first_item = locked.items.order_by("id").first()
-            quantity = Decimal(str(getattr(first_item, "quantity", 1) or 1)) if first_item is not None else Decimal("1")
+            effective_quantity = quantity_input
             effective_unit = unit_price
-            effective_total = manual_total
-            if effective_total is None and effective_unit is not None:
-                effective_total = (effective_unit * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            if effective_unit is None and effective_total is not None and quantity > 0:
-                effective_unit = (effective_total / quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            effective_total = (effective_unit * Decimal(str(effective_quantity))).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
 
-            if first_item is not None and effective_unit is not None:
+            if first_item is not None:
+                first_item.quantity = effective_quantity
                 first_item.unit_price = effective_unit
-                first_item.save(update_fields=["unit_price", "total_price", "updated_at"] if any(field.name == "updated_at" for field in first_item._meta.fields) else ["unit_price", "total_price"])
-                if manual_total is None:
-                    effective_total = first_item.total_price
+                update_fields_item = ["quantity", "unit_price", "total_price"]
+                if any(field.name == "updated_at" for field in first_item._meta.fields):
+                    update_fields_item.append("updated_at")
+                first_item.save(update_fields=update_fields_item)
+                effective_total = first_item.total_price
 
-            if effective_total is not None:
-                locked.total_amount = effective_total
+            locked.total_amount = effective_total
 
             md = locked.metadata if isinstance(locked.metadata, dict) else {}
+            pricing_block = md.get("pricing")
+            if not isinstance(pricing_block, dict):
+                pricing_block = {}
+            pricing_block.update(
+                {
+                    "unit_price": _caneca_decimal_to_metadata(effective_unit),
+                    "quantity": effective_quantity,
+                    "total_price": _caneca_decimal_to_metadata(effective_total),
+                    "commercial_note": notes,
+                    "priced_at": timezone.now().isoformat(),
+                    "source": "admin_panel",
+                }
+            )
+            pricing_history = md.get("pricing_history")
+            if not isinstance(pricing_history, list):
+                pricing_history = []
+            pricing_history.append(
+                {
+                    "unit_price": _caneca_decimal_to_metadata(effective_unit),
+                    "quantity": effective_quantity,
+                    "total_price": _caneca_decimal_to_metadata(effective_total),
+                    "at": timezone.now().isoformat(),
+                    "source": "admin_panel",
+                }
+            )
             md.update(
                 {
                     "caneca_manual_total": _caneca_decimal_to_metadata(effective_total),
                     "caneca_manual_unit_price": _caneca_decimal_to_metadata(effective_unit),
+                    "caneca_manual_quantity": effective_quantity,
                     "caneca_pricing_notes": notes,
                     "caneca_priced_at": timezone.now().isoformat(),
+                    "pricing": pricing_block,
+                    "pricing_history": pricing_history,
                 }
             )
             locked.metadata = md
@@ -1239,6 +1506,7 @@ class CanecaOrderStatusView(CanecaGaragemShellMixin, View):
     http_method_names = ["post"]
 
     def post(self, request: HttpRequest, order_id: int) -> HttpResponse:
+        from apps.caneca_de_garagem.models import ProductionJob
         from apps.market_core.models import MarketplaceOrder
 
         qs = caneca_marketplace_orders_queryset(request)
@@ -1250,15 +1518,85 @@ class CanecaOrderStatusView(CanecaGaragemShellMixin, View):
             messages.warning(request, "Status não reconhecido. Nenhuma alteração foi gravada.")
             return redirect(reverse("admin-shell:caneca-order-detail", kwargs={"order_id": order.pk}))
 
-        prev = order.status
-        order.status = raw
-        order.save(update_fields=["status", "updated_at"])
+        production_created = False
+        production_job = None
+
+        with transaction.atomic():
+            locked = MarketplaceOrder.objects.select_for_update().prefetch_related(
+                "items__product__vendor",
+                "production_jobs",
+            ).get(pk=order.pk)
+
+            prev = locked.status
+            locked.status = raw
+            metadata = locked.metadata if isinstance(locked.metadata, dict) else {}
+            history = metadata.get("status_history")
+            if not isinstance(history, list):
+                history = []
+
+            if prev != raw:
+                history.append(
+                    {
+                        "from": prev,
+                        "to": raw,
+                        "at": timezone.now().isoformat(),
+                        "source": "admin_panel",
+                    }
+                )
+                metadata["status_history"] = history
+
+            if prev != MarketplaceOrder.Status.PAID and raw == MarketplaceOrder.Status.PAID:
+                production_job = locked.production_jobs.order_by("id").first()
+                if production_job is None:
+                    first_item = locked.items.order_by("id").first()
+                    vendor = None
+                    if first_item is not None:
+                        vendor = first_item.vendor
+                        if vendor is None and getattr(first_item, "product", None) is not None:
+                            vendor = first_item.product.vendor
+                    production_job = ProductionJob.objects.create(
+                        order=locked,
+                        order_item=first_item,
+                        vendor=vendor,
+                        job_type=ProductionJob.JobType.ART_PREP,
+                        status=ProductionJob.Status.QUEUED,
+                        notes="Job criado automaticamente ao marcar pedido como Pago.",
+                    )
+                    production_created = True
+
+                production_meta = metadata.get("production")
+                if not isinstance(production_meta, dict):
+                    production_meta = {}
+                production_meta.update(
+                    {
+                        "status": getattr(production_job, "status", ProductionJob.Status.QUEUED),
+                        "queued_at": timezone.now().isoformat(),
+                        "source": "status_paid",
+                        "job_id": getattr(production_job, "id", None),
+                    }
+                )
+                metadata["production"] = production_meta
+
+            locked.metadata = metadata
+            update_fields = ["status", "metadata", "updated_at"]
+            locked.save(update_fields=update_fields)
 
         if prev != raw:
-            messages.success(
-                request,
-                f'Status atualizado de "{labels.get(prev, prev)}" para "{labels.get(raw, raw)}".',
-            )
+            if production_created:
+                messages.success(
+                    request,
+                    f'Status atualizado de "{_caneca_status_label(prev)}" para "{_caneca_status_label(raw)}". Produção criada e enfileirada.',
+                )
+            elif raw == MarketplaceOrder.Status.PAID and production_job is not None:
+                messages.success(
+                    request,
+                    f'Status atualizado de "{_caneca_status_label(prev)}" para "{_caneca_status_label(raw)}". Produção já vinculada ao pedido.',
+                )
+            else:
+                messages.success(
+                    request,
+                    f'Status atualizado de "{_caneca_status_label(prev)}" para "{_caneca_status_label(raw)}".',
+                )
         else:
             messages.success(request, "Status mantido.")
 

@@ -116,16 +116,23 @@ def editor_2d_finish(request):
             company = _resolve_company_for_order(product)
             order_code = _new_order_code()
             order_metadata = {
-                "origin": "caneca_de_garagem",
+                "origin": "visual_3d_editor_2d",
                 "storefront": "caneca_de_garagem",
                 "channel": "visual_3d_editor_2d_finish",
+                "created_from": "/visual-3d/editor-2d/",
                 "productKey": product_key,
                 "productLabel": product_label,
+                "product_key": product_key,
+                "product_label": product_label,
                 "customer_name": customer_name,
                 "whatsapp": customer_whatsapp,
                 "customer_email": customer_email,
                 "previewDataUrl": preview_data_url,
                 "editableProjectJson": editable_project_json,
+                "quantity": quantity,
+                "customer_whatsapp": customer_whatsapp,
+                "preview_data_url": preview_data_url,
+                "editable_project_json": editable_project_json,
             }
             order = MarketplaceOrder.objects.create(
                 code=order_code,

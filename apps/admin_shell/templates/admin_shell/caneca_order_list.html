@@ -58,6 +58,7 @@
                     <th>Qtd.</th>
                     <th>Total</th>
                     <th>Status</th>
+                    <th>Origem</th>
                     <th>Pedido em</th>
                     <th></th>
                 </tr>
@@ -82,13 +83,14 @@
                             {% elif o.status == "cancelled" %}<span class="status-badge status-slate">{{ o.get_status_display }}</span>
                             {% else %}<span class="status-badge status-slate">{{ o.get_status_display }}</span>{% endif %}
                         </td>
+                        <td>{{ o.shell_origin_label }}</td>
                         <td>
                             {% if o.ordered_at %}{{ o.ordered_at|date:"d/m/Y H:i" }}{% elif o.created_at %}{{ o.created_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}
                         </td>
                         <td><a href="{% url 'admin-shell:caneca-order-detail' o.id %}">Ver detalhe</a></td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="11">Nenhum pedido encontrado com os filtros atuais.</td></tr>
+                    <tr><td colspan="12">Nenhum pedido encontrado com os filtros atuais.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -1,5 +1,6 @@
 (() => {
   const ARTWORK_EDITOR_STORAGE_KEY = "caneca-garagem-artwork-editor-project-v1";
+  const ARTWORK_EDITOR_SESSION_PROJECT_KEY = "caneca-garagem-artwork-editor-session-project-v1";
   const PENDING_ARTWORK_DATA_URL_KEY = "caneca-garagem-pending-artwork-data-url";
   const PENDING_ARTWORK_PROJECT_KEY = "caneca-garagem-pending-artwork-project-v1";
   const PENDING_PRODUCT_KEY = "caneca-garagem-pending-product-key";
@@ -8,6 +9,15 @@
   const EDITOR_ZOOM_MIN = 0.15;
   const EDITOR_ZOOM_MAX = 3;
   const EDITOR_ZOOM_STEP = 0.1;
+  const ARTWORK_EDITOR_COLOR_PALETTE = [
+    "#000000", "#1f2937", "#374151", "#4b5563", "#6b7280", "#9ca3af", "#d1d5db", "#ffffff",
+    "#7f1d1d", "#dc2626", "#f97316", "#facc15", "#84cc16", "#22c55e", "#14b8a6", "#06b6d4",
+    "#2563eb", "#4f46e5", "#7c3aed", "#c026d3", "#db2777", "#f43f5e",
+    "#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b",
+    "#052e16", "#166534", "#15803d", "#16a34a", "#bbf7d0",
+    "#0c4a6e", "#0369a1", "#0284c7", "#38bdf8", "#bae6fd",
+    "#312e81", "#4338ca", "#6366f1", "#c4b5fd"
+  ];
 
   const ARTWORK_EDITOR_PRODUCT_GUIDES = {
     mug: {
@@ -159,6 +169,9 @@
   const selectionStatusElement = document.getElementById("artwork-editor-selection-status");
   const propertiesPanel = document.querySelector(".visual-3d-editor-properties");
   const editorToolButtons = Array.from(document.querySelectorAll(".visual-3d-tool-button"));
+  const colorStripElement = document.getElementById("artwork-editor-color-strip");
+  const fillStatusElement = document.getElementById("artwork-editor-fill-status");
+  const strokeStatusElement = document.getElementById("artwork-editor-stroke-status");
   let activeEditorTool = "select";
 
   if (!editorCanvasElement) {
@@ -230,6 +243,8 @@
   let redoStack = [];
   let isRestoringHistory = false;
   let isPushingHistory = false;
+  let autoSaveTimer = null;
+  let autoSaveEnabled = false;
   let editorZoom = 1;
   let resizeZoomTimer = null;
 
@@ -364,6 +379,150 @@
     return activeObject;
   }
 
+  function isImageObject(object) {
+    return object && object.type === "image";
+  }
+
+  function updateColorStatusFromSelection() {
+    const object = getActiveUserObject();
+
+    if (!fillStatusElement || !strokeStatusElement) {
+      return;
+    }
+
+    if (!object) {
+      fillStatusElement.textContent = "N/D";
+      strokeStatusElement.textContent = "N/D";
+      return;
+    }
+
+    if (object.type === "activeSelection") {
+      const objects = object.getObjects().filter((item) => !item.isGuide);
+      const first = objects[0];
+      fillStatusElement.textContent = first?.fill || "N/D";
+      strokeStatusElement.textContent = first?.stroke || "N/D";
+      return;
+    }
+
+    fillStatusElement.textContent = object.fill || "N/D";
+    strokeStatusElement.textContent = object.stroke || "N/D";
+  }
+
+  function applyFillColorToObject(object, color) {
+    if (!object || object.isGuide) return false;
+    if (isImageObject(object)) return false;
+    if (typeof object.fill === "undefined") return false;
+    object.set("fill", color);
+    object.setCoords();
+    return true;
+  }
+
+  function applyStrokeColorToObject(object, color) {
+    if (!object || object.isGuide) return false;
+    if (isImageObject(object)) return false;
+    if (typeof object.stroke === "undefined" && typeof object.strokeWidth === "undefined") return false;
+    object.set("stroke", color);
+    if (!object.strokeWidth || Number(object.strokeWidth) <= 0) {
+      object.set("strokeWidth", 2);
+    }
+    object.setCoords();
+    return true;
+  }
+
+  function applyFillColorToSelection(color) {
+    const activeObject = getActiveUserObject();
+
+    if (!activeObject) {
+      setEditorStatus("Selecione um objeto para aplicar a cor.", "warning");
+      return;
+    }
+
+    let changed = false;
+    let imageBlocked = false;
+
+    if (activeObject.type === "activeSelection") {
+      activeObject.getObjects().forEach((object) => {
+        if (isImageObject(object)) imageBlocked = true;
+        changed = applyFillColorToObject(object, color) || changed;
+      });
+    } else {
+      if (isImageObject(activeObject)) imageBlocked = true;
+      changed = applyFillColorToObject(activeObject, color) || changed;
+    }
+
+    if (!changed && imageBlocked) {
+      setEditorStatus("Imagens não aceitam preenchimento direto.", "warning");
+      updateColorStatusFromSelection();
+      return;
+    }
+
+    if (!changed) {
+      setEditorStatus("Objeto selecionado não aceita preenchimento.", "warning");
+      updateColorStatusFromSelection();
+      return;
+    }
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot();
+    updateObjectPropertiesPanel();
+    updateColorStatusFromSelection();
+    setEditorStatus(imageBlocked ? "Cor aplicada. Imagens não aceitam preenchimento direto." : `Preenchimento aplicado: ${color}`, "success");
+  }
+
+  function applyStrokeColorToSelection(color) {
+    const activeObject = getActiveUserObject();
+
+    if (!activeObject) {
+      setEditorStatus("Selecione um objeto para aplicar contorno.", "warning");
+      return;
+    }
+
+    let changed = false;
+
+    if (activeObject.type === "activeSelection") {
+      activeObject.getObjects().forEach((object) => {
+        changed = applyStrokeColorToObject(object, color) || changed;
+      });
+    } else {
+      changed = applyStrokeColorToObject(activeObject, color) || changed;
+    }
+
+    if (!changed) {
+      setEditorStatus("Objeto selecionado não aceita contorno.", "warning");
+      updateColorStatusFromSelection();
+      return;
+    }
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot();
+    updateObjectPropertiesPanel();
+    updateColorStatusFromSelection();
+    setEditorStatus(`Contorno aplicado: ${color}`, "success");
+  }
+
+  function renderColorPalette() {
+    if (!colorStripElement) return;
+
+    colorStripElement.innerHTML = "";
+    ARTWORK_EDITOR_COLOR_PALETTE.forEach((color) => {
+      const button = document.createElement("button");
+      button.className = "visual-3d-color-swatch";
+      button.type = "button";
+      button.style.backgroundColor = color;
+      button.title = color;
+      button.setAttribute("aria-label", `Aplicar cor ${color}`);
+      button.dataset.color = color;
+      button.addEventListener("click", (event) => {
+        if (event.shiftKey) {
+          applyStrokeColorToSelection(color);
+        } else {
+          applyFillColorToSelection(color);
+        }
+      });
+      colorStripElement.appendChild(button);
+    });
+  }
+
   function updateHistoryButtons() {
     if (undoButton) {
       undoButton.disabled = undoStack.length < 2;
@@ -391,11 +550,38 @@
     return JSON.stringify(snapshot);
   }
 
+  function autoSaveArtworkProject(reason = "auto") {
+    if (!autoSaveEnabled || isRestoringHistory || isPushingHistory) {
+      return;
+    }
+
+    try {
+      const project = exportArtworkProjectJson();
+      const serializedProject = JSON.stringify(project);
+      localStorage.setItem(ARTWORK_EDITOR_STORAGE_KEY, serializedProject);
+      sessionStorage.setItem(ARTWORK_EDITOR_SESSION_PROJECT_KEY, serializedProject);
+    } catch (error) {
+      console.warn(`[artwork-editor-2d] autosave failed (${reason})`, error);
+    }
+  }
+
+  function scheduleAutoSaveArtworkProject(reason = "change") {
+    if (!autoSaveEnabled || isRestoringHistory || isPushingHistory) {
+      return;
+    }
+
+    window.clearTimeout(autoSaveTimer);
+    autoSaveTimer = window.setTimeout(() => {
+      autoSaveArtworkProject(reason);
+    }, 500);
+  }
+
   function pushHistorySnapshot(reason = "") {
     if (isRestoringHistory || isPushingHistory) {
       return;
     }
 
+    let didPushSnapshot = false;
     isPushingHistory = true;
 
     try {
@@ -408,6 +594,7 @@
       }
 
       undoStack.push(snapshot);
+      didPushSnapshot = true;
 
       if (undoStack.length > ARTWORK_EDITOR_HISTORY_LIMIT) {
         undoStack.shift();
@@ -417,6 +604,10 @@
       updateHistoryButtons();
     } finally {
       isPushingHistory = false;
+    }
+
+    if (didPushSnapshot) {
+      scheduleAutoSaveArtworkProject(reason || "history");
     }
   }
 
@@ -1282,6 +1473,32 @@
       setActiveEditorTool("select");
       return;
     }
+    if (tool === "image") {
+      imageInput?.click();
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "text") {
+      addTextObject();
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "grid") {
+      toggleGrid();
+      return;
+    }
+    if (tool === "zoom-fit") {
+      fitEditorZoomToScreen();
+      return;
+    }
+    if (tool === "copy") {
+      copySelectedObject();
+      return;
+    }
+    if (tool === "remove") {
+      removeSelectedObject();
+      return;
+    }
     if (tool === "select") {
       return;
     }
@@ -1618,7 +1835,7 @@
     const project = exportArtworkProjectJson();
     const productKey = currentProductGuideKey || "mug";
 
-    localStorage.setItem(ARTWORK_EDITOR_STORAGE_KEY, JSON.stringify(project));
+    autoSaveArtworkProject("apply-3d");
     sessionStorage.setItem(PENDING_ARTWORK_DATA_URL_KEY, dataUrl);
     sessionStorage.setItem(PENDING_ARTWORK_PROJECT_KEY, JSON.stringify(project));
     sessionStorage.setItem(PENDING_PRODUCT_KEY, productKey);
@@ -1752,7 +1969,9 @@
 
   function saveProjectToLocalStorage() {
     try {
-      localStorage.setItem(ARTWORK_EDITOR_STORAGE_KEY, JSON.stringify(exportArtworkProjectJson()));
+      const serializedProject = JSON.stringify(exportArtworkProjectJson());
+      localStorage.setItem(ARTWORK_EDITOR_STORAGE_KEY, serializedProject);
+      sessionStorage.setItem(ARTWORK_EDITOR_SESSION_PROJECT_KEY, serializedProject);
       setEditorStatus("Projeto salvo neste navegador.", "success");
     } catch (error) {
       console.error("[artwork-editor-2d] save local failed", error);
@@ -1776,8 +1995,8 @@
     }
   }
 
-  function loadInitialEditorProjectIfAvailable() {
-    const sessionProject = sessionStorage.getItem(PENDING_ARTWORK_PROJECT_KEY);
+  function restoreInitialArtworkProject() {
+    const sessionProject = sessionStorage.getItem(ARTWORK_EDITOR_SESSION_PROJECT_KEY);
     const localProject = localStorage.getItem(ARTWORK_EDITOR_STORAGE_KEY);
     const raw = sessionProject || localProject;
 
@@ -1786,9 +2005,20 @@
     }
 
     try {
-      importArtworkProjectJson(JSON.parse(raw), { preserveHistory: false });
-      setEditorStatus("Projeto restaurado.", "success");
-      return true;
+      const project = JSON.parse(raw);
+      const restored = importArtworkProjectJson(project, {
+        preserveHistory: false,
+        resetHistory: false,
+        onComplete: () => {
+          if (typeof resetHistoryWithCurrentState === "function") {
+            resetHistoryWithCurrentState();
+          }
+
+          setEditorStatus("Projeto restaurado.", "success");
+        },
+      });
+
+      return restored;
     } catch (error) {
       console.warn("[artwork-editor-2d] não foi possível restaurar projeto", error);
       return false;
@@ -1963,7 +2193,10 @@
     "object:rotating",
     "object:modified",
   ].forEach((eventName) => {
-    artworkCanvas.on(eventName, updateObjectPropertiesPanel);
+    artworkCanvas.on(eventName, () => {
+      updateObjectPropertiesPanel();
+      updateColorStatusFromSelection();
+    });
   });
 
   ["object:added", "object:removed", "object:modified"].forEach((eventName) => {
@@ -1972,7 +2205,8 @@
         return;
       }
 
-      pushHistorySnapshot();
+      pushHistorySnapshot(eventName);
+      scheduleAutoSaveArtworkProject(eventName);
     });
   });
 
@@ -2116,11 +2350,15 @@
   setArtworkEditorProduct("mug");
   setGuideVisibility(true);
   updateObjectPropertiesPanel();
-  const restoredInitialProject = loadInitialEditorProjectIfAvailable();
+  const restoredInitialProject = restoreInitialArtworkProject();
   requestAnimationFrame(fitEditorZoomToScreen);
 
   if (!restoredInitialProject) {
     resetHistoryWithCurrentState();
     updateEditorStatus("Editor 2D pronto", "idle");
   }
+
+  autoSaveEnabled = true;
+  renderColorPalette();
+  updateColorStatusFromSelection();
 })();

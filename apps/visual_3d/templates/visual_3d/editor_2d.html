@@ -9,6 +9,7 @@
 </head>
 <body class="visual-3d-editor-body">
   <main class="visual-3d-editor-fullscreen" aria-label="Criador de arte 2D">
+    {% csrf_token %}
     <nav class="visual-3d-editor-menubar" aria-label="Menu principal">
       <div class="visual-3d-editor-brand">
         <strong>Caneca de Garagem</strong>
@@ -202,6 +203,7 @@
 
         <div class="visual-3d-editor-toolbar-group visual-3d-editor-toolbar-primary">
           <button type="button" id="artwork-editor-apply" class="visual-3d-editor-apply-button" title="Aplicar no 3D" aria-label="Aplicar no 3D"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5z"/><path d="M3 7v10l9 5 9-5V7"/><path d="M12 12v10"/></svg><span>Aplicar 3D</span></button>
+          <button type="button" id="artwork-editor-finish-artwork" class="visual-3d-editor-finish-button" title="Finalizar arte" aria-label="Finalizar arte">Finalizar arte</button>
           <a href="{% url 'visual_3d:demo' %}" class="visual-3d-editor-back-link" title="Voltar ao visualizador 3D" aria-label="Voltar ao visualizador 3D"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-2"/></svg><span>Voltar 3D</span></a>
         </div>
       </div>
@@ -338,6 +340,44 @@
       <div class="visual-3d-editor-color-strip" id="artwork-editor-color-strip"></div>
     </footer>
   </main>
+
+  <div id="artwork-editor-finish-modal" class="visual-3d-editor-modal" role="dialog" aria-modal="true" aria-labelledby="artwork-editor-finish-modal-title">
+    <div class="visual-3d-editor-modal-card">
+      <h2 id="artwork-editor-finish-modal-title">Finalizar arte</h2>
+      <p>Revise os dados para preparar sua solicitacao comercial.</p>
+      <div class="visual-3d-editor-modal-grid">
+        <label>
+          <span>Produto</span>
+          <input id="artwork-editor-finish-product" type="text" readonly>
+        </label>
+        <label>
+          <span>Quantidade</span>
+          <input id="artwork-editor-finish-quantity" type="number" min="1" value="1">
+        </label>
+        <label>
+          <span>Nome</span>
+          <input id="artwork-editor-finish-name" type="text" placeholder="Seu nome">
+        </label>
+        <label>
+          <span>WhatsApp</span>
+          <input id="artwork-editor-finish-whatsapp" type="text" placeholder="(00) 00000-0000">
+        </label>
+        <label>
+          <span>E-mail</span>
+          <input id="artwork-editor-finish-email" type="email" placeholder="voce@exemplo.com">
+        </label>
+      </div>
+      <div id="artwork-editor-finish-success" class="visual-3d-editor-finish-success" hidden>
+        <strong>Recebemos seu pedido!</strong>
+        <p>Sua arte foi enviada para análise no painel administrativo. Nossa equipe vai revisar os detalhes e entrar em contato pelo WhatsApp.</p>
+        <p id="artwork-editor-finish-order-number"></p>
+      </div>
+      <div class="visual-3d-editor-modal-actions">
+        <button type="button" id="artwork-editor-finish-close" class="visual-3d-editor-modal-cancel">Fechar</button>
+        <button type="button" id="artwork-editor-finish-submit" class="visual-3d-editor-modal-submit">Confirmar solicitacao</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
   <script src="{% static 'visual_3d/js/artwork-editor-2d.js' %}"></script>

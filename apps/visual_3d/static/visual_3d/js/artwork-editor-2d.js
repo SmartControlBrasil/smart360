@@ -1,6 +1,8 @@
 (() => {
   const ARTWORK_EDITOR_STORAGE_KEY = "caneca-garagem-artwork-editor-project-v1";
   const ARTWORK_EDITOR_SESSION_PROJECT_KEY = "caneca-garagem-artwork-editor-session-project-v1";
+  const ARTWORK_EDITOR_FINISH_STORAGE_KEY = "caneca-garagem-finish-request-v1";
+  const ARTWORK_EDITOR_FINISH_PREVIEW_KEY = "caneca-garagem-finish-preview-v1";
   const PENDING_ARTWORK_DATA_URL_KEY = "caneca-garagem-pending-artwork-data-url";
   const PENDING_ARTWORK_PROJECT_KEY = "caneca-garagem-pending-artwork-project-v1";
   const PENDING_PRODUCT_KEY = "caneca-garagem-pending-product-key";
@@ -263,6 +265,17 @@
   const colorStripElement = document.getElementById("artwork-editor-color-strip");
   const fillStatusElement = document.getElementById("artwork-editor-fill-status");
   const strokeStatusElement = document.getElementById("artwork-editor-stroke-status");
+  const finishArtworkButton = document.getElementById("artwork-editor-finish-artwork");
+  const finishModalElement = document.getElementById("artwork-editor-finish-modal");
+  const finishProductInput = document.getElementById("artwork-editor-finish-product");
+  const finishQuantityInput = document.getElementById("artwork-editor-finish-quantity");
+  const finishNameInput = document.getElementById("artwork-editor-finish-name");
+  const finishWhatsappInput = document.getElementById("artwork-editor-finish-whatsapp");
+  const finishEmailInput = document.getElementById("artwork-editor-finish-email");
+  const finishCloseButton = document.getElementById("artwork-editor-finish-close");
+  const finishSubmitButton = document.getElementById("artwork-editor-finish-submit");
+  const finishSuccessMessage = document.getElementById("artwork-editor-finish-success");
+  const finishOrderNumberMessage = document.getElementById("artwork-editor-finish-order-number");
   let activeEditorTool = "select";
 
   if (!editorCanvasElement) {
@@ -2537,6 +2550,187 @@
     window.location.href = "/visual-3d/demo/";
   }
 
+  function getCurrentProductInfo() {
+    const productKey = currentProductGuideKey || "mug";
+    const productConfig = getGuideConfig(productKey);
+    return {
+      productKey,
+      productLabel: productConfig.label || "Caneca",
+    };
+  }
+
+  function getCsrfToken() {
+    const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+    if (csrfInput?.value) {
+      return csrfInput.value;
+    }
+
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return cookieMatch ? decodeURIComponent(cookieMatch[1]) : "";
+  }
+
+  function restoreFinishArtworkData() {
+    const rawSession = sessionStorage.getItem(ARTWORK_EDITOR_FINISH_STORAGE_KEY);
+    const rawLocal = localStorage.getItem(ARTWORK_EDITOR_FINISH_STORAGE_KEY);
+    const raw = rawSession || rawLocal;
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (error) {
+      console.warn("[artwork-editor-2d] finish data inválido", error);
+      return null;
+    }
+  }
+
+  function openFinishArtworkModal() {
+    if (!finishModalElement) {
+      return;
+    }
+
+    const previewDataUrl = exportArtworkPngDataUrl();
+    const productInfo = getCurrentProductInfo();
+    const storedData = restoreFinishArtworkData();
+
+    finishProductInput.value = productInfo.productLabel;
+    finishQuantityInput.value = Math.max(Number(storedData?.quantity || 1), 1);
+    finishNameInput.value = storedData?.customerName || "";
+    finishWhatsappInput.value = storedData?.customerWhatsapp || "";
+    finishEmailInput.value = storedData?.customerEmail || "";
+    if (finishSuccessMessage) {
+      finishSuccessMessage.hidden = true;
+    }
+    if (finishOrderNumberMessage) {
+      finishOrderNumberMessage.textContent = "";
+    }
+    if (finishSubmitButton) {
+      finishSubmitButton.disabled = false;
+      finishSubmitButton.hidden = false;
+    }
+
+    sessionStorage.setItem(ARTWORK_EDITOR_FINISH_PREVIEW_KEY, previewDataUrl);
+    finishModalElement.classList.add("is-open");
+    finishModalElement.setAttribute("aria-hidden", "false");
+    finishNameInput.focus();
+  }
+
+  function closeFinishArtworkModal() {
+    if (!finishModalElement) {
+      return;
+    }
+
+    finishModalElement.classList.remove("is-open");
+    finishModalElement.setAttribute("aria-hidden", "true");
+  }
+
+  function collectFinishArtworkData() {
+    const productInfo = getCurrentProductInfo();
+    const quantity = Math.max(clampNumber(finishQuantityInput?.value, 1, 999999, 1), 1);
+    const customerName = (finishNameInput?.value || "").trim();
+    const customerWhatsapp = (finishWhatsappInput?.value || "").trim();
+    const customerEmail = (finishEmailInput?.value || "").trim();
+
+    if (quantity < 1) {
+      throw new Error("Quantidade deve ser maior ou igual a 1.");
+    }
+
+    if (!customerName) {
+      throw new Error("Nome é obrigatório.");
+    }
+
+    if (!customerWhatsapp) {
+      throw new Error("WhatsApp é obrigatório.");
+    }
+
+    return {
+      productKey: productInfo.productKey,
+      productLabel: productInfo.productLabel,
+      quantity,
+      customerName,
+      customerWhatsapp,
+      customerEmail,
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  function submitFinishArtworkRequest() {
+    try {
+      const finishData = collectFinishArtworkData();
+      const previewDataUrl = exportArtworkPngDataUrl();
+      const editableProjectJson = exportArtworkProjectJson();
+      const serializedData = JSON.stringify(finishData);
+
+      localStorage.setItem(ARTWORK_EDITOR_FINISH_STORAGE_KEY, serializedData);
+      sessionStorage.setItem(ARTWORK_EDITOR_FINISH_STORAGE_KEY, serializedData);
+      localStorage.setItem(ARTWORK_EDITOR_FINISH_PREVIEW_KEY, previewDataUrl);
+      sessionStorage.setItem(ARTWORK_EDITOR_FINISH_PREVIEW_KEY, previewDataUrl);
+      autoSaveArtworkProject("finish-artwork");
+      const csrfToken = getCsrfToken();
+
+      const payload = {
+        ...finishData,
+        previewDataUrl,
+        editableProjectJson,
+      };
+
+      fetch("/visual-3d/editor-2d/finish/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json().catch(() => ({})))
+        .then((result) => {
+          if (!result?.ok) {
+            throw new Error(result?.error || "Não foi possível enviar a solicitação.");
+          }
+
+          if (finishSuccessMessage) {
+            finishSuccessMessage.hidden = false;
+          }
+
+          if (finishOrderNumberMessage) {
+            if (result.order_number) {
+              finishOrderNumberMessage.textContent = `Pedido: ${result.order_number}`;
+            } else if (result.order_id) {
+              finishOrderNumberMessage.textContent = `Protocolo: #${result.order_id}`;
+            } else {
+              finishOrderNumberMessage.textContent = "";
+            }
+          }
+
+          if (finishSubmitButton) {
+            finishSubmitButton.disabled = true;
+            finishSubmitButton.hidden = true;
+          }
+
+          if (result.redirect_url) {
+            sessionStorage.setItem("caneca-garagem-finish-last-redirect-url", String(result.redirect_url));
+          }
+
+          updateEditorStatus(
+            "Recebemos seu pedido. Ele foi enviado para o painel administrativo.",
+            "success"
+          );
+        })
+        .catch((error) => {
+          if (finishSuccessMessage) {
+            finishSuccessMessage.hidden = true;
+          }
+          updateEditorStatus(error.message || "Falha ao enviar solicitação.", "error");
+        });
+    } catch (error) {
+      updateEditorStatus(error.message || "Preencha os dados obrigatórios da solicitação.", "warning");
+    }
+  }
+
   function exportFabricJsonWithoutGuides() {
     return artworkCanvas.toJSON(["isArtworkLocked"]);
   }
@@ -2791,6 +2985,9 @@
 
   function handleEditorShortcut(event) {
     if (event.key === "Escape") {
+      if (finishModalElement?.classList.contains("is-open")) {
+        closeFinishArtworkModal();
+      }
       closeAllEditorMenus();
       return;
     }
@@ -3044,6 +3241,14 @@
   removeSelectedButton?.addEventListener("click", removeSelectedObject);
   clearButton?.addEventListener("click", clearArtworkCanvas);
   applyButton?.addEventListener("click", applyArtworkToViewer);
+  finishArtworkButton?.addEventListener("click", openFinishArtworkModal);
+  finishCloseButton?.addEventListener("click", closeFinishArtworkModal);
+  finishSubmitButton?.addEventListener("click", submitFinishArtworkRequest);
+  finishModalElement?.addEventListener("click", (event) => {
+    if (event.target === finishModalElement) {
+      closeFinishArtworkModal();
+    }
+  });
   elementDecorativeStripeButton?.addEventListener("click", () => addCreativeElement("decorativeStripe"));
   elementSimpleFrameButton?.addEventListener("click", () => addCreativeElement("simpleFrame"));
   elementRoundedFrameButton?.addEventListener("click", () => addCreativeElement("roundedFrame"));

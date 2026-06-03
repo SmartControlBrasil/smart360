@@ -1296,6 +1296,24 @@ body.visual-3d-editor-body {
   text-decoration: underline;
 }
 
+.visual-3d-editor-finish-button {
+  height: 30px;
+  min-height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.visual-3d-editor-finish-button:hover {
+  background: #1d4ed8;
+}
+
 .visual-3d-icon-button.is-active,
 .visual-3d-menu-dropdown button.is-active {
   background: #dbeafe;
@@ -1586,6 +1604,120 @@ body.visual-3d-editor-body {
 .visual-3d-color-swatch:focus-visible {
   outline: 2px solid #111827;
   outline-offset: 1px;
+}
+
+.visual-3d-editor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.55);
+  padding: 20px;
+}
+
+.visual-3d-editor-modal.is-open {
+  display: flex;
+}
+
+.visual-3d-editor-modal-card {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 16px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+  padding: 20px;
+}
+
+.visual-3d-editor-modal-card h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.visual-3d-editor-modal-card p {
+  margin: 6px 0 0;
+  color: #475569;
+  font-size: 13px;
+}
+
+.visual-3d-editor-modal-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.visual-3d-editor-modal-grid label {
+  display: grid;
+  gap: 4px;
+}
+
+.visual-3d-editor-modal-grid span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.visual-3d-editor-modal-grid input {
+  height: 34px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 13px;
+  padding: 0 10px;
+}
+
+.visual-3d-editor-modal-grid input[readonly] {
+  background: #f8fafc;
+}
+
+.visual-3d-editor-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.visual-3d-editor-modal-actions button {
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 12px;
+}
+
+.visual-3d-editor-modal-cancel {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.visual-3d-editor-modal-submit {
+  background: #2563eb;
+  color: #fff;
+}
+
+.visual-3d-editor-finish-success {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #14532d;
+  border-radius: 10px;
+}
+
+.visual-3d-editor-finish-success strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.visual-3d-editor-finish-success p {
+  margin: 4px 0 0;
+  font-size: 13px;
 }
 
 @media (max-width: 900px) {

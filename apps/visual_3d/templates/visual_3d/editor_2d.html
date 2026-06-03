@@ -78,6 +78,18 @@
             <div class="visual-3d-menu-separator"></div>
             <button type="button" id="artwork-editor-bring-forward">Trazer para frente</button>
             <button type="button" id="artwork-editor-send-backward">Enviar para trás</button>
+            <div class="visual-3d-menu-separator"></div>
+            <span class="visual-3d-menu-subtitle">Elementos</span>
+            <button type="button" id="artwork-editor-element-decorative-stripe">Faixa decorativa</button>
+            <button type="button" id="artwork-editor-element-simple-frame">Moldura simples</button>
+            <button type="button" id="artwork-editor-element-rounded-frame">Moldura arredondada</button>
+            <button type="button" id="artwork-editor-element-circle-badge">Selo circular</button>
+            <button type="button" id="artwork-editor-element-promo-badge">Selo promoção</button>
+            <button type="button" id="artwork-editor-element-heart">Coração</button>
+            <button type="button" id="artwork-editor-element-lightning">Raio</button>
+            <button type="button" id="artwork-editor-element-speech-bubble">Balão de fala</button>
+            <button type="button" id="artwork-editor-element-divider-line">Linha divisória</button>
+            <button type="button" id="artwork-editor-element-text-badge">Badge com texto</button>
           </div>
         </div>
 
@@ -88,7 +100,8 @@
             <label class="visual-3d-menu-field">Tamanho <input id="artwork-editor-font-size" type="number" min="8" max="300" value="72"></label>
             <label class="visual-3d-menu-field">Cor <input id="artwork-editor-text-color" type="color" value="#111111"></label>
             <div class="visual-3d-menu-separator"></div>
-            <button type="button" data-editor-click="artwork-editor-add-text">Adicionar texto</button>
+            <button type="button" id="artwork-editor-add-text">Adicionar texto</button>
+            <button type="button" id="artwork-editor-apply-template">Aplicar template selecionado</button>
           </div>
         </div>
 
@@ -133,7 +146,6 @@
           <select id="artwork-editor-template-select">
             <option value="">Template...</option>
           </select>
-          <button type="button" id="artwork-editor-apply-template" class="visual-3d-icon-button visual-3d-secondary" title="Aplicar template" aria-label="Aplicar template"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17h7"/><path d="M17.5 13.5v7"/></svg><span class="visual-3d-sr-only">Aplicar template</span></button>
         </div>
 
 
@@ -142,14 +154,7 @@
           <button type="button" id="artwork-editor-zoom-out" class="visual-3d-icon-button visual-3d-secondary" title="Diminuir zoom" aria-label="Diminuir zoom"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M8 11h6"/><path d="m16.5 16.5 4 4"/></svg><span class="visual-3d-sr-only">Diminuir zoom</span></button>
           <span id="artwork-editor-zoom-label" class="visual-3d-editor-zoom-label">100%</span>
           <button type="button" id="artwork-editor-zoom-in" class="visual-3d-icon-button visual-3d-secondary" title="Aumentar zoom" aria-label="Aumentar zoom"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M8 11h6"/><path d="M11 8v6"/><path d="m16.5 16.5 4 4"/></svg><span class="visual-3d-sr-only">Aumentar zoom</span></button>
-          <button type="button" id="artwork-editor-zoom-reset" class="visual-3d-icon-button visual-3d-secondary" title="Zoom 100%" aria-label="Zoom 100%"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg><span class="visual-3d-sr-only">Zoom 100%</span></button>
           <button type="button" id="artwork-editor-zoom-fit" class="visual-3d-icon-button visual-3d-secondary" title="Ajustar à tela" aria-label="Ajustar à tela"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/><path d="M9 12h6"/></svg><span class="visual-3d-sr-only">Ajustar à tela</span></button>
-        </div>
-
-        <div class="visual-3d-editor-toolbar-group">
-          <button type="button" id="artwork-editor-add-image" class="visual-3d-icon-button visual-3d-secondary" title="Adicionar imagem" aria-label="Adicionar imagem"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 16-5-5L5 22"/></svg><span class="visual-3d-sr-only">Adicionar imagem</span></button>
-          <input id="artwork-editor-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-          <button type="button" id="artwork-editor-add-text" class="visual-3d-icon-button visual-3d-secondary" title="Adicionar texto" aria-label="Adicionar texto"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M12 5v14"/><path d="M8 19h8"/></svg><span class="visual-3d-sr-only">Adicionar texto</span></button>
         </div>
 
         <div class="visual-3d-editor-toolbar-group visual-3d-editor-toolbar-primary">
@@ -158,6 +163,7 @@
         </div>
       </div>
       <p id="artwork-editor-status" class="visual-3d-editor-status" data-status="info" role="status">Editor 2D pronto</p>
+      <input id="artwork-editor-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
       <input id="artwork-editor-import-json-file" type="file" accept="application/json,.json" hidden>
     </header>
 
@@ -175,57 +181,91 @@
     <section class="visual-3d-editor-main-area">
       <aside class="visual-3d-editor-tool-palette" aria-label="Ferramentas">
         <button type="button" class="visual-3d-tool-button is-active" id="artwork-tool-select" title="Selecionar" aria-label="Selecionar" data-tool="select">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 3v17l4-5 4 6 3-2-4-6 7-1z"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 4l14 6-6 2-2 6-6-14z" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Selecionar</span>
         </button>
-        <button type="button" class="visual-3d-tool-button" title="Adicionar imagem" aria-label="Adicionar imagem" data-tool="image" data-editor-click="artwork-editor-add-image">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.3"/><path d="M21 16l-5.5-5.5L7 19"/></svg>
+        <button type="button" class="visual-3d-tool-button" title="Adicionar imagem" aria-label="Adicionar imagem" data-tool="image">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" fill="none"></rect>
+            <circle cx="8.5" cy="9" r="1.3" stroke="currentColor" fill="none"></circle>
+            <path d="M21 16l-5.5-5.5L7 19" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Adicionar imagem</span>
         </button>
-        <button type="button" class="visual-3d-tool-button" title="Adicionar texto" aria-label="Adicionar texto" data-tool="text" data-editor-click="artwork-editor-add-text">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M12 6v12"/><path d="M8 18h8"/></svg>
+        <button type="button" class="visual-3d-tool-button" title="Adicionar texto" aria-label="Adicionar texto" data-tool="text">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 6h16" stroke="currentColor" fill="none"></path>
+            <path d="M12 6v12" stroke="currentColor" fill="none"></path>
+            <path d="M8 18h8" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Adicionar texto</span>
         </button>
 
         <div class="visual-3d-tool-separator" aria-hidden="true"></div>
 
         <button type="button" class="visual-3d-tool-button" id="artwork-tool-rect" title="Retângulo" aria-label="Retângulo" data-tool="rect">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="4" y="6" width="16" height="12" rx="1.5" stroke="currentColor" fill="none"></rect>
+          </svg>
           <span class="visual-3d-sr-only">Retângulo</span>
         </button>
         <button type="button" class="visual-3d-tool-button" id="artwork-tool-circle" title="Círculo" aria-label="Círculo" data-tool="circle">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="7" stroke="currentColor" fill="none"></circle>
+          </svg>
           <span class="visual-3d-sr-only">Círculo</span>
         </button>
         <button type="button" class="visual-3d-tool-button" id="artwork-tool-star" title="Estrela" aria-label="Estrela" data-tool="star">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 4 2.4 5 5.6.6-4.1 3.8 1.2 5.6L12 16.1 7 19l1.2-5.6L4.1 9.6 9.6 9z"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="m12 3.6 2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.2-4.1 5.8-.9z" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Estrela</span>
         </button>
         <button type="button" class="visual-3d-tool-button" id="artwork-tool-spiral" title="Espiral" aria-label="Espiral" data-tool="spiral">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 12c0-2.5 2-4.5 4.5-4.5S21 9.5 21 12s-2 4.5-4.5 4.5S12 14.5 12 12Z"/><path d="M12 12c0 4-3.2 7.2-7.2 7.2S-2.4 16 1.6 12 8.2 4.8 12 4.8"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 12c0-2.6 2.1-4.7 4.7-4.7S21.4 9.4 21.4 12 19.3 16.7 16.7 16.7 12 14.6 12 12z" stroke="currentColor" fill="none"></path>
+            <path d="M12 12c0 3.8-3.1 6.9-6.9 6.9S-1.8 15.8 2 12 8.2 5.1 12 5.1" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Espiral</span>
         </button>
-        <button type="button" class="visual-3d-tool-button" id="artwork-tool-color-picker" title="Conta-gotas" aria-label="Conta-gotas" data-tool="color-picker">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m14 4 6 6"/><path d="m9 9 6 6"/><path d="m6 18 3-3"/><path d="m4 20 2-2"/><path d="m10 8 6-6 4 4-6 6"/></svg>
-          <span class="visual-3d-sr-only">Conta-gotas</span>
-        </button>
-
         <div class="visual-3d-tool-separator" aria-hidden="true"></div>
 
-        <button type="button" class="visual-3d-tool-button" title="Alternar grade" aria-label="Alternar grade" data-tool="grid" data-editor-click="artwork-editor-toggle-grid">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M10 4v16"/><path d="M16 4v16"/><path d="M4 10h16"/><path d="M4 16h16"/></svg>
+        <button type="button" class="visual-3d-tool-button" title="Alternar grade" aria-label="Alternar grade" data-tool="grid">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 4h16v16H4z" stroke="currentColor" fill="none"></path>
+            <path d="M10 4v16" stroke="currentColor" fill="none"></path>
+            <path d="M16 4v16" stroke="currentColor" fill="none"></path>
+            <path d="M4 10h16" stroke="currentColor" fill="none"></path>
+            <path d="M4 16h16" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Grade</span>
         </button>
-        <button type="button" class="visual-3d-tool-button" title="Ajustar zoom" aria-label="Ajustar zoom" data-tool="zoom-fit" data-editor-click="artwork-editor-zoom-fit">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+        <button type="button" class="visual-3d-tool-button" title="Ajustar zoom" aria-label="Ajustar zoom" data-tool="zoom-fit">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 9V4h5" stroke="currentColor" fill="none"></path>
+            <path d="M20 9V4h-5" stroke="currentColor" fill="none"></path>
+            <path d="M4 15v5h5" stroke="currentColor" fill="none"></path>
+            <path d="M20 15v5h-5" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Zoom fit</span>
         </button>
-        <button type="button" class="visual-3d-tool-button" title="Copiar" aria-label="Copiar" data-tool="copy" data-editor-click="artwork-editor-copy">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><rect x="4" y="4" width="11" height="11" rx="2"/></svg>
+        <button type="button" class="visual-3d-tool-button" title="Copiar" aria-label="Copiar" data-tool="copy">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" fill="none"></rect>
+            <rect x="4" y="4" width="11" height="11" rx="2" stroke="currentColor" fill="none"></rect>
+          </svg>
           <span class="visual-3d-sr-only">Copiar</span>
         </button>
-        <button type="button" class="visual-3d-tool-button" title="Remover" aria-label="Remover" data-tool="remove" data-editor-click="artwork-editor-remove-selected">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V4h6v3"/><path d="M8 7v13"/><path d="M16 7v13"/><path d="M6 20h12"/></svg>
+        <button type="button" class="visual-3d-tool-button" title="Remover" aria-label="Remover" data-tool="remove">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M5 7h14" stroke="currentColor" fill="none"></path>
+            <path d="M9 7V4h6v3" stroke="currentColor" fill="none"></path>
+            <path d="M8 7v13" stroke="currentColor" fill="none"></path>
+            <path d="M16 7v13" stroke="currentColor" fill="none"></path>
+            <path d="M6 20h12" stroke="currentColor" fill="none"></path>
+          </svg>
           <span class="visual-3d-sr-only">Remover</span>
         </button>
       </aside>
@@ -244,6 +284,16 @@
         </div>
       </section>
     </section>
+
+    <footer class="visual-3d-editor-colorbar" aria-label="Paleta de cores">
+      <div class="visual-3d-editor-color-meta">
+        <span>Preenchimento:</span>
+        <strong id="artwork-editor-fill-status">N/D</strong>
+        <span>Contorno:</span>
+        <strong id="artwork-editor-stroke-status">N/D</strong>
+      </div>
+      <div class="visual-3d-editor-color-strip" id="artwork-editor-color-strip"></div>
+    </footer>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>

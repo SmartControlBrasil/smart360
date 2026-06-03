@@ -9,6 +9,18 @@
   const EDITOR_ZOOM_MIN = 0.15;
   const EDITOR_ZOOM_MAX = 3;
   const EDITOR_ZOOM_STEP = 0.1;
+  const ARTWORK_EDITOR_ELEMENTS = {
+    decorativeStripe: { label: "Faixa decorativa" },
+    simpleFrame: { label: "Moldura simples" },
+    roundedFrame: { label: "Moldura arredondada" },
+    circleBadge: { label: "Selo circular" },
+    promoBadge: { label: "Selo promoção" },
+    heart: { label: "Coração" },
+    lightning: { label: "Raio" },
+    speechBubble: { label: "Balão de fala" },
+    dividerLine: { label: "Linha divisória" },
+    textBadge: { label: "Badge com texto" },
+  };
   const ARTWORK_EDITOR_COLOR_PALETTE = [
     "#000000", "#1f2937", "#374151", "#4b5563", "#6b7280", "#9ca3af", "#d1d5db", "#ffffff",
     "#7f1d1d", "#dc2626", "#f97316", "#facc15", "#84cc16", "#22c55e", "#14b8a6", "#06b6d4",
@@ -153,6 +165,16 @@
   const removeSelectedButton = document.getElementById("artwork-editor-remove-selected");
   const clearButton = document.getElementById("artwork-editor-clear");
   const applyButton = document.getElementById("artwork-editor-apply");
+  const elementDecorativeStripeButton = document.getElementById("artwork-editor-element-decorative-stripe");
+  const elementSimpleFrameButton = document.getElementById("artwork-editor-element-simple-frame");
+  const elementRoundedFrameButton = document.getElementById("artwork-editor-element-rounded-frame");
+  const elementCircleBadgeButton = document.getElementById("artwork-editor-element-circle-badge");
+  const elementPromoBadgeButton = document.getElementById("artwork-editor-element-promo-badge");
+  const elementHeartButton = document.getElementById("artwork-editor-element-heart");
+  const elementLightningButton = document.getElementById("artwork-editor-element-lightning");
+  const elementSpeechBubbleButton = document.getElementById("artwork-editor-element-speech-bubble");
+  const elementDividerLineButton = document.getElementById("artwork-editor-element-divider-line");
+  const elementTextBadgeButton = document.getElementById("artwork-editor-element-text-badge");
   const saveLocalButton = document.getElementById("artwork-editor-save-local");
   const loadLocalButton = document.getElementById("artwork-editor-load-local");
   const downloadJsonButton = document.getElementById("artwork-editor-download-json");
@@ -1434,6 +1456,211 @@
     updateEditorStatus("Espiral adicionada.", "success");
   }
 
+  function addObjectToCenter(object, statusMessage) {
+    if (!object) return;
+
+    if (!object.group) {
+      object.set({
+        left: artworkCanvas.getWidth() / 2,
+        top: artworkCanvas.getHeight() / 2,
+        originX: "center",
+        originY: "center",
+      });
+    }
+
+    artworkCanvas.add(object);
+    updateCanvasAndSelection(object);
+    arrangeGuideLayers();
+    pushHistorySnapshot("creative-element");
+    scheduleAutoSaveArtworkProject("creative-element");
+    updateEditorStatus(statusMessage || "Elemento adicionado.", "success");
+  }
+
+  function createHeartPath() {
+    return new window.fabric.Path("M 0 -28 C -22 -52 -58 -34 -58 -6 C -58 22 -30 38 0 60 C 30 38 58 22 58 -6 C 58 -34 22 -52 0 -28 Z", {
+      fill: "#ef4444",
+      stroke: "#991b1b",
+      strokeWidth: 3,
+      cornerStyle: "circle",
+      transparentCorners: false,
+    });
+  }
+
+  function createSpeechBubblePath() {
+    return new window.fabric.Path("M -110 -70 H 90 A 24 24 0 0 1 114 -46 V 34 A 24 24 0 0 1 90 58 H -18 L -58 94 L -52 58 H -110 A 24 24 0 0 1 -134 34 V -46 A 24 24 0 0 1 -110 -70 Z", {
+      fill: "#ffffff",
+      stroke: "#111827",
+      strokeWidth: 4,
+      cornerStyle: "circle",
+      transparentCorners: false,
+    });
+  }
+
+  function addCreativeElement(elementKey) {
+    const key = ARTWORK_EDITOR_ELEMENTS[elementKey] ? elementKey : null;
+
+    if (!key) {
+      updateEditorStatus("Elemento não encontrado.", "warning");
+      return;
+    }
+
+    const label = ARTWORK_EDITOR_ELEMENTS[key].label;
+    let elementObject = null;
+
+    if (key === "decorativeStripe") {
+      elementObject = new window.fabric.Rect({
+        width: 600,
+        height: 80,
+        rx: 12,
+        ry: 12,
+        fill: "#facc15",
+        stroke: "#a16207",
+        strokeWidth: 2,
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "simpleFrame") {
+      elementObject = new window.fabric.Rect({
+        width: 700,
+        height: 420,
+        fill: "transparent",
+        stroke: "#111827",
+        strokeWidth: 8,
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "roundedFrame") {
+      elementObject = new window.fabric.Rect({
+        width: 700,
+        height: 420,
+        rx: 28,
+        ry: 28,
+        fill: "transparent",
+        stroke: "#111827",
+        strokeWidth: 8,
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "circleBadge") {
+      elementObject = new window.fabric.Group([
+        new window.fabric.Circle({
+          radius: 90,
+          fill: "#f97316",
+          stroke: "#111827",
+          strokeWidth: 4,
+          originX: "center",
+          originY: "center",
+        }),
+        new window.fabric.IText("NOVO", {
+          textAlign: "center",
+          fontFamily: "Arial",
+          fontSize: 44,
+          fontWeight: "900",
+          fill: "#111827",
+          originX: "center",
+          originY: "center",
+        }),
+      ], {
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "promoBadge") {
+      elementObject = new window.fabric.Group([
+        new window.fabric.Polygon(createStarPoints(100, 56, 8), {
+          fill: "#f43f5e",
+          stroke: "#881337",
+          strokeWidth: 3,
+          originX: "center",
+          originY: "center",
+        }),
+        new window.fabric.IText("PROMO", {
+          textAlign: "center",
+          fontFamily: "Arial",
+          fontSize: 34,
+          fontWeight: "900",
+          fill: "#ffffff",
+          originX: "center",
+          originY: "center",
+        }),
+      ], {
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "heart") {
+      elementObject = createHeartPath();
+    } else if (key === "lightning") {
+      elementObject = new window.fabric.Polygon([
+        { x: -35, y: -84 },
+        { x: 18, y: -84 },
+        { x: -6, y: -20 },
+        { x: 46, y: -20 },
+        { x: -30, y: 86 },
+        { x: -4, y: 10 },
+        { x: -52, y: 10 },
+      ], {
+        fill: "#facc15",
+        stroke: "#a16207",
+        strokeWidth: 3,
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "speechBubble") {
+      elementObject = new window.fabric.Group([
+        createSpeechBubblePath(),
+        new window.fabric.IText("Sua frase", {
+          left: -10,
+          top: -6,
+          textAlign: "center",
+          fontFamily: "Arial",
+          fontSize: 30,
+          fontWeight: "700",
+          fill: "#111827",
+          originX: "center",
+          originY: "center",
+        }),
+      ], {
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "dividerLine") {
+      elementObject = new window.fabric.Line([-330, 0, 330, 0], {
+        stroke: "#111827",
+        strokeWidth: 6,
+        strokeLineCap: "round",
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    } else if (key === "textBadge") {
+      elementObject = new window.fabric.Group([
+        new window.fabric.Rect({
+          width: 300,
+          height: 96,
+          rx: 18,
+          ry: 18,
+          fill: "#2563eb",
+          stroke: "#1e3a8a",
+          strokeWidth: 3,
+          originX: "center",
+          originY: "center",
+        }),
+        new window.fabric.IText("Seu texto", {
+          textAlign: "center",
+          fontFamily: "Arial",
+          fontSize: 34,
+          fontWeight: "800",
+          fill: "#ffffff",
+          originX: "center",
+          originY: "center",
+        }),
+      ], {
+        cornerStyle: "circle",
+        transparentCorners: false,
+      });
+    }
+
+    addObjectToCenter(elementObject, `${label} adicionado.`);
+  }
+
   function triggerEditorClickTarget(targetId) {
     if (!targetId) return false;
     const target = document.getElementById(targetId);
@@ -2298,6 +2525,16 @@
   removeSelectedButton?.addEventListener("click", removeSelectedObject);
   clearButton?.addEventListener("click", clearArtworkCanvas);
   applyButton?.addEventListener("click", applyArtworkToViewer);
+  elementDecorativeStripeButton?.addEventListener("click", () => addCreativeElement("decorativeStripe"));
+  elementSimpleFrameButton?.addEventListener("click", () => addCreativeElement("simpleFrame"));
+  elementRoundedFrameButton?.addEventListener("click", () => addCreativeElement("roundedFrame"));
+  elementCircleBadgeButton?.addEventListener("click", () => addCreativeElement("circleBadge"));
+  elementPromoBadgeButton?.addEventListener("click", () => addCreativeElement("promoBadge"));
+  elementHeartButton?.addEventListener("click", () => addCreativeElement("heart"));
+  elementLightningButton?.addEventListener("click", () => addCreativeElement("lightning"));
+  elementSpeechBubbleButton?.addEventListener("click", () => addCreativeElement("speechBubble"));
+  elementDividerLineButton?.addEventListener("click", () => addCreativeElement("dividerLine"));
+  elementTextBadgeButton?.addEventListener("click", () => addCreativeElement("textBadge"));
   saveLocalButton?.addEventListener("click", saveProjectToLocalStorage);
   loadLocalButton?.addEventListener("click", loadProjectFromLocalStorage);
   downloadJsonButton?.addEventListener("click", downloadProjectJson);
@@ -2333,6 +2570,7 @@
     bringSelectedForward,
     sendSelectedBackward,
     removeSelectedObject,
+    addCreativeElement,
     clearArtworkCanvas,
     saveProjectToLocalStorage,
     loadProjectFromLocalStorage,

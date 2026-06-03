@@ -172,18 +172,77 @@
           <span id="artwork-editor-selection-status">Nenhum objeto selecionado</span>
     </section>
 
-    <section class="visual-3d-editor-canvas-area">
-      <div class="visual-3d-editor-canvas-scroll" id="artwork-editor-scroll-area">
-        <div class="visual-3d-editor-canvas-stage" id="artwork-editor-canvas-stage">
-          <div class="visual-3d-editor-canvas-spacer" id="artwork-editor-canvas-spacer">
-            <div class="visual-3d-editor-canvas-scale" id="artwork-editor-canvas-scale">
-              <div class="visual-3d-editor-canvas-wrap">
-                <canvas id="artwork-editor-canvas" width="1200" height="800"></canvas>
+    <section class="visual-3d-editor-main-area">
+      <aside class="visual-3d-editor-tool-palette" aria-label="Ferramentas">
+        <button type="button" class="visual-3d-tool-button is-active" id="artwork-tool-select" title="Selecionar" aria-label="Selecionar" data-tool="select">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 3v17l4-5 4 6 3-2-4-6 7-1z"/></svg>
+          <span class="visual-3d-sr-only">Selecionar</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" title="Adicionar imagem" aria-label="Adicionar imagem" data-tool="image" data-editor-click="artwork-editor-add-image">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.3"/><path d="M21 16l-5.5-5.5L7 19"/></svg>
+          <span class="visual-3d-sr-only">Adicionar imagem</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" title="Adicionar texto" aria-label="Adicionar texto" data-tool="text" data-editor-click="artwork-editor-add-text">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M12 6v12"/><path d="M8 18h8"/></svg>
+          <span class="visual-3d-sr-only">Adicionar texto</span>
+        </button>
+
+        <div class="visual-3d-tool-separator" aria-hidden="true"></div>
+
+        <button type="button" class="visual-3d-tool-button" id="artwork-tool-rect" title="Retângulo" aria-label="Retângulo" data-tool="rect">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
+          <span class="visual-3d-sr-only">Retângulo</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" id="artwork-tool-circle" title="Círculo" aria-label="Círculo" data-tool="circle">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/></svg>
+          <span class="visual-3d-sr-only">Círculo</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" id="artwork-tool-star" title="Estrela" aria-label="Estrela" data-tool="star">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 4 2.4 5 5.6.6-4.1 3.8 1.2 5.6L12 16.1 7 19l1.2-5.6L4.1 9.6 9.6 9z"/></svg>
+          <span class="visual-3d-sr-only">Estrela</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" id="artwork-tool-spiral" title="Espiral" aria-label="Espiral" data-tool="spiral">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 12c0-2.5 2-4.5 4.5-4.5S21 9.5 21 12s-2 4.5-4.5 4.5S12 14.5 12 12Z"/><path d="M12 12c0 4-3.2 7.2-7.2 7.2S-2.4 16 1.6 12 8.2 4.8 12 4.8"/></svg>
+          <span class="visual-3d-sr-only">Espiral</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" id="artwork-tool-color-picker" title="Conta-gotas" aria-label="Conta-gotas" data-tool="color-picker">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m14 4 6 6"/><path d="m9 9 6 6"/><path d="m6 18 3-3"/><path d="m4 20 2-2"/><path d="m10 8 6-6 4 4-6 6"/></svg>
+          <span class="visual-3d-sr-only">Conta-gotas</span>
+        </button>
+
+        <div class="visual-3d-tool-separator" aria-hidden="true"></div>
+
+        <button type="button" class="visual-3d-tool-button" title="Alternar grade" aria-label="Alternar grade" data-tool="grid" data-editor-click="artwork-editor-toggle-grid">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M10 4v16"/><path d="M16 4v16"/><path d="M4 10h16"/><path d="M4 16h16"/></svg>
+          <span class="visual-3d-sr-only">Grade</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" title="Ajustar zoom" aria-label="Ajustar zoom" data-tool="zoom-fit" data-editor-click="artwork-editor-zoom-fit">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+          <span class="visual-3d-sr-only">Zoom fit</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" title="Copiar" aria-label="Copiar" data-tool="copy" data-editor-click="artwork-editor-copy">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><rect x="4" y="4" width="11" height="11" rx="2"/></svg>
+          <span class="visual-3d-sr-only">Copiar</span>
+        </button>
+        <button type="button" class="visual-3d-tool-button" title="Remover" aria-label="Remover" data-tool="remove" data-editor-click="artwork-editor-remove-selected">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V4h6v3"/><path d="M8 7v13"/><path d="M16 7v13"/><path d="M6 20h12"/></svg>
+          <span class="visual-3d-sr-only">Remover</span>
+        </button>
+      </aside>
+
+      <section class="visual-3d-editor-canvas-area">
+        <div class="visual-3d-editor-canvas-scroll" id="artwork-editor-scroll-area">
+          <div class="visual-3d-editor-canvas-stage" id="artwork-editor-canvas-stage">
+            <div class="visual-3d-editor-canvas-spacer" id="artwork-editor-canvas-spacer">
+              <div class="visual-3d-editor-canvas-scale" id="artwork-editor-canvas-scale">
+                <div class="visual-3d-editor-canvas-wrap">
+                  <canvas id="artwork-editor-canvas" width="1200" height="800"></canvas>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </section>
   </main>
 

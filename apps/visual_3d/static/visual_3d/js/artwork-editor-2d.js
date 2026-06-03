@@ -1,5 +1,8 @@
 (() => {
   const ARTWORK_EDITOR_STORAGE_KEY = "caneca-garagem-artwork-editor-project-v1";
+  const PENDING_ARTWORK_DATA_URL_KEY = "caneca-garagem-pending-artwork-data-url";
+  const PENDING_ARTWORK_PROJECT_KEY = "caneca-garagem-pending-artwork-project-v1";
+  const PENDING_PRODUCT_KEY = "caneca-garagem-pending-product-key";
   const ARTWORK_EDITOR_FILE_VERSION = 1;
   const ARTWORK_EDITOR_HISTORY_LIMIT = 50;
   const EDITOR_ZOOM_MIN = 0.15;
@@ -155,6 +158,8 @@
   const lockObjectButton = document.getElementById("artwork-editor-lock-object");
   const selectionStatusElement = document.getElementById("artwork-editor-selection-status");
   const propertiesPanel = document.querySelector(".visual-3d-editor-properties");
+  const editorToolButtons = Array.from(document.querySelectorAll(".visual-3d-tool-button"));
+  let activeEditorTool = "select";
 
   if (!editorCanvasElement) {
     return;
@@ -173,6 +178,32 @@
 
   function updateEditorStatus(message, state = "info") {
     setEditorStatus(message, state === "idle" ? "info" : state);
+  }
+
+  function getEditorToolLabel(toolName) {
+    const labels = {
+      select: "Selecionar",
+      image: "Adicionar imagem",
+      text: "Adicionar texto",
+      rect: "Retângulo",
+      circle: "Círculo",
+      star: "Estrela",
+      spiral: "Espiral",
+      "color-picker": "Conta-gotas",
+      grid: "Grade",
+      "zoom-fit": "Zoom fit",
+      copy: "Copiar",
+      remove: "Remover",
+    };
+    return labels[toolName] || "Selecionar";
+  }
+
+  function setActiveEditorTool(toolName) {
+    activeEditorTool = toolName || "select";
+    editorToolButtons.forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.tool === activeEditorTool);
+    });
+    setEditorStatus(`Ferramenta: ${getEditorToolLabel(activeEditorTool)}`, "info");
   }
 
   if (!window.fabric) {
@@ -198,6 +229,7 @@
   let undoStack = [];
   let redoStack = [];
   let isRestoringHistory = false;
+  let isPushingHistory = false;
   let editorZoom = 1;
   let resizeZoomTimer = null;
 
@@ -343,42 +375,61 @@
   }
 
   function serializeCanvasForHistory() {
-    return JSON.stringify(exportArtworkProjectJson());
+    return {
+      version: ARTWORK_EDITOR_FILE_VERSION,
+      productKey: currentProductGuideKey || "mug",
+      width: artworkCanvas.getWidth(),
+      height: artworkCanvas.getHeight(),
+      guidesVisible,
+      gridVisible,
+      snapEnabled,
+      fabric: exportFabricJsonWithoutGuides(),
+    };
   }
 
-  function pushHistorySnapshot() {
-    if (isRestoringHistory) {
+  function stringifyHistorySnapshot(snapshot) {
+    return JSON.stringify(snapshot);
+  }
+
+  function pushHistorySnapshot(reason = "") {
+    if (isRestoringHistory || isPushingHistory) {
       return;
     }
 
-    const snapshot = serializeCanvasForHistory();
-    const previousSnapshot = undoStack[undoStack.length - 1];
+    isPushingHistory = true;
 
-    if (snapshot === previousSnapshot) {
+    try {
+      const snapshot = serializeCanvasForHistory();
+      const previousSnapshot = undoStack[undoStack.length - 1];
+
+      if (previousSnapshot && stringifyHistorySnapshot(snapshot) === stringifyHistorySnapshot(previousSnapshot)) {
+        updateHistoryButtons();
+        return;
+      }
+
+      undoStack.push(snapshot);
+
+      if (undoStack.length > ARTWORK_EDITOR_HISTORY_LIMIT) {
+        undoStack.shift();
+      }
+
+      redoStack = [];
       updateHistoryButtons();
-      return;
+    } finally {
+      isPushingHistory = false;
     }
-
-    undoStack.push(snapshot);
-
-    if (undoStack.length > ARTWORK_EDITOR_HISTORY_LIMIT) {
-      undoStack.shift();
-    }
-
-    redoStack = [];
-    updateHistoryButtons();
   }
 
   function resetHistoryWithCurrentState() {
     undoStack = [];
     redoStack = [];
-    pushHistorySnapshot();
+    pushHistorySnapshot("reset");
   }
 
   function restoreHistorySnapshot(snapshot) {
     isRestoringHistory = true;
     const restored = importArtworkProjectJson(snapshot, {
-      resetHistory: false,
+      preserveHistory: true,
       onComplete: () => {
         isRestoringHistory = false;
         updateHistoryButtons();
@@ -726,12 +777,14 @@
     gridVisible = !gridVisible;
     updateGridButtonLabel();
     drawGridObjects();
+    pushHistorySnapshot("toggle-grid");
     updateEditorStatus(gridVisible ? "Grade ativada." : "Grade ocultada.", gridVisible ? "success" : "idle");
   }
 
   function toggleSnap() {
     snapEnabled = !snapEnabled;
     updateSnapButtonLabel();
+    pushHistorySnapshot("toggle-snap");
     updateEditorStatus(snapEnabled ? "Snap ativado." : "Snap desativado.", snapEnabled ? "success" : "idle");
   }
 
@@ -1091,6 +1144,157 @@
     updateEditorStatus("Texto adicionado à prancheta", "success");
   }
 
+  function addRectangleObject() {
+    const object = new window.fabric.Rect({
+      left: artworkCanvas.getWidth() / 2,
+      top: artworkCanvas.getHeight() / 2,
+      originX: "center",
+      originY: "center",
+      width: 240,
+      height: 140,
+      fill: "rgba(249, 115, 22, 0.9)",
+      stroke: "#9a3412",
+      strokeWidth: 2,
+      rx: 14,
+      ry: 14,
+      cornerStyle: "circle",
+      transparentCorners: false,
+    });
+    artworkCanvas.add(object);
+    updateCanvasAndSelection(object);
+    arrangeGuideLayers();
+    pushHistorySnapshot();
+    updateEditorStatus("Retângulo adicionado.", "success");
+  }
+
+  function addCircleObject() {
+    const object = new window.fabric.Circle({
+      left: artworkCanvas.getWidth() / 2,
+      top: artworkCanvas.getHeight() / 2,
+      originX: "center",
+      originY: "center",
+      radius: 80,
+      fill: "rgba(236, 72, 153, 0.9)",
+      stroke: "#9d174d",
+      strokeWidth: 2,
+      cornerStyle: "circle",
+      transparentCorners: false,
+    });
+    artworkCanvas.add(object);
+    updateCanvasAndSelection(object);
+    arrangeGuideLayers();
+    pushHistorySnapshot();
+    updateEditorStatus("Círculo adicionado.", "success");
+  }
+
+  function createStarPoints(outerRadius = 90, innerRadius = 42, points = 5) {
+    const starPoints = [];
+    const step = Math.PI / points;
+    for (let i = 0; i < points * 2; i += 1) {
+      const radius = i % 2 === 0 ? outerRadius : innerRadius;
+      const angle = (i * step) - Math.PI / 2;
+      starPoints.push({
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+      });
+    }
+    return starPoints;
+  }
+
+  function addStarObject() {
+    const object = new window.fabric.Polygon(createStarPoints(), {
+      left: artworkCanvas.getWidth() / 2,
+      top: artworkCanvas.getHeight() / 2,
+      originX: "center",
+      originY: "center",
+      fill: "rgba(250, 204, 21, 0.95)",
+      stroke: "#a16207",
+      strokeWidth: 2,
+      cornerStyle: "circle",
+      transparentCorners: false,
+    });
+    artworkCanvas.add(object);
+    updateCanvasAndSelection(object);
+    arrangeGuideLayers();
+    pushHistorySnapshot();
+    updateEditorStatus("Estrela adicionada.", "success");
+  }
+
+  function addSpiralObject() {
+    const object = new window.fabric.Path("M 0 0 C 20 -18 54 -12 50 18 C 45 54 -8 62 -34 28 C -60 -8 -24 -58 38 -54", {
+      left: artworkCanvas.getWidth() / 2,
+      top: artworkCanvas.getHeight() / 2,
+      originX: "center",
+      originY: "center",
+      fill: "transparent",
+      stroke: "#0f766e",
+      strokeWidth: 6,
+      strokeLineCap: "round",
+      strokeLineJoin: "round",
+      scaleX: 1.4,
+      scaleY: 1.4,
+      cornerStyle: "circle",
+      transparentCorners: false,
+    });
+    artworkCanvas.add(object);
+    updateCanvasAndSelection(object);
+    arrangeGuideLayers();
+    pushHistorySnapshot();
+    updateEditorStatus("Espiral adicionada.", "success");
+  }
+
+  function triggerEditorClickTarget(targetId) {
+    if (!targetId) return false;
+    const target = document.getElementById(targetId);
+    if (!target) return false;
+    target.click();
+    return true;
+  }
+
+  function handleToolButtonAction(button) {
+    const tool = button.dataset.tool || "select";
+    const targetId = button.dataset.editorClick;
+
+    setActiveEditorTool(tool);
+
+    if (tool === "rect") {
+      addRectangleObject();
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "circle") {
+      addCircleObject();
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "star") {
+      addStarObject();
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "spiral") {
+      addSpiralObject();
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "color-picker") {
+      updateEditorStatus("Conta-gotas disponível em breve.", "info");
+      setActiveEditorTool("select");
+      return;
+    }
+    if (tool === "select") {
+      return;
+    }
+
+    if (targetId) {
+      triggerEditorClickTarget(targetId);
+    }
+
+    if (!["grid", "zoom-fit", "copy", "remove"].includes(tool)) {
+      setActiveEditorTool("select");
+    }
+  }
+
   function copySelectedObject() {
     const activeObject = getActiveUserObject();
 
@@ -1411,9 +1615,14 @@
     }
 
     const dataUrl = exportArtworkPngDataUrl();
-    sessionStorage.setItem("caneca-garagem-pending-artwork-data-url", dataUrl);
-    sessionStorage.setItem("caneca-garagem-pending-product-key", currentProductGuideKey || "mug");
-    updateEditorStatus("Composição enviada para o visualizador 3D", "success");
+    const project = exportArtworkProjectJson();
+    const productKey = currentProductGuideKey || "mug";
+
+    localStorage.setItem(ARTWORK_EDITOR_STORAGE_KEY, JSON.stringify(project));
+    sessionStorage.setItem(PENDING_ARTWORK_DATA_URL_KEY, dataUrl);
+    sessionStorage.setItem(PENDING_ARTWORK_PROJECT_KEY, JSON.stringify(project));
+    sessionStorage.setItem(PENDING_PRODUCT_KEY, productKey);
+    updateEditorStatus("Arte enviada para visualização 3D.", "success");
     window.location.href = "/visual-3d/demo/";
   }
 
@@ -1428,6 +1637,8 @@
       width: artworkCanvas.getWidth(),
       height: artworkCanvas.getHeight(),
       guidesVisible,
+      gridVisible,
+      snapEnabled,
       fabric: exportFabricJsonWithoutGuides(),
     };
   }
@@ -1458,7 +1669,9 @@
   }
 
   function importArtworkProjectJson(json, options = {}) {
-    const { resetHistory = true, onComplete = null } = options;
+    const preserveHistory = options.preserveHistory === true;
+    const resetHistory = options.resetHistory ?? !preserveHistory;
+    const onComplete = options.onComplete ?? null;
 
     try {
       const project = typeof json === "string" ? JSON.parse(json) : json;
@@ -1480,6 +1693,17 @@
       const previousHistoryRestoreState = isRestoringHistory;
       isRestoringHistory = true;
       guidesVisible = project.guidesVisible !== false;
+
+      if (typeof project.gridVisible === "boolean") {
+        gridVisible = project.gridVisible;
+      }
+
+      if (typeof project.snapEnabled === "boolean") {
+        snapEnabled = project.snapEnabled;
+      }
+
+      updateGridButtonLabel();
+      updateSnapButtonLabel();
       artworkCanvas.discardActiveObject();
       getUserObjects().forEach((object) => artworkCanvas.remove(object));
       clearGuideObjects();
@@ -1502,6 +1726,7 @@
           resetHistoryWithCurrentState();
         } else {
           isRestoringHistory = previousHistoryRestoreState;
+          updateHistoryButtons();
         }
 
         if (typeof onComplete === "function") {
@@ -1513,6 +1738,8 @@
       return true;
     } catch (error) {
       console.error("[artwork-editor-2d] import failed", error);
+      isRestoringHistory = false;
+      updateHistoryButtons();
       setEditorStatus("Não foi possível importar o projeto.", "error");
 
       if (typeof onComplete === "function") {
@@ -1546,6 +1773,25 @@
     } catch (error) {
       console.error("[artwork-editor-2d] load local failed", error);
       setEditorStatus("Projeto salvo inválido.", "error");
+    }
+  }
+
+  function loadInitialEditorProjectIfAvailable() {
+    const sessionProject = sessionStorage.getItem(PENDING_ARTWORK_PROJECT_KEY);
+    const localProject = localStorage.getItem(ARTWORK_EDITOR_STORAGE_KEY);
+    const raw = sessionProject || localProject;
+
+    if (!raw) {
+      return false;
+    }
+
+    try {
+      importArtworkProjectJson(JSON.parse(raw), { preserveHistory: false });
+      setEditorStatus("Projeto restaurado.", "success");
+      return true;
+    } catch (error) {
+      console.warn("[artwork-editor-2d] não foi possível restaurar projeto", error);
+      return false;
     }
   }
 
@@ -1743,8 +1989,12 @@
 
   document.querySelectorAll("[data-editor-click]").forEach((item) => {
     item.addEventListener("click", () => {
-      document.getElementById(item.dataset.editorClick)?.click();
+      triggerEditorClickTarget(item.dataset.editorClick);
     });
+  });
+
+  editorToolButtons.forEach((button) => {
+    button.addEventListener("click", () => handleToolButtonAction(button));
   });
 
   document.querySelectorAll(".visual-3d-menu-dropdown button, .visual-3d-menu-dropdown a").forEach((item) => {
@@ -1862,10 +2112,15 @@
 
   updateGridButtonLabel();
   updateSnapButtonLabel();
+  setActiveEditorTool("select");
   setArtworkEditorProduct("mug");
   setGuideVisibility(true);
   updateObjectPropertiesPanel();
+  const restoredInitialProject = loadInitialEditorProjectIfAvailable();
   requestAnimationFrame(fitEditorZoomToScreen);
-  resetHistoryWithCurrentState();
-  updateEditorStatus("Editor 2D pronto", "idle");
+
+  if (!restoredInitialProject) {
+    resetHistoryWithCurrentState();
+    updateEditorStatus("Editor 2D pronto", "idle");
+  }
 })();

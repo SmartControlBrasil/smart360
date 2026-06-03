@@ -1341,7 +1341,71 @@ body.visual-3d-editor-body {
   font-weight: 800;
 }
 
+.visual-3d-editor-main-area {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.visual-3d-editor-tool-palette {
+  width: 44px;
+  min-width: 44px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f8fafc;
+  border-right: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.visual-3d-tool-button {
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.visual-3d-tool-button:hover {
+  background: #e5e7eb;
+}
+
+.visual-3d-tool-button.is-active {
+  background: #e5e7eb;
+  box-shadow: inset 0 0 0 1px #94a3b8;
+}
+
+.visual-3d-tool-button svg {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.visual-3d-tool-separator {
+  width: 24px;
+  height: 1px;
+  background: #cbd5e1;
+  margin: 4px 0;
+}
+
 .visual-3d-editor-canvas-area {
+  min-width: 0;
   min-height: 0;
   width: 100%;
   overflow: hidden;
@@ -1423,6 +1487,27 @@ body.visual-3d-editor-body {
 }
 
 @media (max-width: 760px) {
+  .visual-3d-editor-main-area {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .visual-3d-editor-tool-palette {
+    width: 40px;
+    min-width: 40px;
+    padding: 6px 3px;
+  }
+
+  .visual-3d-tool-button {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+
+  .visual-3d-tool-button svg {
+    width: 17px;
+    height: 17px;
+  }
+
   .visual-3d-editor-canvas-scroll {
     padding: 12px;
   }

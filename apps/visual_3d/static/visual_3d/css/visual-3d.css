@@ -1213,6 +1213,11 @@ body.visual-3d-editor-body {
   max-width: 150px;
 }
 
+.visual-3d-editor-font-select {
+  min-width: 120px;
+  max-width: 150px;
+}
+
 .visual-3d-toolbar-label {
   color: rgba(255, 255, 255, 0.72);
   font-size: 10px;
@@ -1271,6 +1276,12 @@ body.visual-3d-editor-body {
 .visual-3d-editor-back-link:hover {
   color: #fff;
   text-decoration: underline;
+}
+
+.visual-3d-icon-button.is-active,
+.visual-3d-menu-dropdown button.is-active {
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
 .visual-3d-editor-contextbar .visual-3d-editor-status {

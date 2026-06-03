@@ -100,6 +100,13 @@
             <label class="visual-3d-menu-field">Tamanho <input id="artwork-editor-font-size" type="number" min="8" max="300" value="72"></label>
             <label class="visual-3d-menu-field">Cor <input id="artwork-editor-text-color" type="color" value="#111111"></label>
             <div class="visual-3d-menu-separator"></div>
+            <button type="button" id="artwork-editor-text-bold">Negrito</button>
+            <button type="button" id="artwork-editor-text-italic">Itálico</button>
+            <button type="button" id="artwork-editor-text-align-left">Alinhar texto à esquerda</button>
+            <button type="button" id="artwork-editor-text-align-center">Centralizar texto</button>
+            <button type="button" id="artwork-editor-text-align-right">Alinhar texto à direita</button>
+            <button type="button" id="artwork-editor-text-uppercase">Caixa alta</button>
+            <div class="visual-3d-menu-separator"></div>
             <button type="button" id="artwork-editor-add-text">Adicionar texto</button>
             <button type="button" id="artwork-editor-apply-template">Aplicar template selecionado</button>
           </div>
@@ -145,6 +152,13 @@
           <span class="visual-3d-toolbar-label">Template</span>
           <select id="artwork-editor-template-select">
             <option value="">Template...</option>
+          </select>
+        </div>
+
+        <div class="visual-3d-editor-toolbar-group">
+          <span class="visual-3d-toolbar-label">Fonte</span>
+          <select id="artwork-editor-font-family" class="visual-3d-editor-font-select">
+            <option value="Arial">Arial</option>
           </select>
         </div>
 

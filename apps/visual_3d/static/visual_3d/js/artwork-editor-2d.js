@@ -21,6 +21,17 @@
     dividerLine: { label: "Linha divisória" },
     textBadge: { label: "Badge com texto" },
   };
+  const ARTWORK_EDITOR_FONT_FAMILIES = [
+    "Arial",
+    "Helvetica",
+    "Georgia",
+    "Times New Roman",
+    "Courier New",
+    "Impact",
+    "Verdana",
+    "Trebuchet MS",
+    "Comic Sans MS",
+  ];
   const ARTWORK_EDITOR_COLOR_PALETTE = [
     "#000000", "#1f2937", "#374151", "#4b5563", "#6b7280", "#9ca3af", "#d1d5db", "#ffffff",
     "#7f1d1d", "#dc2626", "#f97316", "#facc15", "#84cc16", "#22c55e", "#14b8a6", "#06b6d4",
@@ -131,6 +142,7 @@
   const textInput = document.getElementById("artwork-editor-text-input");
   const fontSizeInput = document.getElementById("artwork-editor-font-size");
   const textColorInput = document.getElementById("artwork-editor-text-color");
+  const fontFamilySelect = document.getElementById("artwork-editor-font-family");
   const currentProductLabel = document.getElementById("artwork-editor-current-product");
   const productSelector = document.getElementById("artwork-editor-product-selector");
   const templateSelect = document.getElementById("artwork-editor-template-select");
@@ -165,6 +177,12 @@
   const removeSelectedButton = document.getElementById("artwork-editor-remove-selected");
   const clearButton = document.getElementById("artwork-editor-clear");
   const applyButton = document.getElementById("artwork-editor-apply");
+  const textBoldButton = document.getElementById("artwork-editor-text-bold");
+  const textItalicButton = document.getElementById("artwork-editor-text-italic");
+  const textAlignLeftButton = document.getElementById("artwork-editor-text-align-left");
+  const textAlignCenterButton = document.getElementById("artwork-editor-text-align-center");
+  const textAlignRightButton = document.getElementById("artwork-editor-text-align-right");
+  const textUppercaseButton = document.getElementById("artwork-editor-text-uppercase");
   const elementDecorativeStripeButton = document.getElementById("artwork-editor-element-decorative-stripe");
   const elementSimpleFrameButton = document.getElementById("artwork-editor-element-simple-frame");
   const elementRoundedFrameButton = document.getElementById("artwork-editor-element-rounded-frame");
@@ -269,6 +287,7 @@
   let autoSaveEnabled = false;
   let editorZoom = 1;
   let resizeZoomTimer = null;
+  let defaultTextFontFamily = "Arial";
 
   function clampCanvasSize(value, fallback) {
     const numberValue = Number(value);
@@ -288,6 +307,25 @@
     }
 
     return Math.min(Math.max(Math.round(numberValue), 8), 300);
+  }
+
+  function populateFontFamilySelect() {
+    if (!fontFamilySelect) {
+      return;
+    }
+
+    fontFamilySelect.innerHTML = "";
+    ARTWORK_EDITOR_FONT_FAMILIES.forEach((fontFamily) => {
+      const option = document.createElement("option");
+      option.value = fontFamily;
+      option.textContent = fontFamily;
+      fontFamilySelect.appendChild(option);
+    });
+
+    if (!ARTWORK_EDITOR_FONT_FAMILIES.includes(defaultTextFontFamily)) {
+      defaultTextFontFamily = "Arial";
+    }
+    fontFamilySelect.value = defaultTextFontFamily;
   }
 
   function clampEditorZoom(value) {
@@ -399,6 +437,126 @@
     }
 
     return activeObject;
+  }
+
+  function isTextObject(object) {
+    return Boolean(object && (object.type === "i-text" || object.type === "textbox" || object.type === "text"));
+  }
+
+  function getActiveTextObjects() {
+    const activeObject = getActiveUserObject();
+
+    if (!activeObject) {
+      return [];
+    }
+
+    if (activeObject.type === "activeSelection") {
+      return activeObject.getObjects().filter((item) => isTextObject(item) && !item.isGuide);
+    }
+
+    return isTextObject(activeObject) ? [activeObject] : [];
+  }
+
+  function updateTextControlsFromSelection() {
+    const textObjects = getActiveTextObjects();
+    const first = textObjects[0] || null;
+
+    if (textBoldButton) {
+      textBoldButton.classList.toggle("is-active", first?.fontWeight === "bold");
+    }
+    if (textItalicButton) {
+      textItalicButton.classList.toggle("is-active", first?.fontStyle === "italic");
+    }
+
+    [textAlignLeftButton, textAlignCenterButton, textAlignRightButton].forEach((button) => {
+      button?.classList.remove("is-active");
+    });
+    if (first?.textAlign === "left") textAlignLeftButton?.classList.add("is-active");
+    if (first?.textAlign === "center") textAlignCenterButton?.classList.add("is-active");
+    if (first?.textAlign === "right") textAlignRightButton?.classList.add("is-active");
+
+    if (first?.fontFamily) {
+      defaultTextFontFamily = first.fontFamily;
+    }
+    if (fontFamilySelect) {
+      fontFamilySelect.value = defaultTextFontFamily;
+    }
+    if (fontSizeInput && first?.fontSize) {
+      fontSizeInput.value = clampFontSize(first.fontSize);
+    }
+  }
+
+  function applyTextStyleToSelection(stylePatch) {
+    const textObjects = getActiveTextObjects();
+
+    if (!textObjects.length) {
+      if (stylePatch && stylePatch.fontFamily) {
+        defaultTextFontFamily = stylePatch.fontFamily;
+      }
+      if (stylePatch && stylePatch.fontSize && fontSizeInput) {
+        fontSizeInput.value = clampFontSize(stylePatch.fontSize);
+      }
+      updateEditorStatus("Selecione um texto para aplicar o estilo.", "warning");
+      updateTextControlsFromSelection();
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      Object.entries(stylePatch || {}).forEach(([key, value]) => {
+        object.set(key, value);
+      });
+      object.setCoords();
+    });
+
+    if (stylePatch && stylePatch.fontFamily) {
+      defaultTextFontFamily = stylePatch.fontFamily;
+    }
+    if (stylePatch && stylePatch.fontSize && fontSizeInput) {
+      fontSizeInput.value = clampFontSize(stylePatch.fontSize);
+    }
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-style");
+    scheduleAutoSaveArtworkProject("text-style");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+  }
+
+  function toggleTextBold() {
+    const textObjects = getActiveTextObjects();
+    const shouldBeBold = textObjects.length ? textObjects[0].fontWeight !== "bold" : true;
+    applyTextStyleToSelection({ fontWeight: shouldBeBold ? "bold" : "normal" });
+  }
+
+  function toggleTextItalic() {
+    const textObjects = getActiveTextObjects();
+    const shouldBeItalic = textObjects.length ? textObjects[0].fontStyle !== "italic" : true;
+    applyTextStyleToSelection({ fontStyle: shouldBeItalic ? "italic" : "normal" });
+  }
+
+  function setSelectedTextAlign(align) {
+    applyTextStyleToSelection({ textAlign: align });
+  }
+
+  function applyUppercaseToText() {
+    const textObjects = getActiveTextObjects();
+
+    if (!textObjects.length) {
+      updateEditorStatus("Selecione um texto para aplicar o estilo.", "warning");
+      return;
+    }
+
+    textObjects.forEach((object) => {
+      object.set("text", String(object.text || "").toUpperCase());
+      object.setCoords();
+    });
+
+    artworkCanvas.requestRenderAll();
+    pushHistorySnapshot("text-uppercase");
+    scheduleAutoSaveArtworkProject("text-uppercase");
+    updateObjectPropertiesPanel();
+    updateTextControlsFromSelection();
+    updateEditorStatus("Texto convertido para caixa alta.", "success");
   }
 
   function isImageObject(object) {
@@ -1340,7 +1498,7 @@
       originX: "center",
       originY: "center",
       fill,
-      fontFamily: "Arial",
+      fontFamily: defaultTextFontFamily,
       fontSize,
       fontWeight: "700",
       textAlign: "center",
@@ -1354,6 +1512,7 @@
     textObject.enterEditing();
     textObject.selectAll();
     pushHistorySnapshot();
+    updateTextControlsFromSelection();
     updateEditorStatus("Texto adicionado à prancheta", "success");
   }
 
@@ -2422,6 +2581,7 @@
   ].forEach((eventName) => {
     artworkCanvas.on(eventName, () => {
       updateObjectPropertiesPanel();
+      updateTextControlsFromSelection();
       updateColorStatusFromSelection();
     });
   });
@@ -2518,6 +2678,32 @@
   });
   toggleGuidesButton?.addEventListener("click", toggleGuides);
   addTextButton?.addEventListener("click", addTextObject);
+  textBoldButton?.addEventListener("click", toggleTextBold);
+  textItalicButton?.addEventListener("click", toggleTextItalic);
+  textAlignLeftButton?.addEventListener("click", () => setSelectedTextAlign("left"));
+  textAlignCenterButton?.addEventListener("click", () => setSelectedTextAlign("center"));
+  textAlignRightButton?.addEventListener("click", () => setSelectedTextAlign("right"));
+  textUppercaseButton?.addEventListener("click", applyUppercaseToText);
+  fontFamilySelect?.addEventListener("change", () => {
+    const selectedFont = fontFamilySelect.value || "Arial";
+    defaultTextFontFamily = selectedFont;
+    const textObjects = getActiveTextObjects();
+    if (textObjects.length) {
+      applyTextStyleToSelection({ fontFamily: selectedFont });
+      updateEditorStatus(`Fonte aplicada: ${selectedFont}`, "success");
+    } else {
+      updateEditorStatus(`Fonte padrão definida: ${selectedFont}`, "info");
+    }
+  });
+  fontSizeInput?.addEventListener("change", () => {
+    const nextSize = clampFontSize(fontSizeInput.value);
+    fontSizeInput.value = nextSize;
+    const textObjects = getActiveTextObjects();
+    if (textObjects.length) {
+      applyTextStyleToSelection({ fontSize: nextSize });
+      updateEditorStatus(`Tamanho aplicado: ${nextSize}px`, "success");
+    }
+  });
   duplicateButton?.addEventListener("click", duplicateSelectedObject);
   centerButton?.addEventListener("click", centerSelectedObject);
   bringForwardButton?.addEventListener("click", bringSelectedForward);
@@ -2584,10 +2770,12 @@
 
   updateGridButtonLabel();
   updateSnapButtonLabel();
+  populateFontFamilySelect();
   setActiveEditorTool("select");
   setArtworkEditorProduct("mug");
   setGuideVisibility(true);
   updateObjectPropertiesPanel();
+  updateTextControlsFromSelection();
   const restoredInitialProject = restoreInitialArtworkProject();
   requestAnimationFrame(fitEditorZoomToScreen);
 

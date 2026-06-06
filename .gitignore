@@ -73,3 +73,6 @@ open9/
 
 # Arquivos 3D pesados - manter fora do Git
 apps/visual_3d/static/visual_3d/models/*.glb
+
+# Modelos 3D pesados
+apps/visual_3d/static/visual_3d/models/*.glb

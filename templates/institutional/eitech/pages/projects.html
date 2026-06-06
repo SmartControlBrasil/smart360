@@ -1,8 +1,8 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Projetos de Automação Industrial | Smart Control Brasil{% endblock %}
-{% block meta_description %}Conheça projetos e frentes de entrega da Smart Control Brasil em automação industrial, CLPs, IHMs, inversores, servoacionamentos, retrofit, painéis, supervisório e confiabilidade operacional.{% endblock %}
+{% block title %}Projetos de Automação, Robótica, Softwares e Tecnologia | Smart Control Brasil{% endblock %}
+{% block meta_description %}Conheça frentes de entrega da Smart Control Brasil em automação, robótica, softwares, IoT, dados, produtos tecnológicos, integração e tecnologia embarcada.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -32,9 +32,9 @@
       <div class="row">
         <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Projetos e frentes de automação industrial</h1>
+            <h1>Projetos e aplicações em tecnologia</h1>
             <div class="space16"></div>
-            <p class="text-white-50 px-lg-5">Conheça algumas frentes de entrega da Smart Control Brasil. Cada projeto parte de um problema real da máquina ou processo e evolui com diagnóstico técnico, engenharia aplicada e implantação responsável.</p>
+            <p class="text-white-50 px-lg-5">Conheça frentes de entrega em automação, robótica, softwares, IoT, dados, produtos tecnológicos e integração. Cada projeto nasce de uma necessidade real e evolui para uma solução aplicável.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -54,18 +54,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case05.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Supervisão industrial e dados operacionais</p>
+              <p>Softwares, dashboards e dados operacionais</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Máquinas e processos operam sem histórico confiável, com dados espalhados, pouca visibilidade de alarmes e dificuldade para acompanhar produção, paradas e manutenção.</p>
+              <strong>Necessidade</strong>
+              <p>Empresas precisam acompanhar dados, chamados, ativos, indicadores, vendas, produção ou operação sem depender de planilhas soltas e controles manuais.</p>
               <strong>Solução</strong>
-              <p>Integração de dados industriais, supervisórios, registros técnicos, alarmes, tendências e indicadores para transformar sinais de campo em informação útil para operação e manutenção.</p>
+              <p>Desenvolvimento e integração de sistemas web, dashboards, sensores, registros técnicos, automações em Python, painéis de indicadores e fluxos digitais sob medida.</p>
               <strong>Resultado esperado</strong>
-              <p>Mais rastreabilidade, decisões técnicas mais rápidas, melhor acompanhamento de falhas e uma base organizada para evoluir com indicadores, manutenção preditiva e melhoria contínua.</p>
+              <p>Mais visibilidade, rastreabilidade e controle para gestão. A empresa passa a enxergar dados importantes em tempo real e tomar decisões com mais segurança.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
                 <a href="{% url 'institutional:supervisao_dados_industriais' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Diagnosticar sua operação <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Planejar software ou dashboard <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -77,40 +77,41 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case06.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Diagnóstico industrial e engenharia da solução</p>
+              <p>Engenharia da solução tecnológica</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Muitas empresas querem automatizar, mas ainda não possuem clareza sobre a causa das falhas, os riscos da máquina, os gargalos do processo ou a melhor tecnologia para aplicar.</p>
+              <strong>Necessidade</strong>
+              <p>Muitas empresas querem inovar, automatizar, robotizar ou digitalizar processos, mas ainda não sabem quais equipamentos, softwares ou tecnologias fazem sentido.</p>
               <strong>Solução</strong>
-              <p>Mapeamento técnico de máquinas, sinais, comandos, falhas, dados, painéis, acionamentos e oportunidades para definir o melhor caminho de automação, retrofit ou manutenção.</p>
+              <p>Mapeamento da aplicação, seleção de produtos, definição de arquitetura, análise de integração, escolha de robôs, sensores, controladores, softwares e recursos embarcados.</p>
               <strong>Resultado esperado</strong>
-              <p>Um plano técnico mais claro, com prioridades definidas, escopo controlado e investimento direcionado para onde a automação realmente gera resultado operacional.</p>
+              <p>Um caminho técnico e comercial mais claro, evitando compra errada, excesso de complexidade e investimento sem retorno prático.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
                 <a href="{% url 'institutional:diagnostico_industrial_engenharia_solucao' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Desenhar solução <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
         </div>
+
         <div class="col-lg-6 col-md-6">
           <div class="case-slider-boxarea">
             <div class="img1 image-anime">
               <img src="{% static 'institutional/eitech/img/all-images/case/case07.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Automação industrial, CLPs e IHMs</p>
+              <p>Automação, CLPs, IHMs e equipamentos</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Máquinas com etapas manuais, lógica antiga, falhas recorrentes, baixa rastreabilidade e pouca integração dificultam produtividade, segurança e confiabilidade dos dados.</p>
+              <strong>Necessidade</strong>
+              <p>Máquinas, processos e operações precisam de mais controle, repetibilidade, segurança, interface de operação e integração com sensores, atuadores e dados.</p>
               <strong>Solução</strong>
-              <p>Projetos, melhorias ou retrofit com foco em lógica de controle, CLPs, IHMs, sensores, atuadores, redes industriais, alarmes, receitas e coleta de dados operacionais.</p>
+              <p>Fornecimento e integração de CLPs, IHMs, inversores, servoacionamentos, sensores, painéis, redes industriais, alarmes, receitas e sistemas de supervisão.</p>
               <strong>Resultado esperado</strong>
-              <p>Mais repetibilidade, menos erro manual, melhor controle do processo e informações mais confiáveis para operação, manutenção e gestão técnica.</p>
+              <p>Mais produtividade, menor dependência de operação manual, melhor controle do processo e base técnica preparada para expansão, IoT e monitoramento.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
                 <a href="{% url 'institutional:automacao_industrial_clps_ihms' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico da planta <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar equipamentos <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -122,18 +123,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case10.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Manutenção, retrofit e confiabilidade</p>
+              <p>Robótica, produtos e inovação aplicada</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Máquinas com comandos obsoletos, manutenção reativa, falhas sem causa raiz e histórico técnico incompleto dificultam a redução de paradas e aumentam o custo operacional.</p>
+              <strong>Necessidade</strong>
+              <p>Escolas, empresas, eventos, hospitais, comércios e instituições buscam soluções tecnológicas que gerem experiência, aprendizado, automação e diferenciação.</p>
               <strong>Solução</strong>
-              <p>Modernização de comandos, painéis e acionamentos, estruturação de registros técnicos, análise de falhas, planos preventivos e indicadores de disponibilidade e desempenho.</p>
+              <p>Aplicações com robôs, kits, produtos Xyron Robotics, dispositivos inteligentes, demonstrações tecnológicas, robótica educacional, atendimento e soluções customizadas.</p>
               <strong>Resultado esperado</strong>
-              <p>Menos improviso, maior vida útil dos ativos, mais facilidade de manutenção e uma base técnica para evoluir disponibilidade, segurança e confiabilidade operacional.</p>
+              <p>Mais inovação percebida, novas experiências para clientes e alunos, fortalecimento da marca e abertura para projetos tecnológicos com maior valor agregado.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:manutencao_retrofit_confiabilidade' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Diagnosticar manutenção <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:robotica_celulas_automatizadas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Conhecer robôs e produtos <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

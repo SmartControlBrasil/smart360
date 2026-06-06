@@ -228,3 +228,18 @@
 .scb-vertical-cta-row {
   gap: 14px;
 }
+
+.scb-nav-parent {
+  color: #fff;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  font-family: inherit;
+  display: inline-block;
+  cursor: default;
+  text-decoration: none;
+}
+
+.scb-nav-dropdown:hover .scb-nav-parent {
+  color: #fff;
+}

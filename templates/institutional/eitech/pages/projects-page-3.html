@@ -1,8 +1,8 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Projetos de Automação Industrial — página 3 | Smart Control Brasil{% endblock %}
-{% block meta_description %}Projetos e frentes de entrega da Smart Control Brasil em gerenciamento de energia, painéis elétricos, baixa tensão, segurança de máquinas, dados industriais e continuidade operacional.{% endblock %}
+{% block title %}Projetos de IoT, Energia, Painéis e Tecnologia — página 3 | Smart Control Brasil{% endblock %}
+{% block meta_description %}Projetos e frentes da Smart Control Brasil em IoT, energia, painéis elétricos, integração de dados, produtos tecnológicos, infraestrutura e tecnologia embarcada.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -32,9 +32,9 @@
       <div class="row">
         <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Projetos e frentes de entrega</h1>
+            <h1>Projetos de infraestrutura, dados e tecnologia embarcada</h1>
             <div class="space16"></div>
-            <p class="text-white-50 px-lg-5">Soluções para melhorar energia, painéis elétricos, segurança de máquinas, supervisão industrial e continuidade operacional em ambientes produtivos.</p>
+            <p class="text-white-50 px-lg-5">Soluções para conectar energia, painéis, sensores, sistemas, IoT e dados em aplicações mais inteligentes, rastreáveis e preparadas para expansão.</p>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Projetos</span></a>
           </div>
@@ -54,18 +54,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case14.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Gerenciamento de energia e utilidades</p>
+              <p>Energia, medição e monitoramento inteligente</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Consumo de energia sem medição clara, falta de rateio por setor, ausência de histórico e baixa visibilidade sobre perdas dificultam ações reais de eficiência energética.</p>
+              <strong>Necessidade</strong>
+              <p>Empresas precisam entender consumo, energia, utilidades e comportamento operacional para reduzir desperdícios e tomar decisões com dados concretos.</p>
               <strong>Solução</strong>
-              <p>Aplicação de medidores, coleta de dados, indicadores de consumo, registros históricos e visualização de energia e utilidades para apoiar decisões técnicas e gerenciais.</p>
+              <p>Aplicação de medidores, sensores, coleta de dados, dashboards, históricos de consumo, indicadores e integração com sistemas de monitoramento.</p>
               <strong>Resultado esperado</strong>
-              <p>Mais clareza sobre consumo, melhor controle de custos, identificação de desperdícios e base técnica para projetos de eficiência energética e melhoria contínua.</p>
+              <p>Mais clareza sobre custos, consumo e oportunidades de economia, com base técnica para eficiência energética, automação e gestão inteligente.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
                 <a href="{% url 'institutional:gerenciamento_energia_utilidades' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Diagnosticar energia e utilidades <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Planejar monitoramento de energia <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -77,18 +77,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case15.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Painéis elétricos e baixa tensão</p>
+              <p>Painéis elétricos e infraestrutura de automação</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Painéis antigos, comandos desorganizados, componentes obsoletos e baixa documentação dificultam manutenção, aumentam riscos e tornam falhas elétricas mais difíceis de diagnosticar.</p>
+              <strong>Necessidade</strong>
+              <p>Equipamentos, sensores, CLPs, IHMs e acionamentos precisam de uma base elétrica organizada, segura e preparada para receber automação e tecnologia.</p>
               <strong>Solução</strong>
-              <p>Adequação, modernização e organização de painéis elétricos, comandos, dispositivos de proteção, contatores, disjuntores, partidas de motores e integração com automação.</p>
+              <p>Montagem, adequação e modernização de painéis elétricos, comandos, proteção, baixa tensão, distribuição, organização técnica e integração com automação.</p>
               <strong>Resultado esperado</strong>
-              <p>Mais segurança, melhor manutenção, menor tempo de diagnóstico, padronização técnica e maior confiabilidade para máquinas e processos industriais.</p>
+              <p>Infraestrutura mais confiável, melhor manutenibilidade, menor tempo de intervenção e base pronta para expansão tecnológica, IoT e controle.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
                 <a href="{% url 'institutional:paineis_eletricos_baixa_tensao' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Avaliar painel elétrico <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Avaliar infraestrutura elétrica <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -100,18 +100,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case16.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Integração de chão de fábrica e dados industriais</p>
+              <p>Integração de equipamentos, IoT e sistemas</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Informações de máquinas, produção, energia e manutenção ficam desconectadas, exigindo lançamentos manuais e dificultando análise de desempenho, falhas e produtividade.</p>
+              <strong>Necessidade</strong>
+              <p>Dados de máquinas, sensores, energia, operação, manutenção, vendas ou atendimento ficam espalhados e dificultam uma visão clara do negócio.</p>
               <strong>Solução</strong>
-              <p>Integração entre CLPs, IHMs, supervisórios, sensores, medidores, registros técnicos e sistemas de gestão para reduzir retrabalho e melhorar a confiabilidade das informações.</p>
+              <p>Integração entre CLPs, IHMs, sensores, medidores, dispositivos inteligentes, sistemas web, dashboards, APIs, automações em Python e plataformas digitais.</p>
               <strong>Resultado esperado</strong>
-              <p>Menos digitação manual, dados mais consistentes, melhor rastreabilidade e base técnica para indicadores, supervisão, manutenção preditiva e melhoria operacional.</p>
+              <p>Menos retrabalho manual, mais rastreabilidade, dados organizados e uma operação preparada para análise, automação, IoT e inteligência aplicada.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
                 <a href="{% url 'institutional:integracao_chao_fabrica_dados_industriais' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de integração <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Solicitar integração tecnológica <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>
@@ -123,18 +123,18 @@
               <img src="{% static 'institutional/eitech/img/all-images/case/case17.png' %}" alt="">
             </div>
             <div class="content-area project-mini-case">
-              <p>Segurança de máquinas e continuidade operacional</p>
+              <p>Tecnologia embarcada e soluções customizadas</p>
               <div class="space12"></div>
-              <strong>Problema</strong>
-              <p>Máquinas sem análise adequada de riscos, comandos sem padronização e ausência de documentação técnica aumentam exposição a falhas, paradas e problemas de segurança operacional.</p>
+              <strong>Necessidade</strong>
+              <p>Nem toda aplicação se resolve com produto pronto. Algumas empresas precisam de sensores, placas, controladores, interfaces ou dispositivos sob medida.</p>
               <strong>Solução</strong>
-              <p>Apoio técnico em adequação de comandos, dispositivos de segurança, documentação, análise de riscos, melhoria de painéis e estratégias para continuidade da operação industrial.</p>
+              <p>Aplicações com tecnologia embarcada, sensores, controladores, comunicação, interfaces, protótipos, automação local, coleta de dados e integração com sistemas.</p>
               <strong>Resultado esperado</strong>
-              <p>Operação mais segura, maior previsibilidade em falhas, melhor resposta da manutenção e menor dependência de soluções improvisadas em máquinas críticas.</p>
+              <p>Soluções mais aderentes à realidade do cliente, novas possibilidades de produto, automação personalizada e diferenciação tecnológica para o negócio.</p>
               <div class="space14"></div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <a href="{% url 'institutional:seguranca_maquinas_continuidade_operacional' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
-                <a href="{% url 'institutional:contact' %}">Solicitar diagnóstico de segurança <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:tecnologia_embarcada_solucoes_customizadas' %}">Saiba mais <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'institutional:contact' %}">Desenvolver solução customizada <i class="fa-solid fa-arrow-right ms-1"></i></a>
               </div>
             </div>
           </div>

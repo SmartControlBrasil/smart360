@@ -15,25 +15,38 @@ urlpatterns = [
         "servicos/",
         RedirectView.as_view(pattern_name="institutional:services", permanent=True),
     ),
-    path("servicos/detalhes/", views.service_details, name="service_details"),
-    path("servicos/marketing-digital-sites-conteudo/", views.service_marketing_digital, name="service_marketing_digital"),
-    path("servicos/automacao-industrial-clps/", views.service_automacao_industrial_clps, name="service_automacao_industrial_clps"),
-    path("servicos/inteligencia-artificial-aplicada/", views.service_inteligencia_artificial, name="service_inteligencia_artificial"),
-    path("servicos/robotica-integracao-sistemas/", views.service_robotica_integracao, name="service_robotica_integracao"),
-    path("servicos/manutencao-tpm-confiabilidade/", views.service_manutencao_tpm_confiabilidade, name="service_manutencao_tpm_confiabilidade"),
-    path("servicos/diagnostico-ia-dados-automacao/", views.service_diagnostico_ia_dados_automacao, name="service_diagnostico_ia_dados_automacao"),
+    path("parceiros/agraz/", views.service_details, name="service_details"),
+    path("parceiros/marketing-digital-sites-conteudo/", views.service_marketing_digital, name="service_marketing_digital"),
+    path("parceiros/automacao-industrial-clps/", views.service_automacao_industrial_clps, name="service_automacao_industrial_clps"),
+    path("parceiros/saipos/", views.service_inteligencia_artificial, name="service_inteligencia_artificial"),
+    path("parceiros/robotica-integracao-sistemas/", views.service_robotica_integracao, name="service_robotica_integracao"),
+    path("parceiros/mitsubishi-automacao/", views.service_manutencao_tpm_confiabilidade, name="representada_mitsubishi_automacao"),
+    path(
+        "parceiros/refrigeracao/",
+        views.refrigeracao,
+        name="refrigeracao",
+    ),
+    path("parceiros/diagnostico-ia-dados-automacao/", views.service_diagnostico_ia_dados_automacao, name="service_diagnostico_ia_dados_automacao"),
     path("blog/", views.blog, name="blog"),
     path("blog/pagina/2/", views.blog_page_2, name="blog_page_2"),
     path("blog/detalhes/", views.blog_details, name="blog_details"),
-    # Static individual blog posts focused on industrial automation.
-    path("blog/retrofit-maquina-industrial/", views.blog_retrofit_maquina_industrial, name="blog_retrofit_maquina_industrial"),
-    path("blog/organizar-sinais-dados-antes-automatizar/", views.blog_organizar_sinais_dados_antes_automatizar, name="blog_organizar_sinais_dados_antes_automatizar"),
-    path("blog/manutencao-tpm-confiabilidade-sistemas-automatizados/", views.blog_manutencao_tpm_confiabilidade_sistemas_automatizados, name="blog_manutencao_tpm_confiabilidade_sistemas_automatizados"),
-    path("blog/clp-ihm-inversor-falhas-maquina/", views.blog_clp_ihm_inversor_falhas_maquina, name="blog_clp_ihm_inversor_falhas_maquina"),
-    path("blog/supervisorio-industrial-dados-tempo-real/", views.blog_supervisorio_industrial_dados_tempo_real, name="blog_supervisorio_industrial_dados_tempo_real"),
-    path("blog/automacao-industrial-conectada-manutencao-gestao/", views.blog_automacao_industrial_conectada_manutencao_gestao, name="blog_automacao_industrial_conectada_manutencao_gestao"),
-    path("blog/paineis-eletricos-organizacao-seguranca-manutenibilidade/", views.blog_paineis_eletricos_organizacao_seguranca_manutenibilidade, name="blog_paineis_eletricos_organizacao_seguranca_manutenibilidade"),
-    path("blog/dados-industriais-confiabilidade-reduzir-paradas/", views.blog_dados_industriais_confiabilidade_reduzir_paradas, name="blog_dados_industriais_confiabilidade_reduzir_paradas"),
+    # Static individual blog posts focused on tecnologia aplicada.
+    path("blog/robotica-escolas-empresas-cidades/", views.blog_retrofit_maquina_industrial, name="blog_robotica_escolas_empresas_cidades"),
+    path("blog/iot-mudando-negocios/", views.blog_organizar_sinais_dados_antes_automatizar, name="blog_iot_mudando_negocios"),
+    path("blog/integrar-sensores-maquinas-sistemas/", views.blog_manutencao_tpm_confiabilidade_sistemas_automatizados, name="blog_integrar_sensores_maquinas_sistemas"),
+    path("blog/aplicacoes-reais-robos-brasil/", views.blog_clp_ihm_inversor_falhas_maquina, name="blog_aplicacoes_reais_robos_brasil"),
+    path("blog/dashboards-decisoes-melhores/", views.blog_supervisorio_industrial_dados_tempo_real, name="blog_dashboards_decisoes_melhores"),
+    path("blog/automacao-conectada-maquinas-sensores-sistemas/", views.blog_automacao_industrial_conectada_manutencao_gestao, name="blog_automacao_conectada_maquinas_sensores_sistemas"),
+    path("blog/paineis-eletricos-automacao/", views.blog_paineis_eletricos_organizacao_seguranca_manutenibilidade, name="blog_paineis_eletricos_automacao"),
+    path("blog/dados-operacionais-empresa-inteligente/", views.blog_dados_industriais_confiabilidade_reduzir_paradas, name="blog_dados_operacionais_empresa_inteligente"),
+    path("blog/retrofit-maquina-industrial/", RedirectView.as_view(pattern_name="institutional:blog_robotica_escolas_empresas_cidades", permanent=False), name="blog_retrofit_maquina_industrial"),
+    path("blog/organizar-sinais-dados-antes-automatizar/", RedirectView.as_view(pattern_name="institutional:blog_iot_mudando_negocios", permanent=False), name="blog_organizar_sinais_dados_antes_automatizar"),
+    path("blog/manutencao-tpm-confiabilidade-sistemas-automatizados/", RedirectView.as_view(pattern_name="institutional:blog_integrar_sensores_maquinas_sistemas", permanent=False), name="blog_manutencao_tpm_confiabilidade_sistemas_automatizados"),
+    path("blog/clp-ihm-inversor-falhas-maquina/", RedirectView.as_view(pattern_name="institutional:blog_aplicacoes_reais_robos_brasil", permanent=False), name="blog_clp_ihm_inversor_falhas_maquina"),
+    path("blog/supervisorio-industrial-dados-tempo-real/", RedirectView.as_view(pattern_name="institutional:blog_dashboards_decisoes_melhores", permanent=False), name="blog_supervisorio_industrial_dados_tempo_real"),
+    path("blog/automacao-industrial-conectada-manutencao-gestao/", RedirectView.as_view(pattern_name="institutional:blog_automacao_conectada_maquinas_sensores_sistemas", permanent=False), name="blog_automacao_industrial_conectada_manutencao_gestao"),
+    path("blog/paineis-eletricos-organizacao-seguranca-manutenibilidade/", RedirectView.as_view(pattern_name="institutional:blog_paineis_eletricos_automacao", permanent=False), name="blog_paineis_eletricos_organizacao_seguranca_manutenibilidade"),
+    path("blog/dados-industriais-confiabilidade-reduzir-paradas/", RedirectView.as_view(pattern_name="institutional:blog_dados_operacionais_empresa_inteligente", permanent=False), name="blog_dados_industriais_confiabilidade_reduzir_paradas"),
     path("blog/ia-pequenas-empresas/", RedirectView.as_view(pattern_name="institutional:blog_retrofit_maquina_industrial", permanent=False), name="blog_ia_pequenas_empresas"),
     path("blog/organizar-dados-antes-automatizar/", RedirectView.as_view(pattern_name="institutional:blog_organizar_sinais_dados_antes_automatizar", permanent=False), name="blog_organizar_dados_antes_automatizar"),
     path("blog/manutencao-tpm-confiabilidade-digital/", RedirectView.as_view(pattern_name="institutional:blog_manutencao_tpm_confiabilidade_sistemas_automatizados", permanent=False), name="blog_manutencao_tpm_confiabilidade_digital"),
@@ -42,7 +55,7 @@ urlpatterns = [
     path("blog/automacao-industrial-conectada-gestao/", RedirectView.as_view(pattern_name="institutional:blog_automacao_industrial_conectada_manutencao_gestao", permanent=False), name="blog_automacao_industrial_conectada_gestao"),
     path("blog/marketing-digital-tecnologia-processo/", RedirectView.as_view(pattern_name="institutional:blog_paineis_eletricos_organizacao_seguranca_manutenibilidade", permanent=False), name="blog_marketing_digital_tecnologia_processo"),
     path("blog/smart360-operacao-inteligente/", RedirectView.as_view(pattern_name="institutional:blog_dados_industriais_confiabilidade_reduzir_paradas", permanent=False), name="blog_smart360_operacao_inteligente"),
-    path("smart360/", views.smart360, name="smart360"),
+    path("parceiros/xyron-robotics/", views.smart360, name="parceiro_xyron_robotics"),
     path("contato/", views.contact, name="contact"),
     path("equipe/", views.team, name="team"),
     path("projetos/", views.projects, name="projects"),
@@ -60,6 +73,7 @@ urlpatterns = [
     path("projetos/paineis-eletricos-baixa-tensao/", views.paineis_eletricos_baixa_tensao, name="paineis_eletricos_baixa_tensao"),
     path("projetos/integracao-chao-fabrica-dados-industriais/", views.integracao_chao_fabrica_dados_industriais, name="integracao_chao_fabrica_dados_industriais"),
     path("projetos/seguranca-maquinas-continuidade-operacional/", views.seguranca_maquinas_continuidade_operacional, name="seguranca_maquinas_continuidade_operacional"),
+    path("projetos/tecnologia-embarcada-solucoes-customizadas/", views.tecnologia_embarcada_solucoes_customizadas, name="tecnologia_embarcada_solucoes_customizadas"),
     path("projetos/smart360/", RedirectView.as_view(pattern_name="institutional:supervisao_dados_industriais", permanent=False), name="project_smart360"),
     path("projetos/diagnostico-ia-dados-automacao/", RedirectView.as_view(pattern_name="institutional:diagnostico_industrial_engenharia_solucao", permanent=False), name="project_diagnostico_ia_dados_automacao"),
     path("projetos/automacao-industrial-clps/", RedirectView.as_view(pattern_name="institutional:automacao_industrial_clps_ihms", permanent=False), name="project_automacao_industrial_clps"),
@@ -74,41 +88,26 @@ urlpatterns = [
     path("projetos/seguranca-backup-continuidade/", RedirectView.as_view(pattern_name="institutional:seguranca_maquinas_continuidade_operacional", permanent=False), name="project_seguranca_backup_continuidade"),
     path("projetos/detalhes/", views.project_details, name="project_details"),
     path("faq/", views.faq, name="faq"),
+
+
     # Aliases curtos para manter compatibilidade com o novo plano de URLs publicas.
     path("about/", views.about, name="about_alias"),
-    path(
-        "services/",
-        RedirectView.as_view(pattern_name="institutional:services", permanent=True),
-        name="services_alias",
-    ),
+    
+    path("services/",RedirectView.as_view(pattern_name="institutional:services", permanent=True),name="services_alias",),
+    
     path("contact/", views.contact, name="contact_alias"),
+    
     path("service-details/", views.service_details, name="service_details_alias"),
+    
     path("team/", views.team, name="team_alias"),
+    
     path("projects/", views.projects, name="projects_alias"),
+    
     path("project-details/", views.project_details, name="project_details_alias"),
+    
     path("blog-details/", views.blog_details, name="blog_details_alias"),
-    path(
-        "automacao-industrial/",
-        views.solution_detail,
-        {"slug": "automacao-industrial"},
-        name="automacao_industrial",
-    ),
-    path(
-        "ar-condicionado/",
-        views.solution_detail,
-        {"slug": "ar-condicionado"},
-        name="ar_condicionado",
-    ),
-    path(
-        "seguranca-da-informacao/",
-        views.solution_detail,
-        {"slug": "seguranca-da-informacao"},
-        name="seguranca_da_informacao",
-    ),
-    path(
-        "sites-sistemas-marketing/",
-        views.solution_detail,
-        {"slug": "sites-sistemas-marketing"},
-        name="sites_sistemas_marketing",
-    ),
+    
+    path("seguranca-da-informacao/",views.solution_detail,{"slug": "seguranca-da-informacao"},name="seguranca_da_informacao",),
+    
+    path("sites-sistemas-marketing/",views.solution_detail,{"slug": "sites-sistemas-marketing"},name="sites_sistemas_marketing",),
 ]

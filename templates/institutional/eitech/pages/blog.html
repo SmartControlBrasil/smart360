@@ -11,11 +11,15 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
+        <div class="col-lg-7 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Blog Smart Control Brasil</h1>
+            <h1>Blog de Automação, Robótica e Tecnologia</h1>
+            <div class="space18"></div>
+            <p class="text-white-50">
+              Conteúdos sobre automação, robótica, softwares, IoT, tecnologia embarcada, inovação e aplicações reais para empresas, escolas e operações.
+            </p>
             <div class="space28"></div>
-            <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Blog de Automação Industrial</span></a>
+            <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Blog de Tecnologia</span></a>
           </div>
         </div>
       </div>
@@ -35,16 +39,17 @@
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="{% url 'institutional:blog_retrofit_maquina_industrial' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Artigo técnico</a></li>
+                  <li><a href="{% url 'institutional:blog_robotica_escolas_empresas_cidades' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Tecnologia e Inovação</a></li>
                 </ul>
               </div>
               <div class="space16"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_retrofit_maquina_industrial' %}">Quando fazer retrofit de uma máquina industrial?</a></h4>
+              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_robotica_escolas_empresas_cidades' %}">Como a robótica está transformando escolas, empresas e cidades</a></h4>
               <div class="space20"></div>
-              <a href="{% url 'institutional:blog_retrofit_maquina_industrial' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:blog_robotica_escolas_empresas_cidades' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
+
         <div class="col-lg-4 col-md-6">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
@@ -53,16 +58,17 @@
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="{% url 'institutional:blog_organizar_sinais_dados_antes_automatizar' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Automação industrial</a></li>
+                  <li><a href="{% url 'institutional:blog_iot_mudando_negocios' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> IoT e Dados</a></li>
                 </ul>
               </div>
               <div class="space16"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_organizar_sinais_dados_antes_automatizar' %}">Por que organizar sinais e dados antes de automatizar?</a></h4>
+              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_iot_mudando_negocios' %}">O que é Internet das Coisas e por que ela está mudando os negócios</a></h4>
               <div class="space20"></div>
-              <a href="{% url 'institutional:blog_organizar_sinais_dados_antes_automatizar' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:blog_iot_mudando_negocios' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
+
         <div class="col-lg-4 col-md-6">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
@@ -71,16 +77,17 @@
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="{% url 'institutional:blog_manutencao_tpm_confiabilidade_sistemas_automatizados' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Manutenção técnica</a></li>
+                  <li><a href="{% url 'institutional:blog_integrar_sensores_maquinas_sistemas' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Automação e Software</a></li>
                 </ul>
               </div>
               <div class="space16"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_manutencao_tpm_confiabilidade_sistemas_automatizados' %}">Manutenção, TPM e confiabilidade em sistemas automatizados</a></h4>
+              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_integrar_sensores_maquinas_sistemas' %}">Como integrar sensores, máquinas e sistemas em uma única plataforma</a></h4>
               <div class="space20"></div>
-              <a href="{% url 'institutional:blog_manutencao_tpm_confiabilidade_sistemas_automatizados' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:blog_integrar_sensores_maquinas_sistemas' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>
+
         <div class="col-lg-4 col-md-6">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
@@ -89,13 +96,13 @@
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="{% url 'institutional:blog_clp_ihm_inversor_falhas_maquina' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Diagnóstico industrial</a></li>
+                  <li><a href="{% url 'institutional:blog_aplicacoes_reais_robos_brasil' %}"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Robótica Aplicada</a></li>
                 </ul>
               </div>
               <div class="space16"></div>
-              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_clp_ihm_inversor_falhas_maquina' %}">CLP, IHM e inversor: onde nascem muitas falhas?</a></h4>
+              <h4 class="vl-blog-1-title"><a href="{% url 'institutional:blog_aplicacoes_reais_robos_brasil' %}">5 aplicações reais de robôs que já estão presentes no Brasil</a></h4>
               <div class="space20"></div>
-              <a href="{% url 'institutional:blog_clp_ihm_inversor_falhas_maquina' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:blog_aplicacoes_reais_robos_brasil' %}" class="readmore">Ler artigo <i class="fa-solid fa-arrow-right"></i></a>
             </div>
           </div>
         </div>

@@ -1,8 +1,8 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Contato e diagnóstico técnico | Smart Control Brasil{% endblock %}
-{% block meta_description %}Entre em contato com a Smart Control Brasil e solicite um diagnóstico inicial para automação industrial, CLPs, IHMs, inversores, servoacionamentos, retrofit, painéis elétricos e manutenção técnica.{% endblock %}
+{% block title %}Contato | Automação, Robótica, Softwares e Tecnologia | Smart Control Brasil{% endblock %}
+{% block meta_description %}Entre em contato com a Smart Control Brasil para automação, robótica, softwares, IoT, equipamentos, produtos tecnológicos, integração e tecnologia embarcada.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -35,7 +35,7 @@
       <div class="row">
         <div class="col-lg-8 m-auto">
           <div class="inner-header text-center heading1">
-            <h1>Solicite um diagnóstico técnico da sua máquina ou processo</h1>
+            <h1>Solicite uma solução em automação, robótica ou tecnologia</h1>
             <div class="space28"></div>
             <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Contato</span></a>
           </div>
@@ -53,7 +53,7 @@
           <div class="heading2 text-center">
             <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Smart Control Brasil</h5>
             <div class="space20"></div>
-            <h2>Transforme falhas, paradas e limitações técnicas em um plano claro de ação</h2>
+            <h2>Conte o que você quer automatizar, robotizar, integrar ou transformar com tecnologia</h2>
           </div>
           <div class="space40"></div>
           <div class="row">
@@ -77,7 +77,7 @@
                 </div>
                 <div class="content">
                   <h4>WhatsApp</h4>
-                  <a href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20diagn%C3%B3stico%20t%C3%A9cnico%20em%20automa%C3%A7%C3%A3o%20industrial.">Chamar a Smart Control no WhatsApp</a>
+                  <a href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20uma%20solu%C3%A7%C3%A3o%20em%20automa%C3%A7%C3%A3o%2C%20rob%C3%B3tica%2C%20software%20ou%20tecnologia%20aplicada.">Chamar a Smart Control no WhatsApp</a>
                 </div>
               </div>
               <div class="space30 d-lg-none d-block"></div>
@@ -90,7 +90,7 @@
                 </div>
                 <div class="content">
                   <h4>Atendimento</h4>
-                  <a href="mailto:contato@smartcontrolbrasil.com.br">Retorno técnico-comercial com análise objetiva do seu cenário</a>
+                  <a href="mailto:contato@smartcontrolbrasil.com.br">Retorno técnico-comercial para entender sua necessidade e indicar o melhor caminho</a>
                 </div>
               </div>
             </div>
@@ -99,14 +99,14 @@
           <div class="row">
             <div class="col-lg-6">
               <div class="img1 reveal image-anime">
-                <img src="{% static 'institutional/eitech/img/all-images/others/others-img2.png' %}" alt="Equipe técnica Smart Control Brasil em diagnóstico de automação industrial">
+                <img src="{% static 'institutional/eitech/img/all-images/others/others-img2.png' %}" alt="Smart Control Brasil em automação, robótica, softwares, IoT e tecnologia aplicada">
               </div>
             </div>
 
             <div class="col-lg-6">
               <div class="contact-author-boxarea">
-                <h3>Conte o que sua máquina ou operação precisa resolver</h3>
-                <p class="contact-diagnostic-mini">Envie um resumo do cenário. A partir dessas informações, avaliamos os próximos passos para automação industrial, CLPs, IHMs, inversores, servoacionamentos, retrofit, painéis elétricos, supervisório, energia ou manutenção técnica.</p>
+                <h3>Descreva sua necessidade tecnológica</h3>
+                <p class="contact-diagnostic-mini">Envie um resumo do cenário. A partir dessas informações, avaliamos possibilidades em automação, robótica, softwares, IoT, equipamentos, produtos tecnológicos, integração ou suporte técnico.</p>
                 <div class="space8"></div>
                 <form method="post" action="{% url 'institutional:contact' %}">
                   {% csrf_token %}
@@ -130,7 +130,7 @@
                   <div class="col-lg-12">
                     <div class="contact-diagnostic-label">Empresa</div>
                     <div class="input-area">
-                      <input type="text" name="company" placeholder="Nome da empresa, unidade ou planta industrial" autocomplete="organization">
+                      <input type="text" name="company" placeholder="Nome da empresa, escola, loja, laboratório, unidade ou projeto" autocomplete="organization">
                     </div>
                   </div>
 
@@ -151,7 +151,7 @@
                   <div class="col-lg-12">
                     <div class="contact-diagnostic-label">Segmento</div>
                     <div class="input-area">
-                      <input type="text" name="segment" placeholder="Ex.: alimentos, farmacêutica, automotivo, logística, máquinas, mineração, utilidades, HVAC, saneamento...">
+                      <input type="text" name="segment" placeholder="Ex.: indústria, educação, comércio, saúde, eventos, laboratório, logística, máquinas, tecnologia, utilidades...">
                     </div>
                   </div>
 
@@ -160,33 +160,33 @@
                     <div class="input-area">
                       <select name="interest" class="form-select" aria-label="Interesse principal">
                         <option value="">Selecione a principal necessidade</option>
-                        <option value="automacao">Automação Industrial, CLPs e IHMs</option>
-                        <option value="acionamentos">Inversores, Servoacionamentos e Motion Control</option>
-                        <option value="retrofit">Retrofit de Máquinas e Painéis Elétricos</option>
-                        <option value="manutencao">Manutenção Técnica, TPM e Confiabilidade</option>
-                        <option value="supervisorio">Supervisório, Dados Industriais e Indicadores</option>
-                        <option value="energia">Gerenciamento de Energia e Utilidades</option>
+                        <option value="automacao">Automação, CLPs, IHMs e Equipamentos</option>
+                        <option value="robotica">Robótica, Xyron Robotics e Inovação</option>
+                        <option value="software">Softwares, Sistemas Web e Dashboards</option>
+                        <option value="iot_dados">IoT, Sensores, Dados e Integração</option>
+                        <option value="produtos">Produtos, Kits, Robôs e Componentes</option>
+                        <option value="retrofit_suporte">Retrofit, Suporte Técnico e Manutenção</option>
                       </select>
                     </div>
                   </div>
 
                   <div class="col-lg-12">
-                    <div class="contact-diagnostic-label">Principal problema atual</div>
+                    <div class="contact-diagnostic-label">Objetivo principal</div>
                     <div class="input-area">
-                                      <textarea name="main_problem" placeholder="Ex.: máquina parada, falha recorrente, CLP antigo, IHM com problema, inversor alarmando, painel desorganizado, falta de supervisório, consumo alto de energia..." rows="3"></textarea>
+                                      <textarea name="main_problem" placeholder="Ex.: comprar robô para escola, automatizar máquina, criar dashboard, integrar sensores, vender mais com tecnologia, modernizar painel, monitorar dados..." rows="3"></textarea>
                     </div>
                   </div>
 
                   <div class="col-lg-12">
                     <div class="contact-diagnostic-label">Mensagem</div>
                     <div class="input-area">
-                      <textarea name="message" placeholder="Descreva o contexto, urgência, equipamento, linha, processo, sintomas da falha, marca/modelo dos componentes ou objetivo do projeto." required rows="5"></textarea>
+                      <textarea name="message" placeholder="Descreva o contexto, aplicação desejada, ambiente de uso, produto de interesse, processo, urgência, orçamento estimado ou objetivo do projeto." required rows="5"></textarea>
                     </div>
                   </div>
                   <div class="col-lg-12">
                     <div class="space32"></div>
                     <div class="input-area">
-                      <button type="submit" class="vl-btn2">Enviar solicitação de diagnóstico <i class="fa-solid fa-arrow-right"></i></button>
+                      <button type="submit" class="vl-btn2">Enviar solicitação <i class="fa-solid fa-arrow-right"></i></button>
                     </div>
                   </div>
                 </div>

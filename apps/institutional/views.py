@@ -15,6 +15,9 @@ def about(request):
 def services(request):
     return render(request, "institutional/eitech/pages/services.html")
 
+def refrigeracao(request):
+    return render(request, "institutional/eitech/pages/refrigeracao.html")
+
 
 def service_details(request):
     return render(request, "institutional/eitech/pages/service-details.html")
@@ -107,11 +110,9 @@ Mensagem:
                 from_email=getattr(
                     settings,
                     "DEFAULT_FROM_EMAIL",
-                    "Smart Control Brasil <contato@smartcontrolbrasil.com.br>",
+                    "engenharia@smartcontrolbrasil.com.br",
                 ),
-                recipient_list=[
-                    getattr(settings, "CONTACT_EMAIL", "contato@smartcontrolbrasil.com.br")
-                ],
+                recipient_list=[settings.CONTACT_EMAIL],
                 fail_silently=False,
             )
             messages.success(
@@ -211,6 +212,10 @@ def integracao_chao_fabrica_dados_industriais(request):
 
 def seguranca_maquinas_continuidade_operacional(request):
     return render(request, "institutional/eitech/pages/projects/seguranca-backup-continuidade.html")
+
+
+def tecnologia_embarcada_solucoes_customizadas(request):
+    return render(request, "institutional/eitech/pages/projects/tecnologia-embarcada-solucoes-customizadas.html")
 
 
 def blog_retrofit_maquina_industrial(request):

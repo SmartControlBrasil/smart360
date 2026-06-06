@@ -39,6 +39,10 @@ def service_robotica_integracao(request):
     return render(request, "institutional/eitech/pages/service-robotica-integracao.html")
 
 
+def representada_mitsubishi_automacao(request):
+    return render(request, "institutional/eitech/pages/mitsubishi.html")
+
+
 def service_manutencao_tpm_confiabilidade(request):
     return render(request, "institutional/eitech/pages/service-manutencao-tpm-confiabilidade.html")
 

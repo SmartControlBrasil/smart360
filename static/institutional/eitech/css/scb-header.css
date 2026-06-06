@@ -236,7 +236,7 @@
   line-height: inherit;
   font-family: inherit;
   display: inline-block;
-  cursor: default;
+  cursor: pointer;
   text-decoration: none;
 }
 

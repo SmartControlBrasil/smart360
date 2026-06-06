@@ -1,23 +1,46 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block content %}
-<!--===== HERO AREA STARTS =======-->
-  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
-    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
-    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
-    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
-    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+{% block title %}Mitsubishi Automação Industrial | Smart Control Brasil{% endblock %}
+{% block meta_description %}Soluções em automação industrial com tecnologias Mitsubishi Electric: CLPs, IHMs, inversores, servoacionamentos, robôs industriais, redes industriais, supervisório, dados e integração técnica para máquinas e processos.{% endblock %}
 
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="hero4-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg5.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="hand-img">
+      <img src="{% static 'institutional/eitech/img/elements/elements32.png' %}" alt="" class="elements32">
+      <img src="{% static 'institutional/eitech/img/elements/clp-melseg-mitsubishi.png' %}" alt="" class="elements31 keyframe5">
+    </div>
+    <img src="{% static 'institutional/eitech/img/elements/elements33.png' %}" alt="" class="elements33 aniamtion-key-1">
+    <img src="{% static 'institutional/eitech/img/elements/elements34.png' %}" alt="" class="elements34">
+    <img src="{% static 'institutional/eitech/img/elements/elements35.png' %}" alt="" class="elements35">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-8 m-auto">
-          <div class="inner-header text-center heading1">
-            <h1>Soluções em automação, robótica, softwares e refrigeração</h1>
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hero4-heading heading3">
+            <h5 data-aos="fade-left" data-aos-duration="800" style="text-transform: uppercase;"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Parceiro técnico em automação industrial</h5>
             <div class="space18"></div>
-            <p>Fornecemos e integramos equipamentos, robôs, sensores, sistemas, softwares, IoT e soluções inteligentes para empresas que querem inovar, automatizar e crescer com tecnologia aplicada.</p>
-            <div class="space28"></div>
-            <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> <span>Soluções</span></a>
+            <h1 class="text-anime-style-3">Mitsubishi Automação Industrial</h1>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="1000">A Smart Control Brasil apoia empresas na aplicação de soluções Mitsubishi Electric para controle de máquinas, automação de processos, acionamentos, robótica industrial e integração de dados no chão de fábrica.</p>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="1100">Trabalhamos com visão técnica: entendemos a aplicação, avaliamos a arquitetura, indicamos os recursos adequados e conectamos tecnologia, operação e confiabilidade.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Solicitar diagnóstico</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+              <a href="{% url 'institutional:projects' %}" class="vl-btn5"><span class="demo">Ver projetos</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+          <div class="her4-images-area">
+            <div class="img1" data-aos="zoom-in" data-aos-duration="1000">
+              <img src="{% static 'institutional/eitech/img/all-images/hero/braco-roboticos-mitsubishi.png' %}" alt="Automação industrial com Mitsubishi Electric">
+            </div>
+            <div class="bg"><img src="{% static 'institutional/eitech/img/elements/elements36.png' %}" alt="" class="keyframe5"></div>
+            <img src="{% static 'institutional/eitech/img/elements/braco-robotico-scara-mitsubishi.png' %}" alt="" class="elements37 aniamtion-key-1">
+            <img src="{% static 'institutional/eitech/img/elements/braco-robotico-scara-mitsubishi-v2.png' %}" alt="" class="elements38 aniamtion-key-2">
           </div>
         </div>
       </div>
@@ -25,214 +48,260 @@
   </div>
   <!--===== HERO AREA ENDS =======-->
 
-  <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação e Equipamentos</a>
-            <div class="space16"></div>
-            <p>CLPs, IHMs, inversores, servoacionamentos, sensores, painéis, redes industriais e componentes para máquinas, processos e sistemas automatizados.</p>
-            <div class="space24"></div>
-            <h5>01</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_robotica_integracao' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_robotica_integracao' %}">Robótica e Inovação</a>
-            <div class="space16"></div>
-            <p>Soluções Xyron Robotics para escolas, laboratórios, empresas, comércio, saúde, atendimento, eventos, demonstrações e projetos de inovação.</p>
-            <div class="space24"></div>
-            <h5>02</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:representada_mitsubishi_automacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:representada_mitsubishi_automacao' %}">Suporte Técnico e Retrofit</a>
-            <div class="space16"></div>
-            <p>Modernização, diagnóstico, ajustes, documentação e suporte técnico para manter equipamentos, sistemas e soluções operando com segurança.</p>
-            <div class="space24"></div>
-            <h5>03</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:parceiro_xyron_robotics' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:parceiro_xyron_robotics' %}">Softwares, IoT e Dados</a>
-            <div class="space16"></div>
-            <p>Sistemas web, dashboards, sensores, telemetria, monitoramento remoto, integração com dados, automação com Python e dispositivos inteligentes.</p>
-            <div class="space24"></div>
-            <h5>04</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_details' %}">Produtos Tecnológicos</a>
-            <div class="space16"></div>
-            <p>Robôs, kits, componentes, placas, controladores, sensores, dispositivos inteligentes e soluções de automação para aplicações comerciais e técnicas.</p>
-            <div class="space24"></div>
-            <h5>05</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1300">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_automacao_industrial_clps' %}">Acionamentos e Motion Control</a>
-            <div class="space16"></div>
-            <p>Inversores, servoacionamentos, controle de movimento, posicionamento, sincronismo, precisão, eficiência energética e desempenho em máquinas.</p>
-            <div class="space24"></div>
-            <h5>06</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_automacao_industrial_clps' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_automacao_industrial_clps' %}">Painéis e Baixa Tensão</a>
-            <div class="space16"></div>
-            <p>Painéis elétricos, comandos, proteção, organização técnica, baixa tensão, retrofit e preparação da infraestrutura para automação e controle.</p>
-            <div class="space24"></div>
-            <h5>07</h5>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900">
-          <div class="service1-boxarea">
-            <div class="icons">
-              <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
-            </div>
-            <div class="arrow">
-              <a href="{% url 'institutional:service_diagnostico_ia_dados_automacao' %}"><i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="space24"></div>
-            <a href="{% url 'institutional:service_diagnostico_ia_dados_automacao' %}">Engenharia da Solução</a>
-            <div class="space16"></div>
-            <p>Mapeamos a necessidade, selecionamos tecnologias, definimos arquitetura, produtos, softwares e integrações para entregar uma solução viável.</p>
-            <div class="space24"></div>
-            <h5>08</h5>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--===== SERVICE AREA ENDS =======-->
-
   <!--===== ABOUT AREA STARTS =======-->
-  <div class="about6-section-area-widget sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="about4-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/all-images/bg/about-bg1.png' %}" alt="" class="about-bg1">
+    <img src="{% static 'institutional/eitech/img/elements/elements41.png' %}" alt="" class="elements41">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-5">
-          <div class="about6-header heading2 bg-heading">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Missão e visão</h5>
-            <div class="space18"></div>
-            <h2 class="text-anime-style-3">Nossa missão é transformar tecnologia em solução prática, vendável e aplicável.</h2>
-            <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Nossa visão é aproximar empresas, escolas e operações das tecnologias certas: automação, robótica, softwares, IoT, dados, produtos inteligentes e suporte técnico especializado.</p>
-            <div class="space24"></div>
-            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1000">
-              <div class="icons">
-                <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
-              </div>
-              <div class="content-area">
-                <a href="{% url 'institutional:service_details' %}">Tecnologia aplicada ao negócio</a>
-                <div class="space16"></div>
-                <p>Levamos equipamentos, robôs, sensores, softwares e automação para gerar produtividade, inovação, diferenciação comercial e mais controle operacional.</p>
-              </div>
-            </div>
-            <div class="space24"></div>
-            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1100">
-              <div class="icons">
-                <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
-              </div>
-              <div class="content-area">
-                <a href="{% url 'institutional:parceiro_xyron_robotics' %}">Produtos, dados e integração</a>
-                <div class="space16"></div>
-                <p>Conectamos produtos físicos, sistemas digitais, sensores, dashboards e dados para criar soluções mais inteligentes, rastreáveis e preparadas para expansão.</p>
-              </div>
-            </div>
-            <div class="space32"></div>
-            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn2">Conhecer soluções <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="about-images-area">
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 288 288"><linearGradient id="imagewave" x1="70.711%" x2="0%" y1="70.711%" y2="0%"><stop class="stop-color2" offset="0%" stop-opacity="1"></stop><stop class="stop-color1" offset="100%" stop-opacity="1"></stop></linearGradient><path fill="url(#imagewave)" d=""><animate repeatCount="indefinite" attributeName="d" dur="10s" values="M37.5,186c-12.1-10.5-11.8-32.3-7.2-46.7c4.8-15,13.1-17.8,30.1-36.7C91,68.8,83.5,56.7,103.4,45c22.2-13.1,51.1-9.5,69.6-1.6c18.1,7.8,15.7,15.3,43.3,33.2c28.8,18.8,37.2,14.3,46.7,27.9c15.6,22.3,6.4,53.3,4.4,60.2c-3.3,11.2-7.1,23.9-18.5,32c-16.3,11.5-29.5,0.7-48.6,11c-16.2,8.7-12.6,19.7-28.2,33.2c-22.7,19.7-63.8,25.7-79.9,9.7c-15.2-15.1,0.3-41.7-16.6-54.9C63,186,49.7,196.7,37.5,186z;M51,171.3c-6.1-17.7-15.3-17.2-20.7-32c-8-21.9,0.7-54.6,20.7-67.1c19.5-12.3,32.8,5.5,67.7-3.4C145.2,62,145,49.9,173,43.4c12-2.8,41.4-9.6,60.2,6.6c19,16.4,16.7,47.5,16,57.7c-1.7,22.8-10.3,25.5-9.4,46.4c1,22.5,11.2,25.8,9.1,42.6c-2.2,17.6-16.3,37.5-33.5,40.8c-22,4.1-29.4-22.4-54.9-22.6c-31-0.2-40.8,39-68.3,35.7c-17.3-2-32.2-19.8-37.3-34.8C48.9,198.6,57.8,191,51,171.3z;M37.5,186c-12.1-10.5-11.8-32.3-7.2-46.7c4.8-15,13.1-17.8,30.1-36.7C91,68.8,83.5,56.7,103.4,45c22.2-13.1,51.1-9.5,69.6-1.6c18.1,7.8,15.7,15.3,43.3,33.2c28.8,18.8,37.2,14.3,46.7,27.9c15.6,22.3,6.4,53.3,4.4,60.2c-3.3,11.2-7.1,23.9-18.5,32c-16.3,11.5-29.5,0.7-48.6,11c-16.2,8.7-12.6,19.7-28.2,33.2c-22.7,19.7-63.8,25.7-79.9,9.7c-15.2-15.1,0.3-41.7-16.6-54.9C63,186,49.7,196.7,37.5,186z"></animate></path></svg>
+            <div class="img1"><img src="{% static 'institutional/eitech/img/all-images/about/automacao-maquina.png' %}" alt="Tecnologia Mitsubishi Electric aplicada à automação industrial"></div>
           </div>
         </div>
         <div class="col-lg-1"></div>
-        <div class="col-lg-6">
-          <div class="images-area">
-            <img src="{% static 'institutional/eitech/img/elements/elements27.png' %}" alt="" class="elements27">
-            <div class="img1 image-anime reveal">
-              <img src="{% static 'institutional/eitech/img/all-images/about/about-img27.png' %}" alt="">
+        <div class="col-lg-5">
+          <div class="about-header heading6">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt=""></span>Automação começa com engenharia bem aplicada.</h5>
+            <div class="space24"></div>
+            <h2 class="text-anime-style-3">Da especificação técnica à máquina funcionando</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="800">Projetos de automação não podem depender apenas da escolha de componentes. É preciso entender processo, segurança, produtividade, diagnóstico, manutenção e expansão futura.</p>
+            <div class="space24"></div>
+            <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
+              <div class="progress-bar"><label>Controle e automação de máquinas <span>01</span></label><div class="progress"><div class="progress-inner" style="width: 100%;"></div></div></div>
+              <div class="progress-bar"><label>Acionamentos e motion control <span>02</span></label><div class="progress"><div class="progress-inner" style="width: 100%;"></div></div></div>
+              <div class="progress-bar" style="margin: 0;"><label>Dados, supervisão e integração <span>03</span></label><div class="progress"><div class="progress-inner" style="width: 100%;"></div></div></div>
             </div>
-            <div class="row">
-              <div class="col-lg-6 col-md-6">
-                <div class="img1 image-anime reveal">
-                  <div class="space30"></div>
-                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img28.png' %}" alt="">
-                </div>
-              </div>
-              <div class="col-lg-6 col-md-6">
-                <div class="img1 image-anime reveal">
-                  <div class="space30"></div>
-                  <img src="{% static 'institutional/eitech/img/all-images/about/about-img29.png' %}" alt="">
-                </div>
-              </div>
-            </div>
+            <div class="space24"></div>
+            <p>Uma base técnica sólida para CLPs, IHMs, inversores, servoacionamentos, robôs industriais, redes, supervisórios e dashboards operacionais.</p>
           </div>
         </div>
       </div>
     </div>
   </div>
   <!--===== ABOUT AREA ENDS =======-->
+
+<!--===== ABOUT AREA STARTS =======-->
+<div class="about6-section-area-widget sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5">
+        <div class="about6-header heading2 bg-heading">
+          <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Mitsubishi Electric + Smart Control Brasil</h5>
+          <div class="space18"></div>
+          <h2 class="text-anime-style-3">Tecnologia de automação industrial aplicada com visão de operação.</h2>
+          <div class="space16"></div>
+          <p data-aos="fade-left" data-aos-duration="900">A Smart Control Brasil aproxima empresas das soluções Mitsubishi Electric, ajudando na leitura da aplicação, escolha da arquitetura, integração técnica e evolução da operação industrial.</p>
+          <div class="space24"></div>
+          <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1000">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt="">
+            </div>
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Engenharia antes da proposta</a>
+              <div class="space16"></div>
+              <p>Avaliamos máquina, processo, sinais, potência, comunicação, operação, manutenção e objetivo técnico antes de indicar qualquer solução.</p>
+            </div>
+          </div>
+          <div class="space24"></div>
+          <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1100">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
+            </div>
+            <div class="content-area">
+              <a href="{% url 'institutional:contact' %}">Automação preparada para crescer</a>
+              <div class="space16"></div>
+              <p>Projetamos pensando em produtividade, manutenção, diagnóstico, documentação, conectividade, dados e ciclo de vida do ativo.</p>
+            </div>
+          </div>
+          <div class="space32"></div>
+          <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-1"></div>
+      <div class="col-lg-6">
+        <div class="images-area">
+          <img src="{% static 'institutional/eitech/img/elements/elements27.png' %}" alt="" class="elements27">
+          <div class="img1 image-anime reveal">
+            <img src="{% static 'institutional/eitech/img/all-images/about/automacao-braco-robotico.png' %}" alt="Automação industrial e integração técnica">
+          </div>
+          <div class="row">
+            <div class="col-lg-6 col-md-6">
+              <div class="img1 image-anime reveal">
+                <div class="space30"></div>
+                <img src="{% static 'institutional/eitech/img/all-images/about/about-img28.png' %}" alt="CLPs IHMs inversores e servoacionamentos">
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+              <div class="img1 image-anime reveal">
+                <div class="space30"></div>
+                <img src="{% static 'institutional/eitech/img/all-images/about/painel-automacao.png' %}" alt="Robótica industrial supervisório e dados">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service4-section-area sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-size: cover; background-repeat: no-repeat;">
+    <img src="{% static 'institutional/eitech/img/elements/elements42.png' %}" alt="" class="elements42">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="service-header space-margin60">
+            <div class="heading6"><h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">Frentes de atuação</h5><div class="space18"></div><h2 class="text-anime-style-3">Controle, movimento, robótica e dados industriais</h2></div>
+            <div class="btn-area1"><a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Solicitar diagnóstico</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="700"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">CLPs e controladores industriais</a><div class="space16"></div><p>Aplicação de controladores Mitsubishi Electric para máquinas, processos, células automatizadas, painéis e sistemas industriais com lógica robusta.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">IHMs e operação de máquina</a><div class="space16"></div><p>Telas operacionais para comando, alarmes, receitas, parâmetros, diagnóstico, histórico, usabilidade e suporte à equipe de operação e manutenção.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Inversores de frequência</a><div class="space16"></div><p>Controle de motores, partidas, proteção, economia de energia, estabilidade operacional, redução de esforço mecânico e melhoria do processo.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Servoacionamentos e motion control</a><div class="space16"></div><p>Soluções para posicionamento, sincronismo, velocidade, torque, repetibilidade e controle de movimento em máquinas de maior exigência técnica.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Robôs industriais MELFA</a><div class="space16"></div><p>Integração de robôs industriais para manipulação, montagem, embalagem, pick and place, células automatizadas e aumento de produtividade.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Supervisório, redes e dados</a><div class="space16"></div><p>Conexão entre CLPs, IHMs, redes industriais, supervisórios, dashboards e dados operacionais para análise e tomada de decisão.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Retrofit de máquinas e painéis</a><div class="space16"></div><p>Atualização de sistemas antigos com nova arquitetura de controle, documentação técnica, segurança, diagnóstico e expansão futura.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt=""></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Integração com Smart360</a><div class="space16"></div><p>Conexão da automação com dados, ativos, ordens de serviço, dashboards, relatórios e gestão técnica da operação.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Conhecer integração</a></div></div></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about6-section-area sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="about6-header heading8">
+            <h5 data-aos="fade-left" data-aos-duration="800">Automação, confiabilidade e dados</h5>
+            <div class="space18"></div>
+            <h3 class="text-anime-style-3">Tecnologia industrial só entrega valor quando conversa com a operação</h3>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">A aplicação de CLPs, IHMs, inversores, servos e robôs precisa considerar produtividade, diagnóstico, manutenção, segurança e dados. O objetivo não é apenas ligar a máquina: é criar uma operação mais controlada, confiável e preparada para evoluir.</p>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1000"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Arquitetura técnica bem definida</a><div class="space16"></div><p>Controle, acionamento, redes, supervisão, segurança, operação e manutenção organizados desde o início do projeto.</p></div></div>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1100"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Dados para decisão e melhoria contínua</a><div class="space16"></div><p>Informações de máquina, alarmes, produção, falhas e disponibilidade podem virar dashboards, indicadores e inteligência operacional.</p></div></div>
+          </div>
+        </div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-5"><div class="images"><div class="img1 reveal image-anime"><img src="{% static 'institutional/eitech/img/all-images/about/painel-eletronico.png' %}" alt="Automação industrial Mitsubishi Electric"></div><img src="{% static 'institutional/eitech/img/all-images/about/multimetro.png' %}" alt="Controle de máquinas e dados industriais" class="about-img12 aniamtion-key-1"></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+      <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Tecnologias e aplicações</h2></div></div></div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">CLP</a><div class="space16"></div><p>Controle lógico de máquinas, sequências, intertravamentos, alarmes, comunicação industrial e integração com sistemas.</p><div class="space24"></div><h5>01</h5></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">IHM</a><div class="space16"></div><p>Operação visual da máquina, receitas, alarmes, parâmetros, telas de produção, diagnóstico e suporte ao operador.</p><div class="space24"></div><h5>02</h5></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Inversores</a><div class="space16"></div><p>Controle de motores, velocidade, torque, proteção, economia de energia e estabilidade operacional em processos industriais.</p><div class="space24"></div><h5>03</h5></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Servos</a><div class="space16"></div><p>Precisão, posicionamento, sincronismo, resposta dinâmica e controle de movimento para máquinas de alta performance.</p><div class="space24"></div><h5>04</h5></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Robótica</a><div class="space16"></div><p>Aplicações com robôs industriais para células automatizadas, manipulação, montagem, embalagem e produtividade.</p><div class="space24"></div><h5>05</h5></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1300"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Supervisório</a><div class="space16"></div><p>Monitoramento de processo, alarmes, dados, telas operacionais, rastreabilidade e base para indicadores industriais.</p><div class="space24"></div><h5>06</h5></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+
+  <!--===== WORKS AREA STARTS =======-->
+  <div class="work4-section-area sp1">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
+    <div class="container">
+      <div class="row"><div class="col-lg-6 m-auto"><div class="heading6 text-center space-margin60"><h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">Nossa abordagem com Mitsubishi Automação</h5><div class="space18"></div><h2 class="text-anime-style-3">Processo técnico claro do diagnóstico à implantação</h2><div class="space16"></div><p>Antes de vender componente, entendemos o problema. A tecnologia certa nasce da leitura correta da aplicação, da máquina, do processo e da operação.</p></div></div></div>
+      <div class="row"><div class="col-lg-12"><div class="others-widget-area"><div class="row align-items-center">
+        <div class="col-lg-4">
+          <div class="card-boxarea box1" data-aos="zoom-in" data-aos-duration="800"><div class="div text-end"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt=""><span class="d-none">Diagnóstico</span></h3></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Levantamento da aplicação</a><div class="space14"></div><p>Entendimento da máquina, processo, sinais, motores, sensores, atuadores, painéis, segurança e necessidade da operação.</p></div></div>
+          <div class="space30"></div>
+          <div class="card-boxarea box2" data-aos="zoom-in" data-aos-duration="900"><div class="content-area"><a href="{% url 'institutional:contact' %}">Definição da arquitetura</a><div class="space14"></div><p>Escolha de CLP, IHM, inversor, servo, rede, comunicação, supervisório e integração conforme a realidade técnica do projeto.</p></div><div class="div text-end"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt=""><span class="d-none">Arquitetura</span></h3></div></div>
+        </div>
+        <div class="col-lg-4"><div class="images" data-aos="zoom-in" data-aos-duration="1000"><img src="{% static 'institutional/eitech/img/elements/elements12.png' %}" alt="" class="elements12"><img src="{% static 'institutional/eitech/img/elements/elements13.png' %}" alt="" class="elements13"><img src="{% static 'institutional/eitech/img/elements/elements14.png' %}" alt="" class="elements14"><img src="{% static 'institutional/eitech/img/elements/elements15.png' %}" alt="" class="elements15"><div class="img1"><img src="{% static 'institutional/eitech/img/all-images/case/case-img4.png' %}" alt="Arquitetura de automação industrial"></div></div></div>
+        <div class="col-lg-4">
+          <div class="card-boxarea box3" data-aos="zoom-in" data-aos-duration="800"><div class="div"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt=""><span class="d-none">Implantação</span></h3></div><div class="content-area2"><a href="{% url 'institutional:contact' %}">Programação e integração</a><div class="space14"></div><p>Aplicação técnica da solução, integração de sinais, parametrização, lógica, telas, testes, comunicação e ajustes operacionais.</p></div></div>
+          <div class="space30"></div>
+          <div class="card-boxarea box4" data-aos="zoom-in" data-aos-duration="1000"><div class="content-area2"><a href="{% url 'institutional:contact' %}">Comissionamento e suporte</a><div class="space14"></div><p>Validação em campo, orientação técnica, ajustes finos, documentação, diagnóstico e apoio para evolução futura.</p></div><div class="div"><h3><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt=""><span class="d-none">Suporte</span></h3></div></div>
+        </div>
+      </div></div><div class="space40"></div><div class="heading6 text-center"><p>Etapas: diagnóstico da aplicação, levantamento de campo, definição da arquitetura, especificação dos componentes, programação, integração, testes, documentação, comissionamento e suporte técnico.</p></div></div></div>
+    </div>
+  </div>
+  <!--===== WORKS AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+      <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Benefícios para a empresa</h2></div></div></div>
+      <div class="row">
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon2.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Mais produtividade</a><div class="space16"></div><p>Controle mais preciso, menor variabilidade, melhor repetibilidade e operação mais estável no dia a dia.</p><div class="space24"></div><h5>01</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Menos paradas</a><div class="space16"></div><p>Diagnóstico melhor, alarmes claros, documentação técnica e arquitetura preparada para manutenção.</p><div class="space24"></div><h5>02</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Eficiência energética</a><div class="space16"></div><p>Uso adequado de inversores, controle de motores e estratégias de operação mais eficientes.</p><div class="space24"></div><h5>03</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon4.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Mais precisão</a><div class="space16"></div><p>Servoacionamentos, motion control e lógica de controle para aplicações que exigem repetibilidade.</p><div class="space24"></div><h5>04</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon3.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Operação mais clara</a><div class="space16"></div><p>IHMs bem construídas, alarmes objetivos, telas organizadas, receitas e parâmetros acessíveis.</p><div class="space24"></div><h5>05</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Dados industriais</a><div class="space16"></div><p>Coleta de dados, supervisão, indicadores, rastreabilidade e base para decisões melhores.</p><div class="space24"></div><h5>06</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Arquitetura escalável</a><div class="space16"></div><p>Soluções preparadas para expansão, integração com redes, supervisórios, dashboards e novos módulos.</p><div class="space24"></div><h5>07</h5></div></div>
+        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service1-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon6.svg' %}" alt=""></div><div class="space24"></div><a href="{% url 'institutional:contact' %}">Suporte técnico especializado</a><div class="space16"></div><p>Apoio técnico para especificação, aplicação, diagnóstico, retrofit, integração e evolução da automação.</p><div class="space24"></div><h5>08</h5></div></div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+
+  <!--===== FAQ AREA STARTS =======-->
+  <div class="faq5-section-area sp1">
+    <div class="container">
+      <div class="row"><div class="col-lg-6 m-auto"><div class="faq-header text-center heading8 space-margin60"><h5>Perguntas frequentes</h5><div class="space18"></div><h2 class="text-anime-style-3">Dúvidas sobre Mitsubishi Automação</h2></div></div></div>
+      <div class="row"><div class="col-lg-10 m-auto"><div class="faq-widget-area"><div class="accordion" id="accordionMaintenance">
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="800"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceOne" aria-expanded="true" aria-controls="maintenanceOne">A Smart Control Brasil vende componentes Mitsubishi Electric?</button></h2><div id="maintenanceOne" class="accordion-collapse collapse show" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>A Smart Control Brasil atua no apoio técnico, aplicação, especificação, integração e direcionamento de soluções Mitsubishi Electric conforme a necessidade do projeto. O foco é entregar solução correta, não apenas indicar código de produto.</p></div></div></div>
+        <div class="space32"></div>
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="900"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceTwo" aria-expanded="false" aria-controls="maintenanceTwo">Vocês ajudam a escolher CLP, IHM, inversor ou servo?</button></h2><div id="maintenanceTwo" class="accordion-collapse collapse" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Sim. Avaliamos a aplicação, quantidade de sinais, comunicação, potência, controle de movimento, operação, manutenção e expansão futura para orientar a melhor arquitetura técnica.</p></div></div></div>
+        <div class="space32"></div>
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="1000"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceThree" aria-expanded="false" aria-controls="maintenanceThree">É possível modernizar máquina antiga com tecnologia Mitsubishi?</button></h2><div id="maintenanceThree" class="accordion-collapse collapse" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Sim. O retrofit pode incluir atualização de CLP, IHM, inversores, servoacionamentos, painéis, redes, segurança, documentação e diagnóstico para prolongar o ciclo de vida da máquina.</p></div></div></div>
+        <div class="space32"></div>
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="1100"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceFour" aria-expanded="false" aria-controls="maintenanceFour">Vocês trabalham com robôs industriais?</button></h2><div id="maintenanceFour" class="accordion-collapse collapse" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Sim. Podemos apoiar aplicações com robôs industriais em células automatizadas, manipulação, montagem, embalagem, pick and place e integração com máquinas e sistemas industriais.</p></div></div></div>
+        <div class="space32"></div>
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="1200"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceFive" aria-expanded="false" aria-controls="maintenanceFive">Preciso já saber qual produto Mitsubishi usar?</button></h2><div id="maintenanceFive" class="accordion-collapse collapse" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Não. O ideal é começar pelo diagnóstico da aplicação. A partir dele, definimos se a solução precisa de CLP, IHM, inversor, servo, robô, supervisório, redes ou integração com dados.</p></div></div></div>
+      </div></div></div></div>
+    </div>
+  </div>
+  <!--===== FAQ AREA ENDS =======-->
+
+  <!--===== CTA AREA STARTS =======-->
+  <div class="cta5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-5">
+          <div class="cta-header heading7">
+            <h5 data-aos="fade-left" data-aos-duration="800">
+              <span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Mitsubishi Automação Industrial</h5><div class="space18"></div>
+              <h2 class="text-anime-style-3">Quer aplicar automação Mitsubishi com segurança técnica?</h2>
+              <div class="space16"></div><p data-aos="fade-left" data-aos-duration="900">Fale com a Smart Control Brasil e vamos entender sua máquina, processo ou projeto para indicar a melhor solução em controle, acionamento, robótica, supervisão e dados industriais.</p>
+              <div class="space32"></div><div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+                <a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico 
+                  <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span>
+                  <span class="arrow2">
+                    <i class="fa-solid fa-arrow-right"></i></span>
+                  </a></div></div></div>
+                  <div class="col-lg-1"></div>
+                  <div class="col-lg-6">
+                    <div class="images-area">
+                      <div class="row">
+                        <div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000">
+                          <div class="img1"><img src="{% static 'institutional/eitech/img/all-images/hero/infersor-freqecia-mitsubishi.png' %}" alt="Soluções Mitsubishi Electric para automação"></div>
+                          <div class="space30 d-md-none d-block"></div></div>
+                          <div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="1000">
+                            <div class="img2"><img src="{% static 'institutional/eitech/img/all-images/hero/infersor-freqecia-mitsubishi.png' %}" alt="CLP IHM inversor servo e robótica industrial"></div></div></div></div></div></div></div>
+  </div>
+  <!--===== CTA AREA ENDS =======-->
+
 {% endblock %}

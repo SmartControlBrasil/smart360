@@ -20,7 +20,12 @@ urlpatterns = [
     path("parceiros/automacao-industrial-clps/", views.service_automacao_industrial_clps, name="service_automacao_industrial_clps"),
     path("parceiros/saipos/", views.service_inteligencia_artificial, name="service_inteligencia_artificial"),
     path("parceiros/robotica-integracao-sistemas/", views.service_robotica_integracao, name="service_robotica_integracao"),
-    path("parceiros/mitsubishi-automacao/", views.service_manutencao_tpm_confiabilidade, name="representada_mitsubishi_automacao"),
+    path("parceiros/mitsubishi-automacao/", views.representada_mitsubishi_automacao, name="representada_mitsubishi_automacao"),
+    path(
+        "solucoes/manutencao-tpm-confiabilidade/",
+        views.service_manutencao_tpm_confiabilidade,
+        name="service_manutencao_tpm_confiabilidade",
+    ),
     path(
         "parceiros/refrigeracao/",
         views.refrigeracao,

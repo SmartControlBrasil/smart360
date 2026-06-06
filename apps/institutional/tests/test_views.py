@@ -1,7 +1,16 @@
-from django.test import SimpleTestCase
+from django.conf import settings
+from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
 
+TEST_MIDDLEWARE = [
+    mw
+    for mw in settings.MIDDLEWARE
+    if mw != "shared_kernel.observability.middleware.CorrelationIdMiddleware"
+]
+
+
+@override_settings(MIDDLEWARE=TEST_MIDDLEWARE)
 class InstitutionalRoutesTests(SimpleTestCase):
     # Middleware de observabilidade grava traces no banco durante requests ao client.
     databases = {"default"}
@@ -12,8 +21,12 @@ class InstitutionalRoutesTests(SimpleTestCase):
             "institutional:services",
             "institutional:blog",
             "institutional:contact",
-            "institutional:ar_condicionado",
-            "institutional:automacao_industrial",
+            "institutional:refrigeracao",
+            "institutional:representada_mitsubishi_automacao",
+            "institutional:service_manutencao_tpm_confiabilidade",
+            "institutional:service_automacao_industrial_clps",
+            "institutional:service_robotica_integracao",
+            "institutional:parceiro_xyron_robotics",
             "institutional:seguranca_da_informacao",
             "institutional:sites_sistemas_marketing",
         ]

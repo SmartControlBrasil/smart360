@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from django.core.management import call_command
 from django.test import override_settings, TestCase
 
 from apps.livia_assistant.models import LiviaConversation, LiviaKnowledgeItem, LiviaLeadCapture, LiviaMessage
@@ -20,6 +21,9 @@ class RecordingClient:
 class LiviaAssistantServiceTests(TestCase):
     def setUp(self):
         self.service = LiviaAssistantService()
+
+    def _seed_knowledge(self):
+        call_command("seed_livia_knowledge")
 
     def test_get_or_create_conversation_creates_open_conversation(self):
         conversation = self.service.get_or_create_conversation(session_key="abc123", source_page="/")
@@ -316,3 +320,261 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "oi")
         response = self.service.generate_response(conversation, "oi")
         self.assertIn("sou a lívia", response.reply.lower())
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_same_conversation_cleaning_intent_overrides_previous_buddy_context(self):
+        conversation = self.service.get_or_create_conversation(session_key="case-context-switch")
+        LiviaKnowledgeItem.objects.create(
+            title="Buddy Bot",
+            slug="context-buddy",
+            category=LiviaKnowledgeItem.Category.TECHNICAL,
+            content="Robô quadrúpede para inspeção e segurança patrimonial.",
+            keywords="buddy budy cao robo cachorro robo quadrupede",
+            priority=80,
+        )
+        LiviaKnowledgeItem.objects.create(
+            title="HygiBot / Dune Bot",
+            slug="context-hygibot",
+            category=LiviaKnowledgeItem.Category.TECHNICAL,
+            content="Robô de limpeza autônoma para grandes áreas.",
+            keywords="hygibot hygi bot duno dune dunobot robo de limpeza limpeza",
+            priority=80,
+        )
+
+        self.service.register_user_message(conversation, "quero saber sobre o cão robo")
+        first = self.service.generate_response(conversation, "quero saber sobre o cão robo")
+        self.assertIn("buddy bot", first.reply.lower())
+
+        self.service.register_user_message(conversation, "robô de limpeza")
+        second = self.service.generate_response(conversation, "robô de limpeza")
+        lowered = second.reply.lower()
+        self.assertTrue("hygibot" in lowered or "dune" in lowered or "duno" in lowered)
+        self.assertNotIn("buddy bot", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_neobot(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-neo")
+        self.service.register_user_message(conversation, "fale sobre o neobot")
+        response = self.service.generate_response(conversation, "fale sobre o neobot")
+        lowered = response.reply.lower()
+        self.assertIn("neobot", lowered)
+        self.assertTrue("recep" in lowered or "atendimento" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_neobot_languages(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-neo-lang")
+        self.service.register_user_message(conversation, "quais idiomas o neo fala?")
+        response = self.service.generate_response(conversation, "quais idiomas o neo fala?")
+        lowered = response.reply.lower()
+        self.assertTrue("idioma" in lowered or "multiling" in lowered)
+        self.assertTrue("20" in lowered or "vinte" in lowered or "mais de" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_liro_sala_aula(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-liro-class")
+        self.service.register_user_message(conversation, "como o liro ajuda na sala de aula?")
+        response = self.service.generate_response(conversation, "como o liro ajuda na sala de aula?")
+        lowered = response.reply.lower()
+        self.assertTrue("pedag" in lowered or "professor" in lowered or "bncc" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_liro_apae(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-liro-apae")
+        self.service.register_user_message(conversation, "liro serve para apae?")
+        response = self.service.generate_response(conversation, "liro serve para apae?")
+        lowered = response.reply.lower()
+        self.assertTrue(
+            "apae" in lowered or "inclus" in lowered or "neurodiverg" in lowered or "multidisciplinar" in lowered
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_liro_plano_aula_infantil(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-liro-plan")
+        self.service.register_user_message(conversation, "plano de aula com liro para educação infantil")
+        response = self.service.generate_response(conversation, "plano de aula com liro para educação infantil")
+        lowered = response.reply.lower()
+        self.assertTrue("educacao infantil" in lowered or "historia" in lowered or "cores" in lowered or "sentimentos" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_robo_limpeza_not_buddy(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-cleaning")
+        self.service.register_user_message(conversation, "robô de limpeza")
+        response = self.service.generate_response(conversation, "robô de limpeza")
+        lowered = response.reply.lower()
+        self.assertTrue("hygibot" in lowered or "limpeza aut" in lowered or "varrer" in lowered or "aspirar" in lowered)
+        self.assertNotIn("buddy", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_hygibot_academia(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-hygibot-gym")
+        self.service.register_user_message(conversation, "hygibot serve para academia?")
+        response = self.service.generate_response(conversation, "hygibot serve para academia?")
+        lowered = response.reply.lower()
+        self.assertIn("academia", lowered)
+        self.assertTrue(
+            "áreas internas" in lowered
+            or "areas internas" in lowered
+            or "grandes áreas" in lowered
+            or "grandes areas" in lowered
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_orbit_patrol(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-orbit-patrol")
+        self.service.register_user_message(conversation, "orbit faz patrulha?")
+        response = self.service.generate_response(conversation, "orbit faz patrulha?")
+        lowered = response.reply.lower()
+        self.assertTrue("patrulh" in lowered or "seguranca autonoma" in lowered or "navegacao a laser" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_curated_prompt_orbit_thermal(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="curated-orbit-thermal")
+        self.service.register_user_message(conversation, "orbit tem câmera térmica?")
+        response = self.service.generate_response(conversation, "orbit tem câmera térmica?")
+        lowered = response.reply.lower()
+        self.assertTrue("termica" in lowered or "temperatura" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_overview_question_returns_company_ecosystem(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-overview-question")
+        self.service.register_user_message(conversation, "o que é a xyron?")
+        response = self.service.generate_response(conversation, "o que é a xyron?")
+        lowered = response.reply.lower()
+        self.assertIn("xyron robotics", lowered)
+        self.assertTrue("empresa" in lowered or "solu" in lowered or "ecossistema" in lowered)
+        self.assertIn("liro", lowered)
+        self.assertIn("hygibot", lowered)
+        self.assertIn("buddy", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_single_term_returns_overview(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-overview-short")
+        self.service.register_user_message(conversation, "xyron")
+        response = self.service.generate_response(conversation, "xyron")
+        lowered = response.reply.lower()
+        self.assertIn("xyron robotics", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_alias_hygbot_returns_hygibot_not_safety(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="alias-hygbot")
+        self.service.register_user_message(conversation, "hygbot")
+        response = self.service.generate_response(conversation, "hygbot")
+        lowered = response.reply.lower()
+        self.assertTrue("hygibot" in lowered or "limpeza" in lowered)
+        self.assertNotIn("risco técnico", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_alias_lttle_returns_liro_not_safety(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="alias-lttle")
+        self.service.register_user_message(conversation, "lttle")
+        response = self.service.generate_response(conversation, "lttle")
+        lowered = response.reply.lower()
+        self.assertTrue("liro" in lowered or "littlebot" in lowered)
+        self.assertNotIn("risco técnico", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_unknown_product_connectbot_does_not_trigger_safety(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="unknown-connectbot")
+        self.service.register_user_message(conversation, "connectbot")
+        response = self.service.generate_response(conversation, "connectbot")
+        lowered = response.reply.lower()
+        self.assertIn("não encontrei esse modelo", lowered)
+        self.assertIn("liro", lowered)
+        self.assertNotIn("risco técnico", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_safety_still_triggers_for_burn_smell(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="safety-burn-smell")
+        self.service.register_user_message(conversation, "cheiro de queimado no painel")
+        response = self.service.generate_response(conversation, "cheiro de queimado no painel")
+        lowered = response.reply.lower()
+        self.assertIn("risco técnico", lowered)
+        self.assertIn("interrompa o uso", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_buddy_remains_buddy(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="alias-buddy")
+        self.service.register_user_message(conversation, "buddy")
+        response = self.service.generate_response(conversation, "buddy")
+        lowered = response.reply.lower()
+        self.assertIn("buddy bot", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_neo_bot_remains_neo(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="alias-neo-bot")
+        self.service.register_user_message(conversation, "neo bot")
+        response = self.service.generate_response(conversation, "neo bot")
+        lowered = response.reply.lower()
+        self.assertIn("neobot", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_dune_remains_hygibot(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="alias-dune")
+        self.service.register_user_message(conversation, "dune")
+        response = self.service.generate_response(conversation, "dune")
+        lowered = response.reply.lower()
+        self.assertTrue("hygibot" in lowered or "duno" in lowered or "dune" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_nebot_typo_returns_neobot_not_hostbot(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="nebot-height")
+        self.service.register_user_message(conversation, "qual é a altura do nebot")
+        response = self.service.generate_response(conversation, "qual é a altura do nebot")
+        lowered = response.reply.lower()
+        self.assertTrue("neobot" in lowered or "100 cm" in lowered or "45 x 100 x 40" in lowered)
+        self.assertNotIn("hostbot", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_neobot_context_battery_duration(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="neo-context-battery")
+        self.service.register_user_message(conversation, "fale sobre o NeoBot")
+        self.service.generate_response(conversation, "fale sobre o NeoBot")
+        self.service.register_user_message(conversation, "quanto tempo dura a bateria?")
+        response = self.service.generate_response(conversation, "quanto tempo dura a bateria?")
+        lowered = response.reply.lower()
+        self.assertTrue("10 horas" in lowered or "autonomia" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_neobot_context_recharge_time(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="neo-context-recharge")
+        self.service.register_user_message(conversation, "fale sobre o NeoBot")
+        self.service.generate_response(conversation, "fale sobre o NeoBot")
+        self.service.register_user_message(conversation, "a recarga é feita em quanto tempo?")
+        response = self.service.generate_response(conversation, "a recarga é feita em quanto tempo?")
+        lowered = response.reply.lower()
+        self.assertTrue("9 horas" in lowered or "aproximadamente 9" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_neobot_context_battery_reserve_not_invented(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="neo-context-reserve")
+        self.service.register_user_message(conversation, "fale sobre o NeoBot")
+        self.service.generate_response(conversation, "fale sobre o NeoBot")
+        self.service.register_user_message(conversation, "tem bateria reserva?")
+        response = self.service.generate_response(conversation, "tem bateria reserva?")
+        lowered = response.reply.lower()
+        self.assertIn("na base atual", lowered)
+        self.assertIn("não tenho confirmação", lowered)
+        self.assertIn("validar com a equipe", lowered)
+        self.assertNotIn("tem bateria reserva", lowered.replace("não", ""))

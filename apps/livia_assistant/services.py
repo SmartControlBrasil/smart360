@@ -67,6 +67,14 @@ class LiviaAssistantService:
         service_interest = self._detect_service_interest(normalized)
         history = self._build_recent_messages(conversation)
         knowledge_context = LiviaKnowledgeService().build_context(user_text)
+        last_assistant = (
+            conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+            .order_by("-created_at", "-id")
+            .first()
+        )
+        recent_product = ""
+        if last_assistant:
+            recent_product = str(last_assistant.metadata.get("product_hint") or "").strip().lower()
 
         reply = get_livia_ai_client().generate_reply(
             system_prompt=LIVIA_SYSTEM_PROMPT,
@@ -78,8 +86,11 @@ class LiviaAssistantService:
                 "handoff_recommended": handoff_recommended,
                 "service_interest": service_interest,
                 "knowledge_context": knowledge_context,
+                "recent_product": recent_product,
             },
         )
+
+        product_hint = self._infer_product_hint(reply, user_text, knowledge_context, recent_product)
 
         self.register_assistant_message(
             conversation,
@@ -89,6 +100,7 @@ class LiviaAssistantService:
                 "handoff_recommended": handoff_recommended,
                 "session_key": conversation.session_key,
                 "knowledge_context_used": bool(knowledge_context),
+                "product_hint": product_hint,
             },
         )
 
@@ -199,3 +211,19 @@ class LiviaAssistantService:
         if not match:
             return ""
         return match.group(1).strip(" .,-")[:180]
+
+    def _infer_product_hint(self, reply, user_text, knowledge_context, recent_product):
+        corpus = " ".join([reply or "", user_text or "", knowledge_context or ""]).lower()
+        if any(term in corpus for term in ("neo bot", "neobot", "nebot")):
+            return "neobot"
+        if "hostbot" in corpus:
+            return "hostbot"
+        if any(term in corpus for term in ("buddy bot", "budy", "cão robô", "cao robo")):
+            return "buddy"
+        if any(term in corpus for term in ("hygibot", "dune", "duno")):
+            return "hygibot"
+        if any(term in corpus for term in ("liro", "littlebot")):
+            return "liro"
+        if any(term in corpus for term in ("orbit", "patrol bot", "orbitbot")):
+            return "orbitbot"
+        return recent_product

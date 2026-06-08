@@ -174,6 +174,41 @@
     color: #111827;
     border: 1px solid #e5e7eb;
   }
+  .livia-chat-message-typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 54px;
+  }
+  .livia-typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .livia-typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6b7280;
+    opacity: 0.72;
+    animation: liviaTypingWave 0.9s ease-in-out infinite;
+  }
+  .livia-typing-dot:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+  .livia-typing-dot:nth-child(3) {
+    animation-delay: 0.24s;
+  }
+  @keyframes liviaTypingWave {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.65;
+    }
+    30% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
   .livia-chat-state {
     margin: 0;
     padding: 8px 14px 0;
@@ -241,6 +276,7 @@
     var state = widget.querySelector("[data-livia-state]");
     var sessionKey = window.localStorage.getItem("livia_session_key") || "";
     var isLoading = false;
+    var minTypingMs = 850;
 
     function setOpen(open) {
       panel.toggleAttribute("hidden", !open);
@@ -269,6 +305,35 @@
       node.textContent = content;
       messages.appendChild(node);
       messages.scrollTop = messages.scrollHeight;
+      return node;
+    }
+
+    function appendTypingIndicator() {
+      var node = document.createElement("p");
+      node.className = "livia-chat-message livia-chat-message-assistant livia-chat-message-typing";
+
+      var indicator = document.createElement("span");
+      indicator.className = "livia-typing-indicator";
+      indicator.setAttribute("aria-label", "LÍVIA está digitando");
+      indicator.setAttribute("role", "status");
+
+      for (var i = 0; i < 3; i += 1) {
+        var dot = document.createElement("span");
+        dot.className = "livia-typing-dot";
+        dot.setAttribute("aria-hidden", "true");
+        indicator.appendChild(dot);
+      }
+
+      node.appendChild(indicator);
+      messages.appendChild(node);
+      messages.scrollTop = messages.scrollHeight;
+      return node;
+    }
+
+    function wait(ms) {
+      return new Promise(function (resolve) {
+        window.setTimeout(resolve, ms);
+      });
     }
 
     toggle.addEventListener("click", function () { setOpen(true); });
@@ -288,6 +353,8 @@
       appendMessage(message, "user");
       input.value = "";
       setLoading(true);
+      var typingNode = appendTypingIndicator();
+      var requestStartedAt = Date.now();
 
       try {
         var response = await fetch(endpoint, {
@@ -307,8 +374,16 @@
           sessionKey = data.session_key;
           window.localStorage.setItem("livia_session_key", sessionKey);
         }
+        var elapsed = Date.now() - requestStartedAt;
+        var remaining = Math.max(0, minTypingMs - elapsed);
+        if (remaining > 0) {
+          await wait(remaining);
+        }
+
+        typingNode.remove();
         appendMessage(data.reply || "Não consegui responder agora. Tente novamente em instantes.", "assistant");
       } catch (error) {
+        typingNode.remove();
         setState("Não consegui enviar agora. Tente novamente em instantes.", true);
       } finally {
         setLoading(false);

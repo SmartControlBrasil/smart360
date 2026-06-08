@@ -12,7 +12,7 @@
             <h1 class="color-brand-3">Catálogo Técnico</h1>
             <p>Catálogo técnico B2B com fabricantes representados e parceiros técnicos, soluções sob consulta em robótica, climatização, automação e infraestrutura predial.</p>
             <a class="btn btn-buy" href="{% url 'marketplace_ecom:products' %}">Ver produtos e soluções técnicas</a>
-            <p class="marketplace-disabled-note">Nesta fase o foco é consulta técnica e solicitação de orçamento. Carrinho e pagamento ficam para uma etapa futura.</p>
+            <p class="marketplace-disabled-note">O foco é consulta técnica e solicitação de orçamento B2B.</p>
           </div>
         </div>
         <div class="col-lg-6">
@@ -73,7 +73,7 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% if product.featured_image_url %}<img class="marketplace-product-image" src="{{ product.featured_image_url }}" alt="{{ product.title }}">{% else %}<img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}">{% endif %}</a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image|default:'marketplace/ecom/img/template/devices.svg' %}" alt="{{ product.title }}"></a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.category }}</span><br>

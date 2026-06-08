@@ -88,14 +88,14 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% if product.featured_image_url %}<img class="marketplace-product-image" src="{{ product.featured_image_url }}" alt="{{ product.title }}">{% else %}<img class="marketplace-product-image" src="{% static product.image %}" alt="{{ product.title }}">{% endif %}</a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image|default:'marketplace/ecom/img/template/devices.svg' %}" alt="{{ product.title }}"></a>
       </div>
       <div class="info-right">
-        <span class="font-xs color-gray-500">{{ product.category }}</span><br>
+        <span class="font-xs color-gray-500">{{ product.brand }} · {{ product.category }}</span><br>
         <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:product-detail' product.slug %}">{{ product.title }}</a>
-        <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-xs color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
-        <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">{{ product.price_label }}</strong></div>
-        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
+        <p class="font-xs color-gray-500 mt-10">{{ product.short_description }}</p>
+        <div class="mt-10">{% for tag in product.tags|slice:":3" %}<span class="marketplace-mini-pill">{{ tag }}</span>{% endfor %}</div>
+        <div class="mt-20 d-flex flex-wrap gap-2"><a class="btn btn-buy" href="{% url 'marketplace_ecom:product-detail' product.slug %}">Ver detalhes</a> <a class="btn btn-buy" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
       </div>
     </div>
   </div>

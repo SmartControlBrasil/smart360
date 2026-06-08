@@ -1,0 +1,137 @@
+DEFAULT_IMAGE = "marketplace/ecom/img/template/devices.svg"
+
+
+def technical_product(
+    *,
+    title,
+    slug,
+    brand,
+    category,
+    product_type,
+    short_description,
+    applications,
+    features,
+    specs=None,
+    tags=None,
+    image=DEFAULT_IMAGE,
+):
+    return {
+        "title": title,
+        "slug": slug,
+        "brand": brand,
+        "supplier": "Smart Control Brasil",
+        "vendor": brand,
+        "category": category,
+        "product_type": product_type,
+        "short_description": short_description,
+        "technical_description": short_description,
+        "description": short_description,
+        "applications": applications,
+        "application_area": ", ".join(applications),
+        "features": features,
+        "specs": specs or [],
+        "tags": tags or [],
+        "image": image,
+        "cta_label": "Solicitar orçamento",
+        "button_label": "Solicitar orçamento",
+        "lead_interest": f"{brand} - {title}",
+        "is_featured": False,
+        "featured_image_url": "",
+    }
+
+
+XYRON_PRODUCTS = [
+    technical_product(
+        title="LIRO / LittleBot", slug="xyron-liro-littlebot", brand="Xyron Robotics",
+        category="Robótica educacional", product_type="Robô educacional com IA",
+        short_description="Robô educacional com IA para aprendizagem, engajamento, comunicação, interação por voz, apoio ao professor, atividades gamificadas e projetos de inclusão.",
+        applications=["Escolas", "Educação infantil", "Ensino fundamental", "Ensino médio", "APAEs", "Clínicas multidisciplinares", "Inclusão", "Eventos pedagógicos"],
+        features=["Interação por voz", "IA educacional", "Conteúdos personalizados", "Atividades pedagógicas", "Apoio à BNCC", "Gamificação", "Comunicação", "Estímulo socioemocional"],
+        specs=[("Dimensões", "22,5 x 22 x 16,5 cm"), ("Peso", "1,68 kg"), ("Conectividade", "Wi-Fi"), ("Bateria", "5.000 mAh"), ("Autonomia", "6 horas"), ("Carregamento", "5 horas"), ("Tela", "LCD 5 polegadas")],
+    ),
+    technical_product(
+        title="NeoBot", slug="xyron-neobot", brand="Xyron Robotics",
+        category="Robótica de atendimento", product_type="Robô recepcionista inteligente",
+        short_description="Robô recepcionista para atendimento inteligente, interação com visitantes, apresentação de produtos, IA, reconhecimento facial e comunicação multilíngue.",
+        applications=["Recepção corporativa", "Eventos", "Shoppings", "Lojas", "Escolas", "Aeroportos", "Feiras", "Stands comerciais"],
+        features=["IA integrada", "Reconhecimento facial", "Interação multilíngue", "Gestão de conteúdo", "Tela HD", "Navegação autônoma", "Chamada de vídeo unidirecional"],
+        specs=[("Dimensões", "45 x 100 x 40 cm"), ("Altura", "100 cm"), ("Peso", "18 kg"), ("Tela", "HD 10,1 polegadas"), ("Bateria", "20.000 mAh"), ("Autonomia", "até 10 horas"), ("Carregamento", "aproximadamente 9 horas")],
+    ),
+    technical_product(
+        title="HygiBot / Dune Bot", slug="xyron-hygibot-dune-bot", brand="Xyron Robotics",
+        category="Robótica de limpeza", product_type="Robô de limpeza autônoma",
+        short_description="Robô de limpeza inteligente para varrer, aspirar, lavar e passar pano seco em grandes áreas internas.",
+        applications=["Shoppings", "Hospitais", "Supermercados", "Hotéis", "Academias", "Indústrias", "Ginásios", "Grandes áreas internas"],
+        features=["Limpeza autônoma", "Mapeamento", "Controle por aplicativo", "Programação de áreas", "Visor de status", "Contorno de obstáculos", "Reabastecimento e descarte automático conforme configuração"],
+        specs=[("Dimensões", "50 x 60 x 58 cm"), ("Peso", "53,8 kg"), ("Bateria", "46.000 mAh"), ("Autonomia", "4 horas"), ("Carregamento", "2,5 horas"), ("Funções", "lavar, varrer, aspirar e passar pano seco")],
+    ),
+    technical_product(
+        title="OrbitBot / Patrol Bot", slug="xyron-orbit-patrol-bot", brand="Xyron Robotics",
+        category="Robótica de segurança", product_type="Robô de patrulhamento autônomo",
+        short_description="Robô de segurança com navegação a laser, patrulha autônoma, monitoramento contínuo, câmera visível e imagem térmica.",
+        applications=["Shoppings", "Indústrias", "Galpões", "Condomínios", "Hospitais", "Universidades", "Aeroportos", "Hotéis", "Escolas", "Estacionamentos"],
+        features=["Navegação a laser", "Patrulha 24/7", "Geração de mapas", "Rotas programadas", "Retorno à base", "Câmera HD", "Vigilância térmica", "Comunicação por áudio"],
+        specs=[("Dimensões", "70 x 65 x 67 cm"), ("Peso", "24 kg"), ("Tela", "5,5 polegadas"), ("Bateria", "12.800 mAh"), ("Autonomia", "10 horas"), ("Carregamento", "8 horas"), ("Área por mapa", "até 40.000 m²"), ("Câmera visível", "1080p"), ("Imagem térmica", "-5°C a 150°C")],
+    ),
+    technical_product(
+        title="Buddy Bot", slug="xyron-buddy-bot", brand="Xyron Robotics",
+        category="Robótica de inspeção e segurança", product_type="Robô quadrúpede",
+        short_description="Robô quadrúpede para inspeção, patrulhamento, segurança e operação em terrenos irregulares ou ambientes hostis.",
+        applications=["Usinas", "Indústrias", "Obras", "Subestações", "Fazendas", "Segurança patrimonial", "Resgate", "Áreas de difícil acesso"],
+        features=["Locomoção quadrúpede", "Operação em terreno irregular", "Inspeção visual", "Patrulhamento", "Apoio a resgate e engenharia"],
+        specs=[("Dimensões", "61 x 37 x 40 cm"), ("Peso", "12 kg"), ("Autonomia", "2 horas"), ("Carregamento", "1 hora"), ("Câmera", "1920 x 1080"), ("Inclinação máxima", "40°")],
+    ),
+    technical_product(
+        title="WaiterBot", slug="xyron-waiterbot", brand="Xyron Robotics",
+        category="Robótica de entrega", product_type="Robô garçom / entrega interna",
+        short_description="Robô para entrega interna, retorno de bandejas, deslocamento autônomo e apoio operacional em ambientes de atendimento.",
+        applications=["Restaurantes", "Hotéis", "Supermercados", "Food service", "Eventos", "Ambientes de atendimento"],
+        features=["Navegação autônoma", "Desvio de obstáculos", "Múltiplos pontos de entrega", "Modos de operação", "Transmissão de voz", "Retorno automático à base"],
+        specs=[("Dimensões", "50 x 50 x 130 cm"), ("Capacidade de carga", "40 kg, sendo 10 kg por bandeja"), ("Velocidade", "0,7 m/s"), ("Bateria", "12.800 mAh"), ("Operação", "até 10 horas")],
+    ),
+    technical_product(
+        title="CareBot", slug="xyron-carebot", brand="Xyron Robotics",
+        category="Robótica assistiva", product_type="Robô para saúde e cuidado",
+        short_description="Robô assistivo para apoio ao cuidado, chamadas rápidas, monitoramento de indicadores fisiológicos e teleatendimento.",
+        applications=["Residências", "Hospitais", "Farmácias", "Asilos", "Clínicas de reabilitação", "Telemedicina"],
+        features=["Chamada com um toque", "Monitoramento de saúde", "Teleatendimento", "Alertas", "Relatórios", "Suporte ao cuidado de idosos"],
+        specs=[("Dimensões", "198 x 270 x 420 mm"), ("Tela", "9 polegadas"), ("Câmera", "1920 x 1080"), ("Bateria", "16.8 V / 2500 mAh"), ("Rotação da cabeça", "-70° a +70°"), ("Grau de proteção", "IP20")],
+    ),
+    technical_product(
+        title="HostBot", slug="xyron-hostbot", brand="Xyron Robotics",
+        category="Robótica de atendimento", product_type="Robô host para eventos e recepção",
+        short_description="Robô host com duas telas, IA conversacional, desvio de obstáculos e interação com visitantes.",
+        applications=["Eventos", "Empresas", "Museus", "Galerias", "Concessionárias", "Bancos", "Recepções", "Feiras"],
+        features=["Duas telas", "IA", "Conteúdo multimídia", "Altura semelhante à humana", "Desvio automático de obstáculos"],
+        specs=[("Tamanho", "49 x 140 x 48 cm"), ("Peso", "23 kg"), ("Tela principal", "10,1 polegadas"), ("Extra tablet", "19 polegadas"), ("Bateria", "20.000 mAh"), ("Autonomia", "10 horas"), ("Carregamento", "8 horas")],
+    ),
+    technical_product(
+        title="MowerBot", slug="xyron-mowerbot", brand="Xyron Robotics",
+        category="Robótica externa", product_type="Robô cortador de grama remoto",
+        short_description="Robô cortador de grama por controle remoto para terrenos irregulares, taludes e grandes áreas externas.",
+        applications=["Campos esportivos", "Praças", "Canteiros", "Terrenos baldios", "Campo de golfe", "Áreas verdes", "Taludes"],
+        features=["Controle remoto", "Corte em terreno irregular", "Regulagem de altura", "Operação segura à distância", "Alta produtividade"],
+        specs=[("Tamanho", "90 x 93 x 92 cm"), ("Peso", "140 kg"), ("Área de corte", "1500 m²/h"), ("Velocidade", "4 km/h"), ("Corte", "500 mm"), ("Altura de corte", "20 mm a 150 mm"), ("Inclinação", "45°"), ("Combustível", "gasolina")],
+    ),
+]
+
+
+def mitsubishi_product(title, slug, category, product_type, description, applications, features, tags):
+    return technical_product(
+        title=title, slug=slug, brand="Mitsubishi Electric", category=category,
+        product_type=product_type, short_description=description, applications=applications,
+        features=features, tags=tags,
+    )
+
+
+MITSUBISHI_PRODUCTS = [
+    mitsubishi_product("CLPs Mitsubishi MELSEC", "mitsubishi-clp-melsec", "Automação industrial", "Controladores lógicos programáveis", "CLPs Mitsubishi para controle de máquinas, processos, intertravamentos, aquisição de sinais e integração industrial.", ["Máquinas industriais", "Painéis automatizados", "Linhas de produção", "Retrofit", "Controle de processos"], ["Controle lógico", "Expansão de I/O", "Redes industriais", "Integração com IHM, inversores, servos e supervisórios"], ["MELSEC", "CLP", "PLC", "iQ-R", "iQ-F", "FX5U", "Automação de máquinas"]),
+    mitsubishi_product("IHMs Mitsubishi GOT", "mitsubishi-ihm-got", "Interface de operação", "IHM / HMI industrial", "Interfaces homem-máquina Mitsubishi para operação local, supervisão, parametrização e diagnóstico.", ["Operação de máquinas", "Supervisão local", "Telas de comando", "Alarmes", "Receitas", "Parâmetros"], ["Operação local", "Supervisão", "Parametrização", "Diagnóstico"], ["GOT", "GOT2000", "IHM", "HMI", "Interface homem máquina"]),
+    mitsubishi_product("Inversores Mitsubishi FR", "mitsubishi-inversores-fr", "Acionamentos industriais", "Inversores de frequência", "Inversores Mitsubishi para controle de velocidade, torque, economia de energia e melhoria operacional.", ["Motores", "Bombas", "Ventiladores", "Esteiras", "Máquinas", "Eficiência energética"], ["Controle de velocidade", "Controle de torque", "Economia de energia", "Melhoria operacional"], ["FR-F", "FR-A", "FR-E", "Inversor de frequência", "Motor", "Acionamento"]),
+    mitsubishi_product("Servos Mitsubishi MELSERVO", "mitsubishi-melservo", "Motion control", "Servo drive e servo motor", "Soluções MELSERVO para controle preciso de movimento, posicionamento, sincronismo e repetibilidade.", ["Máquinas especiais", "Embalagem", "Posicionamento", "Pick and place", "Eixos sincronizados"], ["Controle preciso de movimento", "Posicionamento", "Sincronismo", "Repetibilidade"], ["MELSERVO", "Servo motor", "Servo drive", "Motion control", "Posicionamento"]),
+    mitsubishi_product("Robôs Mitsubishi MELFA", "mitsubishi-robos-melfa", "Robótica industrial", "Robôs industriais SCARA e verticais", "Robôs industriais Mitsubishi MELFA para automação de linhas, manipulação, montagem e integração com sistemas industriais.", ["Pick and place", "Montagem", "Manipulação", "Embalagem", "Células robotizadas", "Linhas automatizadas"], ["Automação de linhas", "Manipulação", "Montagem", "Integração industrial"], ["MELFA", "Robô industrial", "SCARA", "Robô vertical", "Célula robotizada"]),
+    mitsubishi_product("Medição e gestão de energia Mitsubishi", "mitsubishi-medicao-gestao-energia", "Energia e monitoramento", "Medição industrial", "Soluções para medição e gestão de energia em ambiente industrial, apoiando eficiência, monitoramento e tomada de decisão.", ["Gestão de energia", "Eficiência energética", "Consumo industrial", "Dashboards", "Indicadores"], ["Medição industrial", "Monitoramento", "Indicadores", "Apoio à tomada de decisão"], ["Multimedidor", "Energia", "Eficiência energética", "Consumo", "Monitoramento"]),
+    mitsubishi_product("Supervisão, SCADA e dashboards industriais", "mitsubishi-scada-dashboards-industriais", "Software industrial", "Supervisão e dados", "Soluções de supervisão e dashboards industriais para acompanhamento de dados, alarmes, KPIs, disponibilidade e performance.", ["Monitoramento de máquinas", "Alarmes", "Produção", "Falhas", "Indicadores", "Manutenção"], ["Supervisão", "Dashboards industriais", "Alarmes", "KPIs", "Disponibilidade", "Performance"], ["SCADA", "Supervisório", "Dashboard industrial", "Dados industriais", "KPI"]),
+]
+
+TECHNICAL_PRODUCTS = XYRON_PRODUCTS + MITSUBISHI_PRODUCTS

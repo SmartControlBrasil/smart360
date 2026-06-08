@@ -18,11 +18,22 @@ EMERGENCY_TERMS = (
     "vazamento",
     "gás",
     "gas",
-    "risco",
     "queimado",
     "superaquecimento",
     "cheiro de queimado",
     "sem funcionar",
+    "fumaca",
+    "fumaça",
+    "choque",
+    "curto",
+    "risco eletrico",
+    "risco elétrico",
+    "risco estrutural",
+    "incendio",
+    "incêndio",
+    "faisca",
+    "faísca",
+    "cabo derretendo",
 )
 
 LEAD_INTENT_TERMS = (
@@ -87,6 +98,20 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 "Para encaminhar melhor, me envie nome, empresa, cidade e telefone."
             )
 
+        # Quando há intenção explícita de produto, a resposta de conhecimento
+        # deve vencer o enquadramento comercial por palavras como "academia".
+        recent_product = str((context or {}).get("recent_product") or "").strip().lower()
+        if knowledge_context:
+            product_reply = _reply_from_knowledge(knowledge_context, normalized, recent_product=recent_product)
+            if product_reply:
+                return product_reply
+
+        if _looks_like_unknown_robot_model(normalized):
+            return (
+                "Não encontrei esse modelo na base atual da Smart Control Brasil. "
+                "Você quis dizer LIRO/LittleBot, NeoBot, HygiBot, OrbitBot, Buddy Bot, WaiterBot, CareBot, HostBot ou MowerBot?"
+            )
+
         if lead_detected:
             service_text = f" sobre {service_interest}" if service_interest else ""
             return (
@@ -119,9 +144,6 @@ class FallbackLiviaAIClient(LiviaAIClient):
             )
 
         if knowledge_context:
-            product_reply = _reply_from_knowledge(knowledge_context, normalized)
-            if product_reply:
-                return product_reply
             summary = _summarize_knowledge_context(knowledge_context)
             return f"{summary} Se você quiser, eu te ajudo com uma pré-análise do seu cenário."
 
@@ -232,11 +254,17 @@ def _summarize_knowledge_context(knowledge_context):
     return first
 
 
-def _reply_from_knowledge(knowledge_context, normalized_text):
+def _reply_from_knowledge(knowledge_context, normalized_text, recent_product=""):
     lines = [line.strip("- ").strip() for line in knowledge_context.splitlines() if line.startswith("- ")]
     if not lines:
         return ""
     top = lines[0].lower()
+    if "xyron robotics - visao geral" in top or "xyron robotics - visão geral" in top:
+        return (
+            "A Xyron Robotics é uma empresa de tecnologia robótica com soluções para educação, recepção, atendimento, segurança, limpeza, saúde, entrega, inspeção e operação autônoma. "
+            "A Smart Control Brasil conecta essas soluções às aplicações reais do cliente, com diagnóstico, escolha do robô, implantação, treinamento e integração. "
+            "As principais linhas incluem LIRO/LittleBot, NeoBot, HygiBot, OrbitBot, Buddy Bot, WaiterBot, CareBot, HostBot e MowerBot."
+        )
     if "buddy bot" in top:
         if _asks_availability(normalized_text):
             return (
@@ -249,6 +277,30 @@ def _reply_from_knowledge(knowledge_context, normalized_text):
             "Por não depender de rodas, atua melhor em terrenos irregulares e ambientes hostis. "
             "No catálogo: 61 x 37 x 40 cm, 12 kg, autonomia de 2 horas, carregamento em 1 hora, câmera 1920 x 1080 e inclinação máxima de 40°."
         )
+    if recent_product == "neobot":
+        if any(term in normalized_text for term in ("altura", "dimensao", "dimensoes", "tamanho", "medida", "qual a altura")):
+            return (
+                "O NeoBot tem dimensões de 45 x 100 x 40 cm. "
+                "Considerando essas medidas, a altura aproximada é de 100 cm."
+            )
+        if "peso" in normalized_text:
+            return "O peso informado do NeoBot no catálogo é de 18 kg."
+        if "tela" in normalized_text:
+            return "O NeoBot possui tela HD de 10,1 polegadas."
+        if any(term in normalized_text for term in ("duracao", "dura", "autonomia", "tempo da bateria", "bateria dura")):
+            return (
+                "O NeoBot tem autonomia de até 10 horas de operação contínua. "
+                "A bateria informada no catálogo é de 20.000 mAh."
+            )
+        if any(term in normalized_text for term in ("recarga", "carregamento", "carregar", "tempo de carga")):
+            return "O tempo de carregamento do NeoBot é de aproximadamente 9 horas."
+        if "bateria reserva" in normalized_text:
+            return (
+                "Na base atual não tenho confirmação sobre bateria reserva para o NeoBot. "
+                "O catálogo informa bateria de 20.000 mAh, autonomia de até 10 horas e carregamento aproximado de 9 horas. "
+                "Para confirmar bateria reserva ou acessórios, preciso validar com a equipe comercial/técnica da Smart Control Brasil."
+            )
+
     if "neo bot" in top:
         return (
             "O Neo Bot é um robô de recepção e atendimento da linha Xyron, indicado para empresas, eventos, escolas e lojas. "
@@ -257,8 +309,66 @@ def _reply_from_knowledge(knowledge_context, normalized_text):
         )
     if "hygibot" in top:
         return (
-            "O HygiBot, também conhecido em alguns contextos como Dune/Duno Bot, é um robô de limpeza autônoma para grandes áreas internas. "
-            "Ele combina lavar, varrer, aspirar e passar pano seco, com monitoramento de status e relatórios operacionais."
+            "O HygiBot, também tratado como Dune/Duno Bot em algumas conversas, é o robô de limpeza autônoma da linha Xyron. "
+            "Ele combina funções como lavar, varrer, aspirar e passar pano seco, apoiando equipes de limpeza em shoppings, indústrias, hospitais, supermercados, hotéis, academias e grandes áreas internas. "
+            "É uma solução indicada para academias e operações com alto fluxo em grandes áreas internas."
+        )
+    if "neobot" in top or "nebot" in normalized_text or ("neo" in normalized_text and "hostbot" not in normalized_text):
+        if any(term in normalized_text for term in ("altura", "dimensao", "dimensoes", "tamanho", "medida")):
+            return (
+                "O NeoBot tem dimensões de 45 x 100 x 40 cm. "
+                "Considerando essas medidas, a altura aproximada é de 100 cm."
+            )
+        if "peso" in normalized_text:
+            return "O peso informado do NeoBot no catálogo é de 18 kg."
+        if "tela" in normalized_text:
+            return "O NeoBot possui tela HD de 10,1 polegadas."
+        if any(term in normalized_text for term in ("duracao", "dura", "autonomia", "tempo da bateria", "bateria dura")):
+            return (
+                "O NeoBot tem autonomia de até 10 horas de operação contínua. "
+                "A bateria informada no catálogo é de 20.000 mAh."
+            )
+        if any(term in normalized_text for term in ("recarga", "carregamento", "carregar", "tempo de carga")):
+            return "O tempo de carregamento do NeoBot é de aproximadamente 9 horas."
+        if "bateria reserva" in normalized_text:
+            return (
+                "Na base atual não tenho confirmação sobre bateria reserva para o NeoBot. "
+                "O catálogo informa bateria de 20.000 mAh, autonomia de até 10 horas e carregamento aproximado de 9 horas. "
+                "Para confirmar bateria reserva ou acessórios, preciso validar com a equipe comercial/técnica da Smart Control Brasil."
+            )
+        if "idioma" in normalized_text or "idiomas" in normalized_text:
+            return (
+                "O NeoBot tem comunicação multilíngue e pode operar em mais de 20 idiomas, "
+                "o que ajuda bastante em ambientes com visitantes de perfis diferentes."
+            )
+        return (
+            "O NeoBot é um robô recepcionista inteligente da Xyron para atendimento, recepção e experiências interativas em ambientes de alto fluxo. "
+            "Ele combina IA, reconhecimento facial, navegação autônoma, gestão de conteúdo e comunicação multilíngue."
+        )
+    if "liro - planos de aula" in top or "planos de aula" in top:
+        return (
+            "O LIRO pode apoiar plano de aula em diferentes faixas etárias, com contação de histórias, atividades de cores e sentimentos, "
+            "quiz e dinâmicas gamificadas, sempre com o professor como protagonista e alinhamento à BNCC."
+        )
+    if "liro - inclusao" in top or "apae" in top:
+        return (
+            "Sim, o LIRO pode apoiar APAEs e clínicas como ferramenta complementar para inclusão, comunicação e engajamento de públicos neurodivergentes. "
+            "Ele não substitui a equipe multidisciplinar; potencializa o trabalho terapêutico e pedagógico."
+        )
+    if "liro - robo educacional com ia" in top or "liro" in top:
+        return (
+            "O LIRO é um robô educacional com IA da Xyron que apoia sala de aula, engajamento e mediação pedagógica, "
+            "respeitando o planejamento do professor e competências da BNCC."
+        )
+    if "orbitbot" in top:
+        if "termica" in normalized_text or "temperatura" in normalized_text:
+            return (
+                "Sim. O OrbitBot possui imagem térmica para vigilância e monitoramento preventivo, "
+                "com faixa de temperatura de -5°C a 150°C no catálogo."
+            )
+        return (
+            "O OrbitBot é um robô de segurança autônoma com navegação a laser, patrulha 24/7 e monitoramento contínuo. "
+            "Ele é indicado para ambientes amplos que exigem cobertura previsível e preventiva."
         )
     if "liro" in top or "littlebot" in top:
         return (
@@ -337,3 +447,32 @@ def _recommend_robot_by_scenario(normalized_text):
         "Posso te sugerir de 1 a 3 robôs ideais, mas preciso de um contexto rápido: "
         "tipo de ambiente, objetivo principal e se o foco é educação, recepção, segurança, limpeza, entrega, saúde, inspeção ou área externa."
     )
+
+
+def _looks_like_unknown_robot_model(normalized_text):
+    if any(term in normalized_text for term in ("cheiro de queimado", "risco eletrico", "risco elétrico", "incendio", "incêndio", "fumaça", "fumaca", "curto", "choque")):
+        return False
+    if "connectbot" not in normalized_text and "bot" not in normalized_text and "robo" not in normalized_text and "robô" not in normalized_text:
+        return False
+    known_terms = (
+        "liro",
+        "little",
+        "littlebot",
+        "neo",
+        "neobot",
+        "hygibot",
+        "hygi",
+        "dune",
+        "duno",
+        "orbit",
+        "patrol",
+        "buddy",
+        "budy",
+        "waiter",
+        "carebot",
+        "hostbot",
+        "mowerbot",
+        "xyron",
+        "nebot",
+    )
+    return not any(term in normalized_text for term in known_terms)

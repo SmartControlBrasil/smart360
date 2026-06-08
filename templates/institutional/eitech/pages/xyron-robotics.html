@@ -382,120 +382,1159 @@
   <!--===== OTHERS AREA ENDS =======-->
 
   <!--===== FEATURES AREA STARTS =======-->
+  <style>
+    .xyron-product-catalog {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .xyron-product-section {
+      background: #ffffff;
+      border: 1px solid rgba(88, 56, 168, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 12px 36px rgba(26, 16, 51, 0.05);
+      padding: 36px 28px 40px;
+    }
+
+    .xyron-product-section:nth-child(even) {
+      background: linear-gradient(180deg, #f8f6fc 0%, #ffffff 100%);
+    }
+
+    .xyron-product-hero {
+      align-items: center;
+      display: grid;
+      gap: 32px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      margin-bottom: 36px;
+    }
+
+    .xyron-product-section--media-right .xyron-product-media {
+      order: 2;
+    }
+
+    .xyron-product-section--media-right .xyron-product-content {
+      order: 1;
+    }
+
+    .xyron-product-media img {
+      border-radius: 18px;
+      display: block;
+      height: auto;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .xyron-product-content h3 {
+      color: #1a1033;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .xyron-product-content p {
+      color: #4a4560;
+      font-size: 16px;
+      line-height: 1.65;
+      margin: 0 0 14px;
+    }
+
+    .xyron-product-content p:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .xyron-product-block-title {
+      color: #1a1033;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 20px;
+      text-align: center;
+    }
+
+    .xyron-product-features-grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-bottom: 32px;
+    }
+
+    .xyron-product-features-grid--cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .xyron-product-features-grid--cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .xyron-product-card {
+      background: #ffffff;
+      border: 1px solid rgba(88, 56, 168, 0.1);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(26, 16, 51, 0.05);
+      height: 100%;
+      padding: 22px 20px;
+    }
+
+    .xyron-product-section:nth-child(even) .xyron-product-card {
+      background: #ffffff;
+    }
+
+    .xyron-product-card__icon {
+      align-items: center;
+      background: rgba(88, 56, 168, 0.1);
+      border-radius: 12px;
+      color: #5838a8;
+      display: inline-flex;
+      font-size: 18px;
+      height: 42px;
+      justify-content: center;
+      margin-bottom: 14px;
+      width: 42px;
+    }
+
+    .xyron-product-card h4 {
+      color: #1a1033;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .xyron-product-card p {
+      color: #5c6670;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .xyron-product-specs {
+      background: #ffffff;
+      border: 1px solid rgba(88, 56, 168, 0.1);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(26, 16, 51, 0.05);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .xyron-product-specs__title {
+      background: linear-gradient(90deg, #5838a8 0%, #3d5afe 100%);
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      padding: 16px 22px;
+    }
+
+    .xyron-product-specs__list {
+      display: grid;
+      gap: 0;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .xyron-product-specs__item {
+      border-bottom: 1px solid rgba(88, 56, 168, 0.08);
+      border-right: 1px solid rgba(88, 56, 168, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 20px;
+    }
+
+    .xyron-product-specs__item:nth-child(2n) {
+      border-right: none;
+    }
+
+    .xyron-product-specs__item:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+
+    .xyron-product-specs__label {
+      color: #5838a8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .xyron-product-specs__value {
+      color: #1a1033;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .xyron-product-applications {
+      margin-bottom: 28px;
+    }
+
+    .xyron-product-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .xyron-product-tags__tag {
+      background: rgba(88, 56, 168, 0.08);
+      border: 1px solid rgba(88, 56, 168, 0.16);
+      border-radius: 999px;
+      color: #3d2d6b;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 16px;
+    }
+
+    .xyron-product-cta {
+      border-top: 1px solid rgba(88, 56, 168, 0.1);
+      padding-top: 28px;
+      text-align: center;
+    }
+
+    @media (max-width: 991px) {
+      .xyron-product-features-grid,
+      .xyron-product-features-grid--cols-3,
+      .xyron-product-features-grid--cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 767px) {
+      .xyron-product-section {
+        padding: 24px 16px 28px;
+      }
+
+      .xyron-product-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .xyron-product-section--media-right .xyron-product-media,
+      .xyron-product-section--media-right .xyron-product-content {
+        order: unset;
+      }
+
+      .xyron-product-features-grid,
+      .xyron-product-features-grid--cols-3,
+      .xyron-product-features-grid--cols-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .xyron-product-specs__list {
+        grid-template-columns: 1fr;
+      }
+
+      .xyron-product-specs__item {
+        border-right: none;
+      }
+
+      .xyron-product-specs__item:not(:last-child) {
+        border-bottom: 1px solid rgba(88, 56, 168, 0.08);
+      }
+
+      .xyron-product-specs__item:nth-last-child(-n+2) {
+        border-bottom: 1px solid rgba(88, 56, 168, 0.08);
+      }
+
+      .xyron-product-specs__item:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+
   <div class="features3-section-area sp1">
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
+        <div class="col-lg-8 m-auto">
           <div class="features heading heading5 text-center">
             <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="">Produtos e soluções integradas</h5>
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">Tecnologia Xyron para interagir, monitorar e proteger</h2>
+            <h2 class="text-anime-style-3">Catálogo técnico Xyron Robotics</h2>
+            <div class="space16"></div>
+            <p>Conheça a linha completa de robôs para educação, segurança, atendimento, logística interna, saúde, limpeza e operação em áreas externas.</p>
           </div>
         </div>
-        <div class="space100 d-lg-block d-none"></div>
-        <div class="space60 d-lg-none d-block"></div>
       </div>
-
-      <div class="row align-items-center">
-        <div class="col-lg-6" data-aos="zoom-in" data-aos-duration="1000">
-          <div class="images-area">
-            <img src="{% static 'institutional/eitech/img/elements/elements28.png' %}" alt="" class="elements28">
-            <svg xmlns="http://www.w3.org/2000/svg" width="483" height="467" viewBox="0 0 483 467" fill="none">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M266.577 463.258C200.182 477.787 129.972 448.449 80.196 402.148C28.7424 354.286 2.6788 285.923 0.403656 215.667C-1.9523 142.916 8.49039 58.9734 67.7138 16.6983C123.868 -23.3859 197.78 20.6378 266.577 25.6664C326.276 30.0299 393.811 3.79349 438.363 43.7902C483.846 84.6228 489.019 155.489 478.219 215.667C468.978 267.16 420.048 295.457 386.062 335.216C346.629 381.348 325.846 450.289 266.577 463.258Z" fill="#D8CEED" fill-opacity="0.7" />
-            </svg>
-            <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img6.png' %}" alt="">
-            </div>
+      <div class="space40"></div>
+      <div class="xyron-product-catalog">
+      <article class="xyron-product-section " data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/blog/banner-little.png' %}" alt="LIRO Little Bot robô educacional Xyron Robotics">
           </div>
-        </div>
-
-        <div class="col-lg-5">
-          <div class="content-area heading5">
+          <div class="xyron-product-content heading5">
             <h3 class="text-anime-style-3">LIRO / Little Bot</h3>
-            <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Robô educacional inteligente para escolas, famílias e espaços de atendimento especializado, apoiando interação, aprendizagem e inclusão.</p>
-            <div class="space18"></div>
+            <p>Robô educacional inteligente para escolas, famílias, clínicas, creches e espaços de atendimento especializado, apoiando interação, aprendizagem, entretenimento e inclusão.</p>
+            <p>Com resposta por voz, reconhecimento facial, controle por toque, chamada de vídeo, conversa com ChatGPT e monitoramento remoto, o Little Bot cria experiências educativas, afetivas e tecnológicas para crianças e ambientes de aprendizagem.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-robot"></i></span>
+            <h4>Mascote Eletrônico</h4>
+            <p>Integra resposta por voz, reconhecimento facial, controle por voz, toque e sensores avançados, suportando voz e movimento em diferentes cenários.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-comments"></i></span>
+            <h4>Modo de Diálogo com ChatGPT</h4>
+            <p>Pode conversar em português, inglês, espanhol, francês, russo, árabe e coreano. O modo de conversação com ChatGPT fornece respostas sobre ciência, conhecimento geral e temas educativos, funcionando como uma enciclopédia interativa.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-microphone-lines"></i></span>
+            <h4>Bate-papo Inteligente</h4>
+            <p>Reconhece comandos por voz e responde conforme o pedido. Ao ouvir comandos como “vá para frente”, pode identificar o rosto e se movimentar até o usuário. Também pode contar histórias e interagir de forma personalizada.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-video"></i></span>
+            <h4>Chamada de Vídeo</h4>
+            <p>Conta com recursos para chamadas de vídeo bidirecionais, permitindo acompanhar momentos especiais, interagir com crianças e ampliar a comunicação à distância.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-child-reaching"></i></span>
+            <h4>Assistente de Vida</h4>
+            <p>Fornece atualizações de clima em tempo real, canta, dança e oferece experiências educativas e divertidas para envolver crianças, famílias e ambientes de aprendizagem.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-satellite-dish"></i></span>
+            <h4>Controle Remoto</h4>
+            <p>Permite conexão remota por rede móvel 4G, com transmissão de imagens em tempo real e monitoramento em 360°, reduzindo pontos cegos no acompanhamento do ambiente.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho (C x A x L)</span>
+              <span class="xyron-product-specs__value">16,5 x 22,5 x 22 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Peso líquido</span>
+              <span class="xyron-product-specs__value">1,68 kg</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Conexão</span>
+              <span class="xyron-product-specs__value">Wi-Fi</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Capacidade da bateria</span>
+              <span class="xyron-product-specs__value">5000 mAh</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Entrada de energia</span>
+              <span class="xyron-product-specs__value">DC 5V / 1.2A</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Porta de entrada</span>
+              <span class="xyron-product-specs__value">Micro USB</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo para carregar</span>
+              <span class="xyron-product-specs__value">5 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia</span>
+              <span class="xyron-product-specs__value">6 horas</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Casa</span>
+            <span class="xyron-product-tags__tag">Pré-escola</span>
+            <span class="xyron-product-tags__tag">Escolas</span>
+            <span class="xyron-product-tags__tag">Escritórios</span>
+            <span class="xyron-product-tags__tag">Creches</span>
+            <span class="xyron-product-tags__tag">Parques</span>
+            <span class="xyron-product-tags__tag">Atendimento especializado</span>
+            <span class="xyron-product-tags__tag">Projetos educacionais</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section xyron-product-section--media-right" data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/about/orbit-robot-security-xyron.png' %}" alt="Orbit Bot Patrol Bot robô de patrulhamento e segurança Xyron">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">Orbit Bot / Patrol Bot</h3>
+            <p>Robô de patrulhamento e segurança para grandes áreas, com navegação autônoma, visão inteligente, monitoramento em tempo real e apoio à prevenção de riscos.</p>
+            <p>Indicado para shoppings, fábricas, aeroportos, hotéis, escolas e edifícios comerciais, o Orbit pode executar rotas de patrulha, reconhecer situações críticas e retornar automaticamente para a base de carregamento.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid xyron-product-features-grid--cols-3">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-route"></i></span>
+            <h4>Navegação Automática em Grandes Áreas</h4>
+            <p>Com sistema de navegação a laser, o Orbit pode criar mapa interno com posicionamento preciso, perceber o ambiente dinamicamente e programar a melhor rota para patrulhas.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-clock"></i></span>
+            <h4>Tarefas Autônomas Programadas</h4>
+            <p>Pode localizar destinos com precisão, configurar tarefas de patrulha conforme a necessidade e retornar automaticamente à base após concluir a missão.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-eye"></i></span>
+            <h4>Identificação Visual por IA</h4>
+            <p>O sistema de identificação visual com IA permite reconhecer rapidamente pessoas, fumaça e alta temperatura, emitindo alertas automaticamente.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho (C x A x L)</span>
+              <span class="xyron-product-specs__value">65 x 70 x 67 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Velocidade</span>
+              <span class="xyron-product-specs__value">0,7 m/s</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia</span>
+              <span class="xyron-product-specs__value">10 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo para carregar</span>
+              <span class="xyron-product-specs__value">9 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Ângulo de movimento da cabeça</span>
+              <span class="xyron-product-specs__value">esquerda 90°, direita 90°, cima 30°, baixo 15°</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Sistema de navegação</span>
+              <span class="xyron-product-specs__value">precisão de movimento 5 mm/m e raio de navegação a laser de 30 m</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Área de navegação</span>
+              <span class="xyron-product-specs__value">40000 m² por mapa</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Vigilância com luz visível</span>
+              <span class="xyron-product-specs__value">resolução 1080p, distância focal 2,8 mm, ângulo de visão 121°, protocolo RTMP</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Vigilância térmica</span>
+              <span class="xyron-product-specs__value">distância focal 2,9 mm, ângulo de visão 121°, faixa de temperatura 5°C a 150°C</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Integração</span>
+              <span class="xyron-product-specs__value">controle de acesso, catracas e portas automáticas</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Edifício comercial</span>
+            <span class="xyron-product-tags__tag">Aeroportos</span>
+            <span class="xyron-product-tags__tag">Hotéis</span>
+            <span class="xyron-product-tags__tag">Escolas</span>
+            <span class="xyron-product-tags__tag">Fábricas</span>
+            <span class="xyron-product-tags__tag">Shopping Centers</span>
+            <span class="xyron-product-tags__tag">Segurança patrimonial</span>
+            <span class="xyron-product-tags__tag">Patrulhamento autônomo</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section " data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/hero/neo-robot-assistence-xyron.png' %}" alt="Neo Bot robô de recepção e atendimento Xyron">
+          </div>
+          <div class="xyron-product-content heading5">
             <h3 class="text-anime-style-3">Neo Bot</h3>
-            <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="1000">Robô de recepção e atendimento para apresentar produtos, apoiar eventos e criar experiências interativas para visitantes.</p>
-            <div class="space28"></div>
-            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista</a>
+            <p>Robô de recepção e atendimento para empresas, eventos, escolas, lojas e ambientes que precisam criar experiências interativas com visitantes e clientes.</p>
+            <p>O Neo Bot combina diálogo multilíngue, IA, reconhecimento facial, apresentação de produtos, respostas personalizadas e interação com o público.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
             </div>
           </div>
         </div>
-      </div>
-      <div class="space100 d-lg-block d-none"></div>
-      <div class="space60 d-lg-block d-none"></div>
-      <div class="row align-items-center">
-        <div class="col-lg-5">
-          <div class="content-area2 heading5">
-            <h3 class="text-anime-style-3">Patrol Bot / Orbit Bot</h3>
-            <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="900">Robôs de segurança para patrulhamento, visão total, monitoramento em tempo real, imagem térmica, visão noturna e prevenção de riscos.</p>
-            <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="1000">Recursos de IA podem apoiar detecção de comportamento anormal, reconhecimento facial, leitura de placas e medidores conforme o projeto.</p>
-            <div class="space28"></div>
-            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Alinhar solução</a>
-            </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-language"></i></span>
+            <h4>Modo de Diálogo Multilíngue</h4>
+            <p>Conversa em diversos idiomas, incluindo inglês, italiano, russo, alemão, espanhol, francês, português, japonês, árabe, cantonês, persa, vietnamita, tailandês, coreano, cazaque, holandês e indonésio.</p>
           </div>
-          <div class="space50 d-lg-none d-block"></div>
-        </div>
-        <div class="col-lg-1"></div>
-        <div class="col-lg-6" data-aos="zoom-in" data-aos-duration="1100">
-          <div class="images-area">
-            <img src="{% static 'institutional/eitech/img/elements/elements28.png' %}" alt="" class="elements28">
-            <svg xmlns="http://www.w3.org/2000/svg" width="483" height="467" viewBox="0 0 483 467" fill="none">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M266.577 463.258C200.182 477.787 129.972 448.449 80.196 402.148C28.7424 354.286 2.6788 285.923 0.403656 215.667C-1.9523 142.916 8.49039 58.9734 67.7138 16.6983C123.868 -23.3859 197.78 20.6378 266.577 25.6664C326.276 30.0299 393.811 3.79349 438.363 43.7902C483.846 84.6228 489.019 155.489 478.219 215.667C468.978 267.16 420.048 295.457 386.062 335.216C346.629 381.348 325.846 450.289 266.577 463.258Z" fill="#D8CEED" fill-opacity="0.7" />
-            </svg>
-            <div class="img1 image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img7.png' %}" alt="">
-            </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-brain"></i></span>
+            <h4>Integração com IA</h4>
+            <p>Integração com inteligência artificial como DeepSeek e ChatGPT para interações naturais, respostas rápidas, suporte ao atendimento e melhoria da experiência do cliente.</p>
           </div>
-        </div>
-      </div>
-      <div class="space80"></div>
-      <div class="row">
-        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="800">
-          <div class="works-single-boxarea">
-            <div class="content-area">
-              <a href="{% url 'institutional:contact' %}">Buddy Bot</a>
-              <div class="space16"></div>
-              <p>Cão robô inteligente com mobilidade, resposta rápida, patrulha dinâmica e acesso a áreas que apresentam risco para pessoas.</p>
-            </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-circle-question"></i></span>
+            <h4>Perguntas e Respostas Personalizadas</h4>
+            <p>Ao carregar informações de produtos ou serviços, o robô responde perguntas automaticamente, exibe imagens e fornece detalhes relevantes.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-music"></i></span>
+            <h4>Dança em Grupo</h4>
+            <p>Com formato amigável e movimentos animados, chama atenção, atrai visitantes e aumenta o engajamento em ações comerciais ou eventos.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-face-smile"></i></span>
+            <h4>Reconhecimento Facial</h4>
+            <p>Pode reconhecer clientes, níveis de associação ou cadastro, oferecendo informações, promoções e recomendações personalizadas conforme o perfil.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-headset"></i></span>
+            <h4>Chamada de Vídeo Unidirecional</h4>
+            <p>Permite que uma equipe remota controle respostas que o robô falará em voz alta, proporcionando atendimento mais humano mesmo à distância.</p>
           </div>
         </div>
-        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="900">
-          <div class="works-single-boxarea">
-            <div class="content-area">
-              <a href="{% url 'institutional:contact' %}">Nexneo</a>
-              <div class="space16"></div>
-              <p>Software integrado para escolas com controle de acesso, comunicação, alertas, BI e integração com a infraestrutura Xyron.</p>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Dimensões (L x A x P)</span>
+              <span class="xyron-product-specs__value">45 x 100 x 40 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Peso líquido</span>
+              <span class="xyron-product-specs__value">18 kg</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho da tela</span>
+              <span class="xyron-product-specs__value">Tela HD de 10,1 polegadas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Capacidade da bateria</span>
+              <span class="xyron-product-specs__value">20.000 mAh</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia de funcionamento</span>
+              <span class="xyron-product-specs__value">10 horas de operação contínua</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo de carregamento</span>
+              <span class="xyron-product-specs__value">aproximadamente 9 horas</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Casa</span>
+            <span class="xyron-product-tags__tag">Pré-escola</span>
+            <span class="xyron-product-tags__tag">Escolas</span>
+            <span class="xyron-product-tags__tag">Escritórios</span>
+            <span class="xyron-product-tags__tag">Creches</span>
+            <span class="xyron-product-tags__tag">Parques</span>
+            <span class="xyron-product-tags__tag">Recepção corporativa</span>
+            <span class="xyron-product-tags__tag">Eventos</span>
+            <span class="xyron-product-tags__tag">Lojas</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section xyron-product-section--media-right" data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/about/relay-robot-entrega-xyron.png' %}" alt="WaiterBot robô de entrega Xyron Robotics">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">WaiterBot</h3>
+            <p>Robô de entrega e apoio operacional para restaurantes, hotéis, supermercados e ambientes de atendimento com fluxo de pedidos, bandejas ou materiais.</p>
+            <p>O WaiterBot automatiza deslocamentos internos, realiza entregas em pontos definidos, retorna bandejas, desvia de obstáculos e melhora a eficiência operacional.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
             </div>
           </div>
         </div>
-        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
-          <div class="works-single-boxarea">
-            <div class="content-area">
-              <a href="{% url 'institutional:contact' %}">Kit Xyron School</a>
-              <div class="space16"></div>
-              <p>Solução integrada para segurança escolar com controle de acesso, câmeras, catracas, Nexneo e LIRO.</p>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-map-location-dot"></i></span>
+            <h4>Navegação Autônoma</h4>
+            <p>Cria mapas do ambiente interno, localiza-se com precisão, analisa o espaço em tempo real e executa rotas de entrega com alta eficiência.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-shield-halved"></i></span>
+            <h4>Desvio Inteligente de Obstáculos</h4>
+            <p>Com sensores avançados, detecta pessoas e objetos ao redor, evita multidões e utiliza sistema anticolisão com fusão de múltiplos sensores.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-truck-fast"></i></span>
+            <h4>Múltiplas Formas de Entrega</h4>
+            <p>Suporta entregas em ponto único ou múltiplos pontos, permitindo várias tarefas em paralelo e reduzindo o tempo de serviço.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-sliders"></i></span>
+            <h4>Modos de Operação Múltiplos</h4>
+            <p>Modo Entrega, modo Retorno de Bandejas e modo Patrulha/Cruzeiro com rotas pré-configuradas.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-volume-high"></i></span>
+            <h4>Transmissão de Voz</h4>
+            <p>Suporta transmissão de voz em diversos idiomas, incluindo chinês, inglês, cantonês, alemão, francês, tailandês, japonês, espanhol e português.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-battery-full"></i></span>
+            <h4>Carregamento Automático</h4>
+            <p>Após concluir as tarefas, retorna automaticamente à base de carregamento, garantindo continuidade operacional.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Dimensões (L x A x C)</span>
+              <span class="xyron-product-specs__value">50 x 50 x 130 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Capacidade de carga</span>
+              <span class="xyron-product-specs__value">40 kg, sendo 10 kg por bandeja</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Velocidade de deslocamento</span>
+              <span class="xyron-product-specs__value">0,7 m/s</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Capacidade da bateria</span>
+              <span class="xyron-product-specs__value">12.800 mAh</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo de operação</span>
+              <span class="xyron-product-specs__value">até 10 horas</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Restaurantes</span>
+            <span class="xyron-product-tags__tag">Hotéis</span>
+            <span class="xyron-product-tags__tag">Supermercados</span>
+            <span class="xyron-product-tags__tag">Food service</span>
+            <span class="xyron-product-tags__tag">Eventos</span>
+            <span class="xyron-product-tags__tag">Ambientes de atendimento</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section " data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/blog/linha-completa-robot.png' %}" alt="CareBot robô assistivo para saúde Xyron Robotics">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">CareBot</h3>
+            <p>Robô assistivo para saúde, cuidado residencial, clínicas, hospitais, farmácias e monitoramento de indicadores fisiológicos.</p>
+            <p>O CareBot atua como plataforma inteligente de apoio ao cuidado, integrando chamadas, monitoramento de saúde, recursos de teleatendimento e alertas de risco.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
             </div>
           </div>
         </div>
-        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-duration="1100">
-          <div class="works-single-boxarea">
-            <div class="content-area">
-              <a href="{% url 'institutional:contact' %}">Kit Xyron Urbano</a>
-              <div class="space16"></div>
-              <p>Solução para cidades com vigilância urbana, IA, cercamento digital e monitoramento inteligente.</p>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-phone"></i></span>
+            <h4>Chamada com Um Toque</h4>
+            <p>Possui botão dedicado para chamadas rápidas. Ao ser acionado, inicia chamadas de áudio e vídeo para contatos previamente configurados.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-heart-pulse"></i></span>
+            <h4>Indicadores de Saúde Monitorados</h4>
+            <p>Permite monitorar pressão arterial, glicose no sangue, ácido úrico, eletrocardiograma, frequência cardíaca, temperatura corporal e oxigenação do sangue.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-house-medical"></i></span>
+            <h4>Monitoramento de Saúde Doméstico</h4>
+            <p>Reúne dados fisiológicos, relatórios e análises para apoio ao cuidado contínuo, especialmente de idosos.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-box"></i></span>
+            <h4>Compartimento para Acessórios</h4>
+            <p>Conta com gaveta de armazenamento para acessórios e pequenos itens de uso diário relacionados à saúde.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-user-doctor"></i></span>
+            <h4>Hospital por Internet</h4>
+            <p>Permite acesso a consulta médica por vídeo, médico da família, renovação de receitas e entrega de medicamentos em domicílio.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-bell"></i></span>
+            <h4>Segurança e Proteção</h4>
+            <p>Inclui chamada de emergência, relatórios de saúde, alertas, sugestões de risco e análise baseada em inteligência artificial.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Dimensões (L x A x C)</span>
+              <span class="xyron-product-specs__value">198 x 270 x 420 mm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tela</span>
+              <span class="xyron-product-specs__value">9 polegadas, 1024 x 600 pixels</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Materiais</span>
+              <span class="xyron-product-specs__value">ABS + PC</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Câmera</span>
+              <span class="xyron-product-specs__value">1920 x 1080 pixels</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Bateria</span>
+              <span class="xyron-product-specs__value">16.8 V / 2500 mAh</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tensão de entrada</span>
+              <span class="xyron-product-specs__value">100–240 V</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Carregador</span>
+              <span class="xyron-product-specs__value">16.8 V / 1.5 A</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Rotação da cabeça</span>
+              <span class="xyron-product-specs__value">suportada, de -70° a +70°</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Grau de proteção</span>
+              <span class="xyron-product-specs__value">IP20</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Residencial</span>
+            <span class="xyron-product-tags__tag">Hospitais</span>
+            <span class="xyron-product-tags__tag">Farmácias</span>
+            <span class="xyron-product-tags__tag">Asilos</span>
+            <span class="xyron-product-tags__tag">Clínicas de reabilitação</span>
+            <span class="xyron-product-tags__tag">Cuidados assistivos</span>
+            <span class="xyron-product-tags__tag">Telemedicina</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section xyron-product-section--media-right" data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/about/robots-xyron.png' %}" alt="HygiBot Dune Bot robô de limpeza autônoma Xyron">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">HygiBot / Dune Bot</h3>
+            <p>Robô de limpeza autônoma para shoppings, indústrias, hospitais, supermercados, ginásios, hotéis e grandes áreas internas.</p>
+            <p>Combina funções de lavar, varrer, aspirar e passar pano seco, apoiando equipes de limpeza com operação inteligente e monitoramento de status.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
             </div>
           </div>
         </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid xyron-product-features-grid--cols-3">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-broom"></i></span>
+            <h4>Limpeza Poderosa Tudo em Um</h4>
+            <p>Combina funções de espanar, aspirar e passar pano em um único equipamento, com operação simples e prática.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-spray-can-sparkles"></i></span>
+            <h4>Desempenho de Limpeza Impecável</h4>
+            <p>Equipado com diversos acessórios e escovas, incluindo escova rotativa de 500 rpm e motor de 15.000 rpm, proporcionando limpeza profunda com alta potência de sucção.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-chart-line"></i></span>
+            <h4>Fácil Gerenciamento</h4>
+            <p>Oferece monitoramento em tempo real do status e relatórios de limpeza, com interface intuitiva e controles simples.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho</span>
+              <span class="xyron-product-specs__value">50 x 60 x 58 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Peso líquido</span>
+              <span class="xyron-product-specs__value">53,8 kg</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Bateria</span>
+              <span class="xyron-product-specs__value">46.000 mAh</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo de carregamento</span>
+              <span class="xyron-product-specs__value">2,5 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia</span>
+              <span class="xyron-product-specs__value">4 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Funções de limpeza</span>
+              <span class="xyron-product-specs__value">lavar, varrer, aspirar e passar pano seco</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Shoppings</span>
+            <span class="xyron-product-tags__tag">Indústrias</span>
+            <span class="xyron-product-tags__tag">Hospitais</span>
+            <span class="xyron-product-tags__tag">Supermercados</span>
+            <span class="xyron-product-tags__tag">Ginásios</span>
+            <span class="xyron-product-tags__tag">Hotéis</span>
+            <span class="xyron-product-tags__tag">Academias</span>
+            <span class="xyron-product-tags__tag">Grandes áreas internas</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section " data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/blog/linha-completa-robot.png' %}" alt="HostBot robô host para recepção e eventos Xyron">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">HostBot</h3>
+            <p>Robô host para recepção, eventos, empresas, comércios, museus, galerias, concessionárias e bancos.</p>
+            <p>Com duas telas, altura semelhante à humana, conversas com IA e desvio de obstáculos, o HostBot cria uma experiência de atendimento dinâmica e interativa.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid xyron-product-features-grid--cols-4">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-display"></i></span>
+            <h4>Interação em Duas Telas</h4>
+            <p>Exibe simultaneamente vídeos, páginas da web e imagens, proporcionando uma experiência dinâmica e interativa.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-user"></i></span>
+            <h4>Altura Semelhante à Humana</h4>
+            <p>Com altura e proporções adequadas, integra-se ao ambiente oferecendo interação confortável e acessível.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-shield"></i></span>
+            <h4>Desvio Automático de Obstáculos</h4>
+            <p>Utiliza sensores avançados para navegar suavemente pelo ambiente, evitando obstáculos em tempo real.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-comments"></i></span>
+            <h4>Conversas com Inteligência Artificial</h4>
+            <p>Com tecnologia ChatGPT, fornece comunicação intuitiva, respostas precisas e melhor experiência para os usuários.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho</span>
+              <span class="xyron-product-specs__value">49 x 140 x 48 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Peso líquido</span>
+              <span class="xyron-product-specs__value">23 kg</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tela principal</span>
+              <span class="xyron-product-specs__value">10,1 polegadas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Extra tablet</span>
+              <span class="xyron-product-specs__value">19 polegadas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Bateria</span>
+              <span class="xyron-product-specs__value">20.000 mAh</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo de carregamento</span>
+              <span class="xyron-product-specs__value">8 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia</span>
+              <span class="xyron-product-specs__value">10 horas</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Eventos</span>
+            <span class="xyron-product-tags__tag">Empresas</span>
+            <span class="xyron-product-tags__tag">Comércios</span>
+            <span class="xyron-product-tags__tag">Museus e galerias</span>
+            <span class="xyron-product-tags__tag">Concessionárias</span>
+            <span class="xyron-product-tags__tag">Bancos</span>
+            <span class="xyron-product-tags__tag">Recepção</span>
+            <span class="xyron-product-tags__tag">Feiras</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section xyron-product-section--media-right" data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/elements/budy-dog-robot.png' %}" alt="Buddy Bot robô quadrúpede para inspeção e segurança Xyron">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">Buddy Bot</h3>
+            <p>Robô quadrúpede para inspeção, segurança patrimonial, resgate, engenharia, obras, indústrias e áreas de difícil acesso.</p>
+            <p>Diferente de robôs sobre rodas, o Buddy pode operar em terrenos irregulares, subir obstáculos, patrulhar áreas externas e apoiar inspeções em ambientes hostis.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid xyron-product-features-grid--cols-3">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-industry"></i></span>
+            <h4>Inspeção Industrial em Ambientes Hostis</h4>
+            <p>Com câmeras e IA, pode atuar em fábricas químicas, subestações elétricas e áreas industriais, lendo manômetros, verificando válvulas e detectando posições de alavancas.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-dog"></i></span>
+            <h4>Segurança Patrimonial e Resgate</h4>
+            <p>Atua como cão de guarda robótico, transmitindo vídeo em tempo real e patrulhando áreas como fazendas, usinas solares, canteiros de obras, lama e locais de difícil acesso.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-helmet-safety"></i></span>
+            <h4>Construção Civil e Engenharia</h4>
+            <p>Pode transitar em terrenos irregulares, carregar ferramentas ou peças e apoiar equipes em locais onde robôs convencionais não operam bem.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho</span>
+              <span class="xyron-product-specs__value">61 x 37 x 40 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Peso líquido</span>
+              <span class="xyron-product-specs__value">12 kg</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tempo de carregamento</span>
+              <span class="xyron-product-specs__value">1 hora</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia</span>
+              <span class="xyron-product-specs__value">2 horas</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Resolução da câmera</span>
+              <span class="xyron-product-specs__value">1920 x 1080</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Inclinação máxima</span>
+              <span class="xyron-product-specs__value">40°</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Usinas</span>
+            <span class="xyron-product-tags__tag">Indústrias</span>
+            <span class="xyron-product-tags__tag">Obras</span>
+            <span class="xyron-product-tags__tag">Desastres</span>
+            <span class="xyron-product-tags__tag">Pecuária</span>
+            <span class="xyron-product-tags__tag">Túneis ferroviários</span>
+            <span class="xyron-product-tags__tag">Segurança patrimonial</span>
+            <span class="xyron-product-tags__tag">Inspeção técnica</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
+      <article class="xyron-product-section " data-aos="fade-up" data-aos-duration="900">
+        <div class="xyron-product-hero">
+          <div class="xyron-product-media">
+            <img src="{% static 'institutional/eitech/img/all-images/blog/linha-completa-robot.png' %}" alt="MowerBot robô cortador de grama Xyron Robotics">
+          </div>
+          <div class="xyron-product-content heading5">
+            <h3 class="text-anime-style-3">MowerBot</h3>
+            <p>Robô cortador de grama por controle remoto para terrenos irregulares, taludes, áreas verdes, praças, campos esportivos e grandes áreas externas.</p>
+            <p>Projetado para aumentar segurança e produtividade no corte de vegetação, permite operação remota em áreas onde cortadores tradicionais têm limitação ou oferecem risco ao operador.</p>
+            <div class="space24"></div>
+            <div class="btn-area1">
+              <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="xyron-product-block-title">Funções</h4>
+        <div class="xyron-product-features-grid xyron-product-features-grid--cols-3">
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-gamepad"></i></span>
+            <h4>Controle Remoto com Alta Precisão e Segurança</h4>
+            <p>Operado por controle remoto, permite movimentos suaves em qualquer direção e mantém o usuário afastado de riscos como terrenos íngremes, pedras, galhos e vegetação densa.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-scissors"></i></span>
+            <h4>Sistema de Corte Poderoso e Ajustável</h4>
+            <p>Conta com lâmina rotativa de alto desempenho, regulagem de altura e motores independentes de tração e corte, mantendo torque em superfícies irregulares ou inclinadas.</p>
+          </div>
+          <div class="xyron-product-card" data-aos="zoom-in" data-aos-duration="800">
+            <span class="xyron-product-card__icon"><i class="fa-solid fa-mountain"></i></span>
+            <h4>Versatilidade Operacional e Produtividade</h4>
+            <p>Trabalha em barrancos, encostas, valetas, terrenos irregulares, taludes e áreas com obstáculos, reduzindo esforço físico e aumentando produtividade.</p>
+          </div>
+        </div>
+
+        <div class="xyron-product-specs">
+          <h3 class="xyron-product-specs__title">Ficha técnica</h3>
+          <ul class="xyron-product-specs__list">
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Tamanho</span>
+              <span class="xyron-product-specs__value">90 x 93 x 92 cm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Peso líquido</span>
+              <span class="xyron-product-specs__value">140 kg</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Área de corte</span>
+              <span class="xyron-product-specs__value">1500 m²/h</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Velocidade</span>
+              <span class="xyron-product-specs__value">4 km/h</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Corte</span>
+              <span class="xyron-product-specs__value">500 mm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Altura de corte</span>
+              <span class="xyron-product-specs__value">20 mm a 150 mm</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Inclinação</span>
+              <span class="xyron-product-specs__value">45°</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Combustível</span>
+              <span class="xyron-product-specs__value">gasolina</span>
+            </li>
+            <li class="xyron-product-specs__item">
+              <span class="xyron-product-specs__label">Autonomia</span>
+              <span class="xyron-product-specs__value">1 L/h</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="xyron-product-applications">
+          <h4 class="xyron-product-block-title">Aplicações</h4>
+          <div class="xyron-product-tags">
+            <span class="xyron-product-tags__tag">Campos esportivos</span>
+            <span class="xyron-product-tags__tag">Praças públicas</span>
+            <span class="xyron-product-tags__tag">Canteiros</span>
+            <span class="xyron-product-tags__tag">Pistas de grama</span>
+            <span class="xyron-product-tags__tag">Terrenos baldios</span>
+            <span class="xyron-product-tags__tag">Campo de golfe</span>
+            <span class="xyron-product-tags__tag">Áreas verdes</span>
+            <span class="xyron-product-tags__tag">Taludes</span>
+          </div>
+        </div>
+
+        <div class="xyron-product-cta">
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Falar com especialista <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </article>
       </div>
     </div>
-    <div class="space50 d-block d-none"></div>
   </div>
   <!--===== FEATURES AREA ENDS =======-->
 

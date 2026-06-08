@@ -9,6 +9,7 @@ from django.views.generic import TemplateView
 from apps.growth_engine.models import Lead, LeadInteraction, LeadSource
 from apps.marketplace_ecom.models import TechnicalProduct
 
+from .catalog import DEFAULT_IMAGE, TECHNICAL_PRODUCTS
 from .forms import MarketplaceQuoteRequestForm
 
 
@@ -21,10 +22,23 @@ PRODUCTS = [{'title': 'Littlebot', 'slug': 'xyron-littlebot', 'brand': 'Xyron Ro
 for _mock_entry in PRODUCTS:
     _mock_entry.setdefault("description", "")
     _mock_entry.setdefault("is_featured", False)
-    _mock_entry.setdefault("featured_image_url", "")
+    _mock_entry["image"] = DEFAULT_IMAGE
+    _mock_entry["featured_image_url"] = ""
+    _mock_entry.setdefault("vendor", _mock_entry["brand"])
+    _mock_entry.setdefault("product_type", "Solução técnica")
+    _mock_entry.setdefault("technical_description", _mock_entry["short_description"])
+    _mock_entry.setdefault("applications", [_mock_entry["application_area"]])
+    _mock_entry.setdefault("features", [])
+    _mock_entry.setdefault("specs", [])
+    _mock_entry.setdefault("tags", [])
+    _mock_entry.setdefault("cta_label", _mock_entry["button_label"])
+    _mock_entry.setdefault("lead_interest", f"{_mock_entry['brand']} - {_mock_entry['title']}")
+
+_technical_slugs = {product["slug"] for product in TECHNICAL_PRODUCTS}
+PRODUCTS = TECHNICAL_PRODUCTS + [product for product in PRODUCTS if product["slug"] not in _technical_slugs]
 
 
-CATALOG_FALLBACK_STATIC_IMAGE = "marketplace/ecom/img/page/homepage1/imgsp1.png"
+CATALOG_FALLBACK_STATIC_IMAGE = DEFAULT_IMAGE
 
 
 def normalize_filter_value(value):
@@ -42,9 +56,15 @@ def product_matches_query(product, query):
         product["application_area"],
         product["short_description"],
         product.get("description", ""),
+        product.get("technical_description", ""),
+        product.get("product_type", ""),
+        *product.get("applications", []),
+        *product.get("features", []),
+        *product.get("tags", []),
     ]
     normalized_query = normalize_filter_value(query)
-    return any(normalized_query in normalize_filter_value(value) for value in searchable_fields)
+    normalized_searchable = " ".join(normalize_filter_value(value) for value in searchable_fields)
+    return all(term in normalized_searchable for term in normalized_query.split())
 
 
 def filter_products(products, filters):
@@ -62,7 +82,8 @@ def filter_products(products, filters):
     if filters["application"]:
         filtered = [
             product for product in filtered
-            if normalize_filter_value(product["application_area"]) == normalize_filter_value(filters["application"])
+            if normalize_filter_value(filters["application"]) in {normalize_filter_value(value) for value in product.get("applications", [product["application_area"]])}
+            or normalize_filter_value(filters["application"]) in {normalize_filter_value(value) for value in product.get("tags", [])}
         ]
 
     return filtered
@@ -70,6 +91,10 @@ def filter_products(products, filters):
 
 def unique_values(products, field):
     return sorted({product[field] for product in products})
+
+
+def unique_list_values(products, field):
+    return sorted({value for product in products for value in product.get(field, [])})
 
 
 def build_active_filters(filters):
@@ -87,16 +112,16 @@ def build_active_filters(filters):
     ]
 
 
+def normalize_specs(specs):
+    if isinstance(specs, dict):
+        return list(specs.items())
+    return specs or []
+
+
 def technical_product_to_catalog_entry(instance: TechnicalProduct) -> dict:
     """Converte modelo persistido para o formato de catálogo usado pelos templates (dict)."""
-    featured_image_url = ""
-    media_asset = getattr(instance, "featured_image", None)
-    if media_asset is not None:
-        asset_image = getattr(media_asset, "image", None)
-        if asset_image and getattr(asset_image, "name", ""):
-            featured_image_url = asset_image.url
-
     description = instance.description or ""
+    metadata = instance.metadata or {}
     price_label = "Sob consulta"
     rating = "Sob consulta"
     button_label = "Solicitar orçamento"
@@ -107,16 +132,25 @@ def technical_product_to_catalog_entry(instance: TechnicalProduct) -> dict:
         "slug": instance.slug,
         "brand": instance.brand,
         "supplier": instance.supplier_name,
+        "vendor": metadata.get("vendor", instance.brand),
         "category": instance.category,
+        "product_type": metadata.get("product_type", "Solução técnica"),
         "short_description": instance.short_description,
+        "technical_description": metadata.get("technical_description", description or instance.short_description),
         "description": description,
         "application_area": instance.application_area,
+        "applications": metadata.get("applications", [instance.application_area]),
+        "features": metadata.get("features", []),
+        "specs": normalize_specs(metadata.get("specs", [])),
+        "tags": metadata.get("tags", []),
         "price_label": price_label,
         "rating": rating,
-        "button_label": button_label,
+        "button_label": metadata.get("cta_label", button_label),
+        "cta_label": metadata.get("cta_label", button_label),
+        "lead_interest": metadata.get("lead_interest", f"{instance.brand} - {instance.title}"),
         "image": image,
         "is_featured": instance.is_featured,
-        "featured_image_url": featured_image_url,
+        "featured_image_url": "",
     }
 
 
@@ -194,6 +228,7 @@ def create_quote_request_lead(product, form):
             "brand": product["brand"],
             "supplier": product["supplier"],
             "category": product["category"],
+            "product_type": product["product_type"],
             "application_area": product["application_area"],
             "origin": "marketplace_ecom",
             "request_type": "quote_request",
@@ -242,7 +277,7 @@ class ProductListView(TemplateView):
         context["available_brands"] = context["brands"]
         context["available_suppliers"] = context["suppliers"]
         context["available_categories"] = unique_values(products, "category")
-        context["available_applications"] = unique_values(products, "application_area")
+        context["available_applications"] = unique_list_values(products, "applications")
         context["active_filters"] = build_active_filters(filters)
         context["filters"] = filters
         context["result_count"] = len(filtered_products)

@@ -30,6 +30,21 @@ class LiviaKnowledgeService:
         "hostbot",
         "mowerbot",
     }
+    CLEANING_INTENT_TERMS = {
+        "limpeza",
+        "hygibot",
+        "hygi",
+        "dune",
+        "duno",
+        "dunobot",
+    }
+    BUDDY_INTENT_TERMS = {
+        "buddy",
+        "budy",
+        "cao",
+        "cachorro",
+        "quadrupede",
+    }
     STOPWORDS = {
         "que",
         "para",
@@ -104,7 +119,7 @@ class LiviaKnowledgeService:
 
     def _score_item(self, item: LiviaKnowledgeItem, normalized_query: str, terms: list[str], has_xyron_intent: bool) -> int:
         searchable = self._normalize(f"{item.title} {item.keywords} {item.content}")
-        score = max(1, item.priority // 10)
+        score = 0
 
         for term in terms:
             if re.search(rf"\b{re.escape(term)}\b", searchable):
@@ -113,6 +128,10 @@ class LiviaKnowledgeService:
                 score += 5
 
         slug = item.slug or ""
+        if score > 0:
+            score += max(1, item.priority // 20)
+
+        is_xyron_overview_query = self._is_xyron_overview_query(normalized_query, terms)
         if has_xyron_intent:
             if slug.startswith("xyron-"):
                 score += 22
@@ -120,19 +139,38 @@ class LiviaKnowledgeService:
                 score += 18
             else:
                 score -= 4
+        if is_xyron_overview_query:
+            if slug == "xyron-robotics-visao-geral":
+                score += 75
+            elif slug.startswith("xyron-"):
+                score -= 12
 
         if "pmoc" in terms and slug == "pmoc":
             score += 35
 
-        buddy_terms = {"buddy", "budy", "cao", "cachorro", "quadrupede", "robo", "robotico"}
+        buddy_terms = self.BUDDY_INTENT_TERMS
+        cleaning_terms = self.CLEANING_INTENT_TERMS
+
         if terms and buddy_terms.intersection(terms) and slug == "xyron-buddy-bot":
             score += 60
-        if {"neo", "neobot"}.intersection(terms) and slug == "xyron-neo-bot":
+        if {"neo", "neobot", "nebot"}.intersection(terms) and slug == "xyron-neo-bot":
             score += 55
+        if {"neo", "neobot", "nebot"}.intersection(terms) and slug == "xyron-hostbot":
+            score -= 30
         if {"orbit", "patrol"}.intersection(terms) and slug == "xyron-orbit-patrol-bot":
             score += 55
-        if {"hygibot", "dune", "duno", "dunobot"}.intersection(terms) and slug == "xyron-hygibot-dune-bot":
+        if cleaning_terms.intersection(terms) and slug == "xyron-hygibot-dune-bot":
             score += 55
+        if cleaning_terms.intersection(terms) and slug == "xyron-hygibot-dune-bot" and "robo" in terms:
+            score += 20
+
+        # Quando a intenção atual é claramente limpeza, priorizamos o HygiBot
+        # e penalizamos Buddy, a menos que haja menção explícita ao Buddy/cão.
+        if cleaning_terms.intersection(terms) and not buddy_terms.intersection(terms):
+            if slug == "xyron-buddy-bot":
+                score -= 45
+            if slug == "xyron-hygibot-dune-bot":
+                score += 35
 
         return score
 
@@ -164,8 +202,38 @@ class LiviaKnowledgeService:
             expansions.append("buddy budy buddy bot robo quadrupede")
         if "budy" in normalized_query:
             expansions.append("buddy buddy bot robo quadrupede")
+        if "nebot" in normalized_query:
+            expansions.append("neobot neo bot robo de recepcao")
+        if "neo bot" in normalized_query or "neo-bot" in normalized_query:
+            expansions.append("neobot neo robo de recepcao")
+        if "robo neo" in normalized_query:
+            expansions.append("neobot neo bot robo de recepcao")
         if "neobot" in normalized_query:
             expansions.append("neo bot robo de recepcao")
         if "duno" in normalized_query or "dune" in normalized_query:
             expansions.append("hygibot hygi bot robo de limpeza")
+        if "hygbot" in normalized_query or "higibot" in normalized_query:
+            expansions.append("hygibot hygi bot robo de limpeza")
+        if "hygi " in normalized_query or normalized_query.endswith("hygi") or " higi" in normalized_query:
+            expansions.append("hygibot hygi bot")
+        if "lttle" in normalized_query or "litlle" in normalized_query or "litle" in normalized_query:
+            expansions.append("little littlebot liro robo educacional")
+        if "connect bot" in normalized_query or "conectbot" in normalized_query:
+            expansions.append("connectbot")
         return " ".join(expansions)
+
+    def _is_xyron_overview_query(self, normalized_query: str, terms: list[str]) -> bool:
+        if "xyron" not in terms:
+            return False
+        query = f" {normalized_query.strip()} "
+        overview_patterns = (
+            " o que e a xyron ",
+            " o que e xyron ",
+            " quem e a xyron ",
+            " quem e xyron ",
+            " empresa xyron ",
+        )
+        if any(pattern in query for pattern in overview_patterns):
+            return True
+        # Query curta apenas com a marca.
+        return len(terms) <= 2 and "xyron" in terms

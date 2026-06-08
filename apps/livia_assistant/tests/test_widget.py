@@ -17,3 +17,6 @@ class LiviaWidgetRenderingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "data-livia-widget")
         self.assertContains(response, "Fale com a Lívia")
+        self.assertContains(response, "livia-typing-indicator")
+        self.assertContains(response, "livia-typing-dot")
+        self.assertContains(response, "setAttribute(\"aria-label\", \"LÍVIA está digitando\")")

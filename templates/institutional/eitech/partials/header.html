@@ -6,7 +6,7 @@
           <div class="row align-items-center row-bg3">
               <div class="col-lg-2 col-md-6 col-6">
                   <div class="vl-logo">
-                      <a href="{% url 'institutional:home' %}"><img src="{% static 'institutional/brand/logo-cores-02.png' %}" alt="Smart Control Brasil" style="max-width: 170px; height: auto;"></a>
+                      <a href="{% url 'institutional:home' %}"><img src="{% static 'institutional/brand/logo-cores-03.png' %}" alt="Smart Control Brasil" style="max-width: 170px; height: auto;"></a>
                   </div>
               </div>
               <div class="col-lg-7 d-none d-lg-block">
@@ -16,7 +16,7 @@
                               <li><a href="{% url 'institutional:home' %}">Home</a></li>
                               <li><a href="{% url 'institutional:about' %}">Sobre</a></li>
                               
-                              <li class="nav-item nav-item--has-dropdown scb-nav-dropdown">
+                              {% comment %} <li class="nav-item nav-item--has-dropdown scb-nav-dropdown">
                                 <a href="{% url 'institutional:services' %}" class="scb-nav-parent">Soluções</a>
                                   <ul class="sub-menu solutions-dropdown">
                                     <li><a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação Industrial e CLPs</a></li>
@@ -25,16 +25,17 @@
                                     <li><a href="{% url 'institutional:service_manutencao_tpm_confiabilidade' %}">Suporte Técnico e Confiabilidade</a></li>
                                     <li><a href="{% url 'institutional:services' %}">Todas as Soluções</a></li>
                                   </ul>
-                              </li>
+                              </li> {% endcomment %}
 
                               <li class="nav-item nav-item--has-dropdown scb-nav-dropdown">
                                 <span class="scb-nav-parent">Parceiros</span>
                                   <ul class="sub-menu solutions-dropdown">
                                     <li><a href="{% url 'institutional:representada_mitsubishi_automacao' %}">Mitsubishi Automação</a></li>
-                                    <li><a href="{% url 'institutional:refrigeracao' %}">Refrigeração</a></li>
-                                    <li><a href="{% url 'institutional:service_inteligencia_artificial' %}">Saipos</a></li>
-                                    <li><a href="{% url 'institutional:service_details' %}">Agraz</a></li>
                                     <li><a href="{% url 'institutional:parceiro_xyron_robotics' %}">Xyron Robotics</a></li>
+                                    <li><a href="{% url 'institutional:refrigeracao' %}">Refrigeração</a></li>
+                                    {% comment %} <li><a href="{% url 'institutional:service_inteligencia_artificial' %}">Saipos</a></li>
+                                    <li><a href="{% url 'institutional:service_details' %}">Agraz</a></li> {% endcomment %}
+                                    
                                   </ul>
                               </li>
                              

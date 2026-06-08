@@ -1,7 +1,14 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
+from django.core.validators import validate_email
 from django.shortcuts import redirect, render
+
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -67,14 +74,16 @@ def contact(request):
 
         if not contact_name or not email or not message:
             messages.error(request, "Preencha nome, e-mail e mensagem antes de enviar.")
-            return redirect("institutional:contact")
+            return render(request, "institutional/eitech/pages/contact.html")
 
         interest_label_by_value = {
             "automacao": "Automação Industrial, CLPs e IHMs",
             "robotica": "Robótica e Automação Aplicada",
             "iot_dados": "IoT, Dados, Integração e Dashboards",
             "produtos": "Produtos, Kits, Robôs e Componentes",
+            "software": "Softwares, Sistemas Web e Dashboards",
             "retrofit": "Retrofit de Máquinas e Painéis Elétricos",
+            "retrofit_suporte": "Retrofit, Suporte Técnico e Manutenção",
             "manutencao": "Manutenção Técnica, TPM e Confiabilidade",
             "acionamentos": "Inversores, Servoacionamentos e Motion Control",
             "supervisorio": "Supervisório, Dados Industriais e Indicadores",
@@ -84,14 +93,8 @@ def contact(request):
             interest, interest or "Não informado"
         )
 
-        subject_line = (
-            f"Diagnóstico pelo site: {interest_display}"
-            if interest
-            else "Diagnóstico inicial pelo site"
-        )
-
         body = f"""
-Solicitação de diagnóstico inicial — Smart Control Brasil.
+Nova solicitação recebida pelo site Smart Control Brasil
 
 Nome: {contact_name}
 Empresa: {company or "Não informada"}
@@ -100,34 +103,47 @@ E-mail: {email}
 Segmento: {segment or "Não informado"}
 Interesse principal: {interest_display}
 
-Principal problema atual:
+Objetivo principal:
 {main_problem or "Não informado"}
 
 Mensagem:
 {message}
+
+Dados técnicos:
+Origem: Página de contato institucional
 """.strip()
 
+        reply_to = []
         try:
-            send_mail(
-                subject=subject_line,
-                message=body,
+            validate_email(email)
+            reply_to.append(email)
+        except ValidationError:
+            pass
+
+        try:
+            email_message = EmailMessage(
+                subject="Nova solicitação pelo site | Smart Control Brasil",
+                body=body,
                 from_email=getattr(
                     settings,
                     "DEFAULT_FROM_EMAIL",
                     "engenharia@smartcontrolbrasil.com.br",
                 ),
-                recipient_list=[settings.CONTACT_EMAIL],
-                fail_silently=False,
+                to=[settings.CONTACT_EMAIL],
+                reply_to=reply_to,
             )
+            email_message.send(fail_silently=False)
             messages.success(
                 request,
-                "Recebemos sua solicitação de diagnóstico. Em breve entraremos em contato.",
+                "Sua solicitação foi enviada com sucesso. Em breve retornaremos pelo contato informado.",
             )
         except Exception:
+            logger.exception("Erro ao enviar solicitação da página de contato institucional")
             messages.error(
                 request,
-                "Não foi possível enviar sua mensagem agora. Tente novamente em alguns minutos.",
+                "Não foi possível enviar sua solicitação agora. Tente novamente ou chame pelo WhatsApp.",
             )
+            return render(request, "institutional/eitech/pages/contact.html")
 
         return redirect("institutional:contact")
 
@@ -138,8 +154,8 @@ def team(request):
     return render(request, "institutional/eitech/pages/team.html")
 
 
-def smart360(request):
-    return render(request, "institutional/eitech/pages/smart360.html")
+def parceiro_xyron_robotics(request):
+    return render(request, "institutional/eitech/pages/xyron-robotics.html")
 
 
 def projects(request):

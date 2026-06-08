@@ -4,11 +4,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = []
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = "Smart Control Brasil <contato@smartcontrolbrasil.com.br>"
-SERVER_EMAIL = "contato@smartcontrolbrasil.com.br"
-CONTACT_EMAIL = "contato@smartcontrolbrasil.com.br"
-
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False

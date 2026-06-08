@@ -305,13 +305,17 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST = env("EMAIL_HOST", default="mailhog")
-EMAIL_PORT = env("EMAIL_PORT", default="1025", cast=int)
-EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST = env("EMAIL_HOST", default="mail.smartcontrolbrasil.com.br")
+EMAIL_PORT = env("EMAIL_PORT", default="587", cast=int)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="engenharia@smartcontrolbrasil.com.br")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
-EMAIL_USE_TLS = env("EMAIL_USE_TLS", default="False", cast=bool)
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@smart360.local")
-CONTACT_EMAIL = env("CONTACT_EMAIL", default="contato@smartcontrolbrasil.com.br")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default="True", cast=bool)
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="Smart Control Brasil <engenharia@smartcontrolbrasil.com.br>",
+)
+SERVER_EMAIL = env("SERVER_EMAIL", default="engenharia@smartcontrolbrasil.com.br")
+CONTACT_EMAIL = "engenharia@smartcontrolbrasil.com.br"
 
 CANECA_DE_GARAGEM_WHATSAPP = env("CANECA_DE_GARAGEM_WHATSAPP", default="")
 

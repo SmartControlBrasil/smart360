@@ -60,7 +60,11 @@ urlpatterns = [
     path("blog/automacao-industrial-conectada-gestao/", RedirectView.as_view(pattern_name="institutional:blog_automacao_industrial_conectada_manutencao_gestao", permanent=False), name="blog_automacao_industrial_conectada_gestao"),
     path("blog/marketing-digital-tecnologia-processo/", RedirectView.as_view(pattern_name="institutional:blog_paineis_eletricos_organizacao_seguranca_manutenibilidade", permanent=False), name="blog_marketing_digital_tecnologia_processo"),
     path("blog/smart360-operacao-inteligente/", RedirectView.as_view(pattern_name="institutional:blog_dados_industriais_confiabilidade_reduzir_paradas", permanent=False), name="blog_smart360_operacao_inteligente"),
-    path("parceiros/xyron-robotics/", views.smart360, name="parceiro_xyron_robotics"),
+    path(
+        "parceiros/xyron-robotics/",
+        views.parceiro_xyron_robotics,
+        name="parceiro_xyron_robotics",
+    ),
     path("contato/", views.contact, name="contact"),
     path("equipe/", views.team, name="team"),
     path("projetos/", views.projects, name="projects"),

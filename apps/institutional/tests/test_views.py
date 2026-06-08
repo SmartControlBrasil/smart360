@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core import mail
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
@@ -36,6 +37,14 @@ class InstitutionalRoutesTests(SimpleTestCase):
                 response = self.client.get(reverse(route_name))
                 self.assertEqual(response.status_code, 200)
 
+    def test_xyron_robotics_page_uses_partner_template(self):
+        response = self.client.get(reverse("institutional:parceiro_xyron_robotics"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "institutional/eitech/pages/xyron-robotics.html"
+        )
+
     def test_services_canonical_url_is_solucoes(self):
         self.assertEqual(reverse("institutional:services"), "/solucoes/")
 
@@ -46,4 +55,61 @@ class InstitutionalRoutesTests(SimpleTestCase):
             reverse("institutional:services"),
             status_code=301,
             fetch_redirect_response=False,
+        )
+
+
+@override_settings(
+    MIDDLEWARE=TEST_MIDDLEWARE,
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+)
+class ContactViewTests(SimpleTestCase):
+    databases = {"default"}
+
+    def setUp(self):
+        mail.outbox.clear()
+        self.url = reverse("institutional:contact")
+        self.valid_data = {
+            "contact_name": "Maria Silva",
+            "company": "Indústria Exemplo",
+            "whatsapp": "(11) 99999-9999",
+            "email": "maria@example.com",
+            "segment": "Indústria",
+            "interest": "automacao",
+            "main_problem": "Automatizar uma linha de produção",
+            "message": "Precisamos avaliar escopo e prazo.",
+        }
+
+    def test_contact_get_returns_200(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_valid_post_sends_email_and_redirects(self):
+        response = self.client.post(self.url, self.valid_data)
+
+        self.assertRedirects(
+            response,
+            self.url,
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        sent_email = mail.outbox[0]
+        self.assertEqual(
+            sent_email.to,
+            ["engenharia@smartcontrolbrasil.com.br"],
+        )
+        self.assertEqual(sent_email.reply_to, ["maria@example.com"])
+        self.assertIn("Nome: Maria Silva", sent_email.body)
+        self.assertIn("Mensagem:\nPrecisamos avaliar escopo e prazo.", sent_email.body)
+
+    def test_invalid_post_does_not_send_email_and_returns_error(self):
+        invalid_data = {**self.valid_data, "contact_name": ""}
+
+        response = self.client.post(self.url, invalid_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertContains(
+            response,
+            "Preencha nome, e-mail e mensagem antes de enviar.",
         )

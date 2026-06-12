@@ -152,3 +152,59 @@ class LiviaKnowledgeItem(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class LiviaKnowledgeDocument(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True)
+    source_type = models.CharField(max_length=40, default="markdown")
+    category = models.CharField(max_length=100, blank=True, db_index=True)
+    product = models.CharField(max_length=120, blank=True, db_index=True)
+    application = models.CharField(max_length=120, blank=True, db_index=True)
+    source_path = models.CharField(max_length=500, unique=True)
+    content_hash = models.CharField(max_length=64, db_index=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "livia_knowledge_documents"
+        ordering = ["title"]
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class LiviaKnowledgeChunk(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    document = models.ForeignKey(
+        "livia_assistant.LiviaKnowledgeDocument",
+        on_delete=models.CASCADE,
+        related_name="chunks",
+    )
+    content = models.TextField()
+    chunk_index = models.PositiveIntegerField()
+    token_estimate = models.PositiveIntegerField(default=0)
+    metadata = models.JSONField(default=dict, blank=True)
+    # Compatibility storage for this first release. When pgvector is required in
+    # every environment, migrate this field to pgvector.django.VectorField.
+    embedding = models.JSONField(null=True, blank=True)
+    embedding_model = models.CharField(max_length=120, blank=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "livia_knowledge_chunks"
+        ordering = ["document_id", "chunk_index"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "chunk_index"],
+                name="livia_unique_document_chunk_index",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.document.title} #{self.chunk_index}"

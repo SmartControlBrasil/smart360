@@ -12,6 +12,7 @@ from .crm_bridge import LiviaCRMBridge
 from .integrations import EMERGENCY_TERMS, LEAD_INTENT_TERMS, SERVICE_KEYWORDS, get_livia_ai_client
 from .knowledge import LiviaKnowledgeService
 from .prompts import LIVIA_SYSTEM_PROMPT
+from .rag.context_builder import build_context_for_prompt
 
 from .models import LiviaConversation, LiviaHandoffRequest, LiviaLeadCapture, LiviaMessage
 
@@ -66,7 +67,8 @@ class LiviaAssistantService:
         handoff_recommended = any(term in normalized for term in EMERGENCY_TERMS)
         service_interest = self._detect_service_interest(normalized)
         history = self._build_recent_messages(conversation)
-        knowledge_context = LiviaKnowledgeService().build_context(user_text)
+        rag_context = build_context_for_prompt(user_text)
+        knowledge_context = rag_context or LiviaKnowledgeService().build_context(user_text)
         last_assistant = (
             conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
             .order_by("-created_at", "-id")

@@ -43,8 +43,8 @@ class LiviaAssistantServiceTests(TestCase):
     def test_detects_lead_intent(self):
         lead_phrases = [
             "quero orçamento",
-            "preciso de manutenção",
-            "me chama no whatsapp",
+            "quero proposta técnica",
+            "quero agendar uma visita",
         ]
 
         for phrase in lead_phrases:
@@ -503,8 +503,83 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "cheiro de queimado no painel")
         response = self.service.generate_response(conversation, "cheiro de queimado no painel")
         lowered = response.reply.lower()
-        self.assertIn("risco técnico", lowered)
-        self.assertIn("interrompa o uso", lowered)
+        self.assertTrue("risco" in lowered or "emerg" in lowered)
+        self.assertIn("interrompa", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_maintenance_operational_question_returns_technical_path_without_false_emergency(self):
+        conversation = self.service.get_or_create_conversation(session_key="maint-operational-path")
+        self.service.register_user_message(conversation, "Tenho muitas paradas em uma máquina, como vocês podem ajudar?")
+        response = self.service.generate_response(conversation, "Tenho muitas paradas em uma máquina, como vocês podem ajudar?")
+        lowered = response.reply.lower()
+        self.assertNotIn("risco elétrico", lowered)
+        self.assertNotIn("vazamento de gás", lowered)
+        self.assertNotIn("cheiro de queimado", lowered)
+        self.assertTrue(
+            any(term in lowered for term in ("diagnóstico", "falhas", "disponibilidade", "manutenção", "fmea", "tpm"))
+        )
+        self.assertIn("?", response.reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_fmea_concept_question_answers_directly_without_premature_lead_capture(self):
+        conversation = self.service.get_or_create_conversation(session_key="fmea-concept")
+        self.service.register_user_message(conversation, "O que é FMEA e por que isso ajuda na manutenção?")
+        response = self.service.generate_response(conversation, "O que é FMEA e por que isso ajuda na manutenção?")
+        lowered = response.reply.lower()
+        self.assertIn("fmea", lowered)
+        self.assertTrue("falha" in lowered or "modo de falha" in lowered)
+        self.assertNotIn("nome, empresa, cidade, telefone e e-mail", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_tpm_question_answers_without_emergency(self):
+        conversation = self.service.get_or_create_conversation(session_key="tpm-concept")
+        self.service.register_user_message(conversation, "Como TPM pode reduzir parada de máquina?")
+        response = self.service.generate_response(conversation, "Como TPM pode reduzir parada de máquina?")
+        lowered = response.reply.lower()
+        self.assertIn("tpm", lowered)
+        self.assertTrue(
+            "manutenção autônoma" in lowered
+            or "manutenção planejada" in lowered
+            or "disponibilidade" in lowered
+            or "falhas" in lowered
+        )
+        self.assertNotIn("risco técnico", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_recurring_failures_question_does_not_use_internal_context_placeholder(self):
+        conversation = self.service.get_or_create_conversation(session_key="recurring-failures")
+        self.service.register_user_message(conversation, "Minha fábrica quer reduzir falhas recorrentes, por onde começo?")
+        response = self.service.generate_response(conversation, "Minha fábrica quer reduzir falhas recorrentes, por onde começo?")
+        lowered = response.reply.lower()
+        self.assertNotIn("há contexto interno disponível", lowered)
+        self.assertTrue(
+            "histórico de falhas" in lowered
+            or "criticidade" in lowered
+            or "diagnóstico" in lowered
+            or "análise de falhas" in lowered
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_real_emergency_only_with_explicit_terms(self):
+        conversation = self.service.get_or_create_conversation(session_key="real-emergency-explicit")
+        text = "Está saindo fumaça e cheiro de queimado do painel"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertTrue("interrompa" in lowered or "pare" in lowered)
+        self.assertTrue("risco" in lowered or "emerg" in lowered)
+        self.assertTrue("atendimento humano" in lowered or "equipe técnica" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_budget_intent_can_collect_contact_data_after_brief_explanation(self):
+        conversation = self.service.get_or_create_conversation(session_key="budget-fmea-intent")
+        text = "Quero orçamento para aplicar FMEA na minha fábrica"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("orçamento", lowered)
+        self.assertIn("fmea", lowered)
+        self.assertTrue("nome" in lowered and "empresa" in lowered and "telefone" in lowered and "e-mail" in lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_buddy_remains_buddy(self):

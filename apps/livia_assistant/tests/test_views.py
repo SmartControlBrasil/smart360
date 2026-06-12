@@ -38,7 +38,7 @@ class LiviaChatEndpointTests(TestCase):
             reverse("livia_assistant:chat"),
             data=json.dumps(
                 {
-                    "message": "Tenho uma máquina parada e preciso de ajuda urgente",
+                    "message": "Está saindo fumaça e cheiro de queimado do painel",
                     "session_key": "public-session-2",
                 }
             ),

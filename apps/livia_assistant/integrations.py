@@ -10,30 +10,25 @@ logger = logging.getLogger(__name__)
 
 
 EMERGENCY_TERMS = (
-    "emergência",
-    "emergencia",
-    "urgente",
-    "parado",
-    "parada",
-    "vazamento",
-    "gás",
-    "gas",
-    "queimado",
-    "superaquecimento",
-    "cheiro de queimado",
-    "sem funcionar",
     "fumaca",
     "fumaça",
-    "choque",
+    "cheiro de queimado",
+    "queimado no painel",
     "curto",
-    "risco eletrico",
-    "risco elétrico",
-    "risco estrutural",
+    "curto-circuito",
+    "choque",
+    "vazamento de gas",
+    "vazamento de gás",
     "incendio",
     "incêndio",
     "faisca",
     "faísca",
+    "explosao",
+    "explosão",
     "cabo derretendo",
+    "superaquecimento critico",
+    "superaquecimento crítico",
+    "risco estrutural",
 )
 
 LEAD_INTENT_TERMS = (
@@ -41,21 +36,14 @@ LEAD_INTENT_TERMS = (
     "orcamento",
     "cotação",
     "cotacao",
-    "manutenção",
-    "manutencao",
-    "preciso",
-    "contrato",
+    "proposta",
     "visita",
-    "me chama",
-    "whatsapp",
-    "zap",
-    "contato",
-    "pmoc",
-    "ar-condicionado",
-    "ar condicionado",
-    "câmara climática",
-    "camara climatica",
-    "academia",
+    "contato humano",
+    "falar com especialista",
+    "comprar",
+    "contratar",
+    "agendar",
+    "atendimento comercial",
 )
 
 SERVICE_KEYWORDS = {
@@ -81,21 +69,16 @@ class FallbackLiviaAIClient(LiviaAIClient):
     def generate_reply(self, *, system_prompt, messages, context=None) -> str:
         user_text = _last_user_message(messages)
         normalized = _normalize(user_text)
-        lead_detected = bool((context or {}).get("lead_detected")) or any(
-            term in normalized for term in LEAD_INTENT_TERMS
-        )
-        handoff_recommended = bool((context or {}).get("handoff_recommended")) or any(
-            term in normalized for term in EMERGENCY_TERMS
-        )
+        lead_detected = bool((context or {}).get("lead_detected")) or is_lead_capture_intent(normalized)
+        handoff_recommended = bool((context or {}).get("handoff_recommended")) or is_real_emergency(normalized)
         service_interest = (context or {}).get("service_interest") or _detect_service_interest(normalized)
         knowledge_context = (context or {}).get("knowledge_context", "")
 
         if handoff_recommended:
             return (
-                "Entendi. Pelo que você descreveu, pode haver urgência ou risco técnico. "
-                "Se houver risco elétrico, vazamento de gás, superaquecimento, cheiro de queimado ou risco estrutural, "
-                "interrompa o uso com segurança e fale com nosso atendimento humano pelo WhatsApp. "
-                "Para encaminhar melhor, me envie nome, empresa, cidade e telefone."
+                "Pelo que você descreveu, há indício de risco real para pessoas e equipamento. "
+                "Interrompa a operação com segurança, isole a área e acione a equipe técnica imediatamente. "
+                "Se houver risco elétrico, incêndio ou vazamento de gás, siga o protocolo de emergência da planta e acione atendimento humano."
             )
 
         # Quando há intenção explícita de produto, a resposta de conhecimento
@@ -112,12 +95,14 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 "Você quis dizer LIRO/LittleBot, NeoBot, HygiBot, OrbitBot, Buddy Bot, WaiterBot, CareBot, HostBot ou MowerBot?"
             )
 
+        if is_maintenance_question(normalized) and not lead_detected:
+            return build_maintenance_answer(normalized, knowledge_context)
+
         if lead_detected:
             service_text = f" sobre {service_interest}" if service_interest else ""
             return (
-                f"Posso te ajudar com esse diagnóstico inicial{service_text}. "
-                "Para encaminhar corretamente, me informe nome, empresa, cidade, telefone e e-mail. "
-                "Não vou passar preços ou prazos fechados por aqui sem avaliação humana."
+                f"{build_lead_intent_preface(normalized, service_text)} "
+                "Se fizer sentido, eu já te encaminho para o time comercial com nome, empresa, cidade, telefone e e-mail."
             )
 
         if _asks_for_price(normalized):
@@ -144,8 +129,9 @@ class FallbackLiviaAIClient(LiviaAIClient):
             )
 
         if knowledge_context:
-            summary = _summarize_knowledge_context(knowledge_context)
-            return f"{summary} Se você quiser, eu te ajudo com uma pré-análise do seu cenário."
+            rag_reply = build_rag_based_fallback(normalized, knowledge_context)
+            if rag_reply:
+                return rag_reply
 
         if "smart360" in normalized:
             return (
@@ -247,7 +233,7 @@ def _system_prompt_with_context(system_prompt, context=None):
 def _summarize_knowledge_context(knowledge_context):
     lines = [line.strip("- ") for line in knowledge_context.splitlines() if line.startswith("- ")]
     if not lines:
-        return "Há contexto interno disponível para orientar a resposta."
+        return ""
     first = lines[0]
     if len(first) > 260:
         first = first[:257].rstrip() + "..."
@@ -401,6 +387,98 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             "Ele aumenta a segurança do operador e a produtividade no corte de vegetação em áreas externas."
         )
     return ""
+
+
+def is_real_emergency(normalized_text):
+    return any(term in normalized_text for term in EMERGENCY_TERMS)
+
+
+def is_lead_capture_intent(normalized_text):
+    return any(term in normalized_text for term in LEAD_INTENT_TERMS)
+
+
+def is_maintenance_question(normalized_text):
+    maintenance_terms = (
+        "fmea",
+        "tpm",
+        "manutencao",
+        "manutenção",
+        "falha",
+        "falhas",
+        "confiabilidade",
+        "disponibilidade",
+        "parada",
+        "paradas",
+        "maquina",
+        "máquina",
+        "mtbf",
+        "mttr",
+        "causa raiz",
+        "diagnostico",
+        "diagnóstico",
+    )
+    return any(term in normalized_text for term in maintenance_terms)
+
+
+def build_maintenance_answer(normalized_text, rag_context):
+    if "fmea" in normalized_text:
+        return (
+            "FMEA é uma metodologia para mapear modos de falha, efeitos e causas, priorizando ações preventivas antes de gerar parada e perda de produção. "
+            "Na manutenção, ele ajuda a definir o que atacar primeiro com base em criticidade e risco operacional. "
+            "Você quer aplicar FMEA em uma máquina específica ou em uma linha inteira?"
+        )
+    if "tpm" in normalized_text:
+        return (
+            "TPM reduz paradas ao estruturar manutenção autônoma, manutenção planejada, eliminação de perdas e rotina de melhoria contínua entre operação e manutenção. "
+            "Na prática, isso reduz falhas repetitivas, melhora disponibilidade e aumenta previsibilidade da produção. "
+            "Hoje suas paradas estão mais ligadas a falha recorrente, preventiva insuficiente ou operação?"
+        )
+    if any(term in normalized_text for term in ("parada", "paradas", "falhas recorrentes", "disponibilidade")):
+        return (
+            "Quando há muitas paradas, o ponto de partida é separar falhas recorrentes de eventos aleatórios e medir impacto em produção, custo e segurança. "
+            "Normalmente analisamos histórico de falhas, MTBF/MTTR, criticidade e causas por elétrica, mecânica, automação e operação para definir um plano com análise de falhas, FMEA e TPM. "
+            "Essa máquina para mais por falha elétrica, mecânica, automação ou operação?"
+        )
+    if rag_context:
+        first_snippet = _summarize_knowledge_context(rag_context)
+        if first_snippet:
+            return (
+                f"{first_snippet} "
+                "Se você quiser, posso transformar isso em um passo a passo inicial para o seu cenário."
+            )
+    return (
+        "Posso te apoiar com um diagnóstico inicial de manutenção usando histórico de falhas, criticidade e indicadores como MTBF/MTTR para priorizar ações. "
+        "Você quer começar por um equipamento específico ou por uma linha de produção?"
+    )
+
+
+def build_rag_based_fallback(normalized_text, rag_context):
+    if is_maintenance_question(normalized_text):
+        return build_maintenance_answer(normalized_text, rag_context)
+
+    first_snippet = _summarize_knowledge_context(rag_context)
+    if first_snippet:
+        return (
+            f"{first_snippet} "
+            "Se fizer sentido, eu detalho a aplicação prática para o seu ambiente."
+        )
+    return ""
+
+
+def build_lead_intent_preface(normalized_text, service_text):
+    if is_maintenance_question(normalized_text):
+        if "fmea" in normalized_text:
+            return (
+                "Para orçamento de FMEA, o caminho é mapear modos de falha, efeitos e criticidade para priorizar ações que reduzam parada e risco operacional."
+            )
+        if "tpm" in normalized_text:
+            return (
+                "Para orçamento de TPM, começamos avaliando perdas, rotina de manutenção autônoma e manutenção planejada para reduzir falhas e elevar disponibilidade."
+            )
+        return (
+            "Para orçamento/proposta, primeiro alinhamos objetivo técnico, histórico de falhas, escopo e criticidade para montar uma recomendação consistente."
+        )
+    return f"Posso te apoiar{service_text} com um direcionamento técnico rápido antes do encaminhamento comercial."
 
 
 def _asks_for_price(normalized_text):

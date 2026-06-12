@@ -9,7 +9,12 @@ logger = logging.getLogger(__name__)
 from django.db import transaction
 
 from .crm_bridge import LiviaCRMBridge
-from .integrations import EMERGENCY_TERMS, LEAD_INTENT_TERMS, SERVICE_KEYWORDS, get_livia_ai_client
+from .integrations import (
+    SERVICE_KEYWORDS,
+    get_livia_ai_client,
+    is_lead_capture_intent,
+    is_real_emergency,
+)
 from .knowledge import LiviaKnowledgeService
 from .prompts import LIVIA_SYSTEM_PROMPT
 from .rag.context_builder import build_context_for_prompt
@@ -64,7 +69,7 @@ class LiviaAssistantService:
     def generate_response(self, conversation, user_text):
         normalized = self._normalize(user_text)
         lead_detected = self.detect_lead_intent(user_text)
-        handoff_recommended = any(term in normalized for term in EMERGENCY_TERMS)
+        handoff_recommended = is_real_emergency(normalized)
         service_interest = self._detect_service_interest(normalized)
         history = self._build_recent_messages(conversation)
         rag_context = build_context_for_prompt(user_text)
@@ -110,7 +115,7 @@ class LiviaAssistantService:
 
     def detect_lead_intent(self, text):
         normalized = self._normalize(text)
-        return any(term in normalized for term in LEAD_INTENT_TERMS)
+        return is_lead_capture_intent(normalized)
 
     def extract_lead_data(self, text):
         normalized = self._normalize(text)
@@ -121,7 +126,7 @@ class LiviaAssistantService:
         city_match = re.search(r"(?:cidade|em|de)\s+([A-Za-zÀ-ÿ ]{3,80})", text, re.IGNORECASE)
 
         urgency = LiviaLeadCapture.Urgency.MEDIUM
-        if any(term in normalized for term in ("emergência", "emergencia", "urgente", "parado", "sem funcionar")):
+        if is_real_emergency(normalized):
             urgency = LiviaLeadCapture.Urgency.EMERGENCY
         elif any(term in normalized for term in ("alta", "essa semana", "hoje")):
             urgency = LiviaLeadCapture.Urgency.HIGH

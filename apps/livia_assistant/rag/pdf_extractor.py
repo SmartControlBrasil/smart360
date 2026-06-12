@@ -67,7 +67,14 @@ def build_pdf_markdown(source_path, extracted_text, category):
     )
 
 
-def convert_pdf_to_markdown(source_path, output_base_path):
+def find_existing_pdf_markdown(source_path, output_base_path):
+    source_path = Path(source_path)
+    category = infer_pdf_output_category(source_path)
+    source_reference = _source_reference(source_path)
+    candidate = _find_output_path(Path(output_base_path) / category, _slugify_filename(source_path.stem), source_reference)
+    return candidate if candidate.exists() and _belongs_to_source(candidate, source_reference) else None
+
+def convert_pdf_to_markdown(source_path, output_base_path, force=False):
     source_path = Path(source_path)
     output_base_path = Path(output_base_path)
     if source_path.suffix.lower() != ".pdf":
@@ -76,9 +83,10 @@ def convert_pdf_to_markdown(source_path, output_base_path):
     category = infer_pdf_output_category(source_path)
     source_reference = _source_reference(source_path)
     output_directory = output_base_path / category
-    output_path = _find_output_path(output_directory, _slugify_filename(source_path.stem), source_reference)
-    if output_path.exists() and _belongs_to_source(output_path, source_reference):
-        return _result("ignored", source_path, output_path, "Markdown already exists for this source", category)
+    existing_output = find_existing_pdf_markdown(source_path, output_base_path)
+    if existing_output and not force:
+        return _result("ignored", source_path, existing_output, "Markdown already exists for this source", category)
+    output_path = existing_output or _find_output_path(output_directory, _slugify_filename(source_path.stem), source_reference)
 
     try:
         extracted_text = normalize_pdf_text(extract_pdf_text(source_path))

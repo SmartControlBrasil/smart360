@@ -8,7 +8,7 @@ from django.test import override_settings, TestCase
 from apps.livia_assistant.models import LiviaKnowledgeChunk, LiviaKnowledgeDocument
 from apps.livia_assistant.rag.chunking import split_text_into_chunks
 from apps.livia_assistant.rag.context_builder import build_context_for_prompt
-from apps.livia_assistant.rag.importer import import_markdown_file
+from apps.livia_assistant.rag.importer import import_knowledge_directory, import_markdown_file
 from apps.livia_assistant.rag.retrieval import retrieve_livia_context
 
 
@@ -43,6 +43,34 @@ class LiviaRAGTests(TestCase):
         self.assertGreater(chunk_count, 0)
         self.assertEqual(second["status"], "ignored")
         self.assertEqual(LiviaKnowledgeChunk.objects.count(), chunk_count)
+
+    def test_import_directory_ignores_internal_directories_and_imports_approved_ones(self):
+        with TemporaryDirectory() as directory:
+            base_path = Path(directory) / "knowledge"
+            paths = {
+                "reports/audit.md": False,
+                "raw_academico/raw.md": False,
+                ".cache/cache.md": False,
+                "__internal/internal.md": False,
+                "engenharia/.hidden.md": False,
+                "engenharia/__temporary.md": False,
+                "engenharia/~$draft.md": False,
+                "engenharia/automacao.md": True,
+                "academico/guia.md": True,
+            }
+            for relative_path in paths:
+                path = base_path / relative_path
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f"# {path.stem}\n\nConteúdo técnico aprovado para teste.", encoding="utf-8")
+
+            summary = import_knowledge_directory(base_path)
+
+        self.assertEqual(summary["created"], 2)
+        self.assertEqual(summary["errors"], [])
+        self.assertSetEqual(
+            set(LiviaKnowledgeDocument.objects.values_list("title", flat=True)),
+            {"automacao", "guia"},
+        )
 
     def test_retrieval_finds_duno_for_supermarket_cleaning(self):
         self._create_chunk("Duno / Dunobot", "Robô de limpeza para corredores e áreas amplas de supermercados.", product="Duno")

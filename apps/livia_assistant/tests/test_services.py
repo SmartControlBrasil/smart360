@@ -633,6 +633,71 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_commercial_intent_quero_um_diagnostico_requests_lead_data(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-intent-diagnostico")
+        text = "quero um diagnóstico"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("encaminhar para um especialista", lowered)
+        self.assertIn("nome", lowered)
+        self.assertIn("empresa", lowered)
+        self.assertIn("cidade", lowered)
+        self.assertIn("telefone/whatsapp", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_commercial_intent_quanto_custa_requests_lead_data(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-intent-quanto-custa")
+        text = "quanto custa"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("especialista", lowered)
+        self.assertIn("telefone/whatsapp", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_commercial_intent_preciso_de_manutencao_requests_lead_data(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-intent-manutencao")
+        text = "preciso de manutenção"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("especialista", lowered)
+        self.assertIn("nome", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_commercial_intent_maquina_parada_requests_lead_data(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-intent-maquina-parada")
+        text = "minha máquina está parada"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("especialista", lowered)
+        self.assertIn("descrição do problema", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_lead_collection_after_user_informs_name_and_phone_requests_only_missing_fields(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-intent-partial-data")
+        first_text = "quero um diagnóstico"
+        self.service.register_user_message(conversation, first_text)
+        self.service.generate_response(conversation, first_text)
+
+        second_text = "meu nome é Carlos e meu telefone é 1199887766"
+        self.service.register_user_message(conversation, second_text)
+        second_response = self.service.generate_response(conversation, second_text)
+        lowered = second_response.reply.lower()
+        self.assertIn("empresa", lowered)
+        self.assertIn("cidade", lowered)
+        self.assertIn("descrição", lowered)
+        self.assertNotIn("nome", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_buddy_remains_buddy(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="alias-buddy")

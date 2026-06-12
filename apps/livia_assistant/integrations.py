@@ -37,13 +37,31 @@ LEAD_INTENT_TERMS = (
     "cotação",
     "cotacao",
     "proposta",
+    "quanto custa",
+    "diagnostico",
+    "visita tecnica",
+    "visita técnica",
     "visita",
     "contato humano",
     "falar com especialista",
+    "especialista",
     "comprar",
     "contratar",
     "agendar",
     "atendimento comercial",
+    "preciso de manutencao",
+    "preciso de manutenção",
+    "preciso de suporte",
+    "suporte tecnico",
+    "suporte técnico",
+    "linha parada",
+    "minha maquina esta parada",
+    "minha máquina está parada",
+    "pode me ligar",
+    "chama no whatsapp",
+    "chama no zap",
+    "quero um diagnostico",
+    "quero um diagnóstico",
 )
 
 SERVICE_KEYWORDS = {
@@ -85,6 +103,9 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if continuation_reply:
             return continuation_reply
 
+        if _should_continue_lead_collection(normalized, messages):
+            return build_lead_collection_reply(normalized, messages, service_interest)
+
         # Quando há intenção explícita de produto, a resposta de conhecimento
         # deve vencer o enquadramento comercial por palavras como "academia".
         recent_product = str((context or {}).get("recent_product") or "").strip().lower()
@@ -103,11 +124,7 @@ class FallbackLiviaAIClient(LiviaAIClient):
             return build_maintenance_answer(normalized, knowledge_context)
 
         if lead_detected:
-            service_text = f" sobre {service_interest}" if service_interest else ""
-            return (
-                f"{build_lead_intent_preface(normalized, service_text)} "
-                "Se fizer sentido, eu já te encaminho para o time comercial com nome, empresa, cidade, telefone e e-mail."
-            )
+            return build_lead_collection_reply(normalized, messages, service_interest)
 
         if _asks_for_price(normalized):
             return (
@@ -502,7 +519,100 @@ def build_lead_intent_preface(normalized_text, service_text):
         return (
             "Para orçamento/proposta, primeiro alinhamos objetivo técnico, histórico de falhas, escopo e criticidade para montar uma recomendação consistente."
         )
+    if any(term in normalized_text for term in ("orcamento", "orçamento", "cotacao", "cotação", "quanto custa")):
+        return "Para orçamento, primeiro alinhamos escopo técnico e objetivo para encaminhar a proposta correta."
     return f"Posso te apoiar{service_text} com um direcionamento técnico rápido antes do encaminhamento comercial."
+
+
+def build_lead_collection_reply(normalized_text, messages, service_interest):
+    known = _collect_known_contact_fields(messages)
+    missing = []
+    if not known.get("name"):
+        missing.append("nome")
+    if not known.get("company"):
+        missing.append("empresa")
+    if not known.get("city"):
+        missing.append("cidade")
+    if not known.get("phone"):
+        missing.append("telefone/WhatsApp")
+    if not known.get("email"):
+        missing.append("e-mail")
+    if not known.get("problem"):
+        missing.append("breve descrição do problema ou objetivo")
+
+    service_context = f" para {service_interest}" if service_interest else ""
+    preface = build_lead_intent_preface(normalized_text, service_context)
+    if not missing:
+        return (
+            f"{preface} "
+            f"Perfeito. Já tenho os dados principais{service_context} e consigo te encaminhar para um especialista da Smart Control Brasil. "
+            "Se quiser, só complemente com mais detalhes técnicos do cenário para acelerar o diagnóstico."
+        )
+
+    missing_text = ", ".join(missing)
+    return (
+        f"{preface} "
+        "Consigo te encaminhar para um especialista da Smart Control Brasil. "
+        f"Para agilizar, me informe {missing_text}."
+    )
+
+
+def _collect_known_contact_fields(messages):
+    known = {"name": "", "company": "", "city": "", "phone": "", "email": "", "problem": ""}
+    for message in messages or []:
+        if message.get("role") != "user":
+            continue
+        text = str(message.get("content") or "").strip()
+        if not text:
+            continue
+        extracted = _extract_contact_fields_from_text(text)
+        for key in ("name", "company", "city", "phone", "email"):
+            if extracted.get(key) and not known.get(key):
+                known[key] = extracted[key]
+        if extracted.get("problem"):
+            if len(extracted["problem"]) > len(known["problem"]):
+                known["problem"] = extracted["problem"]
+    return known
+
+
+def _extract_contact_fields_from_text(text):
+    normalized = _normalize(text)
+    name_match = re.search(r"(?:meu nome e|me chamo|sou o|sou a|sou)\s+([a-zà-ÿ ]{2,80})", normalized, re.IGNORECASE)
+    company_match = re.search(r"(?:empresa|da empresa|trabalho na|sou da)\s+([a-z0-9à-ÿ .&-]{2,100})", normalized, re.IGNORECASE)
+    city_match = re.search(r"(?:cidade|em)\s+([a-zà-ÿ ]{3,80})", normalized, re.IGNORECASE)
+    phone_match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text)
+    email_match = re.search(r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", normalized, re.IGNORECASE)
+
+    problem = ""
+    lower_text = normalized.lower()
+    if any(
+        term in lower_text
+        for term in (
+            "parada",
+            "falha",
+            "manutencao",
+            "manutenção",
+            "diagnostico",
+            "diagnóstico",
+            "suporte",
+            "fmea",
+            "tpm",
+            "objetivo",
+            "problema",
+            "linha",
+        )
+    ):
+        if len(lower_text) >= 45:
+            problem = text.strip()[:300]
+
+    return {
+        "name": (name_match.group(1).strip(" .,-") if name_match else "")[:80],
+        "company": (company_match.group(1).strip(" .,-") if company_match else "")[:100],
+        "city": (city_match.group(1).strip(" .,-") if city_match else "")[:80],
+        "phone": phone_match.group(0).strip() if phone_match else "",
+        "email": (email_match.group(0).strip() if email_match else "")[:180],
+        "problem": problem,
+    }
 
 
 def _build_continuation_reply(normalized_text, messages):
@@ -552,6 +662,29 @@ def _last_assistant_message(messages):
         if message.get("role") == "assistant":
             return str(message.get("content") or "")
     return ""
+
+
+def _should_continue_lead_collection(normalized_text, messages):
+    previous_assistant = _last_assistant_message(messages)
+    if not previous_assistant:
+        return False
+    previous_normalized = _normalize(previous_assistant)
+    asked_lead_fields = any(
+        snippet in previous_normalized
+        for snippet in (
+            "para agilizar, me informe",
+            "nome, empresa, cidade, telefone",
+            "especialista da smart control brasil",
+        )
+    )
+    if not asked_lead_fields:
+        return False
+
+    extracted = _extract_contact_fields_from_text(normalized_text)
+    if extracted.get("name") or extracted.get("company") or extracted.get("city") or extracted.get("phone") or extracted.get("email"):
+        return True
+
+    return bool(re.search(r"\b(nome|empresa|cidade|telefone|whatsapp|whats|zap|email|e-mail)\b", normalized_text))
 
 
 def _asks_for_price(normalized_text):

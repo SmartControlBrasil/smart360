@@ -582,6 +582,57 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertTrue("nome" in lowered and "empresa" in lowered and "telefone" in lowered and "e-mail" in lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_mtbf_question_has_direct_practical_explanation(self):
+        conversation = self.service.get_or_create_conversation(session_key="mtbf-direct")
+        text = "o que é mtbf?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("mtbf", lowered)
+        self.assertIn("mean time between failures", lowered)
+        self.assertIn("tempo médio entre falhas", lowered)
+        self.assertIn("confiabilidade", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_mttr_question_has_direct_practical_explanation(self):
+        conversation = self.service.get_or_create_conversation(session_key="mttr-direct")
+        text = "mttr"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("mttr", lowered)
+        self.assertIn("mean time to repair", lowered)
+        self.assertIn("tempo médio para reparo", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_mtbf_vs_mttr_difference_is_explained(self):
+        conversation = self.service.get_or_create_conversation(session_key="mtbf-mttr-diff")
+        text = "diferença entre mtbf e mttr"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("mtbf", lowered)
+        self.assertIn("mttr", lowered)
+        self.assertIn("mtbf alto", lowered)
+        self.assertIn("mttr baixo", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_followup_na_linha_toda_keeps_fmea_context(self):
+        conversation = self.service.get_or_create_conversation(session_key="fmea-line-followup")
+        self.service.register_user_message(conversation, "fmea")
+        first = self.service.generate_response(conversation, "fmea")
+        self.assertIn("máquina específica", first.reply.lower())
+        self.assertIn("linha inteira", first.reply.lower())
+
+        self.service.register_user_message(conversation, "na linha toda")
+        second = self.service.generate_response(conversation, "na linha toda")
+        lowered = second.reply.lower()
+        self.assertIn("aplicar fmea em uma linha inteira", lowered)
+        self.assertIn("dividir a linha por etapas", lowered)
+        self.assertIn("3 paradas mais frequentes", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_buddy_remains_buddy(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="alias-buddy")

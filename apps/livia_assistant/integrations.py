@@ -81,6 +81,10 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 "Se houver risco elétrico, incêndio ou vazamento de gás, siga o protocolo de emergência da planta e acione atendimento humano."
             )
 
+        continuation_reply = _build_continuation_reply(normalized, messages)
+        if continuation_reply:
+            return continuation_reply
+
         # Quando há intenção explícita de produto, a resposta de conhecimento
         # deve vencer o enquadramento comercial por palavras como "academia".
         recent_product = str((context or {}).get("recent_product") or "").strip().lower()
@@ -421,6 +425,26 @@ def is_maintenance_question(normalized_text):
 
 
 def build_maintenance_answer(normalized_text, rag_context):
+    if "mtbf" in normalized_text and "mttr" in normalized_text and any(
+        term in normalized_text for term in ("diferenca", "diferença")
+    ):
+        return (
+            "MTBF mede o intervalo médio entre falhas. MTTR mede o tempo médio para reparar. "
+            "Um equipamento saudável tende a ter MTBF alto e MTTR baixo."
+        )
+    if "mtbf" in normalized_text:
+        return (
+            "MTBF significa Mean Time Between Failures, ou Tempo Médio Entre Falhas. "
+            "Ele indica, em média, quanto tempo um equipamento opera entre uma falha e outra. "
+            "Quanto maior o MTBF, maior tende a ser a confiabilidade. "
+            "Na prática, usamos MTBF para identificar equipamentos problemáticos, comparar linhas e priorizar manutenção preventiva ou análise de causa raiz."
+        )
+    if "mttr" in normalized_text:
+        return (
+            "MTTR significa Mean Time To Repair, ou Tempo Médio Para Reparo. "
+            "Ele mostra quanto tempo, em média, a equipe leva para restaurar o equipamento depois de uma falha. "
+            "Quanto menor o MTTR, melhor a capacidade de resposta da manutenção."
+        )
     if "fmea" in normalized_text:
         return (
             "FMEA é uma metodologia para mapear modos de falha, efeitos e causas, priorizando ações preventivas antes de gerar parada e perda de produção. "
@@ -479,6 +503,55 @@ def build_lead_intent_preface(normalized_text, service_text):
             "Para orçamento/proposta, primeiro alinhamos objetivo técnico, histórico de falhas, escopo e criticidade para montar uma recomendação consistente."
         )
     return f"Posso te apoiar{service_text} com um direcionamento técnico rápido antes do encaminhamento comercial."
+
+
+def _build_continuation_reply(normalized_text, messages):
+    if not _is_line_wide_followup(normalized_text):
+        return ""
+
+    previous_assistant = _last_assistant_message(messages)
+    if not previous_assistant:
+        return ""
+
+    previous_normalized = _normalize(previous_assistant)
+    asks_scope = any(
+        snippet in previous_normalized
+        for snippet in (
+            "maquina especifica ou em uma linha inteira",
+            "máquina específica ou em uma linha inteira",
+            "equipamento especifico ou por uma linha de producao",
+            "equipamento específico ou por uma linha de produção",
+            "aplicar fmea em uma maquina especifica ou em uma linha inteira",
+            "aplicar fmea em uma máquina específica ou em uma linha inteira",
+        )
+    )
+    if not asks_scope:
+        return ""
+
+    return (
+        "Perfeito. Para aplicar FMEA em uma linha inteira, o ideal é dividir a linha por etapas ou subconjuntos: "
+        "entrada de material, transporte, processamento, inspeção, embalagem e saída. "
+        "Depois mapeamos os principais modos de falha de cada etapa, seus efeitos na produção, causas prováveis, "
+        "controles existentes e prioridade de ação. Para começar, me diga qual é a linha e quais são as 3 paradas mais frequentes."
+    )
+
+
+def _is_line_wide_followup(normalized_text):
+    return normalized_text in {
+        "linha toda",
+        "na linha toda",
+        "linha inteira",
+        "producao toda",
+        "produção toda",
+        "toda a linha",
+    }
+
+
+def _last_assistant_message(messages):
+    for message in reversed(messages or []):
+        if message.get("role") == "assistant":
+            return str(message.get("content") or "")
+    return ""
 
 
 def _asks_for_price(normalized_text):

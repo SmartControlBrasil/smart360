@@ -9,6 +9,7 @@ from drf_spectacular.views import (
 )
 
 from apps.core.api.views import ApiRootView, HealthCheckDetailsView, HealthCheckView, HealthLiveView, HealthReadyView
+from apps.growth_engine.views import receive_n8n_lead
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -53,6 +54,7 @@ urlpatterns = [
         name="redoc-legacy",
     ),
     path("api/v1/", ApiRootView.as_view(), name="api-root"),
+    path("api/integrations/n8n/leads/", receive_n8n_lead, name="n8n-integration-leads"),
     path("api/v1/core/", include("apps.core.api.urls")),
     path("api/v1/users/", include("apps.users.api.urls")),
     path("api/v1/companies/", include("apps.companies.api.urls")),
@@ -95,6 +97,7 @@ urlpatterns = [
     path("visual-3d/", include(("apps.visual_3d.urls", "visual_3d"), namespace="visual_3d")),
     path("", include(("apps.users.urls", "users"), namespace="users")),
     path("livia/", include(("apps.livia_assistant.urls", "livia_assistant"), namespace="livia_assistant")),
+    path("automation/", include(("apps.automation.urls", "automation"), namespace="automation")),
     path(
         "caneca/",
         include(("apps.caneca_de_garagem.urls", "caneca_de_garagem"), namespace="caneca_de_garagem"),

@@ -61,6 +61,8 @@ class InstitutionalRoutesTests(SimpleTestCase):
 @override_settings(
     MIDDLEWARE=TEST_MIDDLEWARE,
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    CONTACT_FORM_RECIPIENTS=["contato@smartcontrolbrasil.com.br"],
+    CONTACT_FORM_BCC=["engenharia@smartcontrolbrasil.com.br"],
 )
 class ContactViewTests(SimpleTestCase):
     databases = {"default"}
@@ -96,20 +98,56 @@ class ContactViewTests(SimpleTestCase):
         sent_email = mail.outbox[0]
         self.assertEqual(
             sent_email.to,
-            ["engenharia@smartcontrolbrasil.com.br"],
+            ["contato@smartcontrolbrasil.com.br"],
         )
+        self.assertEqual(sent_email.bcc, ["engenharia@smartcontrolbrasil.com.br"])
         self.assertEqual(sent_email.reply_to, ["maria@example.com"])
         self.assertIn("Nome: Maria Silva", sent_email.body)
         self.assertIn("Mensagem:\nPrecisamos avaliar escopo e prazo.", sent_email.body)
 
-    def test_invalid_post_does_not_send_email_and_returns_error(self):
-        invalid_data = {**self.valid_data, "contact_name": ""}
-
-        response = self.client.post(self.url, invalid_data)
-
+    def test_contact_get_renders_honeypot_field(self):
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="website"')
+
+    def test_missing_required_fields_is_blocked_as_spam_with_neutral_message(self):
+        invalid_data = {**self.valid_data, "contact_name": ""}
+        response = self.client.post(self.url, invalid_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
         self.assertEqual(len(mail.outbox), 0)
-        self.assertContains(
-            response,
-            "Preencha nome, e-mail e mensagem antes de enviar.",
-        )
+
+    def test_honeypot_filled_does_not_send_email(self):
+        spam_data = {**self.valid_data, "website": "https://spam.example"}
+        response = self.client.post(self.url, spam_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_suspicious_term_casino_does_not_send_email(self):
+        spam_data = {**self.valid_data, "message": "Oferta de casino com free money imperdível"}
+        response = self.client.post(self.url, spam_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_many_links_does_not_send_email(self):
+        spam_data = {
+            **self.valid_data,
+            "message": " ".join(
+                [
+                    "https://a.com",
+                    "https://b.com",
+                    "https://c.com",
+                    "https://d.com",
+                    "https://e.com",
+                    "https://f.com",
+                ]
+            ),
+        }
+        response = self.client.post(self.url, spam_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_short_message_does_not_send_email(self):
+        spam_data = {**self.valid_data, "message": "oi"}
+        response = self.client.post(self.url, spam_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 0)

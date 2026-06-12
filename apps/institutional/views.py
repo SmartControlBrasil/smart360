@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.conf import settings
 from django.contrib import messages
@@ -9,6 +10,59 @@ from django.shortcuts import redirect, render
 
 
 logger = logging.getLogger(__name__)
+
+SUSPICIOUS_CONTACT_TERMS = (
+    "casino",
+    "cassino",
+    "betting",
+    "bet",
+    "crypto",
+    "bitcoin",
+    "loan",
+    "viagra",
+    "seo backlinks",
+    "backlink",
+    "pornography",
+    "adult",
+    "hacked",
+    "free money",
+)
+
+LINK_RE = re.compile(r"(https?://|www\.)", re.IGNORECASE)
+REPEATED_CHARS_RE = re.compile(r"(.)\1{7,}")
+
+
+def _is_contact_spam(data):
+    contact_name = str(data.get("contact_name", "")).strip()
+    email = str(data.get("email", "")).strip()
+    message = str(data.get("message", "")).strip()
+    honeypot = str(data.get("website", "")).strip()
+
+    if honeypot:
+        return True
+
+    if not contact_name or not email or not message:
+        return True
+
+    useful_message = re.sub(r"\s+", " ", message).strip()
+    if len(useful_message) < 10:
+        return True
+
+    if len(LINK_RE.findall(message)) > 5:
+        return True
+
+    lowered = useful_message.lower()
+    if any(term in lowered for term in SUSPICIOUS_CONTACT_TERMS):
+        return True
+
+    if REPEATED_CHARS_RE.search(lowered):
+        return True
+
+    unique_chars = set(lowered)
+    if len(lowered) >= 60 and len(unique_chars) <= 8:
+        return True
+
+    return False
 
 
 def home(request):
@@ -71,10 +125,19 @@ def contact(request):
         )
         main_problem = request.POST.get("main_problem", "").strip()
         message = request.POST.get("message", "").strip()
+        honeypot = request.POST.get("website", "").strip()
 
-        if not contact_name or not email or not message:
-            messages.error(request, "Preencha nome, e-mail e mensagem antes de enviar.")
-            return render(request, "institutional/eitech/pages/contact.html")
+        if _is_contact_spam(request.POST):
+            logger.info(
+                "Mensagem de contato institucional bloqueada por anti-spam.",
+                extra={
+                    "contact_name": contact_name[:150],
+                    "email": email[:200],
+                    "honeypot_filled": bool(honeypot),
+                },
+            )
+            messages.success(request, "Mensagem recebida. Obrigado pelo contato.")
+            return redirect("institutional:contact")
 
         interest_label_by_value = {
             "automacao": "Automação Industrial, CLPs e IHMs",
@@ -129,13 +192,22 @@ Origem: Página de contato institucional
                     "DEFAULT_FROM_EMAIL",
                     "engenharia@smartcontrolbrasil.com.br",
                 ),
-                to=[settings.CONTACT_EMAIL],
+                to=getattr(
+                    settings,
+                    "CONTACT_FORM_RECIPIENTS",
+                    ["contato@smartcontrolbrasil.com.br"],
+                ),
+                bcc=getattr(
+                    settings,
+                    "CONTACT_FORM_BCC",
+                    ["engenharia@smartcontrolbrasil.com.br"],
+                ),
                 reply_to=reply_to,
             )
             email_message.send(fail_silently=False)
             messages.success(
                 request,
-                "Sua solicitação foi enviada com sucesso. Em breve retornaremos pelo contato informado.",
+                "Mensagem enviada com sucesso. Em breve nossa equipe entrará em contato.",
             )
         except Exception:
             logger.exception("Erro ao enviar solicitação da página de contato institucional")

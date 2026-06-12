@@ -105,7 +105,7 @@
 
             <div class="col-lg-6">
               <div class="contact-author-boxarea">
-                <h3>Descreva sua necessidade tecnológica</h3>
+                <h3 class="pb-3">Descreva sua necessidade tecnológica</h3>
                 <p class="contact-diagnostic-mini">Envie um resumo do cenário. A partir dessas informações, avaliamos possibilidades em automação, robótica, softwares, IoT, equipamentos, produtos tecnológicos, integração ou suporte técnico.</p>
                 <div class="space8"></div>
                 <form method="post" action="{% url 'institutional:contact' %}">
@@ -128,35 +128,30 @@
                   </div>
 
                   <div class="col-lg-12">
-                    <div class="contact-diagnostic-label">Empresa</div>
+                    <div class="contact-diagnostic-label pt-3">Empresa</div>
                     <div class="input-area">
                       <input type="text" name="company" placeholder="Nome da empresa, escola, loja, laboratório, unidade ou projeto" autocomplete="organization">
                     </div>
                   </div>
 
                   <div class="col-lg-6">
-                    <div class="contact-diagnostic-label">WhatsApp</div>
+                    <div class="contact-diagnostic-label pt-3">WhatsApp</div>
                     <div class="input-area">
                       <input type="tel" name="whatsapp" inputmode="tel" autocomplete="tel" placeholder="(11) 5196-8525">
                     </div>
                   </div>
 
                   <div class="col-lg-6">
-                    <div class="contact-diagnostic-label">E-mail</div>
+                    <div class="contact-diagnostic-label pt-3">E-mail</div>
                     <div class="input-area">
                       <input type="email" name="email" placeholder="Informe seu melhor e-mail" autocomplete="email" required>
                     </div>
                   </div>
 
-                  <div class="col-lg-12">
-                    <div class="contact-diagnostic-label">Segmento</div>
-                    <div class="input-area">
-                      <input type="text" name="segment" placeholder="Ex.: indústria, educação, comércio, saúde, eventos, laboratório, logística, máquinas, tecnologia, utilidades...">
-                    </div>
-                  </div>
+                  
 
                   <div class="col-lg-12">
-                    <div class="contact-diagnostic-label">Interesse principal</div>
+                    <div class="contact-diagnostic-label pt-3">Interesse principal</div>
                     <div class="input-area">
                       <select name="interest" class="form-select" aria-label="Interesse principal">
                         <option value="">Selecione a principal necessidade</option>
@@ -170,17 +165,12 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-12">
-                    <div class="contact-diagnostic-label">Objetivo principal</div>
-                    <div class="input-area">
-                                      <textarea name="main_problem" placeholder="Ex.: comprar robô para escola, automatizar máquina, criar dashboard, integrar sensores, vender mais com tecnologia, modernizar painel, monitorar dados..." rows="3"></textarea>
-                    </div>
-                  </div>
+        
 
                   <div class="col-lg-12">
-                    <div class="contact-diagnostic-label">Mensagem</div>
+                    <div class="contact-diagnostic-label pt-3">Mensagem</div>
                     <div class="input-area">
-                      <textarea name="message" placeholder="Descreva o contexto, aplicação desejada, ambiente de uso, produto de interesse, processo, urgência, orçamento estimado ou objetivo do projeto." required rows="5"></textarea>
+                      <textarea name="message" placeholder="Descreva sua necessidade, produto de interesse e objetivo do projeto." required rows="5"></textarea>
                     </div>
                   </div>
                   <div class="col-lg-12">

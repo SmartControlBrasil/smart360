@@ -79,3 +79,9 @@ apps/visual_3d/static/visual_3d/models/*.glb
 # Knowledge raw materials - arquivos brutos para RAG
 knowledge/raw_academico/
 knowledge/reports/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+docs/xyron/

@@ -78,6 +78,9 @@ LIVIA_AI_MODEL = env("LIVIA_AI_MODEL", default="gpt-4o-mini")
 LIVIA_AI_TEMPERATURE = env("LIVIA_AI_TEMPERATURE", default="0.4", cast=float)
 LIVIA_AI_MAX_TOKENS = env("LIVIA_AI_MAX_TOKENS", default="500", cast=int)
 N8N_WEBHOOK_TOKEN = env("N8N_WEBHOOK_TOKEN", default="")
+N8N_LIVIA_LEAD_WEBHOOK_URL = env("N8N_LIVIA_LEAD_WEBHOOK_URL", default="")
+N8N_LIVIA_LEAD_WEBHOOK_TOKEN = env("N8N_LIVIA_LEAD_WEBHOOK_TOKEN", default="")
+N8N_LIVIA_LEAD_WEBHOOK_TIMEOUT = env("N8N_LIVIA_LEAD_WEBHOOK_TIMEOUT", default="5", cast=int)
 
 # Textos públicos da bolha Lívia (institucional). Em /caneca/ mescla com CANECA_LETICIA_BRANDING.
 LIVIA_CHAT_DEFAULT_BRANDING = {

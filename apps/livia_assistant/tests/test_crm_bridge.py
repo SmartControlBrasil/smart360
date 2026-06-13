@@ -1,4 +1,6 @@
-from unittest.mock import patch
+import io
+import json
+from unittest.mock import patch, MagicMock
 
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -97,6 +99,71 @@ class LiviaCRMBridgeTests(TestCase):
             LiviaCRMBridge().create_or_update_crm_lead(second_capture)
 
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_n8n_webhook_not_sent_when_url_empty(self):
+        with self.settings(
+            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            N8N_LIVIA_LEAD_WEBHOOK_URL="",
+        ):
+            with patch("apps.livia_assistant.crm_bridge.urlopen") as mocked_urlopen:
+                LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+        mocked_urlopen.assert_not_called()
+
+    def test_n8n_webhook_sends_payload_and_token(self):
+        with self.settings(
+            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            N8N_LIVIA_LEAD_WEBHOOK_URL="https://example.com/webhook",
+            N8N_LIVIA_LEAD_WEBHOOK_TOKEN="token-secret",
+            N8N_LIVIA_LEAD_WEBHOOK_TIMEOUT=7,
+        ):
+            mocked_response = MagicMock()
+            mocked_response.status = 200
+            mocked_context = MagicMock()
+            mocked_context.__enter__.return_value = mocked_response
+            mocked_context.__exit__.return_value = False
+            with patch("apps.livia_assistant.crm_bridge.urlopen", return_value=mocked_context) as mocked_urlopen:
+                LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+
+        mocked_urlopen.assert_called_once()
+        request_obj = mocked_urlopen.call_args.args[0]
+        timeout_used = mocked_urlopen.call_args.kwargs.get("timeout")
+        self.assertEqual(timeout_used, 7)
+        self.assertEqual(request_obj.get_header("X-smart360-token"), "token-secret")
+        payload = json.loads(request_obj.data.decode("utf-8"))
+        self.assertEqual(payload["event"], "livia.lead.qualified")
+        self.assertEqual(payload["source"], "livia_assistant")
+        self.assertEqual(payload["lead"]["contact_name"], "Cliente Teste")
+        self.assertEqual(payload["lead"]["company_name"], "Empresa Teste")
+        self.assertEqual(payload["lead"]["city"], "São Paulo")
+        self.assertEqual(payload["lead"]["phone"], "11999999999")
+        self.assertEqual(payload["lead"]["email"], "cliente@example.com")
+        self.assertIn("quero orçamento", payload["lead"]["notes"])
+        self.livia_lead.refresh_from_db()
+        self.assertIn("n8n_livia_lead_webhook_sent_at", self.livia_lead.crm_reference)
+
+    def test_n8n_webhook_failure_does_not_break_lead_creation(self):
+        with self.settings(
+            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            N8N_LIVIA_LEAD_WEBHOOK_URL="https://example.com/webhook",
+        ):
+            with patch("apps.livia_assistant.crm_bridge.urlopen", side_effect=TimeoutError("timeout")):
+                crm_lead = LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+
+        self.assertIsNotNone(crm_lead)
+        self.assertEqual(Lead.objects.count(), 1)
+        self.livia_lead.refresh_from_db()
+        self.assertNotIn("n8n_livia_lead_webhook_sent_at", self.livia_lead.crm_reference)
+
+    def test_n8n_webhook_not_duplicated_when_marked_sent(self):
+        self.livia_lead.crm_reference = {"n8n_livia_lead_webhook_sent_at": "2026-01-01T10:00:00Z"}
+        self.livia_lead.save(update_fields=["crm_reference"])
+        with self.settings(
+            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            N8N_LIVIA_LEAD_WEBHOOK_URL="https://example.com/webhook",
+        ):
+            with patch("apps.livia_assistant.crm_bridge.urlopen") as mocked_urlopen:
+                LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+        mocked_urlopen.assert_not_called()
 
     def test_bridge_does_not_duplicate_by_email_or_phone(self):
         first = LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)

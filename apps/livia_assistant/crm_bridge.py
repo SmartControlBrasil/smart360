@@ -1,4 +1,7 @@
 import logging
+import json
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -37,8 +40,10 @@ class LiviaCRMBridge:
             payload["metadata"] = merged_metadata
             crm_lead = LeadService.update_lead(lead=crm_lead, validated_data=payload, user=None)
 
+        previous_reference = dict(livia_lead.crm_reference or {})
         livia_lead.crm_lead_id = crm_lead.id
         livia_lead.crm_reference = {
+            **previous_reference,
             "app": "growth_engine",
             "model": "Lead",
             "id": crm_lead.id,
@@ -49,6 +54,7 @@ class LiviaCRMBridge:
         livia_lead.save(update_fields=["crm_lead_id", "crm_reference", "operational_status"])
         self._record_bridge_interaction(LeadInteraction, crm_lead, livia_lead)
         self._notify_team_if_needed(livia_lead=livia_lead, crm_lead=crm_lead)
+        self._notify_n8n_if_needed(livia_lead=livia_lead, crm_lead=crm_lead)
         return crm_lead
 
     def create_followup_task(self, livia_lead) -> object | None:
@@ -236,5 +242,81 @@ class LiviaCRMBridge:
     def _conversation_already_notified(self, livia_lead):
         for capture in livia_lead.conversation.lead_captures.all():
             if capture.crm_reference.get("notification_sent_at"):
+                return True
+        return False
+
+    def _notify_n8n_if_needed(self, *, livia_lead, crm_lead):
+        webhook_url = str(getattr(settings, "N8N_LIVIA_LEAD_WEBHOOK_URL", "") or "").strip()
+        if not webhook_url:
+            return
+        if self._conversation_already_webhooked(livia_lead):
+            return
+        if not livia_lead.is_qualified:
+            return
+        if not (livia_lead.phone or livia_lead.email):
+            return
+        if (crm_lead.metadata or {}).get("source") != "livia_assistant":
+            return
+
+        payload = {
+            "event": "livia.lead.qualified",
+            "source": "livia_assistant",
+            "lead": {
+                "id": str(crm_lead.id),
+                "contact_name": crm_lead.contact_name or "",
+                "company_name": crm_lead.company_name or "",
+                "city": crm_lead.city or "",
+                "phone": crm_lead.phone or "",
+                "whatsapp": crm_lead.whatsapp or "",
+                "email": crm_lead.email or "",
+                "notes": crm_lead.notes or "",
+                "status": crm_lead.status or "",
+                "source": getattr(crm_lead.source, "name", "") if crm_lead.source_id else "",
+            },
+            "capture": {
+                "id": str(livia_lead.id),
+                "service_interest": livia_lead.service_interest or "",
+                "conversation_id": str(livia_lead.conversation_id),
+                "created_at": livia_lead.created_at.isoformat() if livia_lead.created_at else "",
+                "updated_at": livia_lead.created_at.isoformat() if livia_lead.created_at else "",
+            },
+        }
+
+        headers = {"Content-Type": "application/json"}
+        token = str(getattr(settings, "N8N_LIVIA_LEAD_WEBHOOK_TOKEN", "") or "").strip()
+        if token:
+            headers["X-Smart360-Token"] = token
+        timeout = int(getattr(settings, "N8N_LIVIA_LEAD_WEBHOOK_TIMEOUT", 5) or 5)
+        request = Request(
+            webhook_url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST",
+        )
+
+        try:
+            with urlopen(request, timeout=timeout) as response:
+                status_code = getattr(response, "status", None) or response.getcode()
+            if 200 <= int(status_code) < 300:
+                self._mark_n8n_webhook_sent(livia_lead)
+                logger.info("Webhook n8n da Lívia enviado com sucesso. capture_id=%s status=%s", livia_lead.id, status_code)
+                return
+            logger.warning("Webhook n8n da Lívia retornou status não esperado. capture_id=%s status=%s", livia_lead.id, status_code)
+        except HTTPError as exc:
+            logger.warning("Webhook n8n da Lívia falhou com HTTPError. capture_id=%s status=%s", livia_lead.id, exc.code)
+        except URLError as exc:
+            logger.warning("Webhook n8n da Lívia falhou com URLError. capture_id=%s reason=%s", livia_lead.id, exc.reason)
+        except Exception as exc:  # pragma: no cover - defensive integration guard
+            logger.warning("Webhook n8n da Lívia falhou com exceção. capture_id=%s type=%s", livia_lead.id, exc.__class__.__name__)
+
+    def _mark_n8n_webhook_sent(self, livia_lead):
+        updated_reference = dict(livia_lead.crm_reference or {})
+        updated_reference["n8n_livia_lead_webhook_sent_at"] = timezone.now().isoformat()
+        livia_lead.crm_reference = updated_reference
+        livia_lead.save(update_fields=["crm_reference"])
+
+    def _conversation_already_webhooked(self, livia_lead):
+        for capture in livia_lead.conversation.lead_captures.all():
+            if capture.crm_reference.get("n8n_livia_lead_webhook_sent_at"):
                 return True
         return False

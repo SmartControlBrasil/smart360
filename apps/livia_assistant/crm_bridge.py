@@ -1,5 +1,7 @@
 import logging
 
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.utils import timezone
 
@@ -46,6 +48,7 @@ class LiviaCRMBridge:
         livia_lead.operational_status = LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
         livia_lead.save(update_fields=["crm_lead_id", "crm_reference", "operational_status"])
         self._record_bridge_interaction(LeadInteraction, crm_lead, livia_lead)
+        self._notify_team_if_needed(livia_lead=livia_lead, crm_lead=crm_lead)
         return crm_lead
 
     def create_followup_task(self, livia_lead) -> object | None:
@@ -176,3 +179,62 @@ class LiviaCRMBridge:
         from apps.growth_engine.services.lead_service import LeadService
 
         return LeadService
+
+    def _notify_team_if_needed(self, *, livia_lead, crm_lead):
+        if not livia_lead.is_qualified:
+            return
+        if not (livia_lead.phone or livia_lead.email):
+            return
+        if (crm_lead.metadata or {}).get("source") != "livia_assistant":
+            return
+        if self._conversation_already_notified(livia_lead):
+            return
+
+        recipients = list(
+            getattr(settings, "LIVIA_LEAD_NOTIFICATION_RECIPIENTS", ["contato@smartcontrolbrasil.com.br"]) or []
+        )
+        bcc_recipients = list(
+            getattr(settings, "LIVIA_LEAD_NOTIFICATION_BCC", ["engenharia@smartcontrolbrasil.com.br"]) or []
+        )
+        if not recipients:
+            return
+
+        display_name = (livia_lead.name or livia_lead.company or "Lead sem identificação").strip()
+        subject = f"Novo lead da Lívia - {display_name}"
+        timestamp = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
+        body = "\n".join(
+            [
+                "Novo lead qualificado pela Lívia",
+                "",
+                f"Nome: {livia_lead.name or 'Não informado'}",
+                f"Empresa: {livia_lead.company or 'Não informado'}",
+                f"Cidade: {livia_lead.city or 'Não informada'}",
+                f"Telefone/WhatsApp: {livia_lead.phone or 'Não informado'}",
+                f"E-mail: {livia_lead.email or 'Não informado'}",
+                f"Interesse/problema: {livia_lead.notes or 'Não informado'}",
+                "Origem: livia_assistant",
+                f"Data/hora: {timestamp}",
+            ]
+        )
+
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=body,
+            from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "engenharia@smartcontrolbrasil.com.br"),
+            to=recipients,
+            bcc=bcc_recipients,
+        )
+        email.send(fail_silently=False)
+
+        updated_reference = dict(livia_lead.crm_reference or {})
+        updated_reference["notification_sent_at"] = timezone.now().isoformat()
+        updated_reference["notification_subject"] = subject
+        updated_reference["notification_recipients"] = recipients
+        livia_lead.crm_reference = updated_reference
+        livia_lead.save(update_fields=["crm_reference"])
+
+    def _conversation_already_notified(self, livia_lead):
+        for capture in livia_lead.conversation.lead_captures.all():
+            if capture.crm_reference.get("notification_sent_at"):
+                return True
+        return False

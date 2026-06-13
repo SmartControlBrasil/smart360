@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
@@ -12,6 +13,7 @@ from apps.livia_assistant.services import LiviaAssistantService
 
 class LiviaCRMBridgeTests(TestCase):
     def setUp(self):
+        mail.outbox.clear()
         self.conversation = LiviaConversation.objects.create(session_key="crm-session")
         self.livia_lead = LiviaLeadCapture.objects.create(
             conversation=self.conversation,
@@ -41,6 +43,60 @@ class LiviaCRMBridgeTests(TestCase):
         self.assertEqual(crm_lead.email, "cliente@example.com")
         self.assertEqual(self.livia_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
         self.assertEqual(self.livia_lead.crm_lead_id, crm_lead.id)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_notification_email_contains_recipients_subject_and_body(self):
+        with self.settings(
+            EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+            LIVIA_LEAD_NOTIFICATION_RECIPIENTS=["contato@smartcontrolbrasil.com.br"],
+            LIVIA_LEAD_NOTIFICATION_BCC=["engenharia@smartcontrolbrasil.com.br"],
+        ):
+            LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        self.assertEqual(sent.to, ["contato@smartcontrolbrasil.com.br"])
+        self.assertEqual(sent.bcc, ["engenharia@smartcontrolbrasil.com.br"])
+        self.assertIn("Novo lead da Lívia - Cliente Teste", sent.subject)
+        body = sent.body
+        self.assertIn("Nome: Cliente Teste", body)
+        self.assertIn("Empresa: Empresa Teste", body)
+        self.assertIn("Telefone/WhatsApp: 11999999999", body)
+        self.assertIn("E-mail: cliente@example.com", body)
+        self.assertIn("Interesse/problema: quero orçamento", body)
+
+    def test_notification_does_not_send_for_incomplete_lead(self):
+        incomplete = LiviaLeadCapture.objects.create(
+            conversation=self.conversation,
+            name="Lead Incompleto",
+            email="",
+            phone="",
+            company="Empresa Incompleta",
+            city="São Paulo",
+            service_interest="PMOC",
+            notes="sem contato",
+            is_qualified=False,
+        )
+        LiviaCRMBridge().create_or_update_crm_lead(incomplete)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_notification_is_not_duplicated_for_same_conversation(self):
+        with self.settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"):
+            LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+            second_capture = LiviaLeadCapture.objects.create(
+                conversation=self.conversation,
+                name="Cliente Teste 2",
+                email="cliente2@example.com",
+                phone="11999999998",
+                company="Empresa Teste",
+                city="São Paulo",
+                service_interest="PMOC",
+                notes="novo contato na mesma conversa",
+                is_qualified=True,
+            )
+            LiviaCRMBridge().create_or_update_crm_lead(second_capture)
+
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_bridge_does_not_duplicate_by_email_or_phone(self):
         first = LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)

@@ -103,6 +103,9 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if continuation_reply:
             return continuation_reply
 
+        if _is_locality_question(normalized) or _is_visit_request(normalized):
+            return build_lead_collection_reply(normalized, messages, service_interest)
+
         if _should_continue_lead_collection(normalized, messages):
             return build_lead_collection_reply(normalized, messages, service_interest)
 
@@ -541,15 +544,49 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
         missing.append("breve descrição do problema ou objetivo")
 
     service_context = f" para {service_interest}" if service_interest else ""
-    preface = build_lead_intent_preface(normalized_text, service_context)
+    locality_question = _is_locality_question(normalized_text)
+    visit_request = _is_visit_request(normalized_text)
+    is_followup = _is_followup_lead_collection(messages)
+
+    if len(missing) == 1 and missing[0] == "e-mail":
+        return "Perfeito. Falta só o e-mail para registrar o atendimento corretamente."
+    if len(missing) == 1 and missing[0] == "breve descrição do problema ou objetivo":
+        return "Perfeito. Falta só uma breve descrição do problema, equipamento ou objetivo do diagnóstico."
+    if set(missing) == {"e-mail", "breve descrição do problema ou objetivo"}:
+        return "Perfeito. Para fechar o encaminhamento, falta só seu e-mail e uma breve descrição do problema ou objetivo."
+
+    missing_text = _format_missing_fields(missing)
     if not missing:
         return (
-            f"{preface} "
             f"Perfeito. Já tenho os dados principais{service_context} e consigo te encaminhar para um especialista da Smart Control Brasil. "
             "Se quiser, só complemente com mais detalhes técnicos do cenário para acelerar o diagnóstico."
         )
 
-    missing_text = ", ".join(missing)
+    if locality_question:
+        city = known.get("city")
+        if city:
+            return (
+                "Atendemos projetos sob avaliação de escopo, urgência e viabilidade técnica. "
+                f"Para {city}, consigo encaminhar a análise para um especialista verificar a melhor forma de atendimento, "
+                f"seja visita técnica, suporte remoto inicial ou parceiro técnico. Para seguir, me informe {missing_text}."
+            )
+        return (
+            "Atendemos projetos sob avaliação de escopo, urgência e viabilidade técnica. "
+            "Consigo encaminhar a análise para um especialista validar a melhor forma de atendimento na sua região. "
+            f"Para seguir, me informe {missing_text}."
+        )
+
+    if visit_request:
+        return (
+            "Podemos avaliar uma visita técnica, sim. Antes de agendar, precisamos entender a máquina ou linha, "
+            "sintomas, urgência, localização e contato responsável. "
+            f"Para seguir, me informe {missing_text}."
+        )
+
+    if is_followup:
+        return f"Perfeito. Para seguir, me informe {missing_text}."
+
+    preface = build_lead_intent_preface(normalized_text, service_context)
     return (
         f"{preface} "
         "Consigo te encaminhar para um especialista da Smart Control Brasil. "
@@ -579,7 +616,7 @@ def _extract_contact_fields_from_text(text):
     normalized = _normalize(text)
     name_match = re.search(r"(?:meu nome e|me chamo|sou o|sou a|sou)\s+([a-zà-ÿ ]{2,80})", normalized, re.IGNORECASE)
     company_match = re.search(r"(?:empresa|da empresa|trabalho na|sou da)\s+([a-z0-9à-ÿ .&-]{2,100})", normalized, re.IGNORECASE)
-    city_match = re.search(r"(?:cidade|em)\s+([a-zà-ÿ ]{3,80})", normalized, re.IGNORECASE)
+    city_match = re.search(r"(?:cidade|estou em|em)\s+([a-zà-ÿ ]{3,80})", normalized, re.IGNORECASE)
     phone_match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text)
     email_match = re.search(r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", normalized, re.IGNORECASE)
 
@@ -605,10 +642,14 @@ def _extract_contact_fields_from_text(text):
         if len(lower_text) >= 45:
             problem = text.strip()[:300]
 
+    city_value = (city_match.group(1).strip(" .,-") if city_match else "")[:80]
+    if not city_value:
+        city_value = _extract_city_from_csv_like_message(text)
+
     return {
         "name": (name_match.group(1).strip(" .,-") if name_match else "")[:80],
         "company": (company_match.group(1).strip(" .,-") if company_match else "")[:100],
-        "city": (city_match.group(1).strip(" .,-") if city_match else "")[:80],
+        "city": city_value,
         "phone": phone_match.group(0).strip() if phone_match else "",
         "email": (email_match.group(0).strip() if email_match else "")[:180],
         "problem": problem,
@@ -685,6 +726,87 @@ def _should_continue_lead_collection(normalized_text, messages):
         return True
 
     return bool(re.search(r"\b(nome|empresa|cidade|telefone|whatsapp|whats|zap|email|e-mail)\b", normalized_text))
+
+
+def _is_followup_lead_collection(messages):
+    previous_assistant = _last_assistant_message(messages)
+    if not previous_assistant:
+        return False
+    previous_normalized = _normalize(previous_assistant)
+    return "para agilizar, me informe" in previous_normalized or "para seguir, me informe" in previous_normalized
+
+
+def _is_locality_question(normalized_text):
+    locality_terms = (
+        "atendem em",
+        "atendem minha regiao",
+        "atendem minha região",
+        "podem atender em",
+        "estou em",
+        "podem vir aqui",
+        "atendem aqui",
+        "minha regiao",
+        "minha região",
+    )
+    return any(term in normalized_text for term in locality_terms)
+
+
+def _is_visit_request(normalized_text):
+    visit_terms = (
+        "podem enviar um tecnico",
+        "podem enviar um técnico",
+        "preciso de tecnico",
+        "preciso de técnico",
+        "podem vir aqui",
+        "fazem visita tecnica",
+        "fazem visita técnica",
+        "quero uma visita",
+        "tecnico para diagnostico",
+        "técnico para diagnóstico",
+    )
+    return any(term in normalized_text for term in visit_terms)
+
+
+def _extract_city_from_csv_like_message(text):
+    chunks = [chunk.strip(" .,-") for chunk in str(text or "").split(",") if chunk.strip(" .,-")]
+    if not chunks:
+        return ""
+    blacklist = (
+        "meu nome",
+        "me chamo",
+        "sou da",
+        "sou de",
+        "empresa",
+        "telefone",
+        "whatsapp",
+        "email",
+        "e-mail",
+        "diagnostico",
+        "diagnóstico",
+        "problema",
+        "objetivo",
+        "@",
+    )
+    for chunk in chunks:
+        lowered = _normalize(chunk)
+        if any(term in lowered for term in blacklist):
+            continue
+        if re.search(r"\d", chunk):
+            continue
+        words = [word for word in chunk.split() if word]
+        if 1 <= len(words) <= 3:
+            return chunk[:80]
+    return ""
+
+
+def _format_missing_fields(fields):
+    if not fields:
+        return ""
+    if len(fields) == 1:
+        return fields[0]
+    if len(fields) == 2:
+        return f"{fields[0]} e {fields[1]}"
+    return ", ".join(fields[:-1]) + f" e {fields[-1]}"
 
 
 def _asks_for_price(normalized_text):

@@ -698,6 +698,87 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_comma_separated_contact_message_extracts_city_itapevi(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-intent-city-comma")
+        first_text = "quero um diagnóstico"
+        self.service.register_user_message(conversation, first_text)
+        self.service.generate_response(conversation, first_text)
+
+        second_text = "meu nome é Marcelo, sou da Smart Control, Itapevi, telefone 11999999999"
+        self.service.register_user_message(conversation, second_text)
+        response = self.service.generate_response(conversation, second_text)
+        lowered = response.reply.lower()
+        self.assertNotIn("cidade", lowered)
+        self.assertIn("e-mail", lowered)
+        self.assertIn("descrição", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_locality_question_atendem_em_manaus_receives_consultive_answer(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-locality-manaus")
+        text = "vocês atendem em Manaus?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("atendemos projetos sob avaliação", lowered)
+        self.assertIn("manaus", lowered)
+        self.assertIn("visita técnica", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_locality_plus_visit_campinas_has_contextual_answer(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-locality-campinas")
+        text = "estou em campinas, podem vir aqui?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("atendemos projetos sob avaliação", lowered)
+        self.assertIn("campinas", lowered)
+        self.assertIn("visita técnica", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_visit_request_gets_specific_visit_message(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-visit-message")
+        text = "podem enviar um técnico para um diagnóstico?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("podemos avaliar uma visita técnica", lowered)
+        self.assertIn("antes de agendar", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_when_only_email_missing_asks_only_email(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-only-email-missing")
+        first = "quero um diagnóstico"
+        self.service.register_user_message(conversation, first)
+        self.service.generate_response(conversation, first)
+
+        second = "meu nome é Maria, sou da Empresa Alfa, cidade Campinas, telefone 11999999999, problema parada recorrente na linha"
+        self.service.register_user_message(conversation, second)
+        response = self.service.generate_response(conversation, second)
+        lowered = response.reply.lower()
+        self.assertIn("falta só o e-mail", lowered)
+        self.assertNotIn("descrição", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_when_only_email_and_description_missing_requests_exactly_both(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-email-description-missing")
+        first = "quero um diagnóstico"
+        self.service.register_user_message(conversation, first)
+        self.service.generate_response(conversation, first)
+
+        second = "meu nome é Joao, sou da Empresa Beta, cidade Manaus, telefone 11999999999"
+        self.service.register_user_message(conversation, second)
+        response = self.service.generate_response(conversation, second)
+        lowered = response.reply.lower()
+        self.assertIn("falta só seu e-mail", lowered)
+        self.assertIn("breve descrição", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_buddy_remains_buddy(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="alias-buddy")

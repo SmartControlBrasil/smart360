@@ -24,8 +24,8 @@ class LiviaCRMBridge:
 
         Lead, LeadSource, LeadInteraction = self._growth_models()
         LeadService = self._growth_services()
-        crm_lead = self._find_existing_lead(Lead, livia_lead)
         source = self._get_or_create_source(LeadSource)
+        crm_lead = self._find_existing_lead(Lead, livia_lead, source)
         payload = self._payload_for_livia_lead(livia_lead, source)
 
         if crm_lead is None:
@@ -52,7 +52,8 @@ class LiviaCRMBridge:
         if not self.can_integrate():
             return None
         Lead, LeadSource, LeadInteraction = self._growth_models()
-        crm_lead = self._find_existing_lead(Lead, livia_lead)
+        source = self._get_or_create_source(LeadSource)
+        crm_lead = self._find_existing_lead(Lead, livia_lead, source)
         if crm_lead is None and livia_lead.is_qualified:
             crm_lead = self.create_or_update_crm_lead(livia_lead)
         if crm_lead is None:
@@ -72,7 +73,8 @@ class LiviaCRMBridge:
     def mark_contacted(self, livia_lead):
         if self.can_integrate():
             Lead, LeadSource, LeadInteraction = self._growth_models()
-            crm_lead = self._find_existing_lead(Lead, livia_lead)
+            source = self._get_or_create_source(LeadSource)
+            crm_lead = self._find_existing_lead(Lead, livia_lead, source)
             if crm_lead:
                 crm_lead.status = Lead.Status.CONTACTED
                 crm_lead.save(update_fields=["status", "updated_at"])
@@ -94,17 +96,20 @@ class LiviaCRMBridge:
         )
         return handoff
 
-    def _find_existing_lead(self, Lead, livia_lead):
+    def _find_existing_lead(self, Lead, livia_lead, source):
         if livia_lead.crm_lead_id:
             lead = Lead.objects.filter(pk=livia_lead.crm_lead_id).first()
             if lead:
                 return lead
         if livia_lead.email:
-            lead = Lead.objects.filter(email__iexact=livia_lead.email).first()
+            lead = Lead.objects.filter(email__iexact=livia_lead.email, source=source).first()
             if lead:
                 return lead
         if livia_lead.phone:
-            return Lead.objects.filter(phone=livia_lead.phone).first() or Lead.objects.filter(whatsapp=livia_lead.phone).first()
+            return (
+                Lead.objects.filter(phone=livia_lead.phone, source=source).first()
+                or Lead.objects.filter(whatsapp=livia_lead.phone, source=source).first()
+            )
         return None
 
     def _get_or_create_source(self, LeadSource):

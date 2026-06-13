@@ -59,6 +59,53 @@ class LiviaCRMBridgeTests(TestCase):
         self.assertEqual(first.id, second.id)
         self.assertEqual(Lead.objects.count(), 1)
 
+    def test_bridge_deduplicates_by_email_and_source_not_global_email(self):
+        from apps.growth_engine.models import LeadSource
+
+        other_source = LeadSource.objects.create(name="Origem Externa", source_type=LeadSource.SourceType.PARTNER)
+        lead_other_source = Lead.objects.create(
+            company_name="Empresa Externa",
+            email="cliente@example.com",
+            phone="11888887777",
+            source=other_source,
+            status=Lead.Status.NEW,
+        )
+        synced = LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
+
+        self.assertIsNotNone(synced)
+        self.assertEqual(Lead.objects.count(), 2)
+        self.assertNotEqual(synced.id, lead_other_source.id)
+
+    def test_bridge_deduplicates_by_phone_and_source_when_email_missing(self):
+        first = LiviaLeadCapture.objects.create(
+            conversation=self.conversation,
+            name="Contato Um",
+            email="",
+            phone="11911112222",
+            company="Empresa Um",
+            city="São Paulo",
+            service_interest="diagnóstico técnico",
+            notes="linha parada",
+            is_qualified=True,
+        )
+        second = LiviaLeadCapture.objects.create(
+            conversation=self.conversation,
+            name="Contato Dois",
+            email="",
+            phone="11911112222",
+            company="Empresa Dois",
+            city="São Paulo",
+            service_interest="diagnóstico técnico",
+            notes="suporte",
+            is_qualified=True,
+        )
+
+        first_crm = LiviaCRMBridge().create_or_update_crm_lead(first)
+        second_crm = LiviaCRMBridge().create_or_update_crm_lead(second)
+
+        self.assertEqual(first_crm.id, second_crm.id)
+        self.assertEqual(Lead.objects.count(), 1)
+
     def test_qualified_livia_lead_calls_bridge(self):
         service = LiviaAssistantService()
         conversation = LiviaConversation.objects.create(session_key="service-crm")
@@ -70,7 +117,7 @@ class LiviaCRMBridgeTests(TestCase):
             "city": "São Paulo",
             "service_interest": "PMOC",
             "urgency": LiviaLeadCapture.Urgency.HIGH,
-            "notes": "quero orçamento",
+            "notes": "quero orçamento de manutenção",
         }
 
         with patch("apps.livia_assistant.services.LiviaCRMBridge") as bridge_class:

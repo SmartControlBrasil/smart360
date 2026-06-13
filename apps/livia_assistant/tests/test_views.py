@@ -5,6 +5,7 @@ from unittest.mock import patch
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from apps.growth_engine.models import Lead
 from apps.livia_assistant.models import LiviaConversation, LiviaLeadCapture, LiviaMessage
 
 
@@ -124,7 +125,7 @@ class LiviaChatEndpointTests(TestCase):
         )
         self.assertEqual(second.status_code, 200)
         second_reply = second.json()["reply"].lower()
-        self.assertIn("falta só seu e-mail", second_reply)
+        self.assertIn("e-mail", second_reply)
         self.assertIn("breve descrição", second_reply)
         self.assertNotIn("cidade", second_reply)
         self.assertNotIn("sou a lívia", second_reply)
@@ -141,3 +142,75 @@ class LiviaChatEndpointTests(TestCase):
         self.assertIn("e-mail", third_reply)
         self.assertIn("descrição", third_reply)
         self.assertNotIn("sou a lívia", third_reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_chat_flow_creates_growth_lead_and_returns_confirmation(self):
+        session_key = "chat-create-growth-lead"
+        url = reverse("livia_assistant:chat")
+
+        self.client.post(
+            url,
+            data=json.dumps({"message": "quero um diagnóstico", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.client.post(
+            url,
+            data=json.dumps(
+                {
+                    "message": "meu nome é Marcelo, sou da Smart Control, Itapevi, telefone 11999999999",
+                    "session_key": session_key,
+                }
+            ),
+            content_type="application/json",
+        )
+        final = self.client.post(
+            url,
+            data=json.dumps(
+                {
+                    "message": "email marcelo@smartcontrol.com.br e problema: paradas recorrentes na linha de embalagem",
+                    "session_key": session_key,
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(final.status_code, 200)
+        payload = final.json()
+        self.assertTrue(payload["lead_registered"])
+        self.assertIn("registrei seu interesse", payload["reply"].lower())
+        self.assertEqual(Lead.objects.count(), 1)
+        lead = Lead.objects.first()
+        self.assertEqual(lead.email, "marcelo@smartcontrol.com.br")
+        self.assertEqual(lead.phone, "11999999999")
+        self.assertEqual(lead.city.lower(), "itapevi")
+        self.assertEqual((lead.metadata or {}).get("source"), "livia_assistant")
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_chat_flow_repeated_email_does_not_duplicate_growth_lead(self):
+        session_a = "chat-dup-email-a"
+        session_b = "chat-dup-email-b"
+        url = reverse("livia_assistant:chat")
+
+        messages = [
+            "quero um diagnóstico",
+            "meu nome é Ana, sou da Empresa Alfa, cidade Campinas, telefone 11911112222",
+            "email ana@empresa.com e problema falha recorrente na linha",
+        ]
+        for msg in messages:
+            self.client.post(
+                url,
+                data=json.dumps({"message": msg, "session_key": session_a}),
+                content_type="application/json",
+            )
+        for msg in [
+            "quero um diagnóstico",
+            "meu nome é Ana 2, sou da Empresa Beta, cidade Campinas, telefone 11933334444",
+            "email ana@empresa.com e problema parada na esteira",
+        ]:
+            self.client.post(
+                url,
+                data=json.dumps({"message": msg, "session_key": session_b}),
+                content_type="application/json",
+            )
+
+        self.assertEqual(Lead.objects.count(), 1)

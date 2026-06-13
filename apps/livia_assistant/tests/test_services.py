@@ -102,7 +102,7 @@ class LiviaAssistantServiceTests(TestCase):
             "city": "São Paulo",
             "service_interest": "manutenção industrial",
             "urgency": LiviaLeadCapture.Urgency.HIGH,
-            "notes": "quero orçamento de manutenção",
+            "notes": "quero orçamento de manutenção para reduzir falhas e paradas",
         }
 
         lead = self.service.create_or_update_lead_capture(conversation, extracted_data)

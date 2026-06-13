@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import LiviaChatForm
+from .models import LiviaLeadCapture
 from .services import LiviaAssistantService
 
 
@@ -43,9 +44,12 @@ def chat(request):
     livia_response = service.generate_response(conversation, message)
 
     lead_detected = livia_response.lead_detected
+    lead_registered = False
+    lead_capture = None
     if lead_detected:
         extracted_data = service.extract_lead_data(message)
-        service.create_or_update_lead_capture(conversation, extracted_data)
+        lead_capture = service.create_or_update_lead_capture(conversation, extracted_data)
+        lead_registered = lead_capture.operational_status == LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
 
     if livia_response.handoff_recommended:
         service.create_handoff_request(conversation, "Fallback recomendou contato humano por urgência ou risco técnico.")
@@ -53,10 +57,11 @@ def chat(request):
     return JsonResponse(
         {
             "conversation_id": conversation.id,
-            "reply": livia_response.reply,
+            "reply": _resolve_chat_reply(livia_response.reply, lead_registered, lead_capture),
             "lead_detected": lead_detected,
             "handoff_recommended": livia_response.handoff_recommended,
             "session_key": conversation.session_key,
+            "lead_registered": lead_registered,
         }
     )
 
@@ -67,3 +72,35 @@ def _get_or_create_session_key(request):
     if not request.session.session_key:
         request.session.create()
     return request.session.session_key
+
+
+def _resolve_chat_reply(default_reply, lead_registered, lead_capture):
+    if not lead_registered:
+        return default_reply
+
+    if lead_capture and not lead_capture.email:
+        return default_reply
+    if lead_capture and not _has_problem_context(lead_capture.notes):
+        return default_reply
+    return "Perfeito, registrei seu interesse e encaminhei para um especialista da Smart Control Brasil. Em breve entraremos em contato."
+
+
+def _has_problem_context(notes):
+    normalized = str(notes or "").strip().lower()
+    return any(
+        term in normalized
+        for term in (
+            "problema",
+            "objetivo",
+            "falha",
+            "falhas",
+            "parada",
+            "paradas",
+            "diagnostico",
+            "diagnóstico",
+            "suporte",
+            "linha",
+            "maquina",
+            "máquina",
+        )
+    )

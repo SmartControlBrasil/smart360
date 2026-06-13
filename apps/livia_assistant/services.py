@@ -13,6 +13,7 @@ from .integrations import (
     SERVICE_KEYWORDS,
     get_livia_ai_client,
     is_lead_capture_intent,
+    is_lead_data_message,
     is_real_emergency,
 )
 from .knowledge import LiviaKnowledgeService
@@ -115,7 +116,7 @@ class LiviaAssistantService:
 
     def detect_lead_intent(self, text):
         normalized = self._normalize(text)
-        return is_lead_capture_intent(normalized)
+        return is_lead_capture_intent(normalized) or is_lead_data_message(text)
 
     def extract_lead_data(self, text):
         normalized = self._normalize(text)
@@ -123,7 +124,7 @@ class LiviaAssistantService:
         phone_match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text)
         name_match = re.search(r"(?:meu nome é|me chamo|sou o|sou a|sou)\s+([A-Za-zÀ-ÿ ]{2,80})", text, re.IGNORECASE)
         company_match = re.search(r"(?:empresa|da empresa|trabalho na|sou da)\s+([A-Za-z0-9À-ÿ .&-]{2,100})", text, re.IGNORECASE)
-        city_match = re.search(r"(?:cidade|em|de)\s+([A-Za-zÀ-ÿ ]{3,80})", text, re.IGNORECASE)
+        city_match = re.search(r"\b(?:cidade|estou em|em)\s+([A-Za-zÀ-ÿ ]{3,80})", text, re.IGNORECASE)
 
         urgency = LiviaLeadCapture.Urgency.MEDIUM
         if is_real_emergency(normalized):
@@ -133,13 +134,34 @@ class LiviaAssistantService:
         elif any(term in normalized for term in ("sem pressa", "futuro", "planejamento")):
             urgency = LiviaLeadCapture.Urgency.LOW
 
+        service_interest = self._detect_service_interest(normalized)
+        if not service_interest and any(
+            term in normalized
+            for term in (
+                "diagnostico",
+                "diagnóstico",
+                "orcamento",
+                "orçamento",
+                "manutencao",
+                "manutenção",
+                "suporte",
+                "fmea",
+                "tpm",
+            )
+        ):
+            service_interest = "diagnóstico técnico"
+
+        city_value = self._clean_match(city_match)
+        if not city_value:
+            city_value = self._extract_city_from_comma_parts(text)
+
         return {
             "name": self._clean_match(name_match),
             "email": email_match.group(0) if email_match else "",
             "phone": phone_match.group(0) if phone_match else "",
             "company": self._clean_match(company_match),
-            "city": self._clean_match(city_match),
-            "service_interest": self._detect_service_interest(normalized),
+            "city": city_value,
+            "service_interest": service_interest,
             "urgency": urgency,
             "notes": text.strip(),
         }
@@ -157,7 +179,14 @@ class LiviaAssistantService:
         if extracted_data.get("urgency"):
             lead.urgency = extracted_data["urgency"]
 
-        lead.is_qualified = bool(lead.name and (lead.phone or lead.email) and lead.service_interest)
+        lead.is_qualified = bool(
+            lead.name
+            and lead.company
+            and lead.city
+            and lead.phone
+            and lead.service_interest
+            and self._looks_like_problem_description(lead.notes)
+        )
         lead.save()
 
         update_fields = []
@@ -218,6 +247,45 @@ class LiviaAssistantService:
         if not match:
             return ""
         return match.group(1).strip(" .,-")[:180]
+
+    def _looks_like_problem_description(self, text):
+        normalized = self._normalize(text)
+        return any(
+            term in normalized
+            for term in (
+                "problema",
+                "objetivo",
+                "falha",
+                "falhas",
+                "parada",
+                "paradas",
+                "diagnostico",
+                "diagnóstico",
+                "suporte",
+                "manutencao",
+                "manutenção",
+                "orcamento",
+                "orçamento",
+                "linha",
+                "maquina",
+                "máquina",
+            )
+        )
+
+    def _extract_city_from_comma_parts(self, text):
+        parts = [part.strip(" .,-") for part in str(text or "").split(",") if part.strip(" .,-")]
+        if len(parts) < 2:
+            return ""
+        for part in parts:
+            lowered = self._normalize(part)
+            if any(term in lowered for term in ("meu nome", "me chamo", "sou da", "empresa", "telefone", "whatsapp", "email", "e-mail")):
+                continue
+            if re.search(r"\d", part):
+                continue
+            words = [token for token in part.split() if token]
+            if 1 <= len(words) <= 3:
+                return part[:120]
+        return ""
 
     def _infer_product_hint(self, reply, user_text, knowledge_context, recent_product):
         corpus = " ".join([reply or "", user_text or "", knowledge_context or ""]).lower()

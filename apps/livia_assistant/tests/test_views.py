@@ -91,3 +91,53 @@ class LiviaChatEndpointTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("2000", response.json()["error"])
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_chat_flow_commercial_sequence_keeps_context_and_avoids_generic_fallback(self):
+        session_key = "commercial-sequence-real-flow"
+        url = reverse("livia_assistant:chat")
+
+        first = self.client.post(
+            url,
+            data=json.dumps({"message": "quero um diagnóstico", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(first.status_code, 200)
+        first_reply = first.json()["reply"].lower()
+        self.assertIn("nome", first_reply)
+        self.assertIn("empresa", first_reply)
+        self.assertIn("cidade", first_reply)
+        self.assertIn("telefone/whatsapp", first_reply)
+        self.assertIn("e-mail", first_reply)
+        self.assertIn("breve descrição", first_reply)
+        self.assertNotIn("falta só o e-mail", first_reply)
+
+        second = self.client.post(
+            url,
+            data=json.dumps(
+                {
+                    "message": "meu nome é Marcelo, sou da Smart Control, Itapevi, telefone 11999999999",
+                    "session_key": session_key,
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(second.status_code, 200)
+        second_reply = second.json()["reply"].lower()
+        self.assertIn("falta só seu e-mail", second_reply)
+        self.assertIn("breve descrição", second_reply)
+        self.assertNotIn("cidade", second_reply)
+        self.assertNotIn("sou a lívia", second_reply)
+
+        third = self.client.post(
+            url,
+            data=json.dumps({"message": "vocês atendem em Manaus?", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(third.status_code, 200)
+        third_reply = third.json()["reply"].lower()
+        self.assertIn("atendemos projetos sob avaliação", third_reply)
+        self.assertIn("manaus", third_reply)
+        self.assertIn("e-mail", third_reply)
+        self.assertIn("descrição", third_reply)
+        self.assertNotIn("sou a lívia", third_reply)

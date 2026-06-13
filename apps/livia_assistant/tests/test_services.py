@@ -644,6 +644,8 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertIn("empresa", lowered)
         self.assertIn("cidade", lowered)
         self.assertIn("telefone/whatsapp", lowered)
+        self.assertIn("e-mail", lowered)
+        self.assertIn("breve descrição", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -711,6 +713,17 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("cidade", lowered)
         self.assertIn("e-mail", lowered)
         self.assertIn("descrição", lowered)
+        self.assertNotIn("sou a lívia", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_isolated_lead_data_message_enters_commercial_flow(self):
+        conversation = self.service.get_or_create_conversation(session_key="lead-data-isolated")
+        text = "meu nome é Marcelo, sou da Smart Control, Itapevi, telefone 11999999999"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("falta só seu e-mail", lowered)
+        self.assertIn("breve descrição", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")

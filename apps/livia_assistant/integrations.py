@@ -87,7 +87,7 @@ class FallbackLiviaAIClient(LiviaAIClient):
     def generate_reply(self, *, system_prompt, messages, context=None) -> str:
         user_text = _last_user_message(messages)
         normalized = _normalize(user_text)
-        lead_detected = bool((context or {}).get("lead_detected")) or is_lead_capture_intent(normalized)
+        lead_detected = bool((context or {}).get("lead_detected")) or is_lead_capture_intent(normalized) or is_lead_data_message(user_text)
         handoff_recommended = bool((context or {}).get("handoff_recommended")) or is_real_emergency(normalized)
         service_interest = (context or {}).get("service_interest") or _detect_service_interest(normalized)
         knowledge_context = (context or {}).get("knowledge_context", "")
@@ -421,6 +421,36 @@ def is_lead_capture_intent(normalized_text):
     return any(term in normalized_text for term in LEAD_INTENT_TERMS)
 
 
+def is_lead_data_message(text):
+    normalized_text = _normalize(text)
+    if re.search(r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", text, re.IGNORECASE):
+        return True
+    if re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text):
+        return True
+    signal_terms = (
+        "meu nome e",
+        "meu nome é",
+        "me chamo",
+        "sou da",
+        "empresa",
+        "telefone",
+        "whatsapp",
+        "cidade",
+        "e-mail",
+        "email",
+    )
+    if any(term in normalized_text for term in signal_terms):
+        return True
+    extracted = _extract_contact_fields_from_text(text)
+    if extracted.get("name") or extracted.get("company") or extracted.get("phone") or extracted.get("email"):
+        return True
+    has_city_with_lead_pattern = bool(extracted.get("city")) and (
+        "," in str(text or "")
+        and any(term in normalized_text for term in ("meu nome", "me chamo", "sou da", "empresa", "telefone", "whatsapp"))
+    )
+    return has_city_with_lead_pattern
+
+
 def is_maintenance_question(normalized_text):
     maintenance_terms = (
         "fmea",
@@ -528,6 +558,15 @@ def build_lead_intent_preface(normalized_text, service_text):
 
 
 def build_lead_collection_reply(normalized_text, messages, service_interest):
+    if _is_first_commercial_without_explicit_data(normalized_text, messages):
+        service_context = f" para {service_interest}" if service_interest else ""
+        preface = build_lead_intent_preface(normalized_text, service_context)
+        return (
+            f"{preface} "
+            "Consigo te encaminhar para um especialista da Smart Control Brasil. "
+            "Para agilizar, me informe nome, empresa, cidade, telefone/WhatsApp, e-mail e uma breve descrição do problema ou objetivo."
+        )
+
     known = _collect_known_contact_fields(messages)
     missing = []
     if not known.get("name"):
@@ -548,13 +587,6 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
     visit_request = _is_visit_request(normalized_text)
     is_followup = _is_followup_lead_collection(messages)
 
-    if len(missing) == 1 and missing[0] == "e-mail":
-        return "Perfeito. Falta só o e-mail para registrar o atendimento corretamente."
-    if len(missing) == 1 and missing[0] == "breve descrição do problema ou objetivo":
-        return "Perfeito. Falta só uma breve descrição do problema, equipamento ou objetivo do diagnóstico."
-    if set(missing) == {"e-mail", "breve descrição do problema ou objetivo"}:
-        return "Perfeito. Para fechar o encaminhamento, falta só seu e-mail e uma breve descrição do problema ou objetivo."
-
     missing_text = _format_missing_fields(missing)
     if not missing:
         return (
@@ -563,7 +595,9 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
         )
 
     if locality_question:
-        city = known.get("city")
+        current_user_text = _last_user_message(messages)
+        current_city = _extract_contact_fields_from_text(current_user_text).get("city")
+        city = current_city or known.get("city")
         if city:
             return (
                 "Atendemos projetos sob avaliação de escopo, urgência e viabilidade técnica. "
@@ -582,6 +616,13 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
             "sintomas, urgência, localização e contato responsável. "
             f"Para seguir, me informe {missing_text}."
         )
+
+    if len(missing) == 1 and missing[0] == "e-mail":
+        return "Perfeito. Falta só o e-mail para registrar o atendimento corretamente."
+    if len(missing) == 1 and missing[0] == "breve descrição do problema ou objetivo":
+        return "Perfeito. Falta só uma breve descrição do problema, equipamento ou objetivo do diagnóstico."
+    if set(missing) == {"e-mail", "breve descrição do problema ou objetivo"}:
+        return "Perfeito. Para fechar o encaminhamento, falta só seu e-mail e uma breve descrição do problema ou objetivo."
 
     if is_followup:
         return f"Perfeito. Para seguir, me informe {missing_text}."
@@ -736,6 +777,36 @@ def _is_followup_lead_collection(messages):
     return "para agilizar, me informe" in previous_normalized or "para seguir, me informe" in previous_normalized
 
 
+def _is_first_commercial_without_explicit_data(normalized_text, messages):
+    if not is_lead_capture_intent(normalized_text):
+        return False
+    if _is_followup_lead_collection(messages):
+        return False
+    explicit_first_intents = (
+        "quero um diagnostico",
+        "quero um diagnóstico",
+        "preciso de diagnostico",
+        "preciso de diagnóstico",
+        "quero orcamento",
+        "quero orçamento",
+        "preciso de manutencao",
+        "preciso de manutenção",
+    )
+    if any(term in normalized_text for term in explicit_first_intents):
+        return True
+    extracted = _extract_contact_fields_from_text(normalized_text)
+    has_explicit_data = any(
+        [
+            extracted.get("name"),
+            extracted.get("company"),
+            extracted.get("city"),
+            extracted.get("phone"),
+            extracted.get("email"),
+        ]
+    )
+    return not has_explicit_data
+
+
 def _is_locality_question(normalized_text):
     locality_terms = (
         "atendem em",
@@ -768,7 +839,18 @@ def _is_visit_request(normalized_text):
 
 
 def _extract_city_from_csv_like_message(text):
-    chunks = [chunk.strip(" .,-") for chunk in str(text or "").split(",") if chunk.strip(" .,-")]
+    raw_text = str(text or "")
+    if "," not in raw_text:
+        return ""
+    normalized_text = _normalize(raw_text)
+    has_lead_markers = any(
+        term in normalized_text
+        for term in ("meu nome", "me chamo", "sou da", "empresa", "telefone", "whatsapp")
+    )
+    if not has_lead_markers:
+        return ""
+
+    chunks = [chunk.strip(" .,-") for chunk in raw_text.split(",") if chunk.strip(" .,-")]
     if not chunks:
         return ""
     blacklist = (
@@ -792,6 +874,8 @@ def _extract_city_from_csv_like_message(text):
         if any(term in lowered for term in blacklist):
             continue
         if re.search(r"\d", chunk):
+            continue
+        if len(chunk) < 3:
             continue
         words = [word for word in chunk.split() if word]
         if 1 <= len(words) <= 3:

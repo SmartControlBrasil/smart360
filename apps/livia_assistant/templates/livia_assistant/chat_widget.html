@@ -1,12 +1,19 @@
-{% load i18n %}
+{% load i18n static %}
 <div class="livia-widget livia-chat-widget"
      data-livia-widget
      data-endpoint="{% url 'livia_assistant:chat' %}">
   <section class="livia-chat-panel" id="livia-chat-panel" hidden data-livia-panel>
     <header class="livia-chat-header">
-      <div>
-        <strong>{{ livia_chat_branding.assistant_name }}</strong>
-        <span>{{ livia_chat_branding.assistant_subtitle }}</span>
+      <div class="livia-chat-header-content">
+        <img
+          src="{% static 'livia_assistant/img/livia.png' %}"
+          alt="Lívia"
+          class="livia-chat-avatar"
+        />
+        <div>
+          <strong>{{ livia_chat_branding.assistant_name }}</strong>
+          <span>{{ livia_chat_branding.assistant_subtitle }}</span>
+        </div>
       </div>
       <button class="livia-chat-minimize" type="button" data-livia-minimize aria-label="Minimizar chat">−</button>
     </header>
@@ -34,7 +41,11 @@
     </form>
   </section>
   <button class="livia-chat-toggle" type="button" aria-expanded="false" aria-controls="livia-chat-panel" data-livia-toggle>
-    <span class="livia-chat-toggle-icon" aria-hidden="true">💬</span>
+    <img
+      src="{% static 'livia_assistant/img/livia.png' %}"
+      alt="Lívia"
+      class="livia-chat-avatar"
+    />
     {{ livia_chat_branding.toggle_label }}
   </button>
 </div>
@@ -60,9 +71,9 @@
     font-weight: 700;
   }
   .livia-chat-toggle {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     min-height: 48px;
     padding: 12px 18px;
     border-radius: 999px;
@@ -79,12 +90,13 @@
     box-shadow: 0 18px 36px rgba(15, 23, 42, 0.3);
     outline: none;
   }
-  .livia-chat-toggle-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    color: rgba(255, 255, 255, 0.95);
+  .livia-chat-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
   }
 
   .livia-chat-panel {
@@ -106,9 +118,16 @@
     background: linear-gradient(135deg, #111827, #0f766e);
     color: #fff;
   }
-  .livia-chat-header div {
+  .livia-chat-header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .livia-chat-header-content > div {
     display: grid;
     gap: 2px;
+    min-width: 0;
   }
   .livia-chat-header span {
     font-size: 12px;

@@ -10,6 +10,13 @@ from apps.livia_assistant.lead_state import LeadState, resolve_state
 from apps.livia_assistant.models import LiviaConversation, LiviaKnowledgeItem, LiviaLeadCapture, LiviaMessage
 from apps.livia_assistant.qualification import is_lead_ready_for_notification, strip_repetition_noise
 from apps.livia_assistant.services import LiviaAssistantService
+from apps.livia_assistant.technical_summary import (
+    build_technical_service_summary,
+    detect_equipment,
+    detect_intent,
+    detect_symptom,
+    normalize_technical_corpus,
+)
 
 
 class RecordingClient:
@@ -1212,3 +1219,51 @@ class LiviaAssistantServiceTests(TestCase):
                 extracted = universal_extract_lead_data(text)
                 for key, value in expected.items():
                     self.assertEqual(getattr(extracted, key), value)
+
+
+class TechnicalSummaryTests(TestCase):
+    def test_normalize_technical_corpus_fixes_common_typos(self):
+        corpus = normalize_technical_corpus("camara frigorifica com equipamennto e acumulo de gelo")
+        self.assertIn("câmara frigorífica", corpus)
+        self.assertIn("equipamento", corpus)
+        self.assertNotIn("equipamennto", corpus)
+        self.assertIn("acúmulo de gelo", corpus)
+
+    def test_detect_equipment_symptom_and_intent(self):
+        equipment, _ = detect_equipment("uma camara frigorifica com acumulo de gelo no ventilador")
+        symptom, _ = detect_symptom("tem acumulo de gelo no ventilador")
+        self.assertEqual(equipment, "câmara frigorífica")
+        self.assertEqual(symptom, "acúmulo de gelo no ventilador")
+
+        symptom, _ = detect_symptom("tem um disjuntor caindo")
+        self.assertEqual(symptom, "disjuntor desarmando")
+
+        intent = detect_intent("não tenho contrato gostaria de uma avaliação e para possivel contrato")
+        self.assertIn("avaliação técnica", intent)
+        self.assertIn("contrato", intent)
+
+    def test_build_technical_service_summary_cases(self):
+        summary = build_technical_service_summary(
+            raw_corpus="estou com problemas em um equipamennto que parou uma camara frigorifica",
+            city="Cotia",
+        )
+        self.assertIn("câmara frigorífica", summary)
+        self.assertTrue("parada" in summary.lower())
+        self.assertIn("Cotia", summary)
+        self.assertNotIn("equipamennto", summary)
+
+        summary = build_technical_service_summary(
+            raw_corpus="uma camara climatica weiss nao gela sim low pressure",
+            city="",
+        )
+        self.assertIn("câmara climática Weiss", summary)
+        self.assertIn("não gela", summary)
+        self.assertIn("low pressure", summary)
+
+        summary = build_technical_service_summary(
+            raw_corpus="choque termico da marca Votsch painel apagou",
+            city="",
+        )
+        self.assertIn("choque térmico", summary)
+        self.assertTrue("Vötsch" in summary or "votsch" in summary.lower())
+        self.assertTrue("painel apagou" in summary.lower() or "painel apagado" in summary.lower())

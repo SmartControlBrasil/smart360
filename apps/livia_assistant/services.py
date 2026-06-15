@@ -41,6 +41,11 @@ from .qualification import (
     is_lead_ready_for_notification,
     strip_repetition_noise,
 )
+from .technical_summary import (
+    build_technical_service_summary,
+    extract_technical_context,
+    technical_corpus_from_lead,
+)
 
 
 @dataclass(frozen=True)
@@ -464,27 +469,57 @@ class LiviaAssistantService:
                 technical_messages.append(sanitized)
 
         selected_messages = technical_messages
-        if selected_messages:
-            lead.notes = " | ".join(dict.fromkeys(selected_messages))[:4000]
         corpus = " ".join(selected_messages)
         normalized = self._normalize(corpus)
+
+        technical_reference = {
+            **(lead.crm_reference or {}),
+            "technical_history": selected_messages,
+        }
+        context = extract_technical_context(corpus) if corpus else None
+        if context and (context.equipment or context.symptom or context.stopped or context.intent):
+            technical_reference["technical_context"] = {
+                "equipment": context.equipment,
+                "brand": context.brand,
+                "symptom": context.symptom,
+                "intent": context.intent,
+                "stopped": context.stopped,
+            }
+        lead.crm_reference = technical_reference
+
+        city = lead.city if has_valid_city_field(lead) else ""
+        structured_summary = build_technical_service_summary(raw_corpus=corpus, city=city)
+        commercial_summary = self._build_commercial_fallback_summary(lead)
+        if self._should_use_commercial_notes(corpus, commercial_summary):
+            lead.notes = commercial_summary
+        elif structured_summary:
+            lead.notes = structured_summary
+        elif selected_messages:
+            lead.notes = " | ".join(dict.fromkeys(selected_messages))[:4000]
+
         if any(term in normalized for term in ("duno", "dune", "hygibot")):
             lead.service_interest = "Duno - robô de limpeza"
         elif not lead.service_interest:
             lead.service_interest = self._detect_service_interest(normalized)
 
     def _build_commercial_context_summary(self, lead):
+        corpus = self._technical_corpus(lead)
+        commercial_summary = self._build_commercial_fallback_summary(lead)
+        if self._should_use_commercial_notes(corpus, commercial_summary):
+            return commercial_summary
         technical_summary = self._build_technical_service_summary(lead)
         if technical_summary:
             return technical_summary
+        return commercial_summary
 
-        normalized = self._normalize(lead.notes)
+    def _build_commercial_fallback_summary(self, lead):
+        normalized = self._normalize(self._technical_corpus(lead))
         product = "robô Duno" if any(
             term in normalized for term in ("duno", "dune", "hygibot")
         ) or ("robô" in normalized or "robo" in normalized) and "supermercado" in normalized else "solução solicitada"
         application = " para limpeza noturna" if "limpeza" in normalized and "noturn" in normalized else " para limpeza" if "limpeza" in normalized else ""
         environment = " em supermercado" if "supermercado" in normalized else ""
-        area_match = re.search(r"(\d{1,3}(?:[.]\d{3})+|\d+)\s*m(?:²|2)", lead.notes, re.IGNORECASE)
+        area_match = re.search(r"(\d{1,3}(?:[.]\d{3})+|\d+)\s*m(?:²|2)", self._technical_corpus(lead), re.IGNORECASE)
         area = f" de aproximadamente {area_match.group(1)} m²" if area_match else ""
         infrastructure = ", sem infraestrutura de automação atual" if any(term in normalized for term in ("sem infraestrutura", "nao possui infraestrutura", "não possui infraestrutura")) else ""
         city = f", em {lead.city}" if has_valid_city_field(lead) else ""
@@ -492,56 +527,21 @@ class LiviaAssistantService:
             return f"{product}{application}{environment}{area}{infrastructure}{city}"
         return "solicitação comercial registrada"
 
+    def _technical_corpus(self, lead):
+        return technical_corpus_from_lead(lead)
+
+    def _should_use_commercial_notes(self, corpus, commercial_summary):
+        normalized = self._normalize(corpus)
+        if not commercial_summary or commercial_summary == "solicitação comercial registrada":
+            return False
+        return any(term in normalized for term in ("supermercado", "duno", "dune", "hygibot")) and "limpeza" in normalized
+
     def _build_technical_service_summary(self, lead):
-        corpus = self._normalize(f"{lead.notes or ''} {lead.service_interest or ''}")
-        city_suffix = f", em {lead.city}" if has_valid_city_field(lead) else ""
-
-        is_frigorifica = any(term in corpus for term in ("camara frigorifica", "câmara frigorífica"))
-        is_climatic = any(term in corpus for term in ("camara climatica", "câmara climática"))
-        is_choque = any(term in corpus for term in ("choque termico", "choque térmico"))
-        is_weiss = "weiss" in corpus
-        is_votsch = any(term in corpus for term in ("votsch", "vötsch"))
-        no_gela = any(term in corpus for term in ("nao gela", "não gela"))
-        gelo_ventilador = any(
-            term in corpus
-            for term in ("acumulo de gelo", "acúmulo de gelo", "gelo no ventilador", "gelo no ventilador")
-        )
-        disjuntor = any(term in corpus for term in ("disjuntor caindo", "disjuntor cai"))
-        painel_apagou = any(term in corpus for term in ("painel apagou", "painel parou", "apagou o painel"))
-        low_pressure = "low pressure" in corpus
-        wants_evaluation = any(
-            term in corpus
-            for term in ("avaliacao", "avaliação", "visita tecnica", "visita técnica", "possivel contrato", "possível contrato")
-        )
-        action_label = "avaliação técnica" if wants_evaluation else "atendimento técnico"
-
-        if is_frigorifica:
-            summary = f"Solicitação de {action_label} para câmara frigorífica"
-            if gelo_ventilador:
-                summary += " com acúmulo de gelo no ventilador"
-            elif disjuntor:
-                summary += " com disjuntor caindo"
-            return f"{summary}{city_suffix}."
-
-        if is_climatic:
-            summary = f"Solicitação de {action_label} para câmara climática"
-            if is_weiss:
-                summary += " Weiss"
-            if no_gela:
-                summary += " que não gela"
-            if low_pressure:
-                summary += ", com erro low pressure informado"
-            return f"{summary}{city_suffix}."
-
-        if is_choque:
-            summary = f"Solicitação de {action_label} para equipamento de choque térmico"
-            if is_votsch:
-                summary += " Vötsch"
-            if painel_apagou:
-                summary += " com painel apagado"
-            return f"{summary}{city_suffix}."
-
-        return ""
+        corpus = self._technical_corpus(lead)
+        if lead.service_interest:
+            corpus = f"{corpus} {lead.service_interest}"
+        city = lead.city if has_valid_city_field(lead) else ""
+        return build_technical_service_summary(raw_corpus=corpus, city=city)
 
     def _extract_relaxed_phone(self, text):
         value = str(text or "").strip()
@@ -582,7 +582,11 @@ class LiviaAssistantService:
         normalized = self._normalize(value)
         if normalized in INVALID_GENERIC_VALUES:
             return ""
-        if self._looks_like_personal_only_input(value) and not self._looks_like_problem_description(value):
+        if (
+            self._looks_like_personal_only_input(value)
+            and not self._looks_like_problem_description(value)
+            and not self._is_technical_note_message(normalized)
+        ):
             return ""
         if any(snippet in normalized for snippet in INVALID_COMPANY_OR_CITY_SNIPPETS):
             if not self._is_technical_note_message(normalized):
@@ -822,6 +826,9 @@ class LiviaAssistantService:
                 "frigorífica",
                 "gelo",
                 "ventilador",
+                "painel",
+                "apagou",
+                "low pressure",
                 "avaliacao",
                 "avaliação",
                 "contrato",
@@ -1218,6 +1225,9 @@ class LiviaAssistantService:
             "retrofit",
             "falha",
             "parada",
+            "painel",
+            "apagou",
+            "low pressure",
             "diagnost",
             "manutenc",
             "infraestrutura",

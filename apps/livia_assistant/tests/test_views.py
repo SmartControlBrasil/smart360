@@ -326,7 +326,7 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(capture.email, "marcos@gocil.com.br")
         self.assertEqual(capture.city, "São Paulo")
         self.assertEqual(capture.service_interest, "Duno - robô de limpeza")
-        for context in ("Duno", "limpeza", "supermercado", "12.000 m²", "noturno", "infraestrutura", "São Paulo"):
+        for context in ("Duno", "limpeza", "supermercado", "12.000 m²", "noturn", "infraestrutura", "São Paulo"):
             self.assertIn(context.lower(), capture.notes.lower())
 
         crm_lead = Lead.objects.get()
@@ -535,8 +535,9 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.NEW)
 
         notes = (capture.notes or "").lower()
-        self.assertIn("robô para supermercado", notes)
+        self.assertIn("robô", notes)
         self.assertIn("limpeza", notes)
+        self.assertIn("supermercado", notes)
         self.assertIn("12000 m²", notes)
         self.assertNotIn("marcos silva", notes)
         self.assertNotIn("govip", notes)
@@ -933,6 +934,37 @@ class LiviaChatEndpointTests(TestCase):
         self.assertTrue("votsch" in summary or "vötsch" in summary, msg=summary)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_votsch_thermal_shock_flow_builds_structured_notes_when_qualified(self):
+        mail.outbox.clear()
+        session_key = "real-flow-votsch-qualified"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "choque termico da marca Votsch",
+            "painel apagou",
+            "Marcelo",
+            "control lab",
+            "São Paulo",
+            "1178457878",
+            "marcelo@controllab.com.br",
+        ]
+        for message in flow:
+            self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertTrue(capture.is_qualified)
+        self.assertEqual(len(mail.outbox), 1)
+
+        notes = (capture.notes or "").lower()
+        self.assertIn("choque térmico", notes, msg=notes)
+        self.assertTrue("vötsch" in notes or "votsch" in notes, msg=notes)
+        self.assertTrue("painel apagou" in notes or "painel apagado" in notes, msg=notes)
+        self.assertNotIn("|", capture.notes or "", msg=capture.notes)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_complete_technical_flow_with_all_fields_qualifies_and_forwards(self):
         mail.outbox.clear()
         session_key = "real-flow-complete-technical"
@@ -960,6 +992,11 @@ class LiviaChatEndpointTests(TestCase):
         summary = LiviaAssistantService().build_qualified_lead_reply(capture).lower()
         self.assertIn("câmara climática", summary)
         self.assertIn("weiss", summary)
+
+        notes = (capture.notes or "").lower()
+        self.assertIn("câmara climática weiss", notes, msg=notes)
+        self.assertIn("não gela", notes, msg=notes)
+        self.assertIn("low pressure", notes, msg=notes)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_frigorifica_flow_preserves_company_and_technical_summary(self):
@@ -1006,10 +1043,54 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
 
         notes = (capture.notes or "").lower()
+        self.assertIn("câmara frigorífica", notes, msg=notes)
         self.assertTrue("gelo" in notes or "ventilador" in notes, msg=notes)
-        self.assertTrue("avali" in notes or "contrato" in notes, msg=notes)
+        self.assertIn("osasco", notes, msg=notes)
+        self.assertNotIn("solução solicitada", notes, msg=notes)
+        self.assertNotIn("ja falei", notes, msg=notes)
+        self.assertNotIn("|", notes, msg=notes)
 
         final_reply = last_response.json()["reply"].lower()
         self.assertTrue("frigorifica" in final_reply or "frigorífica" in final_reply, msg=final_reply)
         self.assertTrue("gelo" in final_reply or "ventilador" in final_reply, msg=final_reply)
         self.assertNotIn("solução solicitada, em osasco", final_reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_joaquim_frigorifica_flow_builds_structured_technical_notes(self):
+        mail.outbox.clear()
+        session_key = "real-flow-joaquim-frigorifica"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "estou com problemas em um equipamennto que parou",
+            "uma camara frigorifica",
+            "Joaquim",
+            "Animalia",
+            "Cotia",
+            "11962196100",
+            "anamalia@animalia.com.br",
+        ]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertTrue(capture.is_qualified)
+        self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+        self.assertEqual(len(mail.outbox), 1)
+
+        notes = capture.notes or ""
+        notes_lower = notes.lower()
+        self.assertIn("câmara frigorífica", notes_lower, msg=notes)
+        self.assertTrue("parada" in notes_lower or "parou" in notes_lower, msg=notes)
+        self.assertIn("cotia", notes_lower, msg=notes)
+        self.assertNotIn("equipamennto", notes_lower, msg=notes)
+        self.assertNotIn("|", notes, msg=notes)
+        self.assertIn(notes_lower, mail.outbox[0].body.lower())
+
+        history = (capture.crm_reference or {}).get("technical_history", [])
+        self.assertTrue(any("camara frigorifica" in item.lower() for item in history))
+        self.assertTrue(last_response.json()["lead_registered"])

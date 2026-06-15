@@ -155,6 +155,42 @@ class LiviaChatEndpointTests(TestCase):
         self.assertNotIn("telefone/whatsapp", technical_reply)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_technical_electronic_board_request_does_not_start_lead_capture(self):
+        response = self.client.post(
+            reverse("livia_assistant:chat"),
+            data=json.dumps({"message": "preciso fazer uma placa eletrônica", "session_key": "technical-board"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["lead_detected"])
+        self.assertNotIn("como posso te chamar", response.json()["reply"].lower())
+        self.assertFalse(LiviaLeadCapture.objects.filter(conversation__session_key="technical-board").exists())
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_simple_name_answers_are_persisted_and_advance_to_company(self):
+        url = reverse("livia_assistant:chat")
+        for index, name in enumerate(("Antonio", "Marcelo", "João da Silva", "Antonio Carlos")):
+            with self.subTest(name=name):
+                session_key = f"simple-name-{index}"
+                first = self.client.post(
+                    url,
+                    data=json.dumps({"message": "quero um orçamento", "session_key": session_key}),
+                    content_type="application/json",
+                )
+                self.assertIn("como posso te chamar", first.json()["reply"].lower())
+
+                second = self.client.post(
+                    url,
+                    data=json.dumps({"message": name, "session_key": session_key}),
+                    content_type="application/json",
+                )
+                capture = LiviaLeadCapture.objects.get(conversation__session_key=session_key)
+                self.assertEqual(capture.name, name)
+                self.assertIn("em qual empresa", second.json()["reply"].lower())
+                self.assertNotIn("como posso te chamar", second.json()["reply"].lower())
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_endpoint_replaces_provider_multi_field_request_with_single_question(self):
         url = reverse("livia_assistant:chat")
         bad_reply = "Por favor, me informe seu nome, empresa, telefone, e-mail e cidade."

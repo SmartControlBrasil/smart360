@@ -340,21 +340,25 @@ class LiviaAssistantService:
         lead = conversation.lead_captures.order_by("-created_at").first()
         if lead is not None and not lead.is_qualified:
             return True
-        if self._expected_lead_field(conversation):
-            return True
-        last_assistant = conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT).order_by("-created_at", "-id").first()
-        normalized = self._normalize(last_assistant.content) if last_assistant else ""
-        return any(term in normalized for term in ("posso encaminhar", "encaminhar seu interesse", "encaminhar seu pedido"))
+        return bool(self._expected_lead_field(conversation))
 
     def _expected_lead_field(self, conversation):
         if conversation is None:
             return ""
+        lead = conversation.lead_captures.order_by("-created_at").first()
+        if lead is not None and not lead.is_qualified:
+            if not lead.name:
+                return "name"
+            if not lead.company:
+                return "company"
+            if not lead.phone and not lead.email:
+                return "phone"
         last_assistant = conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT).order_by("-created_at", "-id").first()
         if last_assistant is None:
             return ""
         normalized = self._normalize(last_assistant.content)
         prompts = (
-            ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome")),
+            ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome", "informe seu nome", "informar seu nome", "me diga seu nome")),
             ("company", ("qual é a empresa", "qual e a empresa", "em qual empresa")),
             ("phone", ("qual é o melhor telefone", "qual e o melhor telefone", "telefone/whatsapp")),
             ("email", ("qual é o melhor e-mail", "qual e o melhor e-mail", "qual é o seu e-mail", "qual e o seu e-mail")),

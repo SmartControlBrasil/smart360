@@ -9,6 +9,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from .models import LiviaHandoffRequest, LiviaLeadCapture
+from .qualification import is_lead_ready_for_notification
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class LiviaCRMBridge:
 
     @transaction.atomic
     def create_or_update_crm_lead(self, livia_lead) -> object | None:
-        if not self.can_integrate() or not livia_lead.is_qualified:
+        if not self.can_integrate() or not is_lead_ready_for_notification(livia_lead):
             return None
 
         Lead, LeadSource, LeadInteraction = self._growth_models()
@@ -67,7 +68,7 @@ class LiviaCRMBridge:
         Lead, LeadSource, LeadInteraction = self._growth_models()
         source = self._get_or_create_source(LeadSource)
         crm_lead = self._find_existing_lead(Lead, livia_lead, source)
-        if crm_lead is None and livia_lead.is_qualified:
+        if crm_lead is None and is_lead_ready_for_notification(livia_lead):
             crm_lead = self.create_or_update_crm_lead(livia_lead)
         if crm_lead is None:
             return None
@@ -198,7 +199,7 @@ class LiviaCRMBridge:
         return LeadService
 
     def _notify_team_if_needed(self, *, livia_lead, crm_lead):
-        if not livia_lead.is_qualified:
+        if not is_lead_ready_for_notification(livia_lead):
             return
         if not (livia_lead.phone or livia_lead.email):
             return
@@ -262,7 +263,7 @@ class LiviaCRMBridge:
             return
         if self._conversation_already_webhooked(livia_lead):
             return
-        if not livia_lead.is_qualified:
+        if not is_lead_ready_for_notification(livia_lead):
             return
         if not (livia_lead.phone or livia_lead.email):
             return

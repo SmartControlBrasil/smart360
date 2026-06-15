@@ -8,6 +8,7 @@ from apps.growth_engine.models import Lead
 from apps.livia_assistant.lead_extractor import extract_lead_data as universal_extract_lead_data
 from apps.livia_assistant.lead_state import LeadState, resolve_state
 from apps.livia_assistant.models import LiviaConversation, LiviaKnowledgeItem, LiviaLeadCapture, LiviaMessage
+from apps.livia_assistant.qualification import is_lead_ready_for_notification
 from apps.livia_assistant.services import LiviaAssistantService
 
 
@@ -165,31 +166,149 @@ class LiviaAssistantServiceTests(TestCase):
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
         N8N_LIVIA_LEAD_WEBHOOK_URL="",
     )
-    def test_compact_name_and_phone_qualifies_creates_growth_lead_and_sends_email(self):
+    def test_compact_name_and_phone_does_not_qualify_without_email(self):
         mail.outbox.clear()
         conversation = self.service.get_or_create_conversation(session_key="compact-phone-lead")
         data = self.service.extract_lead_data("marcelo, smart control, 11 962196100")
 
         lead = self.service.create_or_update_lead_capture(conversation, data)
 
-        self.assertTrue(lead.is_qualified)
-        self.assertEqual(Lead.objects.filter(contact_name="marcelo", phone="11 962196100").count(), 1)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse(lead.is_qualified)
+        self.assertEqual(Lead.objects.filter(contact_name="marcelo", phone="11 962196100").count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
         N8N_LIVIA_LEAD_WEBHOOK_URL="",
     )
-    def test_compact_name_and_email_qualifies_creates_growth_lead_and_sends_email(self):
+    def test_compact_name_and_email_does_not_qualify_without_phone(self):
         mail.outbox.clear()
         conversation = self.service.get_or_create_conversation(session_key="compact-email-lead")
         data = self.service.extract_lead_data("marcelo, smart control, smartcontrol@gmail.com")
 
         lead = self.service.create_or_update_lead_capture(conversation, data)
 
-        self.assertTrue(lead.is_qualified)
-        self.assertEqual(Lead.objects.filter(contact_name="marcelo", email="smartcontrol@gmail.com").count(), 1)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse(lead.is_qualified)
+        self.assertEqual(Lead.objects.filter(contact_name="marcelo", email="smartcontrol@gmail.com").count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_long_intent_message_does_not_become_name_or_company(self):
+        conversation = self.service.get_or_create_conversation(session_key="long-intent-not-name-company")
+        data = self.service.extract_lead_data(
+            "oi preciso de uma empresa de automação para cuidar dos meus equipamentos",
+            conversation=conversation,
+        )
+        self.assertEqual(data["name"], "")
+        self.assertEqual(data["company"], "")
+        self.assertIn("equipamentos", data["notes"].lower())
+
+    def test_is_lead_ready_for_notification_requires_and(self):
+        capture = LiviaLeadCapture(
+            name="João",
+            company="Arteb",
+            city="São Paulo",
+            phone="1156487854",
+            email="",
+            notes="preciso de automação",
+        )
+        self.assertFalse(is_lead_ready_for_notification(capture))
+        capture.email = "joao@arteb.com.br"
+        self.assertTrue(is_lead_ready_for_notification(capture))
+
+    def test_is_lead_ready_for_notification_rejects_invalid_generic_values(self):
+        capture = LiviaLeadCapture(
+            name="Valmir",
+            company="sim gostaria",
+            city="Não informada",
+            phone="1145784512",
+            email="nao informado",
+            notes="preciso de atendimento",
+        )
+        self.assertFalse(is_lead_ready_for_notification(capture))
+
+    def test_qualification_rejects_invalid_company_and_city_values(self):
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(name="Valmir", company="sim gostaria", city="São Paulo", phone="1145784512", email="a@b.com")
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(name="Valmir", company="Arteb", city="Não informado", phone="1145784512", email="a@b.com")
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(name="Valmir", company="quero atendimento", city="São Paulo", phone="1145784512", email="a@b.com")
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(name="Valmir", company="Arteb", city="choque térmico", phone="1145784512", email="a@b.com")
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(name="Valmir", company="Arteb", city="", phone="1145784512", email="")
+            )
+        )
+
+    def test_build_lead_collection_reply_with_name_and_phone_asks_next_missing_field(self):
+        from apps.livia_assistant.integrations import build_lead_collection_reply
+
+        messages = [
+            {"role": "assistant", "content": "Como posso te chamar?"},
+            {"role": "user", "content": "meu nome é Carlos"},
+            {"role": "assistant", "content": "Qual é o melhor telefone/WhatsApp para a equipe falar com você?"},
+            {"role": "user", "content": "1199887766"},
+        ]
+        reply = build_lead_collection_reply("1199887766", messages, "").lower()
+        self.assertNotIn("já tenho um contato", reply)
+        self.assertNotIn("vou encaminhar", reply)
+        self.assertIn("empresa", reply)
+
+    def test_build_lead_collection_reply_rejects_sim_gostaria_as_company(self):
+        from apps.livia_assistant.integrations import _collect_known_contact_fields
+
+        messages = [
+            {"role": "assistant", "content": "Em qual empresa você trabalha?"},
+            {"role": "user", "content": "sim gostaria"},
+        ]
+        known = _collect_known_contact_fields(messages)
+        self.assertEqual(known["company"], "")
+
+    def test_build_progressive_lead_reply_never_forwards_incomplete_lead(self):
+        conversation = self.service.get_or_create_conversation(session_key="progressive-incomplete-reply")
+        lead = LiviaLeadCapture(
+            conversation=conversation,
+            name="Marcelo",
+            company="Control Lab",
+            phone="1178457878",
+        )
+        lead.save()
+        reply = self.service.build_progressive_lead_reply(lead).lower()
+        self.assertNotIn("vou encaminhar", reply)
+        self.assertTrue("em qual cidade" in reply or "qual e-mail" in reply, msg=reply)
+
+    def test_should_send_qualified_reply_requires_all_five_fields(self):
+        conversation = self.service.get_or_create_conversation(session_key="qualified-reply-gate")
+        incomplete = LiviaLeadCapture(
+            conversation=conversation,
+            name="Marcelo",
+            company="Control Lab",
+            city="Campinas",
+            phone="1178457878",
+        )
+        complete = LiviaLeadCapture(
+            conversation=conversation,
+            name="Marcelo",
+            company="Control Lab",
+            city="Campinas",
+            phone="1178457878",
+            email="marcelo@controllab.com.br",
+        )
+        self.assertFalse(self.service.should_send_qualified_reply(incomplete))
+        self.assertTrue(self.service.should_send_qualified_reply(complete))
 
     def test_response_for_liro_contains_educational_context(self):
         conversation = self.service.get_or_create_conversation(session_key="liro-session")
@@ -773,9 +892,8 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second_text)
         second_response = self.service.generate_response(conversation, second_text)
         lowered = second_response.reply.lower()
-        self.assertIn("já tenho um contato", lowered)
-        self.assertIn("detalhe técnico", lowered)
-        self.assertNotIn("empresa", lowered)
+        self.assertIn("empresa", lowered)
+        self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("telefone/whatsapp", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
@@ -791,9 +909,8 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, second_text)
         lowered = response.reply.lower()
         self.assertNotIn("cidade", lowered)
-        self.assertIn("já tenho um contato", lowered)
-        self.assertIn("detalhe técnico", lowered)
-        self.assertNotIn("e-mail", lowered)
+        self.assertIn("qual e-mail", lowered)
+        self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -803,9 +920,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, text)
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
-        self.assertIn("já tenho um contato", lowered)
-        self.assertIn("detalhe técnico", lowered)
-        self.assertNotIn("e-mail", lowered)
+        self.assertIn("qual e-mail", lowered)
+        self.assertNotIn("já tenho um contato", lowered)
+        self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -854,9 +971,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("já tenho um contato", lowered)
-        self.assertIn("detalhe técnico", lowered)
-        self.assertNotIn("e-mail", lowered)
+        self.assertIn("qual e-mail", lowered)
+        self.assertNotIn("já tenho um contato", lowered)
+        self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -870,9 +987,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("já tenho um contato", lowered)
-        self.assertIn("detalhe técnico", lowered)
-        self.assertNotIn("e-mail", lowered)
+        self.assertIn("qual e-mail", lowered)
+        self.assertNotIn("já tenho um contato", lowered)
+        self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -953,9 +1070,10 @@ class LiviaAssistantServiceTests(TestCase):
             has_intent=True,
             has_name=False,
             has_company=False,
+            has_city=False,
             has_phone=False,
             has_email=False,
-            requires_email=False,
+            city_skippable=False,
             locked=False,
         )
         self.assertEqual(snapshot.state, LeadState.COLLECT_NAME)
@@ -964,9 +1082,10 @@ class LiviaAssistantServiceTests(TestCase):
             has_intent=True,
             has_name=True,
             has_company=False,
+            has_city=False,
             has_phone=False,
             has_email=False,
-            requires_email=False,
+            city_skippable=False,
             locked=False,
         )
         self.assertEqual(snapshot.state, LeadState.COLLECT_COMPANY)
@@ -975,20 +1094,34 @@ class LiviaAssistantServiceTests(TestCase):
             has_intent=True,
             has_name=True,
             has_company=True,
-            has_phone=True,
+            has_city=False,
+            has_phone=False,
             has_email=False,
-            requires_email=True,
+            city_skippable=False,
             locked=False,
         )
-        self.assertEqual(snapshot.state, LeadState.COLLECT_EMAIL)
+        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
 
         snapshot = resolve_state(
             has_intent=True,
             has_name=True,
             has_company=True,
+            has_city=False,
+            has_phone=True,
+            has_email=False,
+            city_skippable=False,
+            locked=False,
+        )
+        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
+
+        snapshot = resolve_state(
+            has_intent=True,
+            has_name=True,
+            has_company=True,
+            has_city=True,
             has_phone=True,
             has_email=True,
-            requires_email=False,
+            city_skippable=False,
             locked=False,
         )
         self.assertEqual(snapshot.state, LeadState.QUALIFIED)

@@ -3,8 +3,17 @@ import os
 import re
 import unicodedata
 from abc import ABC, abstractmethod
+from types import SimpleNamespace
 
 from django.conf import settings
+
+from .qualification import (
+    _is_valid_company_or_city,
+    _is_valid_email,
+    _is_valid_name,
+    _is_valid_phone,
+    first_missing_required_field,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -421,6 +430,11 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
 
 
 def is_real_emergency(normalized_text):
+    if any(
+        term in normalized_text
+        for term in ("choque termico", "choque térmico")
+    ):
+        return False
     return any(term in normalized_text for term in EMERGENCY_TERMS)
 
 
@@ -570,16 +584,7 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
     locality_question = _is_locality_question(normalized_text)
     visit_request = _is_visit_request(normalized_text)
 
-    if known.get("name") and (known.get("phone") or known.get("email")):
-        return (
-            f"Perfeito, {known['name']}. Já tenho um contato para o encaminhamento{service_context}. "
-            "Podemos continuar por aqui: qual detalhe técnico você quer avaliar agora?"
-        )
-
-    next_field = next(
-        (field for field in ("name", "company", "phone", "email", "city") if not known.get(field)),
-        "",
-    )
+    next_field = first_missing_required_field(_known_contact_snapshot(known))
     question = _lead_field_question(next_field, known)
 
     if locality_question:
@@ -612,9 +617,9 @@ def _lead_field_question(field, known):
     if field == "phone":
         return "Qual é o melhor telefone/WhatsApp para a equipe falar com você?"
     if field == "email":
-        return "Qual é o melhor e-mail para contato?"
+        return "Qual e-mail podemos usar para formalizar o atendimento?"
     if field == "city":
-        return "Em qual cidade você está? Essa informação é opcional."
+        return "Em qual cidade você está?"
     return "Qual detalhe técnico você quer avaliar agora?"
 
 
@@ -632,6 +637,30 @@ def build_post_qualified_followup_reply(normalized_text):
     return ""
 
 
+def _known_contact_snapshot(known):
+    return SimpleNamespace(
+        name=known.get("name", ""),
+        company=known.get("company", ""),
+        city=known.get("city", ""),
+        phone=known.get("phone", ""),
+        email=known.get("email", ""),
+    )
+
+
+def _is_valid_known_contact_field(field, value):
+    validators = {
+        "name": _is_valid_name,
+        "company": _is_valid_company_or_city,
+        "city": _is_valid_company_or_city,
+        "phone": _is_valid_phone,
+        "email": _is_valid_email,
+    }
+    validator = validators.get(field)
+    if validator is None:
+        return False
+    return validator(value)
+
+
 def _collect_known_contact_fields(messages):
     known = {"name": "", "company": "", "city": "", "phone": "", "email": "", "problem": ""}
     expected_field = ""
@@ -645,11 +674,12 @@ def _collect_known_contact_fields(messages):
             continue
         extracted = _extract_contact_fields_from_text(text)
         for key in ("name", "company", "city", "phone", "email"):
-            if extracted.get(key) and not known.get(key):
-                known[key] = extracted[key]
+            candidate = extracted.get(key)
+            if candidate and not known.get(key) and _is_valid_known_contact_field(key, candidate):
+                known[key] = candidate
         if expected_field and not known.get(expected_field):
             conversational_value = _extract_conversational_reply(text, expected_field)
-            if conversational_value:
+            if conversational_value and _is_valid_known_contact_field(expected_field, conversational_value):
                 known[expected_field] = conversational_value
         if extracted.get("problem") and len(extracted["problem"]) > len(known["problem"]):
             known["problem"] = extracted["problem"]

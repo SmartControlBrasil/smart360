@@ -82,6 +82,23 @@ class LiviaCRMBridgeTests(TestCase):
         LiviaCRMBridge().create_or_update_crm_lead(incomplete)
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_bridge_does_not_send_or_create_when_required_and_fields_missing(self):
+        incomplete_but_flagged = LiviaLeadCapture.objects.create(
+            conversation=self.conversation,
+            name="Lead Parcial",
+            email="",
+            phone="11999990000",
+            company="Empresa Parcial",
+            city="São Paulo",
+            service_interest="PMOC",
+            notes="preciso de suporte técnico",
+            is_qualified=True,
+        )
+        result = LiviaCRMBridge().create_or_update_crm_lead(incomplete_but_flagged)
+        self.assertIsNone(result)
+        self.assertEqual(Lead.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_notification_is_not_duplicated_for_same_conversation(self):
         with self.settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"):
             LiviaCRMBridge().create_or_update_crm_lead(self.livia_lead)
@@ -173,6 +190,7 @@ class LiviaCRMBridgeTests(TestCase):
             email="cliente@example.com",
             phone="11999999999",
             company="Outra Empresa",
+            city="São Paulo",
             service_interest="PMOC",
             is_qualified=True,
         )
@@ -199,11 +217,11 @@ class LiviaCRMBridgeTests(TestCase):
         self.assertEqual(Lead.objects.count(), 2)
         self.assertNotEqual(synced.id, lead_other_source.id)
 
-    def test_bridge_deduplicates_by_phone_and_source_when_email_missing(self):
+    def test_bridge_deduplicates_by_phone_and_source_when_email_present(self):
         first = LiviaLeadCapture.objects.create(
             conversation=self.conversation,
             name="Contato Um",
-            email="",
+            email="contato1@example.com",
             phone="11911112222",
             company="Empresa Um",
             city="São Paulo",
@@ -214,7 +232,7 @@ class LiviaCRMBridgeTests(TestCase):
         second = LiviaLeadCapture.objects.create(
             conversation=self.conversation,
             name="Contato Dois",
-            email="",
+            email="contato1@example.com",
             phone="11911112222",
             company="Empresa Dois",
             city="São Paulo",

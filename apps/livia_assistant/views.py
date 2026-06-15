@@ -94,6 +94,6 @@ def _get_or_create_session_key(request):
 def _resolve_chat_reply(default_reply, lead_registered, lead_capture, service):
     if lead_capture is None:
         return default_reply
-    if lead_capture.is_qualified or lead_registered:
+    if service.should_send_qualified_reply(lead_capture) or lead_registered:
         return service.build_qualified_lead_reply(lead_capture)
     return service.build_progressive_lead_reply(lead_capture)

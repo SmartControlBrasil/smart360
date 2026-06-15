@@ -13,6 +13,7 @@ from .qualification import (
     _is_valid_name,
     _is_valid_phone,
     first_missing_required_field,
+    strip_repetition_noise,
 )
 
 logger = logging.getLogger(__name__)
@@ -691,7 +692,16 @@ def _requested_lead_field(text):
     normalized = _normalize(text)
     prompts = (
         ("name", ("como posso te chamar", "qual e o seu nome")),
-        ("company", ("em qual empresa", "qual e a empresa")),
+        ("company", (
+            "em qual empresa",
+            "qual e a empresa",
+            "qual é a empresa",
+            "qual o nome da sua empresa",
+            "qual é o nome da sua empresa",
+            "nome da empresa",
+            "nome da sua empresa",
+            "agora preciso do nome da empresa",
+        )),
         ("phone", ("qual e o melhor telefone", "telefone/whatsapp")),
         ("email", ("qual e o melhor e-mail", "qual e o seu e-mail")),
         ("city", ("em qual cidade",)),
@@ -716,6 +726,8 @@ def _extract_conversational_reply(text, expected_field):
         return ""
     if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-z0-9À-ÿ .&/'-]{1,179}", value):
         return ""
+    if expected_field in {"name", "company", "city"}:
+        value = strip_repetition_noise(value)
     return value
 
 

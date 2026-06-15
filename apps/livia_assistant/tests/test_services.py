@@ -8,7 +8,7 @@ from apps.growth_engine.models import Lead
 from apps.livia_assistant.lead_extractor import extract_lead_data as universal_extract_lead_data
 from apps.livia_assistant.lead_state import LeadState, resolve_state
 from apps.livia_assistant.models import LiviaConversation, LiviaKnowledgeItem, LiviaLeadCapture, LiviaMessage
-from apps.livia_assistant.qualification import is_lead_ready_for_notification
+from apps.livia_assistant.qualification import is_lead_ready_for_notification, strip_repetition_noise
 from apps.livia_assistant.services import LiviaAssistantService
 
 
@@ -309,6 +309,73 @@ class LiviaAssistantServiceTests(TestCase):
         )
         self.assertFalse(self.service.should_send_qualified_reply(incomplete))
         self.assertTrue(self.service.should_send_qualified_reply(complete))
+
+    def test_strip_repetition_noise_from_company_value(self):
+        self.assertEqual(strip_repetition_noise("buffet arroz e festa ja falei"), "buffet arroz e festa")
+        self.assertEqual(strip_repetition_noise("buffet arroz e festa já falei"), "buffet arroz e festa")
+
+    def test_create_or_update_lead_capture_sanitizes_company_with_repetition_noise(self):
+        conversation = self.service.get_or_create_conversation(session_key="sanitize-company-noise")
+        lead = self.service.create_or_update_lead_capture(
+            conversation,
+            {
+                "name": "José",
+                "company": "buffet arroz e festa ja falei",
+                "phone": "",
+                "email": "",
+                "city": "",
+            },
+        )
+        self.assertEqual(lead.company, "buffet arroz e festa")
+
+    def test_create_or_update_lead_capture_does_not_overwrite_clean_company_with_noisy_version(self):
+        conversation = self.service.get_or_create_conversation(session_key="keep-clean-company")
+        self.service.create_or_update_lead_capture(
+            conversation,
+            {
+                "name": "José",
+                "company": "buffet arroz e festa",
+                "phone": "",
+                "email": "",
+                "city": "",
+            },
+        )
+        lead = self.service.create_or_update_lead_capture(
+            conversation,
+            {
+                "company": "buffet arroz e festa ja falei",
+            },
+        )
+        self.assertEqual(lead.company, "buffet arroz e festa")
+
+    def test_extract_company_with_multiple_words_when_expected_field_is_company(self):
+        conversation = self.service.get_or_create_conversation(session_key="multi-word-company")
+        LiviaMessage.objects.create(
+            conversation=conversation,
+            role=LiviaMessage.Role.ASSISTANT,
+            content="Perfeito, José. Agora preciso do nome da empresa, por favor.",
+        )
+        data = self.service.extract_lead_data("buffet arroz e festa", conversation=conversation)
+        self.assertEqual(data["company"], "buffet arroz e festa")
+
+    def test_create_or_update_lead_capture_persists_multi_word_company_after_name(self):
+        conversation = self.service.get_or_create_conversation(session_key="company-after-name")
+        self.service.create_or_update_lead_capture(
+            conversation,
+            {"name": "José", "company": "", "phone": "", "email": "", "city": ""},
+        )
+        LiviaMessage.objects.create(
+            conversation=conversation,
+            role=LiviaMessage.Role.ASSISTANT,
+            content="Perfeito, José. Agora preciso do nome da empresa, por favor.",
+        )
+        self.service.register_user_message(conversation, "buffet arroz e festa")
+        lead = self.service.create_or_update_lead_capture(
+            conversation,
+            self.service.extract_lead_data("buffet arroz e festa", conversation=conversation),
+        )
+        self.assertEqual(lead.name, "José")
+        self.assertEqual(lead.company, "buffet arroz e festa")
 
     def test_response_for_liro_contains_educational_context(self):
         conversation = self.service.get_or_create_conversation(session_key="liro-session")

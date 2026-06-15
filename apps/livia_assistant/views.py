@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import LiviaChatForm
-from .models import LiviaLeadCapture
+from .models import LiviaLeadCapture, LiviaMessage
 from .services import LiviaAssistantService
 
 
@@ -51,18 +51,24 @@ def chat(request):
     if locked_lead is not None:
         collecting_lead = service.should_capture_post_qualified_update_for_conversation(message, conversation)
     else:
-        collecting_lead = (
-            service.detect_lead_intent(message)
-            or service.is_lead_collection_active(conversation)
-        )
-    if collecting_lead:
+        collecting_lead = service.is_lead_collection_active(conversation)
+        if not collecting_lead:
+            collecting_lead = service.should_collect_explicit_contact_message(message)
+    updating_lead = collecting_lead or service.should_update_lead_capture(conversation, message)
+    if updating_lead:
         extracted_data = service.extract_lead_data(message, conversation=conversation)
+        if not collecting_lead:
+            extracted_data = service.extract_notes_only_lead_data(extracted_data)
         if locked_lead is not None:
             extracted_data = service.apply_post_qualified_expected_field(extracted_data, message, conversation)
         target_conversation = conversation
         if locked_lead is not None:
             target_conversation = locked_lead.conversation
-        lead_capture = service.create_or_update_lead_capture(target_conversation, extracted_data)
+        lead_capture = service.create_or_update_lead_capture(
+            target_conversation,
+            extracted_data,
+            collecting_contact=collecting_lead,
+        )
         lead_registered = lead_capture.operational_status == LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
 
     livia_response = service.generate_response(conversation, message)
@@ -71,10 +77,27 @@ def chat(request):
     if livia_response.handoff_recommended:
         service.create_handoff_request(conversation, "Fallback recomendou contato humano por urgência ou risco técnico.")
 
+    reply = _resolve_chat_reply(
+        livia_response.reply,
+        lead_registered,
+        lead_capture,
+        service,
+        prefer_provider_reply=locked_lead is not None,
+    )
+    if lead_capture is not None and reply != livia_response.reply:
+        last_assistant = (
+            conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+            .order_by("-created_at", "-id")
+            .first()
+        )
+        if last_assistant is not None:
+            last_assistant.content = reply
+            last_assistant.save(update_fields=["content"])
+
     return JsonResponse(
         {
             "conversation_id": conversation.id,
-            "reply": _resolve_chat_reply(livia_response.reply, lead_registered, lead_capture, service),
+            "reply": reply,
             "lead_detected": lead_detected,
             "handoff_recommended": livia_response.handoff_recommended,
             "session_key": conversation.session_key,
@@ -91,8 +114,10 @@ def _get_or_create_session_key(request):
     return request.session.session_key
 
 
-def _resolve_chat_reply(default_reply, lead_registered, lead_capture, service):
+def _resolve_chat_reply(default_reply, lead_registered, lead_capture, service, prefer_provider_reply=False):
     if lead_capture is None:
+        return default_reply
+    if prefer_provider_reply:
         return default_reply
     if service.should_send_qualified_reply(lead_capture) or lead_registered:
         return service.build_qualified_lead_reply(lead_capture)

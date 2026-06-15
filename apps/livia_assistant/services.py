@@ -16,6 +16,7 @@ from .integrations import (
     get_livia_ai_client,
     is_lead_capture_intent,
     is_lead_data_message,
+    is_maintenance_question,
     is_real_emergency,
 )
 from .knowledge import LiviaKnowledgeService
@@ -26,6 +27,7 @@ from .models import LiviaConversation, LiviaHandoffRequest, LiviaLeadCapture, Li
 from .qualification import (
     INVALID_GENERIC_VALUES,
     INVALID_COMPANY_OR_CITY_SNIPPETS,
+    INVALID_NAME_SNIPPETS,
     _is_valid_company_or_city,
     _is_valid_email,
     _is_valid_name,
@@ -37,6 +39,7 @@ from .qualification import (
     has_valid_name_field,
     has_valid_phone_field,
     is_lead_ready_for_notification,
+    strip_repetition_noise,
 )
 
 
@@ -48,6 +51,17 @@ class LiviaResponse:
 
 
 class LiviaAssistantService:
+    COMPANY_ASSISTANT_MARKERS = (
+        "em qual empresa",
+        "qual é a empresa",
+        "qual e a empresa",
+        "qual o nome da sua empresa",
+        "qual é o nome da sua empresa",
+        "nome da empresa",
+        "nome da sua empresa",
+        "agora preciso do nome da empresa",
+    )
+
     INVALID_COMPANY_OR_CITY_VALUES = {
         "sim",
         "sim gostaria",
@@ -151,9 +165,29 @@ class LiviaAssistantService:
 
         return LiviaResponse(reply=reply, lead_detected=lead_detected, handoff_recommended=handoff_recommended)
 
+    def should_collect_explicit_contact_message(self, message):
+        normalized = self._normalize(message)
+        return is_lead_data_message(message) or is_lead_capture_intent(normalized)
+
+    def should_update_lead_capture(self, conversation, message):
+        if self.detect_lead_intent(message) or self.is_lead_collection_active(conversation):
+            return True
+        lead = self._latest_lead_capture(conversation)
+        return lead is not None and not lead.is_qualified and not self._is_capture_cycle_locked(lead)
+
+    def extract_notes_only_lead_data(self, extracted_data):
+        notes_only = dict(extracted_data or {})
+        for field in ("name", "email", "phone", "company", "city"):
+            notes_only[field] = ""
+        return notes_only
+
     def detect_lead_intent(self, text):
         normalized = self._normalize(text)
-        return is_lead_capture_intent(normalized) or is_lead_data_message(text)
+        if is_lead_capture_intent(normalized) or is_lead_data_message(text):
+            return True
+        if is_maintenance_question(normalized):
+            return False
+        return self._looks_like_problem_description(text)
 
     def extract_lead_data(self, text, conversation=None):
         normalized = self._normalize(text)
@@ -183,7 +217,7 @@ class LiviaAssistantService:
         elif expected_field == "company":
             company_value = conversational_value or company_value
             if not company_value:
-                candidate_company = str(text or "").strip()
+                candidate_company = strip_repetition_noise(str(text or "").strip())
                 if (
                     candidate_company
                     and _is_valid_company_or_city(candidate_company)
@@ -240,7 +274,7 @@ class LiviaAssistantService:
         }
 
     @transaction.atomic
-    def create_or_update_lead_capture(self, conversation, extracted_data):
+    def create_or_update_lead_capture(self, conversation, extracted_data, collecting_contact=True):
         expected_field_before_update = self._expected_lead_field(conversation)
         lead = self._get_active_lead_capture(conversation, extracted_data=extracted_data)
         if lead is not None and self._is_capture_cycle_locked(lead) and not self._has_meaningful_lead_update(extracted_data):
@@ -256,6 +290,17 @@ class LiviaAssistantService:
             .first()
         )
         if lead is None:
+            locked_candidate = (
+                conversation.lead_captures.filter(
+                    is_qualified=True,
+                    operational_status=LiviaLeadCapture.OperationalStatus.SENT_TO_CRM,
+                )
+                .order_by("-created_at", "-id")
+                .first()
+            )
+            if locked_candidate is not None and self._is_capture_cycle_locked(locked_candidate):
+                lead = locked_candidate
+        if lead is None:
             start_message_id = first_user_message.id if first_user_message else None
             if start_message_id is None and current_user_message:
                 start_message_id = current_user_message.id
@@ -268,6 +313,9 @@ class LiviaAssistantService:
         elif not (lead.crm_reference or {}).get("capture_start_message_id") and current_user_message:
             lead.crm_reference = {**(lead.crm_reference or {}), "capture_start_message_id": current_user_message.id}
 
+        if lead.name and lead.company and self._normalize(lead.company) == self._normalize(lead.name):
+            lead.company = ""
+
         for field in ("name", "email", "phone", "company", "city", "service_interest"):
             value = (extracted_data.get(field) or "").strip()
             if value:
@@ -276,15 +324,38 @@ class LiviaAssistantService:
                     continue
                 existing_value = (getattr(lead, field) or "").strip()
                 if field in {"name", "company", "city"} and existing_value:
-                    # Evita degradar dado já coletado com resposta curta.
+                    existing_validators = {
+                        "name": has_valid_name_field,
+                        "company": has_valid_company_field,
+                        "city": has_valid_city_field,
+                    }
+                    existing_validator = existing_validators.get(field)
+                    if existing_validator is not None and not existing_validator(lead):
+                        setattr(lead, field, sanitized_value)
+                        continue
+                    if field == "company" and lead.name and self._normalize(sanitized_value) == self._normalize(lead.name):
+                        continue
+                    if self._is_noisier_field_update(existing_value, sanitized_value):
+                        continue
                     if len(sanitized_value) < len(existing_value):
                         continue
                 setattr(lead, field, sanitized_value)
         if extracted_data.get("urgency"):
             lead.urgency = extracted_data["urgency"]
 
-        self._backfill_contact_fields_from_recent_messages(lead, conversation, current_user_message)
+        if collecting_contact:
+            collection_anchor = self._contact_collection_anchor_message(conversation)
+            self._backfill_contact_fields_from_recent_messages(
+                lead,
+                conversation,
+                current_user_message,
+                collection_anchor=collection_anchor,
+                expected_field=expected_field_before_update,
+            )
+            self._apply_expected_field_answer(lead, expected_field_before_update, current_user_message)
         self._enrich_lead_from_conversation(lead, conversation)
+        if lead.name and lead.company and self._normalize(lead.company) == self._normalize(lead.name):
+            lead.company = ""
         if expected_field_before_update == "email" and current_user_message and self._explicitly_refused_email(current_user_message.content):
             lead.crm_reference = {**(lead.crm_reference or {}), "missing_email": True}
         lead.is_qualified = is_lead_ready_for_notification(lead)
@@ -397,10 +468,6 @@ class LiviaAssistantService:
             lead.notes = " | ".join(dict.fromkeys(selected_messages))[:4000]
         corpus = " ".join(selected_messages)
         normalized = self._normalize(corpus)
-        if not lead.city:
-            city_match = re.search(r"(?:cidade|em)\s+(São Paulo|Sao Paulo)", corpus, re.IGNORECASE)
-            if city_match:
-                lead.city = "São Paulo"
         if any(term in normalized for term in ("duno", "dune", "hygibot")):
             lead.service_interest = "Duno - robô de limpeza"
         elif not lead.service_interest:
@@ -427,32 +494,52 @@ class LiviaAssistantService:
 
     def _build_technical_service_summary(self, lead):
         corpus = self._normalize(f"{lead.notes or ''} {lead.service_interest or ''}")
+        city_suffix = f", em {lead.city}" if has_valid_city_field(lead) else ""
 
+        is_frigorifica = any(term in corpus for term in ("camara frigorifica", "câmara frigorífica"))
         is_climatic = any(term in corpus for term in ("camara climatica", "câmara climática"))
         is_choque = any(term in corpus for term in ("choque termico", "choque térmico"))
         is_weiss = "weiss" in corpus
         is_votsch = any(term in corpus for term in ("votsch", "vötsch"))
         no_gela = any(term in corpus for term in ("nao gela", "não gela"))
+        gelo_ventilador = any(
+            term in corpus
+            for term in ("acumulo de gelo", "acúmulo de gelo", "gelo no ventilador", "gelo no ventilador")
+        )
+        disjuntor = any(term in corpus for term in ("disjuntor caindo", "disjuntor cai"))
         painel_apagou = any(term in corpus for term in ("painel apagou", "painel parou", "apagou o painel"))
         low_pressure = "low pressure" in corpus
+        wants_evaluation = any(
+            term in corpus
+            for term in ("avaliacao", "avaliação", "visita tecnica", "visita técnica", "possivel contrato", "possível contrato")
+        )
+        action_label = "avaliação técnica" if wants_evaluation else "atendimento técnico"
+
+        if is_frigorifica:
+            summary = f"Solicitação de {action_label} para câmara frigorífica"
+            if gelo_ventilador:
+                summary += " com acúmulo de gelo no ventilador"
+            elif disjuntor:
+                summary += " com disjuntor caindo"
+            return f"{summary}{city_suffix}."
 
         if is_climatic:
-            summary = "Solicitação de atendimento técnico para câmara climática"
+            summary = f"Solicitação de {action_label} para câmara climática"
             if is_weiss:
                 summary += " Weiss"
             if no_gela:
                 summary += " que não gela"
             if low_pressure:
                 summary += ", com erro low pressure informado"
-            return f"{summary}."
+            return f"{summary}{city_suffix}."
 
         if is_choque:
-            summary = "Solicitação de atendimento técnico para equipamento de choque térmico"
+            summary = f"Solicitação de {action_label} para equipamento de choque térmico"
             if is_votsch:
                 summary += " Vötsch"
             if painel_apagou:
                 summary += " com painel apagado"
-            return f"{summary}."
+            return f"{summary}{city_suffix}."
 
         return ""
 
@@ -466,10 +553,10 @@ class LiviaAssistantService:
         normalized = self._normalize(text)
         prompts = (
             ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome")),
-            ("company", ("em qual empresa", "qual é a empresa", "qual e a empresa")),
+            ("company", self.COMPANY_ASSISTANT_MARKERS),
             ("phone", ("telefone/whatsapp", "qual é o melhor telefone", "qual e o melhor telefone")),
             ("email", ("qual é o melhor e-mail", "qual e o melhor e-mail", "qual é o seu e-mail", "qual e o seu e-mail")),
-            ("city", ("em qual cidade",)),
+            ("city", ("em qual cidade", "qual cidade você está")),
         )
         for field, markers in prompts:
             if any(marker in normalized for marker in markers):
@@ -513,6 +600,8 @@ class LiviaAssistantService:
         technical_terms = (
             "camara climatica",
             "câmara climática",
+            "camara frigorifica",
+            "câmara frigorífica",
             "choque termico",
             "choque térmico",
             "weiss",
@@ -530,19 +619,40 @@ class LiviaAssistantService:
             "apagou o painel",
             "maquina parou",
             "máquina parou",
+            "gelo no ventilador",
+            "acumulo de gelo",
+            "acúmulo de gelo",
+            "disjuntor",
+            "avaliacao",
+            "avaliação",
+            "contrato",
         )
         return any(term in normalized for term in technical_terms)
 
-    def _backfill_contact_fields_from_recent_messages(self, lead, conversation, current_user_message):
+    def _contact_collection_anchor_message(self, conversation):
+        for message in conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT).order_by("-created_at", "-id"):
+            if self._requested_lead_field_from_assistant(message.content):
+                return message
+        return None
+
+    def _backfill_contact_fields_from_recent_messages(
+        self,
+        lead,
+        conversation,
+        current_user_message,
+        collection_anchor=None,
+        expected_field="",
+    ):
         messages = list(
             conversation.messages.filter(role=LiviaMessage.Role.USER).order_by("created_at", "id")
         )
         if not messages:
             return
 
-        # Janela curta perto da etapa de coleta para evitar puxar histórico irrelevante.
         if current_user_message:
             messages = [m for m in messages if m.id <= current_user_message.id]
+        if collection_anchor is not None:
+            messages = [m for m in messages if m.id > collection_anchor.id]
         recent_texts = [m.content.strip() for m in messages[-8:] if m.content.strip()]
 
         if not lead.name:
@@ -568,12 +678,27 @@ class LiviaAssistantService:
                 if multi_word_candidates:
                     lead.name = multi_word_candidates[0]
 
-        if not lead.company:
+        if not lead.company and expected_field in {"company", "city", "phone", "email"}:
             for text in reversed(recent_texts):
-                candidate = self._extract_conversational_field_value(text, "company")
-                if not candidate:
+                normalized_text = self._normalize(text)
+                if any(
+                    marker in normalized_text
+                    for marker in ("meu nome", "me chamo", "sou da", "telefone", "whatsapp", "email", "e-mail")
+                ):
                     continue
-                if not self._looks_like_personal_only_input(text):
+                candidate = strip_repetition_noise(self._extract_conversational_field_value(text, "company"))
+                if not candidate:
+                    raw = strip_repetition_noise(str(text).strip())
+                    if (
+                        raw
+                        and _is_valid_company_or_city(raw)
+                        and not self._looks_like_problem_description(raw)
+                        and not self._is_technical_note_message(self._normalize(raw))
+                        and len(raw.split()) <= 5
+                        and not (_is_valid_name(raw) and len(raw.split()) == 1)
+                    ):
+                        candidate = raw
+                if not candidate or not _is_valid_company_or_city(candidate):
                     continue
                 if self._looks_like_problem_description(candidate):
                     continue
@@ -582,12 +707,36 @@ class LiviaAssistantService:
                     continue
                 if lead.name and lowered == self._normalize(lead.name):
                     continue
-                if not _is_valid_company_or_city(candidate):
-                    continue
                 lead.company = candidate
                 break
 
+    def _apply_expected_field_answer(self, lead, expected_field, current_user_message):
+        if not expected_field or current_user_message is None:
+            return
+        text = str(current_user_message.content or "").strip()
+        if not text:
+            return
+        value = ""
+        if expected_field in {"name", "company", "city"}:
+            value = self._extract_conversational_field_value(text, expected_field)
+        elif expected_field == "phone":
+            value = self._extract_relaxed_phone(text) or ""
+            if not value:
+                match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text)
+                value = match.group(0).strip() if match else ""
+        elif expected_field == "email":
+            match = re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text, re.IGNORECASE)
+            value = match.group(0).strip() if match else ""
+        sanitized_value = self._sanitize_lead_field_before_save(expected_field, value)
+        if not sanitized_value:
+            return
+        if expected_field == "company" and lead.name and self._normalize(sanitized_value) == self._normalize(lead.name):
+            return
+        setattr(lead, expected_field, sanitized_value)
+
     def _sanitize_lead_field_before_save(self, field, value):
+        if field in {"name", "company", "city"}:
+            value = strip_repetition_noise(value)
         validators = {
             "name": _is_valid_name,
             "company": _is_valid_company_or_city,
@@ -599,6 +748,13 @@ class LiviaAssistantService:
         if validator is None:
             return value
         return value if validator(value) else ""
+
+    def _is_noisier_field_update(self, existing_value, new_value):
+        existing_clean = strip_repetition_noise(existing_value)
+        new_clean = strip_repetition_noise(new_value)
+        if self._normalize(existing_clean) == self._normalize(new_clean):
+            return len(new_value) > len(existing_value)
+        return False
 
     def create_handoff_request(self, conversation, reason):
         handoff = conversation.handoff_requests.filter(status=LiviaHandoffRequest.Status.PENDING).first()
@@ -662,6 +818,15 @@ class LiviaAssistantService:
                 "atendimento técnico",
                 "camara",
                 "câmara",
+                "frigorifica",
+                "frigorífica",
+                "gelo",
+                "ventilador",
+                "avaliacao",
+                "avaliação",
+                "contrato",
+                "possivel contrato",
+                "possível contrato",
                 "choque",
                 "weiss",
                 "votsch",
@@ -679,31 +844,38 @@ class LiviaAssistantService:
         if lead is not None and self._is_capture_cycle_locked(lead):
             return False
         if lead is not None and not lead.is_qualified:
-            return True
+            missing = first_missing_required_field(lead)
+            if not missing:
+                return False
+            last_assistant = (
+                conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+                .order_by("-created_at", "-id")
+                .first()
+            )
+            if last_assistant and self._requested_lead_field_from_assistant(last_assistant.content) == missing:
+                return True
+            last_user = (
+                conversation.messages.filter(role=LiviaMessage.Role.USER)
+                .order_by("-created_at", "-id")
+                .first()
+            )
+            if last_user and self._is_contact_collection_reply(last_user.content, missing):
+                return True
+            return False
         return bool(self._expected_lead_field(conversation))
 
     def _expected_lead_field(self, conversation):
         if conversation is None:
             return ""
         lead = self._latest_lead_capture(conversation)
+        if lead is not None and not lead.is_qualified:
+            missing = first_missing_required_field(lead)
+            if missing:
+                return missing
         if lead is not None:
             raw_state = (lead.crm_reference or {}).get("lead_state", "")
-            state_field = field_for_state(normalize_state(raw_state))
-            if state_field:
-                return state_field
             if normalize_state(raw_state) in {LeadState.QUALIFIED, LeadState.CLOSED}:
                 return ""
-        if lead is not None and not lead.is_qualified:
-            if not has_valid_name_field(lead):
-                return "name"
-            if not has_valid_company_field(lead):
-                return "company"
-            if not has_valid_city_field(lead):
-                return "city"
-            if not has_valid_phone_field(lead):
-                return "phone"
-            if not has_valid_email_field(lead):
-                return "email"
         if lead is not None and (lead.is_qualified or self._is_capture_cycle_locked(lead)):
             return ""
         last_assistant = conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT).order_by("-created_at", "-id").first()
@@ -712,10 +884,10 @@ class LiviaAssistantService:
         normalized = self._normalize(last_assistant.content)
         prompts = (
             ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome", "informe seu nome", "informar seu nome", "me diga seu nome")),
-            ("company", ("qual é a empresa", "qual e a empresa", "em qual empresa")),
+            ("company", self.COMPANY_ASSISTANT_MARKERS),
             ("phone", ("qual é o melhor telefone", "qual e o melhor telefone", "telefone/whatsapp")),
             ("email", ("qual é o melhor e-mail", "qual e o melhor e-mail", "qual é o seu e-mail", "qual e o seu e-mail")),
-            ("city", ("em qual cidade",)),
+            ("city", ("em qual cidade", "qual cidade você está")),
         )
         for field, markers in prompts:
             if any(marker in normalized for marker in markers):
@@ -723,7 +895,7 @@ class LiviaAssistantService:
         return ""
 
     def _extract_conversational_field_value(self, text, expected_field):
-        value = str(text or "").strip(" .,-")
+        value = strip_repetition_noise(str(text or "").strip(" .,-"))
         if expected_field not in {"name", "company", "city"} or not value or len(value) > 180:
             return ""
         if re.search(r"[@\d]", value) or "," in value or "?" in value:
@@ -747,6 +919,10 @@ class LiviaAssistantService:
                 "diagnóstico",
             }
             if normalized in forbidden_name_values:
+                return ""
+            if any(snippet in normalized for snippet in INVALID_NAME_SNIPPETS):
+                return ""
+            if self._is_technical_note_message(normalized):
                 return ""
             if len(value.split()) > 4:
                 return ""
@@ -776,10 +952,8 @@ class LiviaAssistantService:
             return ""
         if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-z0-9À-ÿ .&/'-]{1,179}", value):
             return ""
-        if expected_field == "company":
-            # Evita confundir mensagens de nome com empresa.
-            if len(value.split()) >= 3 and "." not in value and "&" not in value:
-                return ""
+        if expected_field == "company" and self._looks_like_problem_description(value) and len(value.split()) > 6:
+            return ""
         return value
 
     def _extract_explicit_name(self, text):
@@ -954,9 +1128,9 @@ class LiviaAssistantService:
         lead.crm_reference = updated_reference
 
     def get_locked_lead_capture(self, conversation):
-        lead = self._latest_lead_capture(conversation)
-        if lead is not None and self._is_capture_cycle_locked(lead):
-            return lead
+        for lead in conversation.lead_captures.order_by("-created_at", "-id"):
+            if self._is_capture_cycle_locked(lead):
+                return lead
         return None
 
     def should_capture_post_qualified_update(self, text):
@@ -970,6 +1144,15 @@ class LiviaAssistantService:
 
     def should_capture_post_qualified_update_for_conversation(self, text, conversation):
         if self.should_capture_post_qualified_update(text):
+            return True
+        normalized = self._normalize(text)
+        if "cidade" in normalized and any(
+            term in normalized for term in ("quer", "posso", "informar", "passar", "saber", "qual")
+        ):
+            return True
+        if any(term in normalized for term in ("email", "e-mail")) and any(
+            term in normalized for term in ("quer", "posso", "informar", "passar")
+        ):
             return True
         expected = self._post_qualified_expected_field(conversation)
         if expected == "email":

@@ -256,7 +256,12 @@ class LiviaChatEndpointTests(TestCase):
         self.assertTrue(
             any(
                 marker in accepted_reply
-                for marker in ("como posso te chamar", "em qual empresa", "telefone/whatsapp")
+                for marker in (
+                    "como posso te chamar",
+                    "em qual empresa",
+                    "nome da empresa",
+                    "telefone/whatsapp",
+                )
             )
         )
 
@@ -955,3 +960,56 @@ class LiviaChatEndpointTests(TestCase):
         summary = LiviaAssistantService().build_qualified_lead_reply(capture).lower()
         self.assertIn("câmara climática", summary)
         self.assertIn("weiss", summary)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_frigorifica_flow_preserves_company_and_technical_summary(self):
+        mail.outbox.clear()
+        session_key = "real-flow-frigorifica-buffet"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "estou com problemas em um equipamento que parou!!!",
+            "Uma camara frigorifica",
+            "tem acumulo de gelo no ventilador",
+            "não tenho contrato gostaria de uma avaliação e para possivel contrato",
+            "José",
+            "buffet arroz e festa",
+            "1196457845",
+            "Osasco",
+            "arroz@gmail.com",
+        ]
+        after_company = None
+        after_phone = None
+        last_response = None
+        for index, message in enumerate(flow, start=1):
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+            if index == 6:
+                after_company = capture
+            if index == 7:
+                after_phone = last_response
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertIsNotNone(after_company)
+        self.assertEqual(after_company.company, "buffet arroz e festa")
+        self.assertNotIn("ja falei", (capture.company or "").lower())
+        self.assertNotIn("já falei", (capture.company or "").lower())
+
+        phone_reply = after_phone.json()["reply"].lower()
+        self.assertNotIn("nome da empresa", phone_reply)
+        self.assertTrue("em qual cidade" in phone_reply or "qual cidade" in phone_reply, msg=phone_reply)
+
+        self.assertTrue(capture.is_qualified)
+        self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+
+        notes = (capture.notes or "").lower()
+        self.assertTrue("gelo" in notes or "ventilador" in notes, msg=notes)
+        self.assertTrue("avali" in notes or "contrato" in notes, msg=notes)
+
+        final_reply = last_response.json()["reply"].lower()
+        self.assertTrue("frigorifica" in final_reply or "frigorífica" in final_reply, msg=final_reply)
+        self.assertTrue("gelo" in final_reply or "ventilador" in final_reply, msg=final_reply)
+        self.assertNotIn("solução solicitada, em osasco", final_reply)

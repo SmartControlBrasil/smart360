@@ -364,3 +364,83 @@ class LiviaChatEndpointTests(TestCase):
             )
 
         self.assertEqual(Lead.objects.count(), 1)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_new_subject_after_qualified_lead_starts_new_cycle_without_context_leak(self):
+        mail.outbox.clear()
+        session_key = "chat-isolated-cycle-after-qualified"
+        url = reverse("livia_assistant:chat")
+
+        first_cycle_messages = [
+            "quero um robô de limpeza para supermercado",
+            "supermercado em São Paulo",
+            "empresa Gocil",
+            "nome Marcos",
+            "telefone 112345678",
+        ]
+        for message in first_cycle_messages:
+            self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+
+        first_lead = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertIsNotNone(first_lead)
+        self.assertTrue(first_lead.is_qualified)
+        self.assertEqual(first_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+        self.assertIn("notification_sent_at", first_lead.crm_reference)
+        self.assertEqual(len(mail.outbox), 1)
+        first_email_body = mail.outbox[-1].body.lower()
+        self.assertIn("gocil", first_email_body)
+        self.assertIn("limpeza", first_email_body)
+
+        new_subject = self.client.post(
+            url,
+            data=json.dumps(
+                {"message": "preciso fazer uma placa eletrônica", "session_key": session_key}
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(new_subject.status_code, 200)
+        new_reply = new_subject.json()["reply"].lower()
+        self.assertNotIn("gocil", new_reply)
+        self.assertNotIn("supermercado", new_reply)
+        self.assertNotIn("duno", new_reply)
+
+        self.client.post(
+            url,
+            data=json.dumps({"message": "meu nome é Carla", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.client.post(
+            url,
+            data=json.dumps({"message": "sou da Eletro Nova", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.client.post(
+            url,
+            data=json.dumps({"message": "telefone 11988776655", "session_key": session_key}),
+            content_type="application/json",
+        )
+
+        captures = list(LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("created_at", "id"))
+        self.assertEqual(len(captures), 2)
+        second_lead = captures[1]
+
+        self.assertEqual(second_lead.name.lower(), "carla")
+        self.assertEqual(second_lead.company.lower(), "eletro nova")
+        self.assertEqual(second_lead.phone, "11988776655")
+        self.assertNotIn("gocil", second_lead.notes.lower())
+        self.assertNotIn("supermercado", second_lead.notes.lower())
+        self.assertNotIn("duno", second_lead.notes.lower())
+        self.assertIn("placa eletrônica", second_lead.notes.lower())
+        self.assertIn("eletro nova", second_lead.notes.lower())
+
+        self.assertEqual(len(mail.outbox), 2)
+        second_email_body = mail.outbox[-1].body.lower()
+        self.assertIn("carla", second_email_body)
+        self.assertIn("eletro nova", second_email_body)
+        self.assertIn("placa eletrônica", second_email_body)
+        self.assertNotIn("gocil", second_email_body)
+        self.assertNotIn("supermercado", second_email_body)

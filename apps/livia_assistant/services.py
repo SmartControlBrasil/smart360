@@ -31,7 +31,7 @@ class LiviaResponse:
 
 
 class LiviaAssistantService:
-    def get_or_create_conversation(self, session_key=None, source_page=""):
+    def get_or_create_conversation(self, session_key=None, source_page="", current_message=""):
         session_key = (session_key or uuid.uuid4().hex).strip()
         conversation = (
             LiviaConversation.objects.filter(
@@ -45,6 +45,12 @@ class LiviaAssistantService:
             conversation = LiviaConversation.objects.create(
                 session_key=session_key,
                 source_page=(source_page or "")[:255],
+            )
+        elif self._is_lead_cycle_locked(conversation) and not self._is_locked_cycle_continuation_message(current_message):
+            # Após qualificação + notificação, iniciamos novo atendimento lógico.
+            conversation = LiviaConversation.objects.create(
+                session_key=session_key,
+                source_page=(source_page or conversation.source_page or "")[:255],
             )
         elif source_page and not conversation.source_page:
             conversation.source_page = source_page[:255]
@@ -122,7 +128,7 @@ class LiviaAssistantService:
         normalized = self._normalize(text)
         email_match = re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text, re.IGNORECASE)
         phone_match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text)
-        name_match = re.search(r"(?:meu nome é|me chamo|sou o|sou a|sou)\s+([A-Za-zÀ-ÿ ]{2,80})", text, re.IGNORECASE)
+        name_match = re.search(r"(?:meu nome é|me chamo|sou o|sou a)\s+([A-Za-zÀ-ÿ ]{2,80})", text, re.IGNORECASE)
         company_match = re.search(r"(?:empresa|da empresa|trabalho na|sou da)\s+([A-Za-z0-9À-ÿ .&-]{2,100})", text, re.IGNORECASE)
         city_match = re.search(r"\b(?:cidade|estou em|em)\s+([A-Za-zÀ-ÿ ]{3,80})", text, re.IGNORECASE)
         compact_name, compact_company = self._extract_compact_lead_identity(text)
@@ -183,9 +189,29 @@ class LiviaAssistantService:
 
     @transaction.atomic
     def create_or_update_lead_capture(self, conversation, extracted_data):
-        lead = conversation.lead_captures.order_by("-created_at").first()
+        lead = self._get_active_lead_capture(conversation, extracted_data=extracted_data)
+        current_user_message = (
+            conversation.messages.filter(role=LiviaMessage.Role.USER)
+            .order_by("-created_at", "-id")
+            .first()
+        )
+        first_user_message = (
+            conversation.messages.filter(role=LiviaMessage.Role.USER)
+            .order_by("created_at", "id")
+            .first()
+        )
         if lead is None:
-            lead = LiviaLeadCapture(conversation=conversation)
+            start_message_id = current_user_message.id if current_user_message else None
+            if not conversation.lead_captures.exists() and first_user_message:
+                start_message_id = first_user_message.id
+            lead = LiviaLeadCapture(
+                conversation=conversation,
+                crm_reference={
+                    "capture_start_message_id": start_message_id,
+                },
+            )
+        elif not (lead.crm_reference or {}).get("capture_start_message_id") and current_user_message:
+            lead.crm_reference = {**(lead.crm_reference or {}), "capture_start_message_id": current_user_message.id}
 
         for field in ("name", "email", "phone", "company", "city", "service_interest", "notes"):
             value = (extracted_data.get(field) or "").strip()
@@ -244,9 +270,14 @@ class LiviaAssistantService:
         )
 
     def _enrich_lead_from_conversation(self, lead, conversation):
+        start_message_id = (lead.crm_reference or {}).get("capture_start_message_id")
+        user_messages_query = conversation.messages.filter(role=LiviaMessage.Role.USER).order_by("created_at", "id")
+        if isinstance(start_message_id, int):
+            user_messages_query = user_messages_query.filter(id__gte=start_message_id)
+
         user_messages = [
             message.content.strip()
-            for message in conversation.messages.filter(role=LiviaMessage.Role.USER).order_by("created_at", "id")
+            for message in user_messages_query
             if message.content.strip()
         ]
         if user_messages:
@@ -337,7 +368,9 @@ class LiviaAssistantService:
         )
 
     def is_lead_collection_active(self, conversation):
-        lead = conversation.lead_captures.order_by("-created_at").first()
+        lead = self._latest_lead_capture(conversation)
+        if lead is not None and self._is_capture_cycle_locked(lead):
+            return False
         if lead is not None and not lead.is_qualified:
             return True
         return bool(self._expected_lead_field(conversation))
@@ -345,7 +378,7 @@ class LiviaAssistantService:
     def _expected_lead_field(self, conversation):
         if conversation is None:
             return ""
-        lead = conversation.lead_captures.order_by("-created_at").first()
+        lead = self._latest_lead_capture(conversation)
         if lead is not None and not lead.is_qualified:
             if not lead.name:
                 return "name"
@@ -353,6 +386,8 @@ class LiviaAssistantService:
                 return "company"
             if not lead.phone and not lead.email:
                 return "phone"
+        if lead is not None and (lead.is_qualified or self._is_capture_cycle_locked(lead)):
+            return ""
         last_assistant = conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT).order_by("-created_at", "-id").first()
         if last_assistant is None:
             return ""
@@ -429,3 +464,62 @@ class LiviaAssistantService:
         if any(term in corpus for term in ("orbit", "patrol bot", "orbitbot")):
             return "orbitbot"
         return recent_product
+
+    def _latest_lead_capture(self, conversation):
+        return conversation.lead_captures.order_by("-created_at", "-id").first()
+
+    def _is_capture_cycle_locked(self, lead):
+        reference = lead.crm_reference or {}
+        return bool(
+            lead.is_qualified
+            and lead.operational_status == LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
+            and reference.get("notification_sent_at")
+        )
+
+    def _is_lead_cycle_locked(self, conversation):
+        latest = self._latest_lead_capture(conversation)
+        if latest is None:
+            return False
+        return self._is_capture_cycle_locked(latest)
+
+    def _get_active_lead_capture(self, conversation, extracted_data=None):
+        lead = self._latest_lead_capture(conversation)
+        if lead is None:
+            return None
+        if self._is_capture_cycle_locked(lead):
+            if self._has_meaningful_lead_update(extracted_data or {}):
+                return lead
+            return None
+        if lead.is_qualified:
+            return None
+        return lead
+
+    def _has_meaningful_lead_update(self, extracted_data):
+        if any((extracted_data.get(field) or "").strip() for field in ("name", "email", "phone", "company", "city", "service_interest")):
+            return True
+        notes = (extracted_data.get("notes") or "").strip()
+        return bool(notes and self._looks_like_problem_description(notes))
+
+    def _is_locked_cycle_continuation_message(self, text):
+        normalized = self._normalize(text)
+        if not normalized:
+            return False
+        continuation_markers = (
+            "meu nome",
+            "me chamo",
+            "sou da",
+            "empresa",
+            "telefone",
+            "whatsapp",
+            "e-mail",
+            "email",
+            "problema",
+            "objetivo",
+        )
+        if any(marker in normalized for marker in continuation_markers):
+            return True
+        if re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text or "", re.IGNORECASE):
+            return True
+        if re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text or ""):
+            return True
+        return False

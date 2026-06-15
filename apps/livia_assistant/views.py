@@ -35,7 +35,11 @@ def chat(request):
     session_key = form.cleaned_data.get("session_key") or _get_or_create_session_key(request)
 
     service = LiviaAssistantService()
-    conversation = service.get_or_create_conversation(session_key=session_key, source_page=source_page)
+    conversation = service.get_or_create_conversation(
+        session_key=session_key,
+        source_page=source_page,
+        current_message=message,
+    )
     service.register_user_message(
         conversation,
         message,

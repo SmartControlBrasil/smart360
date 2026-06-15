@@ -34,6 +34,40 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertEqual(conversation.source_page, "/")
         self.assertEqual(conversation.status, LiviaConversation.Status.OPEN)
 
+    def test_get_or_create_conversation_opens_new_cycle_after_locked_capture(self):
+        conversation = self.service.get_or_create_conversation(session_key="cycle-session")
+        LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Marcos",
+            phone="11999999999",
+            is_qualified=True,
+            operational_status=LiviaLeadCapture.OperationalStatus.SENT_TO_CRM,
+            crm_reference={"notification_sent_at": "2026-01-01T00:00:00Z"},
+        )
+
+        next_conversation = self.service.get_or_create_conversation(
+            session_key="cycle-session",
+            current_message="preciso fazer uma placa eletrônica",
+        )
+        self.assertNotEqual(conversation.id, next_conversation.id)
+
+    def test_get_or_create_conversation_keeps_cycle_for_contact_followup_message(self):
+        conversation = self.service.get_or_create_conversation(session_key="cycle-followup")
+        LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Marcos",
+            phone="11999999999",
+            is_qualified=True,
+            operational_status=LiviaLeadCapture.OperationalStatus.SENT_TO_CRM,
+            crm_reference={"notification_sent_at": "2026-01-01T00:00:00Z"},
+        )
+
+        same_conversation = self.service.get_or_create_conversation(
+            session_key="cycle-followup",
+            current_message="meu nome é Carla",
+        )
+        self.assertEqual(conversation.id, same_conversation.id)
+
     def test_register_user_message(self):
         conversation = self.service.get_or_create_conversation(session_key="abc123")
 

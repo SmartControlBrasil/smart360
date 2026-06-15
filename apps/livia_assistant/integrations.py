@@ -101,6 +101,11 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 "Se houver risco elétrico, incêndio ou vazamento de gás, siga o protocolo de emergência da planta e acione atendimento humano."
             )
 
+        if bool((context or {}).get("qualified_cycle_locked")):
+            post_qualified_reply = build_post_qualified_followup_reply(normalized)
+            if post_qualified_reply:
+                return post_qualified_reply
+
         continuation_reply = _build_continuation_reply(normalized, messages)
         if continuation_reply:
             return continuation_reply
@@ -611,6 +616,20 @@ def _lead_field_question(field, known):
     if field == "city":
         return "Em qual cidade você está? Essa informação é opcional."
     return "Qual detalhe técnico você quer avaliar agora?"
+
+
+def build_post_qualified_followup_reply(normalized_text):
+    if any(term in normalized_text for term in ("email", "e-mail")) and any(
+        term in normalized_text for term in ("quer", "quer meu", "posso", "informar", "passar")
+    ):
+        return "Se puder me informar, eu adiciono ao atendimento."
+    if "cidade" in normalized_text and any(
+        term in normalized_text for term in ("quer", "quer saber", "posso", "informar", "passar")
+    ):
+        return "Pode me informar a cidade, eu adiciono ao atendimento."
+    if normalized_text in {"ok", "obrigado", "obrigada", "valeu", "só isso", "so isso", "somente isso"}:
+        return "Perfeito. Atendimento registrado e atualizado. Se precisar, é só me chamar."
+    return ""
 
 
 def _collect_known_contact_fields(messages):

@@ -40,6 +40,7 @@ def chat(request):
         source_page=source_page,
         current_message=message,
     )
+    locked_lead = service.get_locked_lead_capture(conversation)
     service.register_user_message(
         conversation,
         message,
@@ -47,10 +48,21 @@ def chat(request):
     )
     lead_capture = None
     lead_registered = False
-    collecting_lead = service.detect_lead_intent(message) or service.is_lead_collection_active(conversation)
+    if locked_lead is not None:
+        collecting_lead = service.should_capture_post_qualified_update_for_conversation(message, conversation)
+    else:
+        collecting_lead = (
+            service.detect_lead_intent(message)
+            or service.is_lead_collection_active(conversation)
+        )
     if collecting_lead:
         extracted_data = service.extract_lead_data(message, conversation=conversation)
-        lead_capture = service.create_or_update_lead_capture(conversation, extracted_data)
+        if locked_lead is not None:
+            extracted_data = service.apply_post_qualified_expected_field(extracted_data, message, conversation)
+        target_conversation = conversation
+        if locked_lead is not None:
+            target_conversation = locked_lead.conversation
+        lead_capture = service.create_or_update_lead_capture(target_conversation, extracted_data)
         lead_registered = lead_capture.operational_status == LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
 
     livia_response = service.generate_response(conversation, message)

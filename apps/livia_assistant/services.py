@@ -91,6 +91,7 @@ class LiviaAssistantService:
         recent_product = ""
         if last_assistant:
             recent_product = str(last_assistant.metadata.get("product_hint") or "").strip().lower()
+        locked_lead = self.get_locked_lead_capture(conversation)
 
         reply = get_livia_ai_client().generate_reply(
             system_prompt=LIVIA_SYSTEM_PROMPT,
@@ -103,6 +104,7 @@ class LiviaAssistantService:
                 "service_interest": service_interest,
                 "knowledge_context": knowledge_context,
                 "recent_product": recent_product,
+                "qualified_cycle_locked": bool(locked_lead),
             },
         )
 
@@ -195,6 +197,8 @@ class LiviaAssistantService:
     def create_or_update_lead_capture(self, conversation, extracted_data):
         expected_field_before_update = self._expected_lead_field(conversation)
         lead = self._get_active_lead_capture(conversation, extracted_data=extracted_data)
+        if lead is not None and self._is_capture_cycle_locked(lead) and not self._has_meaningful_lead_update(extracted_data):
+            return lead
         current_user_message = (
             conversation.messages.filter(role=LiviaMessage.Role.USER)
             .order_by("-created_at", "-id")
@@ -504,6 +508,8 @@ class LiviaAssistantService:
             state_field = field_for_state(normalize_state(raw_state))
             if state_field:
                 return state_field
+            if normalize_state(raw_state) in {LeadState.QUALIFIED, LeadState.CLOSED}:
+                return ""
         if lead is not None and not lead.is_qualified:
             if not lead.name:
                 return "name"
@@ -709,6 +715,61 @@ class LiviaAssistantService:
             updated_reference["product_hint"] = extracted_data["product_hint"]
         lead.crm_reference = updated_reference
 
+    def get_locked_lead_capture(self, conversation):
+        lead = self._latest_lead_capture(conversation)
+        if lead is not None and self._is_capture_cycle_locked(lead):
+            return lead
+        return None
+
+    def should_capture_post_qualified_update(self, text):
+        extracted = self.extract_lead_data(text)
+        if any(
+            (extracted.get(field) or "").strip()
+            for field in ("name", "email", "phone", "company", "city")
+        ):
+            return True
+        return False
+
+    def should_capture_post_qualified_update_for_conversation(self, text, conversation):
+        if self.should_capture_post_qualified_update(text):
+            return True
+        expected = self._post_qualified_expected_field(conversation)
+        if expected == "email":
+            return bool(re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text or "", re.IGNORECASE))
+        if expected == "city":
+            return bool(self._extract_conversational_field_value(text, "city"))
+        return False
+
+    def apply_post_qualified_expected_field(self, extracted_data, text, conversation):
+        expected = self._post_qualified_expected_field(conversation)
+        updated = dict(extracted_data or {})
+        if expected == "email" and not (updated.get("email") or "").strip():
+            match = re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text or "", re.IGNORECASE)
+            if match:
+                updated["email"] = match.group(0).strip()
+        if expected == "city" and not (updated.get("city") or "").strip():
+            city_value = self._extract_conversational_field_value(text, "city")
+            if city_value:
+                updated["city"] = city_value
+        return updated
+
+    def _post_qualified_expected_field(self, conversation):
+        if conversation is None:
+            return ""
+        last_assistant = (
+            conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+            .order_by("-created_at", "-id")
+            .first()
+        )
+        if last_assistant is None:
+            return ""
+        normalized = self._normalize(last_assistant.content)
+        if "informar" in normalized and ("e-mail" in normalized or "email" in normalized):
+            return "email"
+        if "informar a cidade" in normalized or ("cidade" in normalized and "adiciono ao atendimento" in normalized):
+            return "city"
+        return ""
+
     def _looks_like_personal_only_input(self, text):
         normalized = self._normalize(text)
         if re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text, re.IGNORECASE):
@@ -754,6 +815,7 @@ class LiviaAssistantService:
             "whatsapp",
             "e-mail",
             "email",
+            "cidade",
             "problema",
             "objetivo",
         )

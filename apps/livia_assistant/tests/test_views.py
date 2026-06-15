@@ -493,3 +493,76 @@ class LiviaChatEndpointTests(TestCase):
         self.assertIn("nome: marcos silva", email_body)
         self.assertIn("empresa: govip", email_body)
         self.assertIn("telefone/whatsapp: 11962196100", email_body)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_post_qualification_optional_email_and_city_update_without_new_notification(self):
+        mail.outbox.clear()
+        session_key = "post-qualified-optional-fields"
+        url = reverse("livia_assistant:chat")
+
+        initial_flow = [
+            "quero orçamento",
+            "meu nome é Marcos",
+            "sou da Govip",
+            "11962196100",
+        ]
+        for message in initial_flow:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        first_capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertIsNotNone(first_capture)
+        self.assertTrue(first_capture.is_qualified)
+        self.assertEqual(first_capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+        self.assertEqual(len(mail.outbox), 1)
+
+        offer_email = self.client.post(
+            url,
+            data=json.dumps({"message": "vc quer meu email?", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(offer_email.status_code, 200)
+        self.assertIn("se puder me informar, eu adiciono ao atendimento", offer_email.json()["reply"].lower())
+        self.assertNotIn("telefone/whatsapp", offer_email.json()["reply"].lower())
+
+        provide_email = self.client.post(
+            url,
+            data=json.dumps({"message": "marcos@govip.com", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(provide_email.status_code, 200)
+        self.assertNotIn("telefone/whatsapp", provide_email.json()["reply"].lower())
+
+        offer_city = self.client.post(
+            url,
+            data=json.dumps({"message": "quer saber qual minha cidade?", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(offer_city.status_code, 200)
+        self.assertIn("pode me informar a cidade, eu adiciono ao atendimento", offer_city.json()["reply"].lower())
+        self.assertNotIn("telefone/whatsapp", offer_city.json()["reply"].lower())
+
+        provide_city = self.client.post(
+            url,
+            data=json.dumps({"message": "São Paulo", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(provide_city.status_code, 200)
+
+        close_message = self.client.post(
+            url,
+            data=json.dumps({"message": "ok", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(close_message.status_code, 200)
+        self.assertIn("atendimento registrado e atualizado", close_message.json()["reply"].lower())
+
+        updated_capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertEqual(updated_capture.email, "marcos@govip.com")
+        self.assertEqual(updated_capture.city.lower(), "são paulo")
+        self.assertEqual(updated_capture.phone, "11962196100")
+        self.assertEqual(len(mail.outbox), 1)

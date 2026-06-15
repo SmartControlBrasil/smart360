@@ -5,6 +5,8 @@ from django.core.management import call_command
 from django.test import override_settings, TestCase
 
 from apps.growth_engine.models import Lead
+from apps.livia_assistant.lead_extractor import extract_lead_data as universal_extract_lead_data
+from apps.livia_assistant.lead_state import LeadState, resolve_state
 from apps.livia_assistant.models import LiviaConversation, LiviaKnowledgeItem, LiviaLeadCapture, LiviaMessage
 from apps.livia_assistant.services import LiviaAssistantService
 
@@ -51,7 +53,7 @@ class LiviaAssistantServiceTests(TestCase):
         )
         self.assertNotEqual(conversation.id, next_conversation.id)
 
-    def test_get_or_create_conversation_keeps_cycle_for_contact_followup_message(self):
+    def test_get_or_create_conversation_keeps_cycle_for_explicit_contact_followup_message(self):
         conversation = self.service.get_or_create_conversation(session_key="cycle-followup")
         LiviaLeadCapture.objects.create(
             conversation=conversation,
@@ -64,7 +66,7 @@ class LiviaAssistantServiceTests(TestCase):
 
         same_conversation = self.service.get_or_create_conversation(
             session_key="cycle-followup",
-            current_message="meu nome é Carla",
+            current_message="meu nome é Carla e meu telefone é 11999999999",
         )
         self.assertEqual(conversation.id, same_conversation.id)
 
@@ -945,3 +947,68 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertIn("não tenho confirmação", lowered)
         self.assertIn("validar com a equipe", lowered)
         self.assertNotIn("tem bateria reserva", lowered.replace("não", ""))
+
+    def test_lead_state_machine_transitions(self):
+        snapshot = resolve_state(
+            has_intent=True,
+            has_name=False,
+            has_company=False,
+            has_phone=False,
+            has_email=False,
+            requires_email=False,
+            locked=False,
+        )
+        self.assertEqual(snapshot.state, LeadState.COLLECT_NAME)
+
+        snapshot = resolve_state(
+            has_intent=True,
+            has_name=True,
+            has_company=False,
+            has_phone=False,
+            has_email=False,
+            requires_email=False,
+            locked=False,
+        )
+        self.assertEqual(snapshot.state, LeadState.COLLECT_COMPANY)
+
+        snapshot = resolve_state(
+            has_intent=True,
+            has_name=True,
+            has_company=True,
+            has_phone=True,
+            has_email=False,
+            requires_email=True,
+            locked=False,
+        )
+        self.assertEqual(snapshot.state, LeadState.COLLECT_EMAIL)
+
+        snapshot = resolve_state(
+            has_intent=True,
+            has_name=True,
+            has_company=True,
+            has_phone=True,
+            has_email=True,
+            requires_email=False,
+            locked=False,
+        )
+        self.assertEqual(snapshot.state, LeadState.QUALIFIED)
+
+    def test_universal_extractor_handles_variations(self):
+        cases = [
+            ("nome simples", "Marcelo", {"name": "", "company": "", "phone": "", "email": ""}),
+            ("nome completo", "meu nome é Marcos Silva", {"name": "Marcos Silva"}),
+            ("empresa simples", "sou da govip", {"company": "govip"}),
+            ("telefone simples", "11962196100", {"phone": "11962196100"}),
+            ("email simples", "marcos@govip.com", {"email": "marcos@govip.com"}),
+            ("dados compactos", "marcos, govip, 11962196100, marcos@govip.com", {"phone": "11962196100", "email": "marcos@govip.com"}),
+            ("sou joao empresa", "sou João da empresa XPTO", {"company": "XPTO"}),
+            ("telefone rotulado", "meu telefone é 11962196100", {"phone": "11962196100"}),
+            ("intenção orçamento", "quero orçamento", {"service_interest": "diagnóstico técnico"}),
+            ("placa eletrônica", "preciso fazer uma placa eletrônica", {"product_hint": "engenharia_embarcada"}),
+        ]
+
+        for _, text, expected in cases:
+            with self.subTest(text=text):
+                extracted = universal_extract_lead_data(text)
+                for key, value in expected.items():
+                    self.assertEqual(getattr(extracted, key), value)

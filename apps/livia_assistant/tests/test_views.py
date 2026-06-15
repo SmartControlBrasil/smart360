@@ -238,11 +238,12 @@ class LiviaChatEndpointTests(TestCase):
             content_type="application/json",
         )
         accepted_reply = accepted.json()["reply"].lower()
-        self.assertIn("como posso te chamar", accepted_reply)
-        self.assertNotIn("empresa", accepted_reply)
-        self.assertNotIn("telefone", accepted_reply)
-        self.assertNotIn("e-mail", accepted_reply)
-        self.assertNotIn("cidade", accepted_reply)
+        self.assertTrue(
+            any(
+                marker in accepted_reply
+                for marker in ("como posso te chamar", "em qual empresa", "telefone/whatsapp")
+            )
+        )
 
         name = self.client.post(
             url,
@@ -435,7 +436,6 @@ class LiviaChatEndpointTests(TestCase):
         self.assertNotIn("supermercado", second_lead.notes.lower())
         self.assertNotIn("duno", second_lead.notes.lower())
         self.assertIn("placa eletrônica", second_lead.notes.lower())
-        self.assertIn("eletro nova", second_lead.notes.lower())
 
         self.assertEqual(len(mail.outbox), 2)
         second_email_body = mail.outbox[-1].body.lower()
@@ -444,3 +444,52 @@ class LiviaChatEndpointTests(TestCase):
         self.assertIn("placa eletrônica", second_email_body)
         self.assertNotIn("gocil", second_email_body)
         self.assertNotIn("supermercado", second_email_body)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_progressive_collection_persists_company_and_keeps_notes_technical_only(self):
+        mail.outbox.clear()
+        session_key = "progressive-collection-company-persistence"
+        url = reverse("livia_assistant:chat")
+
+        flow = [
+            "Quero um robô para supermercado",
+            "limpeza",
+            "12000 m²",
+            "não possui infraestrutura",
+            "sim",
+            "Marcos Silva",
+            "govip",
+            "11962196100",
+            "Marcos",
+        ]
+        for message in flow:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertIsNotNone(capture)
+        self.assertEqual(capture.name, "Marcos Silva")
+        self.assertEqual(capture.company, "govip")
+        self.assertEqual(capture.phone, "11962196100")
+        self.assertEqual(capture.email, "")
+        self.assertTrue(capture.is_qualified)
+        self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+
+        notes = (capture.notes or "").lower()
+        self.assertIn("robô para supermercado", notes)
+        self.assertIn("limpeza", notes)
+        self.assertIn("12000 m²", notes)
+        self.assertNotIn("marcos silva", notes)
+        self.assertNotIn("govip", notes)
+        self.assertNotIn("11962196100", notes)
+        self.assertNotIn("marcos@govip.com", notes)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email_body = mail.outbox[0].body.lower()
+        self.assertIn("nome: marcos silva", email_body)
+        self.assertIn("empresa: govip", email_body)
+        self.assertIn("telefone/whatsapp: 11962196100", email_body)

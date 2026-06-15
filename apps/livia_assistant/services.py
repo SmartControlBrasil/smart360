@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 from django.db import transaction
 
 from .crm_bridge import LiviaCRMBridge
+from .lead_extractor import extract_lead_data as universal_extract_lead_data
+from .lead_state import LeadState, field_for_state, normalize_state, resolve_state
 from .integrations import (
     SERVICE_KEYWORDS,
     get_livia_ai_client,
@@ -126,14 +128,15 @@ class LiviaAssistantService:
 
     def extract_lead_data(self, text, conversation=None):
         normalized = self._normalize(text)
+        extracted = universal_extract_lead_data(text)
         email_match = re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text, re.IGNORECASE)
         phone_match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text)
-        name_match = re.search(r"(?:meu nome é|me chamo|sou o|sou a)\s+([A-Za-zÀ-ÿ ]{2,80})", text, re.IGNORECASE)
+        name_match = re.search(r"(?:meu nome é|me chamo|sou o|sou a|nome)\s+([A-Za-zÀ-ÿ ]{2,80})", text, re.IGNORECASE)
         company_match = re.search(r"(?:empresa|da empresa|trabalho na|sou da)\s+([A-Za-z0-9À-ÿ .&-]{2,100})", text, re.IGNORECASE)
         city_match = re.search(r"\b(?:cidade|estou em|em)\s+([A-Za-zÀ-ÿ ]{3,80})", text, re.IGNORECASE)
         compact_name, compact_company = self._extract_compact_lead_identity(text)
-        name_value = self._clean_match(name_match) or compact_name
-        company_value = self._clean_match(company_match) or compact_company
+        name_value = extracted.name or self._clean_match(name_match) or compact_name
+        company_value = extracted.company or self._clean_match(company_match) or compact_company
         expected_field = self._expected_lead_field(conversation)
         conversational_value = self._extract_conversational_field_value(text, expected_field)
         if expected_field == "name" and not name_value:
@@ -149,7 +152,7 @@ class LiviaAssistantService:
         elif any(term in normalized for term in ("sem pressa", "futuro", "planejamento")):
             urgency = LiviaLeadCapture.Urgency.LOW
 
-        service_interest = self._detect_service_interest(normalized)
+        service_interest = extracted.service_interest or self._detect_service_interest(normalized)
         if not service_interest and any(
             term in normalized
             for term in (
@@ -166,29 +169,31 @@ class LiviaAssistantService:
         ):
             service_interest = "diagnóstico técnico"
 
-        city_value = self._clean_match(city_match)
+        city_value = extracted.city or self._clean_match(city_match)
         if expected_field == "city" and not city_value:
             city_value = conversational_value
         if not city_value:
             city_value = self._extract_city_from_comma_parts(text, excluded_values=(name_value, company_value))
 
-        phone_value = phone_match.group(0) if phone_match else ""
+        phone_value = extracted.phone or (phone_match.group(0) if phone_match else "")
         if expected_field == "phone":
             phone_value = self._extract_relaxed_phone(text) or phone_value
 
         return {
             "name": name_value,
-            "email": email_match.group(0) if email_match else "",
+            "email": extracted.email or (email_match.group(0) if email_match else ""),
             "phone": phone_value,
             "company": company_value,
             "city": city_value,
             "service_interest": service_interest,
             "urgency": urgency,
-            "notes": text.strip(),
+            "notes": extracted.technical_context or text.strip(),
+            "product_hint": extracted.product_hint,
         }
 
     @transaction.atomic
     def create_or_update_lead_capture(self, conversation, extracted_data):
+        expected_field_before_update = self._expected_lead_field(conversation)
         lead = self._get_active_lead_capture(conversation, extracted_data=extracted_data)
         current_user_message = (
             conversation.messages.filter(role=LiviaMessage.Role.USER)
@@ -216,12 +221,21 @@ class LiviaAssistantService:
         for field in ("name", "email", "phone", "company", "city", "service_interest", "notes"):
             value = (extracted_data.get(field) or "").strip()
             if value:
+                existing_value = (getattr(lead, field) or "").strip()
+                if field in {"name", "company", "city"} and existing_value:
+                    # Evita degradar dado já coletado com resposta curta.
+                    if len(value) < len(existing_value):
+                        continue
                 setattr(lead, field, value)
         if extracted_data.get("urgency"):
             lead.urgency = extracted_data["urgency"]
 
+        self._backfill_contact_fields_from_recent_messages(lead, conversation, current_user_message)
         self._enrich_lead_from_conversation(lead, conversation)
         lead.is_qualified = bool(lead.name and (lead.phone or lead.email))
+        if self._is_pending_required_field_unanswered(expected_field_before_update, lead):
+            lead.is_qualified = False
+        self._persist_lead_state(lead, conversation, extracted_data)
         lead.save()
 
         update_fields = []
@@ -253,12 +267,17 @@ class LiviaAssistantService:
         return lead
 
     def build_progressive_lead_reply(self, lead):
-        if not lead.name:
+        snapshot = self._current_state_snapshot(lead, requires_email=self._requires_email_after_prompt(lead.conversation))
+        if snapshot.state == LeadState.COLLECT_NAME:
             return "Para encaminhar seu pedido, como posso te chamar?"
-        if not lead.company:
+        if snapshot.state == LeadState.COLLECT_COMPANY:
             return f"Obrigado, {lead.name.split()[0]}. Em qual empresa você trabalha?"
-        if not lead.phone and not lead.email:
+        if snapshot.state == LeadState.COLLECT_PHONE:
             return "Qual é o melhor telefone/WhatsApp para nossa equipe falar com você?"
+        if snapshot.state == LeadState.COLLECT_EMAIL:
+            return "Qual é o melhor e-mail para contato?"
+        if snapshot.state == LeadState.QUALIFIED:
+            return self.build_qualified_lead_reply(lead)
         return self.build_qualified_lead_reply(lead)
 
     def build_qualified_lead_reply(self, lead):
@@ -271,18 +290,36 @@ class LiviaAssistantService:
 
     def _enrich_lead_from_conversation(self, lead, conversation):
         start_message_id = (lead.crm_reference or {}).get("capture_start_message_id")
-        user_messages_query = conversation.messages.filter(role=LiviaMessage.Role.USER).order_by("created_at", "id")
+        messages_query = conversation.messages.order_by("created_at", "id")
         if isinstance(start_message_id, int):
-            user_messages_query = user_messages_query.filter(id__gte=start_message_id)
+            messages_query = messages_query.filter(id__gte=start_message_id)
 
-        user_messages = [
-            message.content.strip()
-            for message in user_messages_query
-            if message.content.strip()
-        ]
-        if user_messages:
-            lead.notes = " | ".join(dict.fromkeys(user_messages))[:4000]
-        corpus = " ".join(user_messages)
+        all_user_messages = []
+        technical_messages = []
+        expected_field = ""
+        for message in messages_query:
+            content = (message.content or "").strip()
+            if not content:
+                continue
+            if message.role == LiviaMessage.Role.ASSISTANT:
+                expected_field = self._requested_lead_field_from_assistant(content)
+                continue
+            if message.role != LiviaMessage.Role.USER:
+                continue
+
+            all_user_messages.append(content)
+            if self._is_contact_collection_reply(content, expected_field):
+                expected_field = ""
+                continue
+            sanitized = self._sanitize_message_for_notes(content)
+            if sanitized:
+                technical_messages.append(sanitized)
+            expected_field = ""
+
+        selected_messages = technical_messages or all_user_messages
+        if selected_messages:
+            lead.notes = " | ".join(dict.fromkeys(selected_messages))[:4000]
+        corpus = " ".join(selected_messages)
         normalized = self._normalize(corpus)
         if not lead.city:
             city_match = re.search(r"(?:cidade|em)\s+(São Paulo|Sao Paulo)", corpus, re.IGNORECASE)
@@ -311,6 +348,89 @@ class LiviaAssistantService:
         if re.fullmatch(r"[+()\d .-]+", value) and 8 <= len(re.sub(r"\D", "", value)) <= 15:
             return value
         return ""
+
+    def _requested_lead_field_from_assistant(self, text):
+        normalized = self._normalize(text)
+        prompts = (
+            ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome")),
+            ("company", ("em qual empresa", "qual é a empresa", "qual e a empresa")),
+            ("phone", ("telefone/whatsapp", "qual é o melhor telefone", "qual e o melhor telefone")),
+            ("email", ("qual é o melhor e-mail", "qual e o melhor e-mail", "qual é o seu e-mail", "qual e o seu e-mail")),
+            ("city", ("em qual cidade",)),
+        )
+        for field, markers in prompts:
+            if any(marker in normalized for marker in markers):
+                return field
+        return ""
+
+    def _is_contact_collection_reply(self, text, expected_field):
+        value = str(text or "").strip()
+        if not expected_field:
+            return False
+        if expected_field in {"name", "company", "city"}:
+            return bool(self._extract_conversational_field_value(value, expected_field))
+        if expected_field == "phone":
+            return bool(self._extract_relaxed_phone(value) or re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", value))
+        if expected_field == "email":
+            return bool(re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", value, re.IGNORECASE))
+        return False
+
+    def _sanitize_message_for_notes(self, text):
+        value = str(text or "").strip()
+        if not value:
+            return ""
+        if self._looks_like_personal_only_input(value):
+            return ""
+        if not self._looks_like_problem_description(value):
+            return value
+        sanitized = re.sub(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", "", value, flags=re.IGNORECASE)
+        sanitized = re.sub(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", "", sanitized)
+        sanitized = re.sub(r"\b(?:meu nome é|me chamo|nome)\s+[A-Za-zÀ-ÿ ]{2,80}", "", sanitized, flags=re.IGNORECASE)
+        sanitized = re.sub(r"\b(?:sou da|empresa|trabalho na)\s+[A-Za-z0-9À-ÿ .&-]{2,100}", "", sanitized, flags=re.IGNORECASE)
+        sanitized = re.sub(r"\s+", " ", sanitized).strip(" ,.-")
+        return sanitized[:300]
+
+    def _backfill_contact_fields_from_recent_messages(self, lead, conversation, current_user_message):
+        messages = list(
+            conversation.messages.filter(role=LiviaMessage.Role.USER).order_by("created_at", "id")
+        )
+        if not messages:
+            return
+
+        # Janela curta perto da etapa de coleta para evitar puxar histórico irrelevante.
+        if current_user_message:
+            messages = [m for m in messages if m.id <= current_user_message.id]
+        recent_texts = [m.content.strip() for m in messages[-8:] if m.content.strip()]
+
+        if not lead.name:
+            multi_word_candidates = [
+                text
+                for text in reversed(recent_texts)
+                if self._extract_conversational_field_value(text, "name")
+                and self._looks_like_personal_only_input(text)
+                and len(text.split()) >= 2
+                and not self._looks_like_problem_description(text)
+                and self._normalize(text) not in {"sim", "nao", "não"}
+            ]
+            if multi_word_candidates:
+                lead.name = multi_word_candidates[0]
+
+        if not lead.company:
+            for text in reversed(recent_texts):
+                candidate = self._extract_conversational_field_value(text, "company")
+                if not candidate:
+                    continue
+                if not self._looks_like_personal_only_input(text):
+                    continue
+                if self._looks_like_problem_description(candidate):
+                    continue
+                lowered = self._normalize(candidate)
+                if lowered in {"sim", "nao", "não"}:
+                    continue
+                if lead.name and lowered == self._normalize(lead.name):
+                    continue
+                lead.company = candidate
+                break
 
     def create_handoff_request(self, conversation, reason):
         handoff = conversation.handoff_requests.filter(status=LiviaHandoffRequest.Status.PENDING).first()
@@ -379,6 +499,11 @@ class LiviaAssistantService:
         if conversation is None:
             return ""
         lead = self._latest_lead_capture(conversation)
+        if lead is not None:
+            raw_state = (lead.crm_reference or {}).get("lead_state", "")
+            state_field = field_for_state(normalize_state(raw_state))
+            if state_field:
+                return state_field
         if lead is not None and not lead.is_qualified:
             if not lead.name:
                 return "name"
@@ -410,8 +535,46 @@ class LiviaAssistantService:
             return ""
         if re.search(r"[@\d]", value) or "," in value or "?" in value:
             return ""
+        normalized = self._normalize(value)
+        if expected_field == "name":
+            value = re.sub(r"^(?:nome|meu nome)\s+", "", value, flags=re.IGNORECASE).strip(" .,-")
+            normalized = self._normalize(value)
+            forbidden_name_values = {
+                "sim",
+                "nao",
+                "não",
+                "limpeza",
+                "supermercado",
+                "robo",
+                "robô",
+                "placa",
+                "eletronica",
+                "eletrônica",
+                "diagnostico",
+                "diagnóstico",
+            }
+            if normalized in forbidden_name_values:
+                return ""
+        if expected_field == "company":
+            value = re.sub(r"^(?:empresa|sou da|da)\s+", "", value, flags=re.IGNORECASE).strip(" .,-")
+            normalized = self._normalize(value)
+            if normalized in {"sim", "nao", "não"}:
+                return ""
+            if any(term in normalized for term in ("meu nome", "me chamo", "nome")):
+                return ""
+        if expected_field == "city":
+            value = re.sub(r"^(?:cidade|estou em|em)\s+", "", value, flags=re.IGNORECASE).strip(" .,-")
+            normalized = self._normalize(value)
+            if normalized in {"sim", "nao", "não"}:
+                return ""
+        if not value:
+            return ""
         if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-z0-9À-ÿ .&/'-]{1,179}", value):
             return ""
+        if expected_field == "company":
+            # Evita confundir mensagens de nome com empresa.
+            if len(value.split()) >= 3 and "." not in value and "&" not in value:
+                return ""
         return value
 
     def _extract_compact_lead_identity(self, text):
@@ -500,6 +663,84 @@ class LiviaAssistantService:
         notes = (extracted_data.get("notes") or "").strip()
         return bool(notes and self._looks_like_problem_description(notes))
 
+    def _is_pending_required_field_unanswered(self, expected_field, lead):
+        if not expected_field:
+            return False
+        field_values = {
+            "name": bool((lead.name or "").strip()),
+            "company": bool((lead.company or "").strip()),
+            "phone": bool((lead.phone or "").strip()),
+            "email": bool((lead.email or "").strip()),
+        }
+        if expected_field not in field_values:
+            return False
+        return not field_values[expected_field]
+
+    def _requires_email_after_prompt(self, conversation):
+        if conversation is None:
+            return False
+        last_assistant = (
+            conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+            .order_by("-created_at", "-id")
+            .first()
+        )
+        if last_assistant is None:
+            return False
+        normalized = self._normalize(last_assistant.content)
+        return "e-mail" in normalized or "email" in normalized
+
+    def _current_state_snapshot(self, lead, requires_email=False):
+        return resolve_state(
+            has_intent=True,
+            has_name=bool((lead.name or "").strip()),
+            has_company=bool((lead.company or "").strip()),
+            has_phone=bool((lead.phone or "").strip()),
+            has_email=bool((lead.email or "").strip()),
+            requires_email=requires_email,
+            locked=self._is_capture_cycle_locked(lead),
+        )
+
+    def _persist_lead_state(self, lead, conversation, extracted_data):
+        requires_email = self._requires_email_after_prompt(conversation)
+        snapshot = self._current_state_snapshot(lead, requires_email=requires_email)
+        updated_reference = dict(lead.crm_reference or {})
+        updated_reference["lead_state"] = snapshot.state
+        if extracted_data.get("product_hint"):
+            updated_reference["product_hint"] = extracted_data["product_hint"]
+        lead.crm_reference = updated_reference
+
+    def _looks_like_personal_only_input(self, text):
+        normalized = self._normalize(text)
+        if re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text, re.IGNORECASE):
+            return True
+        if re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text):
+            return True
+        if any(marker in normalized for marker in ("meu nome", "me chamo", "sou da", "empresa", "telefone", "whatsapp", "email", "e-mail")):
+            return True
+        technical_markers = (
+            "robo",
+            "robô",
+            "limpeza",
+            "supermercado",
+            "placa",
+            "eletronic",
+            "iot",
+            "retrofit",
+            "falha",
+            "parada",
+            "diagnost",
+            "manutenc",
+            "infraestrutura",
+            "m²",
+            "m2",
+        )
+        if any(marker in normalized for marker in technical_markers):
+            return False
+        if re.search(r"\d+\s*m(?:²|2)", text, re.IGNORECASE):
+            return False
+        words = [w for w in normalized.split() if w]
+        return 1 <= len(words) <= 3
+
     def _is_locked_cycle_continuation_message(self, text):
         normalized = self._normalize(text)
         if not normalized:
@@ -521,5 +762,11 @@ class LiviaAssistantService:
         if re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text or "", re.IGNORECASE):
             return True
         if re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", text or ""):
+            return True
+        # Permite correções curtas de nome/empresa após fechamento técnico/comercial.
+        candidate = str(text or "").strip(" .,-")
+        if self._looks_like_personal_only_input(candidate) and self._extract_conversational_field_value(candidate, "name"):
+            return True
+        if self._looks_like_personal_only_input(candidate) and self._extract_conversational_field_value(candidate, "company"):
             return True
         return False

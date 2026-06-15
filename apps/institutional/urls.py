@@ -32,16 +32,23 @@ urlpatterns = [
         name="engenharia_embarcada",
     ),
     path(
-        "parceiros/refrigeracao/",
+        "parceiros/engenharia-embarcada/",
         RedirectView.as_view(
             pattern_name="institutional:engenharia_embarcada",
             permanent=True,
         ),
+        name="engenharia_embarcada_parceiros",
+    ),
+    path(
+        "parceiros/refrigeracao/",
+        views.refrigeracao,
+        name="refrigeracao",
     ),
     path("parceiros/diagnostico-ia-dados-automacao/", views.service_diagnostico_ia_dados_automacao, name="service_diagnostico_ia_dados_automacao"),
     path("blog/", views.blog, name="blog"),
     path("blog/pagina/2/", views.blog_page_2, name="blog_page_2"),
     path("blog/detalhes/", views.blog_details, name="blog_details"),
+
     # Static individual blog posts focused on tecnologia aplicada.
     path("blog/robotica-escolas-empresas-cidades/", views.blog_retrofit_maquina_industrial, name="blog_robotica_escolas_empresas_cidades"),
     path("blog/iot-mudando-negocios/", views.blog_organizar_sinais_dados_antes_automatizar, name="blog_iot_mudando_negocios"),
@@ -105,25 +112,29 @@ urlpatterns = [
     path("projetos/detalhes/", views.project_details, name="project_details"),
     path("faq/", views.faq, name="faq"),
 
-
     # Aliases curtos para manter compatibilidade com o novo plano de URLs publicas.
     path("about/", views.about, name="about_alias"),
-    
-    path("services/",RedirectView.as_view(pattern_name="institutional:services", permanent=True),name="services_alias",),
-    
+    path(
+        "services/",
+        RedirectView.as_view(pattern_name="institutional:services", permanent=True),
+        name="services_alias",
+    ),
     path("contact/", views.contact, name="contact_alias"),
-    
     path("service-details/", views.service_details, name="service_details_alias"),
-    
     path("team/", views.team, name="team_alias"),
-    
     path("projects/", views.projects, name="projects_alias"),
-    
     path("project-details/", views.project_details, name="project_details_alias"),
-    
     path("blog-details/", views.blog_details, name="blog_details_alias"),
-    
-    path("seguranca-da-informacao/",views.solution_detail,{"slug": "seguranca-da-informacao"},name="seguranca_da_informacao",),
-    
-    path("sites-sistemas-marketing/",views.solution_detail,{"slug": "sites-sistemas-marketing"},name="sites_sistemas_marketing",),
+    path(
+        "seguranca-da-informacao/",
+        views.solution_detail,
+        {"slug": "seguranca-da-informacao"},
+        name="seguranca_da_informacao",
+    ),
+    path(
+        "sites-sistemas-marketing/",
+        views.solution_detail,
+        {"slug": "sites-sistemas-marketing"},
+        name="sites_sistemas_marketing",
+    ),
 ]

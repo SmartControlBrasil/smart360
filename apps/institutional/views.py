@@ -76,8 +76,13 @@ def about(request):
 def services(request):
     return render(request, "institutional/eitech/pages/services.html")
 
+
 def engenharia_embarcada(request):
     return render(request, "institutional/eitech/pages/engenharia_embarcada.html")
+
+
+def refrigeracao(request):
+    return redirect("institutional:engenharia_embarcada", permanent=True)
 
 
 def service_details(request):

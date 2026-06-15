@@ -31,6 +31,7 @@ class LiviaCRMBridge:
         LeadService = self._growth_services()
         source = self._get_or_create_source(LeadSource)
         crm_lead = self._find_existing_lead(Lead, livia_lead, source)
+        superseded_crm_lead = self._find_superseded_crm_lead(Lead, livia_lead, crm_lead, source)
         payload = self._payload_for_livia_lead(livia_lead, source)
 
         if crm_lead is None:
@@ -39,6 +40,9 @@ class LiviaCRMBridge:
             merged_metadata = {**(crm_lead.metadata or {}), **payload.pop("metadata", {})}
             payload["metadata"] = merged_metadata
             crm_lead = LeadService.update_lead(lead=crm_lead, validated_data=payload, user=None)
+
+        if superseded_crm_lead is not None:
+            superseded_crm_lead.delete()
 
         previous_reference = dict(livia_lead.crm_reference or {})
         livia_lead.crm_lead_id = crm_lead.id
@@ -106,12 +110,12 @@ class LiviaCRMBridge:
         return handoff
 
     def _find_existing_lead(self, Lead, livia_lead, source):
-        if livia_lead.crm_lead_id:
-            lead = Lead.objects.filter(pk=livia_lead.crm_lead_id).first()
-            if lead:
-                return lead
         if livia_lead.email:
             lead = Lead.objects.filter(email__iexact=livia_lead.email, source=source).first()
+            if lead:
+                return lead
+        if livia_lead.crm_lead_id:
+            lead = Lead.objects.filter(pk=livia_lead.crm_lead_id).first()
             if lead:
                 return lead
         if livia_lead.phone:
@@ -120,6 +124,13 @@ class LiviaCRMBridge:
                 or Lead.objects.filter(whatsapp=livia_lead.phone, source=source).first()
             )
         return None
+
+    def _find_superseded_crm_lead(self, Lead, livia_lead, crm_lead, source):
+        if not livia_lead.email or not livia_lead.crm_lead_id or crm_lead is None:
+            return None
+        if livia_lead.crm_lead_id == crm_lead.id:
+            return None
+        return Lead.objects.filter(pk=livia_lead.crm_lead_id, source=source).first()
 
     def _get_or_create_source(self, LeadSource):
         source, _ = LeadSource.objects.get_or_create(

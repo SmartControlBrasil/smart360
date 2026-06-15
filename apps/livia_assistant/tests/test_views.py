@@ -2,6 +2,7 @@ import json
 import os
 from unittest.mock import patch
 
+from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -94,7 +95,8 @@ class LiviaChatEndpointTests(TestCase):
         self.assertIn("2000", response.json()["error"])
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_chat_flow_commercial_sequence_keeps_context_and_avoids_generic_fallback(self):
+    def test_chat_flow_collects_one_field_at_a_time_and_persists_progress(self):
+        mail.outbox.clear()
         session_key = "commercial-sequence-real-flow"
         url = reverse("livia_assistant:chat")
 
@@ -103,45 +105,156 @@ class LiviaChatEndpointTests(TestCase):
             data=json.dumps({"message": "quero um diagnóstico", "session_key": session_key}),
             content_type="application/json",
         )
-        self.assertEqual(first.status_code, 200)
         first_reply = first.json()["reply"].lower()
-        self.assertIn("nome", first_reply)
-        self.assertIn("empresa", first_reply)
-        self.assertIn("cidade", first_reply)
-        self.assertIn("telefone/whatsapp", first_reply)
-        self.assertIn("e-mail", first_reply)
-        self.assertIn("breve descrição", first_reply)
-        self.assertNotIn("falta só o e-mail", first_reply)
+        self.assertIn("como posso te chamar", first_reply)
+        self.assertNotIn("telefone/whatsapp", first_reply)
+        self.assertNotIn("e-mail", first_reply)
 
         second = self.client.post(
             url,
-            data=json.dumps(
-                {
-                    "message": "meu nome é Marcelo, sou da Smart Control, Itapevi, telefone 11999999999",
-                    "session_key": session_key,
-                }
-            ),
+            data=json.dumps({"message": "Marcelo", "session_key": session_key}),
             content_type="application/json",
         )
-        self.assertEqual(second.status_code, 200)
-        second_reply = second.json()["reply"].lower()
-        self.assertIn("e-mail", second_reply)
-        self.assertIn("breve descrição", second_reply)
-        self.assertNotIn("cidade", second_reply)
-        self.assertNotIn("sou a lívia", second_reply)
+        capture = LiviaLeadCapture.objects.get(conversation__session_key=session_key)
+        self.assertEqual(capture.name, "Marcelo")
+        self.assertEqual(capture.company, "")
+        self.assertIn("em qual empresa", second.json()["reply"].lower())
 
         third = self.client.post(
             url,
-            data=json.dumps({"message": "vocês atendem em Manaus?", "session_key": session_key}),
+            data=json.dumps({"message": "Smart Control", "session_key": session_key}),
             content_type="application/json",
         )
-        self.assertEqual(third.status_code, 200)
-        third_reply = third.json()["reply"].lower()
-        self.assertIn("atendemos projetos sob avaliação", third_reply)
-        self.assertIn("manaus", third_reply)
-        self.assertIn("e-mail", third_reply)
-        self.assertIn("descrição", third_reply)
-        self.assertNotIn("sou a lívia", third_reply)
+        capture.refresh_from_db()
+        self.assertEqual(capture.company, "Smart Control")
+        self.assertIn("telefone/whatsapp", third.json()["reply"].lower())
+        self.assertNotIn("e-mail", third.json()["reply"].lower())
+
+        fourth = self.client.post(
+            url,
+            data=json.dumps({"message": "11 962196100", "session_key": session_key}),
+            content_type="application/json",
+        )
+        capture.refresh_from_db()
+        self.assertEqual(capture.phone, "11 962196100")
+        self.assertTrue(capture.is_qualified)
+        self.assertTrue(fourth.json()["lead_registered"])
+        self.assertIn("vou encaminhar seu pedido", fourth.json()["reply"].lower())
+        self.assertIn("diagnóstico técnico", fourth.json()["reply"].lower())
+        self.assertEqual(Lead.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
+
+        technical = self.client.post(
+            url,
+            data=json.dumps({"message": "O que é FMEA?", "session_key": session_key}),
+            content_type="application/json",
+        )
+        technical_reply = technical.json()["reply"].lower()
+        self.assertIn("fmea", technical_reply)
+        self.assertNotIn("como posso te chamar", technical_reply)
+        self.assertNotIn("telefone/whatsapp", technical_reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_endpoint_replaces_provider_multi_field_request_with_single_question(self):
+        url = reverse("livia_assistant:chat")
+        bad_reply = "Por favor, me informe seu nome, empresa, telefone, e-mail e cidade."
+
+        with patch("apps.livia_assistant.services.get_livia_ai_client") as client_factory:
+            client_factory.return_value.generate_reply.return_value = bad_reply
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": "Quero um orçamento", "session_key": "bad-provider-reply"}),
+                content_type="application/json",
+            )
+
+        reply = response.json()["reply"].lower()
+        self.assertIn("como posso te chamar", reply)
+        self.assertNotIn("empresa", reply)
+        self.assertNotIn("telefone", reply)
+        self.assertNotIn("e-mail", reply)
+        self.assertNotIn("cidade", reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_duno_supermarket_flow_qualifies_with_context_summary_without_redundant_questions(self):
+        mail.outbox.clear()
+        session_key = "duno-supermarket-qualified-flow"
+        url = reverse("livia_assistant:chat")
+
+        technical_messages = [
+            "Quero um robô para supermercado em São Paulo",
+            "A função é limpeza",
+            "A área tem 12.000 m²",
+            "A operação será no período noturno",
+            "Não possui infraestrutura de automação atual",
+            "O Duno atende esse cenário?",
+        ]
+        for message in technical_messages:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        accepted = self.client.post(
+            url,
+            data=json.dumps({"message": "Pode encaminhar meu pedido", "session_key": session_key}),
+            content_type="application/json",
+        )
+        accepted_reply = accepted.json()["reply"].lower()
+        self.assertIn("como posso te chamar", accepted_reply)
+        self.assertNotIn("empresa", accepted_reply)
+        self.assertNotIn("telefone", accepted_reply)
+        self.assertNotIn("e-mail", accepted_reply)
+        self.assertNotIn("cidade", accepted_reply)
+
+        name = self.client.post(
+            url,
+            data=json.dumps({"message": "Marcos Antonio", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertIn("em qual empresa", name.json()["reply"].lower())
+        self.assertNotIn("telefone", name.json()["reply"].lower())
+
+        company = self.client.post(
+            url,
+            data=json.dumps({"message": "Gocil", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertIn("telefone/whatsapp", company.json()["reply"].lower())
+        self.assertNotIn("e-mail", company.json()["reply"].lower())
+
+        qualified = self.client.post(
+            url,
+            data=json.dumps({"message": "112345678", "session_key": session_key}),
+            content_type="application/json",
+        )
+        expected = (
+            "Perfeito, Marcos. Vou encaminhar seu pedido para nossa equipe com este resumo: "
+            "robô Duno para limpeza noturna em supermercado de aproximadamente 12.000 m², "
+            "sem infraestrutura de automação atual, em São Paulo. "
+            "Um especialista da Smart Control Brasil entrará em contato."
+        )
+        self.assertEqual(qualified.json()["reply"], expected)
+        self.assertTrue(qualified.json()["lead_registered"])
+        self.assertNotIn("qual serviço", qualified.json()["reply"].lower())
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Duno", mail.outbox[0].body)
+        self.assertIn("12.000 m²", mail.outbox[0].body)
+
+        capture = LiviaLeadCapture.objects.get(conversation__session_key=session_key)
+        self.assertEqual(capture.name, "Marcos Antonio")
+        self.assertEqual(capture.company, "Gocil")
+        self.assertEqual(capture.phone, "112345678")
+        self.assertEqual(capture.city, "São Paulo")
+        self.assertEqual(capture.service_interest, "Duno - robô de limpeza")
+        for context in ("Duno", "limpeza", "supermercado", "12.000 m²", "noturno", "infraestrutura", "São Paulo"):
+            self.assertIn(context.lower(), capture.notes.lower())
+
+        crm_lead = Lead.objects.get()
+        self.assertEqual(crm_lead.contact_name, "Marcos Antonio")
+        self.assertIn("Duno", crm_lead.notes)
+        self.assertIn("12.000 m²", crm_lead.notes)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_chat_flow_creates_growth_lead_and_returns_confirmation(self):
@@ -177,7 +290,8 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(final.status_code, 200)
         payload = final.json()
         self.assertTrue(payload["lead_registered"])
-        self.assertIn("registrei seu interesse", payload["reply"].lower())
+        self.assertIn("vou encaminhar seu pedido", payload["reply"].lower())
+        self.assertIn("especialista da smart control brasil", payload["reply"].lower())
         self.assertEqual(Lead.objects.count(), 1)
         lead = Lead.objects.first()
         self.assertEqual(lead.email, "marcelo@smartcontrol.com.br")

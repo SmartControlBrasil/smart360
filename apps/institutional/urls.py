@@ -27,9 +27,16 @@ urlpatterns = [
         name="service_manutencao_tpm_confiabilidade",
     ),
     path(
+        "engenharia-embarcada/",
+        views.engenharia_embarcada,
+        name="engenharia_embarcada",
+    ),
+    path(
         "parceiros/refrigeracao/",
-        views.refrigeracao,
-        name="refrigeracao",
+        RedirectView.as_view(
+            pattern_name="institutional:engenharia_embarcada",
+            permanent=True,
+        ),
     ),
     path("parceiros/diagnostico-ia-dados-automacao/", views.service_diagnostico_ia_dados_automacao, name="service_diagnostico_ia_dados_automacao"),
     path("blog/", views.blog, name="blog"),

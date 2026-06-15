@@ -1,8 +1,10 @@
 from unittest.mock import patch
 
+from django.core import mail
 from django.core.management import call_command
 from django.test import override_settings, TestCase
 
+from apps.growth_engine.models import Lead
 from apps.livia_assistant.models import LiviaConversation, LiviaKnowledgeItem, LiviaLeadCapture, LiviaMessage
 from apps.livia_assistant.services import LiviaAssistantService
 
@@ -111,6 +113,47 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertTrue(lead.is_qualified)
         self.assertEqual(conversation.status, LiviaConversation.Status.QUALIFIED)
         self.assertEqual(conversation.visitor_name, "Marcelo")
+
+    def test_extracts_compact_commercial_data(self):
+        data = self.service.extract_lead_data(
+            "marcelo, smart control, 11 962196100, smartcontrol@gmail.com"
+        )
+
+        self.assertEqual(data["name"], "marcelo")
+        self.assertEqual(data["company"], "smart control")
+        self.assertEqual(data["phone"], "11 962196100")
+        self.assertEqual(data["email"], "smartcontrol@gmail.com")
+        self.assertEqual(data["city"], "")
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        N8N_LIVIA_LEAD_WEBHOOK_URL="",
+    )
+    def test_compact_name_and_phone_qualifies_creates_growth_lead_and_sends_email(self):
+        mail.outbox.clear()
+        conversation = self.service.get_or_create_conversation(session_key="compact-phone-lead")
+        data = self.service.extract_lead_data("marcelo, smart control, 11 962196100")
+
+        lead = self.service.create_or_update_lead_capture(conversation, data)
+
+        self.assertTrue(lead.is_qualified)
+        self.assertEqual(Lead.objects.filter(contact_name="marcelo", phone="11 962196100").count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        N8N_LIVIA_LEAD_WEBHOOK_URL="",
+    )
+    def test_compact_name_and_email_qualifies_creates_growth_lead_and_sends_email(self):
+        mail.outbox.clear()
+        conversation = self.service.get_or_create_conversation(session_key="compact-email-lead")
+        data = self.service.extract_lead_data("marcelo, smart control, smartcontrol@gmail.com")
+
+        lead = self.service.create_or_update_lead_capture(conversation, data)
+
+        self.assertTrue(lead.is_qualified)
+        self.assertEqual(Lead.objects.filter(contact_name="marcelo", email="smartcontrol@gmail.com").count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_response_for_liro_contains_educational_context(self):
         conversation = self.service.get_or_create_conversation(session_key="liro-session")
@@ -579,7 +622,9 @@ class LiviaAssistantServiceTests(TestCase):
         lowered = response.reply.lower()
         self.assertIn("orçamento", lowered)
         self.assertIn("fmea", lowered)
-        self.assertTrue("nome" in lowered and "empresa" in lowered and "telefone" in lowered and "e-mail" in lowered)
+        self.assertIn("como posso te chamar", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
+        self.assertNotIn("e-mail", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_mtbf_question_has_direct_practical_explanation(self):
@@ -639,13 +684,10 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, text)
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
-        self.assertIn("encaminhar para um especialista", lowered)
-        self.assertIn("nome", lowered)
-        self.assertIn("empresa", lowered)
-        self.assertIn("cidade", lowered)
-        self.assertIn("telefone/whatsapp", lowered)
-        self.assertIn("e-mail", lowered)
-        self.assertIn("breve descrição", lowered)
+        self.assertIn("especialista", lowered)
+        self.assertIn("como posso te chamar", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
+        self.assertNotIn("e-mail", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -656,7 +698,8 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
         self.assertIn("especialista", lowered)
-        self.assertIn("telefone/whatsapp", lowered)
+        self.assertIn("como posso te chamar", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -667,7 +710,8 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
         self.assertIn("especialista", lowered)
-        self.assertIn("nome", lowered)
+        self.assertIn("como posso te chamar", lowered)
+        self.assertNotIn("empresa", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -678,7 +722,8 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
         self.assertIn("especialista", lowered)
-        self.assertIn("descrição do problema", lowered)
+        self.assertIn("como posso te chamar", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -692,10 +737,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second_text)
         second_response = self.service.generate_response(conversation, second_text)
         lowered = second_response.reply.lower()
-        self.assertIn("empresa", lowered)
-        self.assertIn("cidade", lowered)
-        self.assertIn("descrição", lowered)
-        self.assertNotIn("nome", lowered)
+        self.assertIn("já tenho um contato", lowered)
+        self.assertIn("detalhe técnico", lowered)
+        self.assertNotIn("empresa", lowered)
         self.assertNotIn("telefone/whatsapp", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
@@ -711,8 +755,9 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, second_text)
         lowered = response.reply.lower()
         self.assertNotIn("cidade", lowered)
-        self.assertIn("e-mail", lowered)
-        self.assertIn("descrição", lowered)
+        self.assertIn("já tenho um contato", lowered)
+        self.assertIn("detalhe técnico", lowered)
+        self.assertNotIn("e-mail", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -722,8 +767,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, text)
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
-        self.assertIn("falta só seu e-mail", lowered)
-        self.assertIn("breve descrição", lowered)
+        self.assertIn("já tenho um contato", lowered)
+        self.assertIn("detalhe técnico", lowered)
+        self.assertNotIn("e-mail", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -772,8 +818,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("falta só o e-mail", lowered)
-        self.assertNotIn("descrição", lowered)
+        self.assertIn("já tenho um contato", lowered)
+        self.assertIn("detalhe técnico", lowered)
+        self.assertNotIn("e-mail", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -787,8 +834,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("falta só seu e-mail", lowered)
-        self.assertIn("breve descrição", lowered)
+        self.assertIn("já tenho um contato", lowered)
+        self.assertIn("detalhe técnico", lowered)
+        self.assertNotIn("e-mail", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")

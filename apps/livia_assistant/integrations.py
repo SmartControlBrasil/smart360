@@ -62,6 +62,8 @@ LEAD_INTENT_TERMS = (
     "chama no zap",
     "quero um diagnostico",
     "quero um diagnóstico",
+    "pode encaminhar",
+    "pode encaminhar meu pedido",
 )
 
 SERVICE_KEYWORDS = {
@@ -558,99 +560,114 @@ def build_lead_intent_preface(normalized_text, service_text):
 
 
 def build_lead_collection_reply(normalized_text, messages, service_interest):
-    if _is_first_commercial_without_explicit_data(normalized_text, messages):
-        service_context = f" para {service_interest}" if service_interest else ""
-        preface = build_lead_intent_preface(normalized_text, service_context)
-        return (
-            f"{preface} "
-            "Consigo te encaminhar para um especialista da Smart Control Brasil. "
-            "Para agilizar, me informe nome, empresa, cidade, telefone/WhatsApp, e-mail e uma breve descrição do problema ou objetivo."
-        )
-
     known = _collect_known_contact_fields(messages)
-    missing = []
-    if not known.get("name"):
-        missing.append("nome")
-    if not known.get("company"):
-        missing.append("empresa")
-    if not known.get("city"):
-        missing.append("cidade")
-    if not known.get("phone"):
-        missing.append("telefone/WhatsApp")
-    if not known.get("email"):
-        missing.append("e-mail")
-    if not known.get("problem"):
-        missing.append("breve descrição do problema ou objetivo")
-
     service_context = f" para {service_interest}" if service_interest else ""
     locality_question = _is_locality_question(normalized_text)
     visit_request = _is_visit_request(normalized_text)
-    is_followup = _is_followup_lead_collection(messages)
 
-    missing_text = _format_missing_fields(missing)
-    if not missing:
+    if known.get("name") and (known.get("phone") or known.get("email")):
         return (
-            f"Perfeito. Já tenho os dados principais{service_context} e consigo te encaminhar para um especialista da Smart Control Brasil. "
-            "Se quiser, só complemente com mais detalhes técnicos do cenário para acelerar o diagnóstico."
+            f"Perfeito, {known['name']}. Já tenho um contato para o encaminhamento{service_context}. "
+            "Podemos continuar por aqui: qual detalhe técnico você quer avaliar agora?"
         )
+
+    next_field = next(
+        (field for field in ("name", "company", "phone", "email", "city") if not known.get(field)),
+        "",
+    )
+    question = _lead_field_question(next_field, known)
 
     if locality_question:
         current_user_text = _last_user_message(messages)
-        current_city = _extract_contact_fields_from_text(current_user_text).get("city")
-        city = current_city or known.get("city")
-        if city:
-            return (
-                "Atendemos projetos sob avaliação de escopo, urgência e viabilidade técnica. "
-                f"Para {city}, consigo encaminhar a análise para um especialista verificar a melhor forma de atendimento, "
-                f"seja visita técnica, suporte remoto inicial ou parceiro técnico. Para seguir, me informe {missing_text}."
-            )
+        city = _extract_contact_fields_from_text(current_user_text).get("city") or known.get("city")
+        location_text = f" Para {city}," if city else " Para sua região,"
         return (
-            "Atendemos projetos sob avaliação de escopo, urgência e viabilidade técnica. "
-            "Consigo encaminhar a análise para um especialista validar a melhor forma de atendimento na sua região. "
-            f"Para seguir, me informe {missing_text}."
+            "Atendemos projetos sob avaliação de escopo, urgência e viabilidade técnica."
+            f"{location_text} consigo encaminhar uma análise da melhor forma de atendimento, incluindo visita técnica ou suporte remoto. {question}"
         )
 
     if visit_request:
         return (
-            "Podemos avaliar uma visita técnica, sim. Antes de agendar, precisamos entender a máquina ou linha, "
-            "sintomas, urgência, localização e contato responsável. "
-            f"Para seguir, me informe {missing_text}."
+            "Podemos avaliar uma visita técnica, sim. Antes de agendar, primeiro alinhamos o cenário e a equipe confirma a melhor forma de atendimento. "
+            f"{question}"
         )
 
-    if len(missing) == 1 and missing[0] == "e-mail":
-        return "Perfeito. Falta só o e-mail para registrar o atendimento corretamente."
-    if len(missing) == 1 and missing[0] == "breve descrição do problema ou objetivo":
-        return "Perfeito. Falta só uma breve descrição do problema, equipamento ou objetivo do diagnóstico."
-    if set(missing) == {"e-mail", "breve descrição do problema ou objetivo"}:
-        return "Perfeito. Para fechar o encaminhamento, falta só seu e-mail e uma breve descrição do problema ou objetivo."
+    if _is_first_commercial_without_explicit_data(normalized_text, messages):
+        preface = build_lead_intent_preface(normalized_text, service_context)
+        return f"{preface} Consigo encaminhar seu interesse para um especialista. {question}"
 
-    if is_followup:
-        return f"Perfeito. Para seguir, me informe {missing_text}."
+    return f"Perfeito. {question}"
 
-    preface = build_lead_intent_preface(normalized_text, service_context)
-    return (
-        f"{preface} "
-        "Consigo te encaminhar para um especialista da Smart Control Brasil. "
-        f"Para agilizar, me informe {missing_text}."
-    )
+
+def _lead_field_question(field, known):
+    if field == "name":
+        return "Como posso te chamar?"
+    if field == "company":
+        return "Em qual empresa você trabalha?"
+    if field == "phone":
+        return "Qual é o melhor telefone/WhatsApp para a equipe falar com você?"
+    if field == "email":
+        return "Qual é o melhor e-mail para contato?"
+    if field == "city":
+        return "Em qual cidade você está? Essa informação é opcional."
+    return "Qual detalhe técnico você quer avaliar agora?"
 
 
 def _collect_known_contact_fields(messages):
     known = {"name": "", "company": "", "city": "", "phone": "", "email": "", "problem": ""}
+    expected_field = ""
     for message in messages or []:
-        if message.get("role") != "user":
-            continue
+        role = message.get("role")
         text = str(message.get("content") or "").strip()
-        if not text:
+        if role == "assistant":
+            expected_field = _requested_lead_field(text)
+            continue
+        if role != "user" or not text:
             continue
         extracted = _extract_contact_fields_from_text(text)
         for key in ("name", "company", "city", "phone", "email"):
             if extracted.get(key) and not known.get(key):
                 known[key] = extracted[key]
-        if extracted.get("problem"):
-            if len(extracted["problem"]) > len(known["problem"]):
-                known["problem"] = extracted["problem"]
+        if expected_field and not known.get(expected_field):
+            conversational_value = _extract_conversational_reply(text, expected_field)
+            if conversational_value:
+                known[expected_field] = conversational_value
+        if extracted.get("problem") and len(extracted["problem"]) > len(known["problem"]):
+            known["problem"] = extracted["problem"]
+        expected_field = ""
     return known
+
+
+def _requested_lead_field(text):
+    normalized = _normalize(text)
+    prompts = (
+        ("name", ("como posso te chamar", "qual e o seu nome")),
+        ("company", ("em qual empresa", "qual e a empresa")),
+        ("phone", ("qual e o melhor telefone", "telefone/whatsapp")),
+        ("email", ("qual e o melhor e-mail", "qual e o seu e-mail")),
+        ("city", ("em qual cidade",)),
+    )
+    for field, markers in prompts:
+        if any(marker in normalized for marker in markers):
+            return field
+    return ""
+
+
+def _extract_conversational_reply(text, expected_field):
+    value = str(text or "").strip(" .,-")
+    if expected_field == "phone":
+        match = re.search(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", value)
+        return match.group(0) if match else ""
+    if expected_field == "email":
+        match = re.search(r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", value, re.IGNORECASE)
+        return match.group(0) if match else ""
+    if expected_field not in {"name", "company", "city"} or not value or len(value) > 180:
+        return ""
+    if re.search(r"[@\d]", value) or "," in value or "?" in value:
+        return ""
+    if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-z0-9À-ÿ .&/'-]{1,179}", value):
+        return ""
+    return value
 
 
 def _extract_contact_fields_from_text(text):
@@ -748,33 +765,14 @@ def _last_assistant_message(messages):
 
 def _should_continue_lead_collection(normalized_text, messages):
     previous_assistant = _last_assistant_message(messages)
-    if not previous_assistant:
+    expected_field = _requested_lead_field(previous_assistant)
+    if not expected_field:
         return False
-    previous_normalized = _normalize(previous_assistant)
-    asked_lead_fields = any(
-        snippet in previous_normalized
-        for snippet in (
-            "para agilizar, me informe",
-            "nome, empresa, cidade, telefone",
-            "especialista da smart control brasil",
-        )
-    )
-    if not asked_lead_fields:
-        return False
-
-    extracted = _extract_contact_fields_from_text(normalized_text)
-    if extracted.get("name") or extracted.get("company") or extracted.get("city") or extracted.get("phone") or extracted.get("email"):
-        return True
-
-    return bool(re.search(r"\b(nome|empresa|cidade|telefone|whatsapp|whats|zap|email|e-mail)\b", normalized_text))
+    return bool(_extract_conversational_reply(_last_user_message(messages), expected_field))
 
 
 def _is_followup_lead_collection(messages):
-    previous_assistant = _last_assistant_message(messages)
-    if not previous_assistant:
-        return False
-    previous_normalized = _normalize(previous_assistant)
-    return "para agilizar, me informe" in previous_normalized or "para seguir, me informe" in previous_normalized
+    return bool(_requested_lead_field(_last_assistant_message(messages)))
 
 
 def _is_first_commercial_without_explicit_data(normalized_text, messages):

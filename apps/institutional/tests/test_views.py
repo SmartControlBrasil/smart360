@@ -22,7 +22,7 @@ class InstitutionalRoutesTests(SimpleTestCase):
             "institutional:services",
             "institutional:blog",
             "institutional:contact",
-            "institutional:refrigeracao",
+            "institutional:engenharia_embarcada",
             "institutional:representada_mitsubishi_automacao",
             "institutional:service_manutencao_tpm_confiabilidade",
             "institutional:service_automacao_industrial_clps",
@@ -43,6 +43,31 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(
             response, "institutional/eitech/pages/xyron-robotics.html"
+        )
+
+    def test_engenharia_embarcada_canonical_url(self):
+        self.assertEqual(
+            reverse("institutional:engenharia_embarcada"),
+            "/engenharia-embarcada/",
+        )
+
+    def test_engenharia_embarcada_page_uses_new_template(self):
+        response = self.client.get(reverse("institutional:engenharia_embarcada"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "institutional/eitech/pages/engenharia_embarcada.html"
+        )
+        self.assertContains(response, "Engenharia Embarcada")
+
+    def test_legacy_refrigeracao_url_redirects_to_engenharia_embarcada(self):
+        response = self.client.get("/parceiros/refrigeracao/", follow=False)
+
+        self.assertRedirects(
+            response,
+            reverse("institutional:engenharia_embarcada"),
+            status_code=301,
+            fetch_redirect_response=False,
         )
 
     def test_services_canonical_url_is_solucoes(self):

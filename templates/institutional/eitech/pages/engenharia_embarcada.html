@@ -1,26 +1,29 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Engenharia Embarcada, Microcontroladores PIC e IoT | Smart Control Brasil{% endblock %}
+{% block meta_description %}Engenharia embarcada, microcontroladores PIC, IoT e retrofit eletrônico para controle dedicado, sensores, atuadores e sistemas conectados com confiabilidade operacional.{% endblock %}
+
 {% block content %}
 
 <style>
-  .scb-refrigeracao-bg-section {
+  .scb-embarcada-bg-section {
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
   }
 
-  .scb-refrigeracao-hero-section {
+  .scb-embarcada-hero-section {
     min-height: 860px;
     display: flex;
     align-items: center;
   }
 
-  .scb-refrigeracao-hero-section > .container {
+  .scb-embarcada-hero-section > .container {
     width: 100%;
   }
 
-  .scb-refrigeracao-hero-badge {
+  .scb-embarcada-hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -31,31 +34,31 @@
     padding: 8px 14px;
   }
 
-  .scb-refrigeracao-hero-badge img {
+  .scb-embarcada-hero-badge img {
     max-width: 20px;
   }
 
-  .scb-refrigeracao-tagline {
+  .scb-embarcada-tagline {
     color: #dcecff;
     max-width: 620px;
   }
 
-  .scb-refrigeracao-counter .counter-box p {
+  .scb-embarcada-counter .counter-box p {
     min-height: 42px;
   }
 
-  .scb-refrigeracao-card-title {
+  .scb-embarcada-card-title {
     display: block;
     font-weight: 700;
     color: #061a33;
   }
 
-  .scb-refrigeracao-service-note {
+  .scb-embarcada-service-note {
     color: #5c6670;
     line-height: 1.7;
   }
 
-  .scb-refrigeracao-application-card {
+  .scb-embarcada-application-card {
     background: #ffffff;
     border-radius: 18px;
     padding: 28px 24px;
@@ -65,12 +68,12 @@
     transition: all 0.25s ease;
   }
 
-  .scb-refrigeracao-application-card:hover {
+  .scb-embarcada-application-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 18px 50px rgba(5, 25, 50, 0.12);
   }
 
-  .scb-refrigeracao-application-card span {
+  .scb-embarcada-application-card span {
     width: 48px;
     height: 48px;
     border-radius: 14px;
@@ -83,22 +86,22 @@
     font-size: 20px;
   }
 
-  .scb-refrigeracao-application-card h4 {
+  .scb-embarcada-application-card h4 {
     margin-bottom: 12px;
     color: #061a33;
   }
 
-  .scb-refrigeracao-application-card p {
+  .scb-embarcada-application-card p {
     margin: 0;
     color: #5c6670;
     line-height: 1.7;
   }
 
-  .scb-refrigeracao-cta-list {
+  .scb-embarcada-cta-list {
     margin-top: 24px;
   }
 
-  .scb-refrigeracao-cta-list li {
+  .scb-embarcada-cta-list li {
     color: #ffffff;
     margin-bottom: 10px;
     display: flex;
@@ -106,18 +109,87 @@
     gap: 10px;
   }
 
-  .scb-refrigeracao-cta-list li i {
+  .scb-embarcada-cta-list li i {
     color: #46d369;
   }
 
-  .scb-refrigeracao-tab-icon {
+  .scb-embarcada-tab-icon {
     width: 38px;
     height: 38px;
     object-fit: contain;
   }
 
+  .scb-embarcada-cta-fix .cta-header h2 {
+    color: #ffffff;
+    max-width: 620px;
+    font-size: 48px;
+    line-height: 1.15;
+  }
+
+  .scb-embarcada-cta-fix .cta-header p {
+    color: rgba(255, 255, 255, 0.86);
+    max-width: 600px;
+    line-height: 1.7;
+  }
+
+  .scb-embarcada-cta-fix .scb-embarcada-cta-list li {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .scb-embarcada-cta-fix .cta-images {
+    position: relative;
+    min-height: 430px;
+  }
+
+  .scb-embarcada-cta-fix .cta-images .img1 {
+    position: relative;
+    z-index: 1;
+  }
+
+  .scb-embarcada-cta-fix .cta-images .aniamtion-key-1 {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 3;
+    margin: 18px 0 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+    max-width: 320px;
+  }
+
+  .scb-embarcada-cta-fix .cta-images .aniamtion-key-1 li {
+    list-style: none;
+  }
+
+  .scb-embarcada-cta-fix .cta-images .aniamtion-key-1 li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    color: #061a33;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 700;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  }
+
+  @media (max-width: 991px) {
+    .scb-embarcada-cta-fix .cta-header h2 {
+      font-size: 38px;
+    }
+
+    .scb-embarcada-cta-fix .cta-images {
+      min-height: auto;
+      margin-top: 40px;
+    }
+  }
+
   @media (max-width: 767px) {
-    .scb-refrigeracao-hero-badge {
+    .scb-embarcada-hero-badge {
       font-size: 13px;
     }
 
@@ -131,15 +203,21 @@
       text-align: left;
     }
   }
+
+  @media (max-width: 575px) {
+    .scb-embarcada-cta-fix .cta-header h2 {
+      font-size: 32px;
+    }
+  }
 </style>
 
 <!--===== HERO AREA STARTS =======-->
-<div class="hero2-section-area scb-refrigeracao-bg-section scb-refrigeracao-hero-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
+<div class="hero2-section-area scb-embarcada-bg-section scb-embarcada-hero-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
         <div class="hero2-header heading3">
-          <h5 data-aos="fade-left" data-aos-duration="800" class="scb-refrigeracao-hero-badge">
+          <h5 data-aos="fade-left" data-aos-duration="800" class="scb-embarcada-hero-badge">
             <img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">
             Smart Control Brasil
           </h5>
@@ -147,34 +225,34 @@
           <div class="space24"></div>
 
           <h1 class="text-anime-style-3">
-            Soluções em Refrigeração e Climatização Profissional
+            Engenharia Embarcada, Microcontroladores PIC e IoT
           </h1>
 
           <div class="space18"></div>
 
-          <p data-aos="fade-left" data-aos-duration="900" class="scb-refrigeracao-tagline">
-            Projetos, instalação, manutenção e modernização de sistemas de ar-condicionado,
-            câmaras frigoríficas e equipamentos de refrigeração comercial com foco em eficiência,
-            confiabilidade e continuidade operacional.
+          <p data-aos="fade-left" data-aos-duration="900" class="scb-embarcada-tagline">
+            Desenvolvimento de soluções eletrônicas sob medida para controle de máquinas,
+            retrofit de placas, automação dedicada, sensores, atuadores e sistemas conectados
+            com foco em confiabilidade, integração e continuidade operacional.
           </p>
 
           <div class="space32"></div>
 
-          <div class="counter-boxarea scb-refrigeracao-counter">
+          <div class="counter-boxarea scb-embarcada-counter">
             <div class="row">
               <div class="col-lg-4 col-md-4 col-6" data-aos="zoom-in" data-aos-duration="800">
                 <div class="counter-box">
-                  <h2>HVAC</h2>
+                  <h2>PIC</h2>
                   <div class="space16"></div>
-                  <p>Climatização comercial</p>
+                  <p>Microcontroladores</p>
                 </div>
               </div>
 
               <div class="col-lg-4 col-md-4 col-6" data-aos="zoom-in" data-aos-duration="900">
                 <div class="counter-box">
-                  <h2>VRF</h2>
+                  <h2>IoT</h2>
                   <div class="space16"></div>
-                  <p>Sistemas de maior porte</p>
+                  <p>Sistemas conectados</p>
                 </div>
               </div>
 
@@ -183,7 +261,7 @@
                 <div class="counter-box box2">
                   <h2>24/7</h2>
                   <div class="space16"></div>
-                  <p>Operação crítica</p>
+                  <p>Controle crítico</p>
                 </div>
               </div>
             </div>
@@ -206,7 +284,7 @@
             <div class="col-lg-6 col-md-6">
               <div class="images">
                 <div class="img1 reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img2.png' %}" alt="Soluções de refrigeração Smart Control Brasil">
+                  <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img2.png' %}" alt="Soluções em engenharia embarcada Smart Control Brasil">
                 </div>
                 <div class="space30"></div>
                 <div class="arrow-circle text-end">
@@ -221,7 +299,7 @@
 
             <div class="col-lg-6 col-md-6">
               <div class="img2 reveal">
-                <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img3.png' %}" alt="Ar-condicionado e câmaras frigoríficas">
+                <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img3.png' %}" alt="Microcontroladores, sensores e automação dedicada">
               </div>
             </div>
           </div>
@@ -235,7 +313,7 @@
 
 
 <!--===== ABOUT AREA STARTS =======-->
-<div class="about2-section-area sp1 scb-refrigeracao-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
+<div class="about2-section-area sp1 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
   <div class="container">
     <div class="row">
       <div class="col-lg-6 m-auto">
@@ -246,7 +324,7 @@
           </h5>
           <div class="space20"></div>
           <h2 class="text-anime-style-3">
-            Refrigeração não é só equipamento. É desempenho, segurança e controle.
+            Controle embarcado não é só placa. É inteligência, segurança e continuidade.
           </h2>
         </div>
       </div>
@@ -263,21 +341,21 @@
 
         <div class="about-list-box box2">
           <span><i class="fa-solid fa-check"></i></span>
-          Soluções para conforto térmico e conservação de produtos
+          Soluções para controle, medição e automação dedicada
         </div>
 
         <div class="space56"></div>
 
         <div class="about-list-box box3">
           <span><i class="fa-solid fa-check"></i></span>
-          Atendimento para comércio, indústria, academias e mercados
+          Atendimento para indústria, comércio, máquinas e equipamentos
         </div>
       </div>
 
       <div class="col-lg-4">
         <div class="about-images">
           <div class="img1 reveal">
-            <img src="{% static 'institutional/eitech/img/all-images/about/about-img4.png' %}" alt="Manutenção técnica em refrigeração">
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img4.png' %}" alt="Desenvolvimento técnico em sistemas embarcados">
           </div>
           <img src="{% static 'institutional/eitech/img/elements/elements23.png' %}" alt="" class="elements10">
         </div>
@@ -294,14 +372,14 @@
 
         <div class="about-list-box box2">
           <span><i class="fa-solid fa-check"></i></span>
-          Soluções para conforto térmico e conservação de produtos
+          Soluções para controle, medição e automação dedicada
         </div>
 
         <div class="space56"></div>
 
         <div class="about-list-box box3">
           <span><i class="fa-solid fa-check"></i></span>
-          Atendimento para comércio, indústria, academias e mercados
+          Atendimento para indústria, comércio, máquinas e equipamentos
         </div>
 
         <div class="space56 d-lg-none d-block"></div>
@@ -310,21 +388,21 @@
       <div class="col-lg-4 col-md-6">
         <div class="about-list-box2 box1">
           <span><i class="fa-solid fa-check"></i></span>
-          Integração com elétrica, automação e controle
+          Integração com elétrica, automação e sistemas digitais
         </div>
 
         <div class="space56"></div>
 
         <div class="about-list-box2 box2">
           <span><i class="fa-solid fa-check"></i></span>
-          Foco em eficiência energética e confiabilidade operacional
+          Foco em confiabilidade, manutenção e operação contínua
         </div>
 
         <div class="space56"></div>
 
         <div class="about-list-box2 box3">
           <span><i class="fa-solid fa-check"></i></span>
-          Planos de manutenção preventiva e corretiva
+          Projetos para retrofit eletrônico e controle dedicado
         </div>
       </div>
     </div>
@@ -334,7 +412,7 @@
 
 
 <!--===== WORK AREA STARTS =======-->
-<div class="work2-section-area sp1 scb-refrigeracao-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
+<div class="work2-section-area sp1 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-7">
@@ -342,7 +420,7 @@
           <div class="row">
             <div class="col-lg-6 col-md-6">
               <div class="img1 reveal">
-                <img src="{% static 'institutional/eitech/img/all-images/work/work-img3.png' %}" alt="Climatização profissional">
+                <img src="{% static 'institutional/eitech/img/all-images/work/work-img3.png' %}" alt="Engenharia embarcada profissional">
               </div>
               <div class="arrow-circle text-end">
                 <a href="{% url 'institutional:contact' %}">
@@ -359,7 +437,7 @@
                 </div>
                 <div class="space100"></div>
                 <div class="img reveal">
-                  <img src="{% static 'institutional/eitech/img/all-images/work/work-img4.png' %}" alt="Câmara frigorífica e controle de temperatura">
+                  <img src="{% static 'institutional/eitech/img/all-images/work/work-img4.png' %}" alt="Controle eletrônico e microcontroladores">
                 </div>
               </div>
             </div>
@@ -371,42 +449,42 @@
         <div class="solution-header heading4">
           <h5>
             <span><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt=""></span>
-            Engenharia aplicada à refrigeração
+            Engenharia aplicada ao controle embarcado
           </h5>
 
           <div class="space24"></div>
 
           <h2 class="text-anime-style-3">
-            Análise técnica para reduzir falhas, consumo e paradas inesperadas
+            Análise técnica para reduzir falhas, obsolescência e paradas inesperadas
           </h2>
 
           <div class="space16"></div>
 
           <p data-aos="fade-left" data-aos-duration="800">
-            A Smart Control Brasil atua na análise, implantação e manutenção de sistemas de
-            refrigeração e climatização, considerando carga térmica, aplicação, consumo energético,
-            disponibilidade operacional e segurança dos ativos refrigerados.
+            A Smart Control Brasil atua na análise, desenvolvimento e modernização de sistemas
+            eletrônicos dedicados, considerando sensores, atuadores, lógica de controle,
+            integração com máquinas, disponibilidade operacional e segurança do processo.
           </p>
 
           <div class="space24"></div>
 
           <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
             <div class="progress-bar">
-              <label>Climatização Comercial <span>95%</span></label>
+              <label>Microcontroladores PIC <span>95%</span></label>
               <div class="progress">
                 <div class="progress-inner" style="width: 95%;"></div>
               </div>
             </div>
 
             <div class="progress-bar">
-              <label>Câmaras Frigoríficas <span>98%</span></label>
+              <label>Sistemas Embarcados <span>98%</span></label>
               <div class="progress">
                 <div class="progress-inner" style="width: 98%;"></div>
               </div>
             </div>
 
             <div class="progress-bar">
-              <label>Manutenção Preventiva <span>97%</span></label>
+              <label>Retrofit Eletrônico <span>97%</span></label>
               <div class="progress">
                 <div class="progress-inner" style="width: 97%;"></div>
               </div>
@@ -431,7 +509,7 @@
 
 
 <!--===== SERVICE AREA STARTS =======-->
-<div class="service2-section-area sp1 scb-refrigeracao-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
+<div class="service2-section-area sp1 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
   <div class="container">
     <div class="row">
       <div class="col-lg-7 m-auto">
@@ -442,7 +520,7 @@
           </h5>
           <div class="space20"></div>
           <h2 class="text-anime-style-3">
-            Ar-condicionado, VRF e câmaras frigoríficas para operação profissional
+            Microcontroladores, IoT e retrofit eletrônico para operação profissional
           </h2>
         </div>
       </div>
@@ -466,16 +544,16 @@
 
                     <div class="content-area">
                       <h3 data-aos="fade-left" data-aos-duration="800">
-                        Ar-condicionado Split
+                        Microcontroladores PIC
                       </h3>
 
                       <div class="space16"></div>
 
-                      <p data-aos="fade-left" data-aos-duration="900" class="scb-refrigeracao-service-note">
-                        Soluções com uma evaporadora para ambientes comerciais, salas técnicas,
-                        escritórios, recepções, pequenos comércios e áreas administrativas.
-                        Atuação em instalação, manutenção, higienização, diagnóstico elétrico,
-                        análise de rendimento e correção de falhas.
+                      <p data-aos="fade-left" data-aos-duration="900" class="scb-embarcada-service-note">
+                        Desenvolvimento de firmware e soluções com microcontroladores PIC para máquinas,
+                        dispositivos de controle, leitura de sensores, acionamento de saídas, temporizações,
+                        alarmes, intertravamentos e comandos dedicados. Atuação em análise, desenvolvimento,
+                        testes, documentação e aplicação prática.
                       </p>
 
                       <div class="space28"></div>
@@ -495,7 +573,7 @@
                 <div class="col-lg-5">
                   <div class="images-area">
                     <div class="img1 reveal">
-                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Ar-condicionado split">
+                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Microcontrolador PIC">
                     </div>
 
                     <div class="arrow-circle text-end">
@@ -522,16 +600,16 @@
 
                     <div class="content-area">
                       <h3 data-aos="fade-left" data-aos-duration="800">
-                        Multi Split
+                        Sistemas Embarcados
                       </h3>
 
                       <div class="space16"></div>
 
-                      <p data-aos="fade-left" data-aos-duration="900" class="scb-refrigeracao-service-note">
-                        Sistemas com múltiplas evaporadoras conectadas a uma unidade externa,
-                        ideais para ambientes com várias salas e necessidade de climatização
-                        setorizada. Avaliamos capacidade, distribuição térmica, infraestrutura
-                        elétrica, dreno, tubulação e condições de operação.
+                      <p data-aos="fade-left" data-aos-duration="900" class="scb-embarcada-service-note">
+                        Soluções eletrônicas dedicadas para equipamentos, máquinas especiais,
+                        bancadas de teste, dispositivos de medição e automações compactas.
+                        Avaliamos sinais, entradas, saídas, alimentação, ambiente de operação,
+                        segurança e forma ideal de integração com o processo.
                       </p>
 
                       <div class="space28"></div>
@@ -551,7 +629,7 @@
                 <div class="col-lg-5">
                   <div class="images-area">
                     <div class="img1 reveal">
-                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Sistema multi split">
+                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Sistema embarcado">
                     </div>
 
                     <div class="arrow-circle text-end">
@@ -578,23 +656,23 @@
 
                     <div class="content-area">
                       <h3 data-aos="fade-left" data-aos-duration="800">
-                        Sistemas VRF
+                        IoT e Monitoramento
                       </h3>
 
                       <div class="space16"></div>
 
-                      <p data-aos="fade-left" data-aos-duration="900" class="scb-refrigeracao-service-note">
-                        Sistemas de fluxo de refrigerante variável para operações maiores,
-                        com melhor controle, flexibilidade de instalação, eficiência energética
-                        e gestão por zonas. Indicado para edifícios comerciais, clínicas,
-                        academias, escritórios, lojas e ambientes de maior circulação.
+                      <p data-aos="fade-left" data-aos-duration="900" class="scb-embarcada-service-note">
+                        Soluções conectadas para coleta de dados, supervisão remota, alertas,
+                        comunicação com sensores, envio de informações e integração com dashboards.
+                        Indicado para máquinas, ambientes técnicos, processos produtivos,
+                        sistemas de manutenção e aplicações que precisam de visibilidade em tempo real.
                       </p>
 
                       <div class="space28"></div>
 
                       <div class="btn-area" data-aos="fade-left" data-aos-duration="1000">
                         <a href="{% url 'institutional:contact' %}" class="vl-btn3">
-                          <span class="demo">Avaliar VRF</span>
+                          <span class="demo">Avaliar IoT</span>
                           <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span>
                         </a>
                       </div>
@@ -607,7 +685,7 @@
                 <div class="col-lg-5">
                   <div class="images-area">
                     <div class="img1 reveal">
-                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Sistema VRF">
+                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="IoT e monitoramento">
                     </div>
 
                     <div class="arrow-circle text-end">
@@ -634,16 +712,16 @@
 
                     <div class="content-area">
                       <h3 data-aos="fade-left" data-aos-duration="800">
-                        Câmaras Frigoríficas e Cervejeiras
+                        Retrofit de Placas e Controles
                       </h3>
 
                       <div class="space16"></div>
 
-                      <p data-aos="fade-left" data-aos-duration="900" class="scb-refrigeracao-service-note">
-                        Soluções para resfriados, congelados e conservação de bebidas,
-                        incluindo análise técnica, manutenção, ajustes de operação,
-                        elétrica, comando, controle de temperatura, segurança operacional
-                        e prevenção de perdas por falha de refrigeração.
+                      <p data-aos="fade-left" data-aos-duration="900" class="scb-embarcada-service-note">
+                        Soluções para equipamentos com placas obsoletas, controles sem suporte,
+                        comandos antigos ou falhas recorrentes. Atuamos na análise da função original,
+                        desenvolvimento de alternativas técnicas, integração elétrica, lógica de controle,
+                        testes e prevenção de paradas por falta de peças.
                       </p>
 
                       <div class="space28"></div>
@@ -663,7 +741,7 @@
                 <div class="col-lg-5">
                   <div class="images-area">
                     <div class="img1 reveal">
-                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Câmara frigorífica">
+                      <img src="{% static 'institutional/eitech/img/all-images/service/service-img1.png' %}" alt="Retrofit eletrônico">
                     </div>
 
                     <div class="arrow-circle text-end">
@@ -685,29 +763,29 @@
             <ul class="nav nav-pills" id="pills-tab" role="tablist">
               <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pills-split-tab" data-bs-toggle="pill" data-bs-target="#pills-split" type="button" role="tab" aria-controls="pills-split" aria-selected="true">
-                  <span><img class="scb-refrigeracao-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon7.svg' %}" alt=""></span>
-                  Split
+                  <span><img class="scb-embarcada-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon7.svg' %}" alt=""></span>
+                  PIC
                 </button>
               </li>
 
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-multisplit-tab" data-bs-toggle="pill" data-bs-target="#pills-multisplit" type="button" role="tab" aria-controls="pills-multisplit" aria-selected="false">
-                  <span><img class="scb-refrigeracao-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon8.svg' %}" alt=""></span>
-                  Multi Split
+                  <span><img class="scb-embarcada-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon8.svg' %}" alt=""></span>
+                  Embarcados
                 </button>
               </li>
 
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-vrf-tab" data-bs-toggle="pill" data-bs-target="#pills-vrf" type="button" role="tab" aria-controls="pills-vrf" aria-selected="false">
-                  <span><img class="scb-refrigeracao-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon9.svg' %}" alt=""></span>
-                  VRF
+                  <span><img class="scb-embarcada-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon9.svg' %}" alt=""></span>
+                  IoT
                 </button>
               </li>
 
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-camaras-tab" data-bs-toggle="pill" data-bs-target="#pills-camaras" type="button" role="tab" aria-controls="pills-camaras" aria-selected="false">
-                  <span><img class="scb-refrigeracao-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon10.svg' %}" alt=""></span>
-                  Câmaras Frigoríficas
+                  <span><img class="scb-embarcada-tab-icon" src="{% static 'institutional/eitech/img/icons/service-icon10.svg' %}" alt=""></span>
+                  Retrofit Eletrônico
                 </button>
               </li>
             </ul>
@@ -722,7 +800,7 @@
 
 
 <!--===== APPLICATION AREA STARTS =======-->
-<div class="team2-section-area sp2 scb-refrigeracao-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
+<div class="team2-section-area sp2 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
   <div class="container">
     <div class="row">
       <div class="col-lg-6 m-auto">
@@ -741,52 +819,52 @@
 
     <div class="row">
       <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
-        <div class="scb-refrigeracao-application-card">
+        <div class="scb-embarcada-application-card">
           <span><i class="fa-solid fa-store"></i></span>
-          <h4>Supermercados e hortifrúti</h4>
-          <p>Controle de temperatura para conservação de produtos, redução de perdas e estabilidade operacional.</p>
+          <h4>Máquinas e equipamentos comerciais</h4>
+          <p>Controle dedicado para pequenos sistemas, automações específicas, alarmes, sensores e acionamentos.</p>
         </div>
       </div>
 
       <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900">
-        <div class="scb-refrigeracao-application-card">
+        <div class="scb-embarcada-application-card">
           <span><i class="fa-solid fa-utensils"></i></span>
-          <h4>Restaurantes e cozinhas industriais</h4>
-          <p>Climatização, conservação de alimentos, câmaras de resfriados e congelados.</p>
+          <h4>Bancadas de teste e validação</h4>
+          <p>Desenvolvimento de dispositivos para medição, ensaio, repetibilidade, acionamentos e coleta de dados.</p>
         </div>
       </div>
 
       <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000">
-        <div class="scb-refrigeracao-application-card">
+        <div class="scb-embarcada-application-card">
           <span><i class="fa-solid fa-warehouse"></i></span>
-          <h4>Distribuidoras e pequenos centros logísticos</h4>
-          <p>Soluções para armazenamento refrigerado, manutenção preventiva e resposta técnica.</p>
+          <h4>Indústrias e pequenos centros técnicos</h4>
+          <p>Soluções para monitoramento, controle de processo, retrofit eletrônico e suporte à manutenção.</p>
         </div>
       </div>
 
       <div class="space30"></div>
 
       <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100">
-        <div class="scb-refrigeracao-application-card">
+        <div class="scb-embarcada-application-card">
           <span><i class="fa-solid fa-dumbbell"></i></span>
-          <h4>Academias e ambientes comerciais</h4>
-          <p>Conforto térmico, qualidade do ambiente e planos de manutenção para operação contínua.</p>
+          <h4>Ambientes comerciais automatizados</h4>
+          <p>Controle de sensores, dispositivos, sinalizações, comandos locais e integração com sistemas digitais.</p>
         </div>
       </div>
 
       <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200">
-        <div class="scb-refrigeracao-application-card">
+        <div class="scb-embarcada-application-card">
           <span><i class="fa-solid fa-beer-mug-empty"></i></span>
-          <h4>Cervejeiras e bebidas</h4>
-          <p>Conservação de bebidas, controle térmico e manutenção de equipamentos comerciais.</p>
+          <h4>Projetos especiais sob medida</h4>
+          <p>Criação de soluções eletrônicas quando não existe produto pronto adequado para a aplicação.</p>
         </div>
       </div>
 
       <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1300">
-        <div class="scb-refrigeracao-application-card">
+        <div class="scb-embarcada-application-card">
           <span><i class="fa-solid fa-microchip"></i></span>
           <h4>Salas técnicas e ambientes críticos</h4>
-          <p>Climatização para áreas sensíveis, equipamentos eletrônicos, servidores e automação.</p>
+          <p>Monitoramento de grandezas, alarmes, controle eletrônico, sensores e integração com automação.</p>
         </div>
       </div>
     </div>
@@ -796,26 +874,26 @@
 
 
 <!--===== CTA AREA STARTS =======-->
-<div class="cta2-section-area sp1 scb-refrigeracao-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
+<div class="cta2-section-area sp1 scb-embarcada-bg-section scb-embarcada-cta-fix" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
         <div class="cta-header heading1">
           <h2 data-aos="fade-left" data-aos-duration="700">
-            Sua operação não pode parar por falha de refrigeração
+            Modernize controles antigos com eletrônica dedicada
           </h2>
 
           <div class="space16"></div>
 
           <p data-aos="fade-left" data-aos-duration="800">
-            Fale com a Smart Control Brasil para avaliar seu sistema, reduzir riscos de parada,
-            melhorar o desempenho e planejar uma manutenção mais inteligente.
+            Desenvolvemos soluções com microcontroladores PIC, sensores, atuadores, IoT e retrofit eletrônico
+            para reduzir falhas, recuperar equipamentos e criar controles sob medida para sua operação.
           </p>
 
-          <ul class="scb-refrigeracao-cta-list" data-aos="fade-left" data-aos-duration="850">
+          <ul class="scb-embarcada-cta-list" data-aos="fade-left" data-aos-duration="850">
             <li><i class="fa-solid fa-check"></i> Diagnóstico técnico e plano de ação</li>
-            <li><i class="fa-solid fa-check"></i> Manutenção preventiva e corretiva</li>
-            <li><i class="fa-solid fa-check"></i> Soluções para climatização e câmaras frigoríficas</li>
+            <li><i class="fa-solid fa-check"></i> Desenvolvimento com PIC, sensores e atuadores</li>
+            <li><i class="fa-solid fa-check"></i> Soluções para IoT, controle dedicado e retrofit eletrônico</li>
           </ul>
 
           <div class="space24"></div>
@@ -836,13 +914,13 @@
           <img src="{% static 'institutional/eitech/img/elements/elements7.png' %}" alt="" class="elements7 keyframe5">
 
           <div class="img1">
-            <img src="{% static 'institutional/eitech/img/all-images/cta/cta-img2.png' %}" alt="Smart Control Brasil Refrigeração">
+            <img src="{% static 'institutional/eitech/img/all-images/cta/cta-img2.png' %}" alt="Smart Control Brasil Engenharia Embarcada">
           </div>
 
           <ul class="aniamtion-key-1">
-            <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/check2.svg' %}" alt="">Ar-condicionado Split</a></li>
-            <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/check2.svg' %}" alt="">Multi Split e VRF</a></li>
-            <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/check2.svg' %}" alt="">Câmaras Frigoríficas</a></li>
+            <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/check2.svg' %}" alt="">Microcontroladores PIC</a></li>
+            <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/check2.svg' %}" alt="">Sistemas Embarcados</a></li>
+            <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/check2.svg' %}" alt="">Retrofit Eletrônico</a></li>
           </ul>
         </div>
       </div>

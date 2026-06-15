@@ -76,8 +76,8 @@ def about(request):
 def services(request):
     return render(request, "institutional/eitech/pages/services.html")
 
-def refrigeracao(request):
-    return render(request, "institutional/eitech/pages/refrigeracao.html")
+def engenharia_embarcada(request):
+    return render(request, "institutional/eitech/pages/engenharia_embarcada.html")
 
 
 def service_details(request):

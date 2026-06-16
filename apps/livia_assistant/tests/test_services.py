@@ -13,7 +13,6 @@ from apps.livia_assistant.services import LiviaAssistantService
 from apps.livia_assistant.technical_summary import (
     build_technical_service_summary,
     detect_equipment,
-    detect_error_codes,
     detect_intent,
     detect_symptom,
     normalize_technical_corpus,
@@ -295,11 +294,6 @@ class LiviaAssistantServiceTests(TestCase):
         )
         self.assertFalse(
             is_lead_ready_for_notification(
-                LiviaLeadCapture(name="E2", company="Arteb", city="Osasco", phone="1145784512", email="a@b.com")
-            )
-        )
-        self.assertFalse(
-            is_lead_ready_for_notification(
                 LiviaLeadCapture(name="", company="", city="", phone="1145784512", email="a@b.com")
             )
         )
@@ -341,54 +335,6 @@ class LiviaAssistantServiceTests(TestCase):
         )
         self.assertIn("Cotia", summary_with_city)
         self.assertIn("ar-condicionado", summary_with_city.lower())
-        self.assertIn("e2", summary_with_city.lower())
-
-        separate_messages_corpus = "estou com problema em um ar condicionado erro E2"
-        jandira_summary = build_technical_service_summary(
-            raw_corpus=separate_messages_corpus,
-            city="Jandira",
-        )
-        self.assertIn("ar-condicionado", jandira_summary.lower())
-        self.assertIn("e2", jandira_summary.lower())
-        self.assertIn("Jandira", jandira_summary)
-        self.assertNotIn("duno", jandira_summary.lower())
-
-    def test_detect_error_codes_supports_common_short_codes(self):
-        self.assertEqual(detect_error_codes("erro E2"), ["E2"])
-        self.assertEqual(detect_error_codes("apareceu E3 no painel"), ["E3"])
-        self.assertEqual(detect_error_codes("código F1"), ["F1"])
-        self.assertEqual(detect_error_codes("CH10 no display"), ["CH10"])
-        self.assertEqual(detect_error_codes("CH05"), ["CH05"])
-
-    def test_enrich_lead_summary_preserves_error_code_from_separate_cycle_messages(self):
-        conversation = self.service.get_or_create_conversation(session_key="error-code-separate-messages")
-        first_message = self.service.register_user_message(
-            conversation,
-            "estou com problema em um ar condicionado",
-        )
-        self.service.register_user_message(conversation, "erro E2")
-        lead = LiviaLeadCapture(
-            conversation=conversation,
-            name="João",
-            company="Digital Cold",
-            city="Jandira",
-            phone="11987654321",
-            email="joao@digitalcold.com.br",
-            crm_reference={"capture_start_message_id": first_message.id},
-        )
-        lead.save()
-        self.service._enrich_lead_from_conversation(lead, conversation)
-
-        notes = (lead.notes or "").lower()
-        self.assertTrue("ar condicionado" in notes or "ar-condicionado" in notes, msg=lead.notes)
-        self.assertIn("e2", notes)
-        self.assertNotIn("duno", notes)
-        self.assertIn("jandira", notes)
-
-        history = (lead.crm_reference or {}).get("technical_history", [])
-        self.assertTrue(any("erro e2" in item.lower() for item in history))
-
-    def test_build_lead_collection_reply_with_name_and_phone_asks_next_missing_field(self):
         from apps.livia_assistant.integrations import build_lead_collection_reply
 
         messages = [

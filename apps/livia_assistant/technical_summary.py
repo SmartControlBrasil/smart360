@@ -54,49 +54,6 @@ class TechnicalContext:
     symptom: str = ""
     intent: str = ""
     stopped: bool = False
-    error_codes: tuple[str, ...] = ()
-
-
-ERROR_CODE_PATTERN = re.compile(
-    r"\b(?:erro\s+)?(?:"
-    r"[Ee][1-4]"
-    r"|[Ff][1-2]"
-    r"|[Hh]1"
-    r"|[Pp]1"
-    r"|CH\d{2,3}"
-    r")\b",
-    re.IGNORECASE,
-)
-
-
-def detect_error_codes(corpus: str) -> list[str]:
-    """Extrai códigos de erro curtos informados no corpus do ciclo atual."""
-    if not corpus:
-        return []
-
-    codes: list[str] = []
-    for match in ERROR_CODE_PATTERN.finditer(corpus):
-        code = match.group(0)
-        if code.lower().startswith("erro "):
-            code = code.split(maxsplit=1)[1]
-        normalized_code = code.upper()
-        if normalized_code.startswith("CH"):
-            normalized_code = f"CH{normalized_code[2:]}"
-        if normalized_code not in codes:
-            codes.append(normalized_code)
-    return codes
-
-
-def _error_code_symptom_label(codes: list[str]) -> str:
-    if not codes:
-        return ""
-    return f"erro {codes[0]}"
-
-
-def _error_code_clause(codes: list[str]) -> str:
-    if not codes:
-        return ""
-    return f" com erro {codes[0]}"
 
 
 def _detect_brand(corpus: str) -> str:
@@ -149,11 +106,9 @@ def detect_equipment(corpus: str) -> tuple[str, str]:
 def detect_symptom(corpus: str) -> tuple[str, bool]:
     """Retorna (sintoma normalizado, indica parada operacional)."""
     normalized = normalize_technical_corpus(corpus)
-    error_codes = detect_error_codes(corpus)
-    if error_codes:
-        return _error_code_symptom_label(error_codes), False
 
     symptom_rules = (
+        ("erro E2", ("erro e2",)),
         ("acúmulo de gelo no ventilador", ("acúmulo de gelo", "gelo no ventilador")),
         ("disjuntor desarmando", ("disjuntor desarmando",)),
         ("erro low pressure", ("low pressure",)),
@@ -222,27 +177,24 @@ def detect_intent(corpus: str) -> str:
 def extract_technical_context(corpus: str) -> TechnicalContext:
     normalized = normalize_technical_corpus(corpus)
     equipment, brand = detect_equipment(normalized)
-    symptom, stopped = detect_symptom(corpus)
+    symptom, stopped = detect_symptom(normalized)
     intent = detect_intent(normalized)
-    error_codes = tuple(detect_error_codes(corpus))
     return TechnicalContext(
         equipment=equipment,
         brand=brand,
         symptom=symptom,
         intent=intent,
         stopped=stopped,
-        error_codes=error_codes,
     )
 
 
 def _symptom_clause(context: TechnicalContext, corpus: str) -> str:
     normalized = normalize_technical_corpus(corpus)
-    error_codes = list(context.error_codes) or detect_error_codes(corpus)
-    if error_codes:
-        return _error_code_clause(error_codes)
     has_low_pressure = "low pressure" in normalized
     has_no_gela = "não gela" in normalized
 
+    if context.symptom == "erro E2":
+        return " com erro E2"
     if context.symptom == "acúmulo de gelo no ventilador":
         return " com acúmulo de gelo no ventilador"
     if context.symptom == "disjuntor desarmando":

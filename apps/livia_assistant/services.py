@@ -43,7 +43,6 @@ from .qualification import (
 )
 from .technical_summary import (
     build_technical_service_summary,
-    detect_error_codes,
     extract_technical_context,
     technical_corpus_from_lead,
 )
@@ -488,14 +487,13 @@ class LiviaAssistantService:
             "technical_history": selected_messages,
         }
         context = extract_technical_context(corpus) if corpus else None
-        if context and (context.equipment or context.symptom or context.stopped or context.intent or context.error_codes):
+        if context and (context.equipment or context.symptom or context.stopped or context.intent):
             technical_reference["technical_context"] = {
                 "equipment": context.equipment,
                 "brand": context.brand,
                 "symptom": context.symptom,
                 "intent": context.intent,
                 "stopped": context.stopped,
-                "error_codes": list(context.error_codes),
             }
         lead.crm_reference = technical_reference
 
@@ -613,8 +611,6 @@ class LiviaAssistantService:
         return sanitized[:300]
 
     def _is_technical_note_message(self, normalized):
-        if detect_error_codes(normalized):
-            return True
         technical_terms = (
             "camara climatica",
             "câmara climática",

@@ -7,6 +7,7 @@
 {% block body_extra %} class="home-page"{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-home.css' %}">
 <style>
   body.home-page .hero1-section-area {
     padding-top: 176px;
@@ -15,16 +16,6 @@
     body.home-page .hero1-section-area {
       padding-top: 132px;
     }
-  }
-  .pillar-check-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .pillar-check-list img {
-    width: 18px;
-    flex: 0 0 18px;
-    margin-top: 2px;
   }
 </style>
 {% endblock %}

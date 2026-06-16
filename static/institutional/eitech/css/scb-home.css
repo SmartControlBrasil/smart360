@@ -1,0 +1,85 @@
+/* Smart Control Brasil — contraste e legibilidade na home */
+
+.home-page .pillar-check-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.home-page .pillar-check-list img {
+  width: 18px;
+  flex: 0 0 18px;
+  margin-top: 2px;
+}
+
+/* Cards de soluções: texto claro sobre fundo roxo no hover/foco */
+.home-page .service1-section-area .service1-boxarea:hover,
+.home-page .service1-section-area .service1-boxarea:focus-within {
+  color: #ffffff;
+}
+
+.home-page .service1-section-area .service1-boxarea:hover > a,
+.home-page .service1-section-area .service1-boxarea:focus-within > a {
+  color: #ffffff;
+}
+
+.home-page .service1-section-area .service1-boxarea:hover p,
+.home-page .service1-section-area .service1-boxarea:focus-within p {
+  color: rgba(255, 255, 255, 0.86) !important;
+  opacity: 1 !important;
+}
+
+.home-page .service1-section-area .service1-boxarea:hover .pillar-check-list li,
+.home-page .service1-section-area .service1-boxarea:focus-within .pillar-check-list li {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* CTAs roxos dentro dos cards — texto e ícone sempre brancos */
+.home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2,
+.home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2 i {
+  color: #ffffff;
+}
+
+.home-page .service1-section-area .service1-boxarea:hover .btn-area1 a.vl-btn2,
+.home-page .service1-section-area .service1-boxarea:focus-within .btn-area1 a.vl-btn2,
+.home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2:hover,
+.home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2:focus-visible {
+  color: #ffffff;
+}
+
+.home-page .service1-section-area .service1-boxarea:hover .btn-area1 a.vl-btn2 i,
+.home-page .service1-section-area .service1-boxarea:focus-within .btn-area1 a.vl-btn2 i,
+.home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2:hover i,
+.home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2:focus-visible i {
+  color: #ffffff;
+}
+
+/* Cards do processo (case) — reforço de contraste no hover */
+.home-page .case1-section-area .card-boxarea .content-area:hover a,
+.home-page .case1-section-area .card-boxarea .content-area2:hover a,
+.home-page .case1-section-area .card-boxarea .content-area:focus-within a,
+.home-page .case1-section-area .card-boxarea .content-area2:focus-within a {
+  color: #ffffff;
+}
+
+.home-page .case1-section-area .card-boxarea .content-area:hover p,
+.home-page .case1-section-area .card-boxarea .content-area2:hover p,
+.home-page .case1-section-area .card-boxarea .content-area:focus-within p,
+.home-page .case1-section-area .card-boxarea .content-area2:focus-within p {
+  color: rgba(255, 255, 255, 0.86) !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 767.98px) {
+  .home-page .service1-section-area .service1-boxarea .btn-area1 a.vl-btn2 {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 18px;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+}

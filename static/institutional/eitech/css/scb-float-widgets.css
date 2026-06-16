@@ -57,10 +57,12 @@ a.whatsapp-floating-button i {
   top: auto !important;
   z-index: 950 !important;
   font-family: inherit;
+  overflow: visible !important;
 }
 
 .livia-chat-toggle {
   position: relative;
+  overflow: visible !important;
 }
 
 .livia-chat-panel {
@@ -97,12 +99,5 @@ a.whatsapp-floating-button i {
     left: max(18px, env(safe-area-inset-left)) !important;
     bottom: max(20px, env(safe-area-inset-bottom)) !important;
     z-index: 950 !important;
-  }
-
-  /* bolha Lívia um pouco mais compacta em telas estreitas */
-  .livia-chat-toggle {
-    min-height: 42px !important;
-    padding: 10px 14px !important;
-    font-size: 13px !important;
   }
 }

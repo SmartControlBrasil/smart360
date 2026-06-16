@@ -66,7 +66,7 @@ def _is_contact_spam(data):
 
 
 def home(request):
-    return render(request, "institutional/eitech/pages/home.html")
+    return render(request, "institutional/eitech/pages/index.html")
 
 
 def about(request):

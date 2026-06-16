@@ -37,6 +37,15 @@ class InstitutionalRoutesTests(SimpleTestCase):
                 response = self.client.get(reverse(route_name))
                 self.assertEqual(response.status_code, 200)
 
+    def test_home_uses_index_template_and_institutional_content(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "institutional/eitech/pages/index.html")
+        self.assertContains(response, "Smart Control Brasil")
+        self.assertNotContains(response, "em construção", status_code=200)
+        self.assertNotContains(response, "coming soon", status_code=200)
+
     def test_xyron_robotics_page_uses_partner_template(self):
         response = self.client.get(reverse("institutional:parceiro_xyron_robotics"))
 

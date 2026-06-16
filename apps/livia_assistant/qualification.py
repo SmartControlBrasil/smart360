@@ -103,6 +103,9 @@ INVALID_COMPANY_OR_CITY_SNIPPETS = (
 )
 
 
+from .technical_summary import detect_error_codes
+
+
 def _normalize(value) -> str:
     return str(value or "").strip().lower()
 
@@ -146,6 +149,8 @@ def _is_valid_name(value) -> bool:
     normalized = _normalize(strip_repetition_noise(value))
     if normalized in INVALID_GENERIC_VALUES:
         return False
+    if detect_error_codes(value):
+        return False
     if any(snippet in normalized for snippet in INVALID_NAME_SNIPPETS):
         return False
     if any(
@@ -168,6 +173,8 @@ def _is_valid_company_or_city(value) -> bool:
     cleaned = strip_repetition_noise(value)
     normalized = _normalize(cleaned)
     if normalized in INVALID_GENERIC_VALUES:
+        return False
+    if detect_error_codes(value):
         return False
     if any(snippet in normalized for snippet in INVALID_COMPANY_OR_CITY_SNIPPETS):
         return False

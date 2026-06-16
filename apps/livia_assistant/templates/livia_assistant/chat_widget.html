@@ -46,7 +46,7 @@
       alt="Lívia"
       class="livia-chat-avatar"
     />
-    {{ livia_chat_branding.toggle_label }}
+    <span class="livia-chat-toggle-label">{{ livia_chat_branding.toggle_label }}</span>
   </button>
 </div>
 
@@ -61,6 +61,7 @@
     top: auto !important;
     z-index: 950 !important;
     font-family: inherit;
+    overflow: visible;
   }
 
   .livia-chat-toggle,
@@ -71,17 +72,26 @@
     font-weight: 700;
   }
   .livia-chat-toggle {
-    display: flex;
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 12px 18px;
+    justify-content: flex-start;
+    height: 34px;
+    min-height: 34px;
+    min-width: 162px;
+    width: auto;
+    padding: 0 10px 0 58px;
     border-radius: 999px;
+    overflow: visible !important;
+    white-space: nowrap;
     background: #111827;
-    color: #fff;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1;
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    position: relative;
   }
   .livia-chat-toggle:hover,
   .livia-chat-toggle:focus {
@@ -90,13 +100,51 @@
     box-shadow: 0 18px 36px rgba(15, 23, 42, 0.3);
     outline: none;
   }
-  .livia-chat-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
+  .livia-chat-toggle-label {
+    position: relative;
+    z-index: 2;
+    line-height: 1;
+    color: #ffffff;
+    font-size: 0.7rem;
+    letter-spacing: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .livia-chat-toggle .livia-chat-avatar {
+    width: 54px !important;
+    height: 54px !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 999px !important;
     object-fit: cover;
-    display: block;
+    object-position: center center;
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    border: 2px solid #080d1a;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background: #080d1a;
     flex-shrink: 0;
+    display: block;
+    pointer-events: none;
+  }
+  .livia-chat-header .livia-chat-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    position: static;
+    transform: none;
+    border-radius: 999px !important;
+    object-fit: cover;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    flex-shrink: 0;
+    z-index: auto;
+    display: block;
   }
 
   .livia-chat-panel {
@@ -269,11 +317,25 @@
       bottom: max(20px, env(safe-area-inset-bottom)) !important;
       z-index: 950 !important;
     }
+  }
 
+  @media (max-width: 640px) {
     .livia-chat-toggle {
-      min-height: 42px !important;
-      padding: 10px 14px !important;
-      font-size: 13px !important;
+      height: 32px;
+      min-height: 32px;
+      min-width: 154px;
+      padding: 0 8px 0 54px !important;
+      font-size: 0.68rem;
+    }
+
+    .livia-chat-toggle .livia-chat-avatar {
+      width: 50px !important;
+      height: 50px !important;
+      left: -1px;
+    }
+
+    .livia-chat-toggle-label {
+      font-size: 0.68rem;
     }
   }
 </style>

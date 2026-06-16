@@ -69,6 +69,7 @@ def detect_equipment(corpus: str) -> tuple[str, str]:
     brand = _detect_brand(normalized)
 
     equipment_rules = (
+        ("ar-condicionado", ("ar condicionado", "ar-condicionado")),
         ("câmara frigorífica", ("câmara frigorífica",)),
         ("câmara climática", ("câmara climática",)),
         ("choque térmico", ("choque térmico",)),
@@ -107,6 +108,7 @@ def detect_symptom(corpus: str) -> tuple[str, bool]:
     normalized = normalize_technical_corpus(corpus)
 
     symptom_rules = (
+        ("erro E2", ("erro e2",)),
         ("acúmulo de gelo no ventilador", ("acúmulo de gelo", "gelo no ventilador")),
         ("disjuntor desarmando", ("disjuntor desarmando",)),
         ("erro low pressure", ("low pressure",)),
@@ -191,6 +193,8 @@ def _symptom_clause(context: TechnicalContext, corpus: str) -> str:
     has_low_pressure = "low pressure" in normalized
     has_no_gela = "não gela" in normalized
 
+    if context.symptom == "erro E2":
+        return " com erro E2"
     if context.symptom == "acúmulo de gelo no ventilador":
         return " com acúmulo de gelo no ventilador"
     if context.symptom == "disjuntor desarmando":

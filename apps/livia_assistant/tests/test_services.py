@@ -259,8 +259,82 @@ class LiviaAssistantServiceTests(TestCase):
                 LiviaLeadCapture(name="Valmir", company="Arteb", city="", phone="1145784512", email="")
             )
         )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(
+                    name="",
+                    company="Eu nao falei meu nome",
+                    city="Osasco",
+                    phone="1145784512",
+                    email="a@b.com",
+                )
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(
+                    name="Valmir",
+                    company="Arteb",
+                    city="um ar condicionado",
+                    phone="1145784512",
+                    email="a@b.com",
+                )
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(
+                    name="Valmir",
+                    company="Arteb",
+                    city="erro E2",
+                    phone="1145784512",
+                    email="a@b.com",
+                )
+            )
+        )
+        self.assertFalse(
+            is_lead_ready_for_notification(
+                LiviaLeadCapture(name="", company="", city="", phone="1145784512", email="a@b.com")
+            )
+        )
 
-    def test_build_lead_collection_reply_with_name_and_phone_asks_next_missing_field(self):
+    def test_extract_lead_data_rejects_equipment_phrases_as_city(self):
+        conversation = self.service.get_or_create_conversation(session_key="reject-equipment-city")
+        extracted = self.service.extract_lead_data(
+            "estou com problema em um ar condicionado",
+            conversation=conversation,
+        )
+        self.assertEqual(extracted["city"], "")
+
+    def test_extract_lead_data_rejects_denial_phrases_as_company(self):
+        conversation = self.service.get_or_create_conversation(session_key="reject-denial-company")
+        LiviaLeadCapture.objects.create(conversation=conversation, name="Teste")
+        last_assistant = LiviaMessage.objects.create(
+            conversation=conversation,
+            role=LiviaMessage.Role.ASSISTANT,
+            content="Agora preciso do nome da empresa, por favor.",
+        )
+        extracted = self.service.extract_lead_data(
+            "Eu nao falei meu nome",
+            conversation=conversation,
+        )
+        self.assertEqual(extracted["company"], "")
+
+    def test_build_technical_service_summary_air_conditioner_e2(self):
+        summary = build_technical_service_summary(
+            raw_corpus="estou com problema em um ar condicionado erro E2",
+            city="",
+        )
+        self.assertIn("ar-condicionado", summary.lower())
+        self.assertIn("e2", summary.lower())
+        self.assertNotIn("duno", summary.lower())
+
+        summary_with_city = build_technical_service_summary(
+            raw_corpus="estou com problema em um ar condicionado erro E2",
+            city="Cotia",
+        )
+        self.assertIn("Cotia", summary_with_city)
+        self.assertIn("ar-condicionado", summary_with_city.lower())
         from apps.livia_assistant.integrations import build_lead_collection_reply
 
         messages = [

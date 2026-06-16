@@ -1094,3 +1094,118 @@ class LiviaChatEndpointTests(TestCase):
         history = (capture.crm_reference or {}).get("technical_history", [])
         self.assertTrue(any("camara frigorifica" in item.lower() for item in history))
         self.assertTrue(last_response.json()["lead_registered"])
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_lead_cycle_isolation_after_duno_lead_air_conditioner_e2(self):
+        mail.outbox.clear()
+        session_key = "isolation-duno-to-air-conditioner-e2"
+        url = reverse("livia_assistant:chat")
+
+        first_cycle = [
+            "quero um robô Duno para limpeza em supermercado",
+            "quero atendimento",
+            "Marcelo",
+            "Smart Control",
+            "Osasco",
+            "11999999999",
+            "marcelo@teste.com",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        first_lead = (
+            LiviaLeadCapture.objects.filter(conversation__session_key=session_key)
+            .order_by("created_at", "id")
+            .first()
+        )
+        self.assertIsNotNone(first_lead)
+        self.assertTrue(first_lead.is_qualified)
+        self.assertEqual(first_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+
+        last_reply = ""
+        second_cycle = [
+            "estou com problema em um ar condicionado",
+            "erro E2",
+            "quero atendimento",
+            "11987654321",
+            "Digitalcold1@gmail.com",
+        ]
+        for message in second_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+            last_reply = response.json()["reply"].lower()
+
+        captures = list(
+            LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("created_at", "id")
+        )
+        self.assertGreaterEqual(len(captures), 2)
+        new_lead = captures[-1]
+
+        self.assertFalse(new_lead.is_qualified)
+        self.assertNotEqual(new_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+        self.assertNotEqual((new_lead.name or "").lower(), "marcelo")
+        self.assertNotEqual((new_lead.company or "").lower(), "eu nao falei meu nome")
+        self.assertNotEqual((new_lead.city or "").lower(), "um ar condicionado")
+
+        notes = (new_lead.notes or new_lead.service_interest or "").lower()
+        self.assertNotIn("duno", notes)
+        self.assertTrue("ar condicionado" in notes or "ar-condicionado" in notes, msg=notes)
+        self.assertIn("e2", notes)
+
+        self.assertTrue(
+            any(marker in last_reply for marker in ("como posso te chamar", "nome da empresa", "em qual cidade")),
+            msg=last_reply,
+        )
+        self.assertFalse(response.json()["lead_registered"])
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_air_conditioner_e2_full_flow_qualifies_without_duno_contamination(self):
+        mail.outbox.clear()
+        session_key = "air-conditioner-e2-full-flow"
+        url = reverse("livia_assistant:chat")
+
+        flow = [
+            "estou com problema em um ar condicionado",
+            "erro E2",
+            "quero atendimento",
+            "João",
+            "Digital Cold",
+            "Cotia",
+            "11987654321",
+            "joao@digitalcold.com.br",
+        ]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+
+        capture = (
+            LiviaLeadCapture.objects.filter(conversation__session_key=session_key)
+            .order_by("-created_at", "-id")
+            .first()
+        )
+        self.assertIsNotNone(capture)
+        self.assertTrue(capture.is_qualified)
+        self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+        self.assertEqual(capture.name.lower(), "joão")
+        self.assertEqual(capture.company.lower(), "digital cold")
+        self.assertEqual(capture.city.lower(), "cotia")
+
+        notes = (capture.notes or capture.service_interest or "").lower()
+        self.assertTrue("ar condicionado" in notes or "ar-condicionado" in notes, msg=notes)
+        self.assertIn("e2", notes)
+        self.assertNotIn("duno", notes)
+        self.assertTrue(last_response.json()["lead_registered"])

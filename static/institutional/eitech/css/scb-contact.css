@@ -1,0 +1,16 @@
+/* Smart Control Brasil — formulário de contato / diagnóstico */
+
+.contact-diagnostic-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+.contact-diagnostic-mini {
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}

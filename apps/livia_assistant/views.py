@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import LiviaChatForm
-from .integrations import is_clear_technical_issue, is_lead_capture_intent, is_web_system_project_text
+from .integrations import is_clear_technical_issue, is_lead_capture_intent, is_lead_data_message, is_web_system_project_text
 from .models import LiviaLeadCapture, LiviaMessage
 from .services import LiviaAssistantService
 
@@ -64,9 +64,7 @@ def chat(request):
         collecting_lead = False
         locked_lead = locked_lead or service.get_locked_lead_capture(conversation)
     else:
-        collecting_lead = service.is_lead_collection_active(conversation)
-        if not collecting_lead and locked_lead is None:
-            collecting_lead = service.should_collect_explicit_contact_message(message)
+        collecting_lead = service.should_start_contact_collection(conversation, message)
     if notified_commercial_append:
         collecting_lead = False
         locked_lead = locked_lead or service.get_locked_lead_capture(conversation)
@@ -101,7 +99,10 @@ def chat(request):
     if updating_lead:
         extracted_data = service.extract_lead_data(message, conversation=conversation)
         if not collecting_lead:
-            extracted_data = service.extract_notes_only_lead_data(extracted_data)
+            if service.needs_consultative_discovery_for_conversation(conversation, message) and is_lead_data_message(message):
+                extracted_data = service.extract_spontaneous_contact_data(extracted_data)
+            else:
+                extracted_data = service.extract_notes_only_lead_data(extracted_data)
         if locked_lead is not None and not new_commercial_cycle:
             extracted_data = service.apply_post_qualified_expected_field(extracted_data, message, conversation)
         target_conversation = locked_lead.conversation if locked_lead is not None else conversation
@@ -156,7 +157,8 @@ def chat(request):
         and collecting_lead
     )
     is_technical = is_clear_technical_issue(service._normalize(message))
-    prefer_provider_reply = is_technical and not collecting_lead and not starting_new_lead
+    discovery_pending = service.needs_consultative_discovery_for_conversation(conversation, message)
+    prefer_provider_reply = (is_technical or discovery_pending) and not collecting_lead and not starting_new_lead
     post_qualified_collection = (
         collecting_lead and locked_lead is not None and not new_commercial_cycle
     )

@@ -191,6 +191,39 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_spontaneous_phone_during_warehouse_discovery_is_saved_without_notification(self):
+        mail.outbox.clear()
+        session_key = "warehouse-discovery-spontaneous-phone"
+        url = reverse("livia_assistant:chat")
+
+        first = self.client.post(
+            url,
+            data=json.dumps(
+                {
+                    "message": "preciso de um sistema para meu deposito de materiais de construção",
+                    "session_key": session_key,
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(first.status_code, 200)
+        self.assertNotIn("como posso te chamar", first.json()["reply"].lower())
+
+        second = self.client.post(
+            url,
+            data=json.dumps({"message": "11988887766", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(second.status_code, 200)
+        self.assertFalse(second.json()["lead_registered"])
+        self.assertEqual(len(mail.outbox), 0)
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).first()
+        self.assertIsNotNone(capture)
+        self.assertEqual(capture.phone, "11988887766")
+        self.assertFalse(capture.is_qualified)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_web_system_quote_intent_starts_lead_collection(self):
         session_key = "web-system-quote-starts-lead"
         response = self.client.post(

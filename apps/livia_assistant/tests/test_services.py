@@ -1137,6 +1137,54 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_open_warehouse_system_need_starts_consultative_discovery_not_contact_collection(self):
+        conversation = self.service.get_or_create_conversation(session_key="warehouse-discovery-first")
+        text = "preciso de um sistema para meu deposito de materiais de construção"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+
+        self.assertNotIn("como posso te chamar", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
+        self.assertNotIn("e-mail", lowered)
+        self.assertTrue(
+            any(term in lowered for term in ("estoque", "pedidos", "entregas", "planilha", "depósito", "deposito")),
+            msg=response.reply,
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_warehouse_discovery_starts_contact_collection_after_two_substantive_answers(self):
+        conversation = self.service.get_or_create_conversation(session_key="warehouse-discovery-complete")
+        opening = "preciso de um sistema para meu deposito de materiais de construção"
+        self.service.register_user_message(conversation, opening)
+        first = self.service.generate_response(conversation, opening)
+        self.assertNotIn("como posso te chamar", first.reply.lower())
+
+        followups = [
+            "hoje a maior dor é controlar estoque e pedidos do depósito",
+            "somos 8 pessoas no dia a dia e precisamos acessar pelo celular e computador",
+        ]
+        last_response = first
+        for message in followups:
+            self.service.register_user_message(conversation, message)
+            last_response = self.service.generate_response(conversation, message)
+
+        lowered = last_response.reply.lower()
+        self.assertIn("como posso te chamar", lowered)
+        self.assertIn("registrar seu atendimento", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_explicit_budget_for_warehouse_system_starts_contact_collection(self):
+        conversation = self.service.get_or_create_conversation(session_key="warehouse-budget-intent")
+        text = "quero orçamento para um sistema para meu depósito"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+
+        self.assertIn("como posso te chamar", lowered)
+        self.assertNotIn("telefone/whatsapp", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_commercial_intent_maquina_parada_requests_lead_data(self):
         conversation = self.service.get_or_create_conversation(session_key="lead-intent-maquina-parada")
         text = "minha máquina está parada"

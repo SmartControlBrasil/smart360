@@ -9,8 +9,13 @@ logger = logging.getLogger(__name__)
 from django.db import transaction
 
 from .crm_bridge import LiviaCRMBridge
+from .discovery import (
+    conversation_has_open_solution_need,
+    discovery_minimum_met,
+    needs_consultative_discovery,
+)
 from .lead_extractor import extract_lead_data as universal_extract_lead_data
-from .lead_state import LeadState, field_for_state, normalize_state, resolve_state
+from .lead_state import LeadState, LeadStateSnapshot, field_for_state, normalize_state, resolve_state
 from .integrations import (
     SERVICE_KEYWORDS,
     get_livia_ai_client,
@@ -121,7 +126,11 @@ class LiviaAssistantService:
 
     def generate_response(self, conversation, user_text):
         normalized = self._normalize(user_text)
-        lead_detected = self.detect_lead_intent(user_text) or self.is_lead_collection_active(conversation)
+        lead_detected = (
+            self.detect_lead_intent(user_text)
+            or self.is_lead_collection_active(conversation)
+            or self._should_resume_lead_capture_after_discovery(conversation)
+        )
         handoff_recommended = is_real_emergency(normalized)
         service_interest = self._detect_service_interest(normalized)
         history = self._build_recent_messages(conversation)
@@ -172,6 +181,33 @@ class LiviaAssistantService:
         normalized = self._normalize(message)
         return is_lead_data_message(message) or is_lead_capture_intent(normalized)
 
+    def needs_consultative_discovery_for_conversation(self, conversation, message=""):
+        messages = self._build_recent_messages(conversation)
+        normalized = self._normalize(message)
+        locked_lead = self.get_locked_lead_capture(conversation)
+        return needs_consultative_discovery(
+            messages,
+            normalized,
+            qualified_cycle_locked=bool(locked_lead),
+        )
+
+    def should_start_contact_collection(self, conversation, message):
+        if self.needs_consultative_discovery_for_conversation(conversation, message):
+            return False
+        if self._should_resume_lead_capture_after_discovery(conversation):
+            return True
+        if self.should_capture_post_qualified_update_for_conversation(message, conversation):
+            return True
+        if self.is_lead_collection_active(conversation):
+            return True
+        return self.should_collect_explicit_contact_message(message)
+
+    def _should_resume_lead_capture_after_discovery(self, conversation):
+        if self.get_locked_lead_capture(conversation):
+            return False
+        messages = self._build_recent_messages(conversation)
+        return conversation_has_open_solution_need(messages) and discovery_minimum_met(messages)
+
     def should_update_lead_capture(self, conversation, message):
         if self.detect_lead_intent(message) or self.is_lead_collection_active(conversation):
             return True
@@ -183,6 +219,14 @@ class LiviaAssistantService:
         for field in ("name", "email", "phone", "company", "city"):
             notes_only[field] = ""
         return notes_only
+
+    def extract_spontaneous_contact_data(self, extracted_data):
+        spontaneous = self.extract_notes_only_lead_data(extracted_data)
+        for field in ("name", "email", "phone", "company", "city"):
+            value = (extracted_data.get(field) or "").strip()
+            if value:
+                spontaneous[field] = value
+        return spontaneous
 
     def detect_lead_intent(self, text):
         normalized = self._normalize(text)
@@ -517,6 +561,17 @@ class LiviaAssistantService:
             return f"O e-mail {invalid_value} parece estar fora do formato. Pode confirmar o endereço correto, por favor?"
 
         snapshot = self._current_state_snapshot(lead, conversation=lead.conversation)
+        if snapshot.state == LeadState.DISCOVERY:
+            from .discovery import build_consultative_discovery_reply
+
+            messages = self._build_recent_messages(lead.conversation)
+            last_user = (
+                lead.conversation.messages.filter(role=LiviaMessage.Role.USER)
+                .order_by("-created_at", "-id")
+                .first()
+            )
+            normalized = self._normalize(last_user.content if last_user else "")
+            return build_consultative_discovery_reply(normalized, messages)
         if snapshot.state == LeadState.COLLECT_NAME:
             return self._build_collect_name_reply(lead)
         if snapshot.state == LeadState.COLLECT_COMPANY:
@@ -782,6 +837,10 @@ class LiviaAssistantService:
             "avaliacao",
             "avaliação",
             "contrato",
+            "problema",
+            "parou",
+            "equipamennto",
+            "equipamento",
         )
         return any(term in normalized for term in technical_terms)
 
@@ -1093,6 +1152,8 @@ class LiviaAssistantService:
         return any(marker in normalized for marker in new_cycle_markers)
 
     def is_lead_collection_active(self, conversation):
+        if self.needs_consultative_discovery_for_conversation(conversation):
+            return False
         lead = self._get_active_lead_capture(conversation)
         if lead is None:
             return bool(self._expected_lead_field(conversation))
@@ -1361,6 +1422,9 @@ class LiviaAssistantService:
         return False
 
     def _current_state_snapshot(self, lead, conversation=None):
+        target_conversation = conversation or lead.conversation
+        if self.needs_consultative_discovery_for_conversation(target_conversation):
+            return LeadStateSnapshot(state=LeadState.DISCOVERY, next_field="", is_terminal=False)
         return resolve_state(
             has_intent=True,
             has_name=has_valid_name_field(lead),

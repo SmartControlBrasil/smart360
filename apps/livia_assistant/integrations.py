@@ -7,6 +7,14 @@ from types import SimpleNamespace
 
 from django.conf import settings
 
+from .discovery import (
+    build_consultative_discovery_reply,
+    build_discovery_to_collection_handoff,
+    conversation_has_open_solution_need,
+    discovery_minimum_met,
+    needs_consultative_discovery,
+)
+
 from .qualification import (
     _is_valid_company_or_city,
     _is_valid_email,
@@ -166,6 +174,14 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if continuation_reply:
             return continuation_reply
 
+        qualified_cycle_locked = bool((context or {}).get("qualified_cycle_locked"))
+        if needs_consultative_discovery(
+            messages,
+            normalized,
+            qualified_cycle_locked=qualified_cycle_locked,
+        ):
+            return build_consultative_discovery_reply(normalized, messages)
+
         if _is_locality_question(normalized) or _is_visit_request(normalized):
             return build_lead_collection_reply(normalized, messages, service_interest)
 
@@ -189,7 +205,11 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if is_maintenance_question(normalized) and not lead_detected:
             return build_maintenance_answer(normalized, knowledge_context)
 
-        if lead_detected:
+        if lead_detected or (
+            discovery_minimum_met(messages)
+            and conversation_has_open_solution_need(messages)
+            and not bool((context or {}).get("qualified_cycle_locked"))
+        ):
             return build_lead_collection_reply(normalized, messages, service_interest)
 
         if _asks_for_price(normalized):
@@ -902,6 +922,11 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
             "Podemos avaliar uma visita técnica, sim. Antes de agendar, primeiro alinhamos o cenário e a equipe confirma a melhor forma de atendimento. "
             f"{question}"
         )
+
+    if discovery_minimum_met(messages):
+        handoff = build_discovery_to_collection_handoff(normalized_text, messages)
+        if handoff:
+            return f"{handoff}{question}"
 
     if _is_first_commercial_without_explicit_data(normalized_text, messages):
         preface = build_lead_intent_preface(normalized_text, service_context)

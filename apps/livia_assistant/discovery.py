@@ -4,6 +4,110 @@ import re
 import unicodedata
 
 MIN_DISCOVERY_ANSWERS = 2
+MIN_GENERIC_DIGITAL_DISCOVERY_ANSWERS = 4
+MIN_FOOD_DELIVERY_FUNCTIONAL_AREAS = 4
+
+DIGITAL_PRODUCT_MARKERS = (
+    "aplicativo",
+    "app mobile",
+    " mobile",
+    "moveis",
+    "móveis",
+    "plataforma",
+    "saas",
+    "delivery",
+    "cardapio",
+    "cardápio",
+    "tablet",
+    "portal",
+    "e-commerce",
+    "ecommerce",
+    "sistema web",
+    "sistema de entrega",
+    "app de",
+    "software sob medida",
+)
+
+FOOD_DELIVERY_FUNCTIONAL_CHECKS = {
+    "order_channel": (
+        "app",
+        "site",
+        "tablet",
+        "whatsapp",
+        "telefone",
+        "balcao",
+        "balcão",
+        "celular",
+        "web",
+    ),
+    "delivery_model": (
+        "entregador",
+        "motoboy",
+        "terceiro",
+        "terceiriz",
+        "proprio",
+        "próprio",
+        "proprios",
+        "próprios",
+        "parceiro",
+        "ifood",
+        "rappi",
+    ),
+    "payment": (
+        "pagamento",
+        "pix",
+        "cartao",
+        "cartão",
+        "online",
+        "credito",
+        "crédito",
+        "debito",
+        "débito",
+    ),
+    "scale": (
+        "unidade",
+        "loja",
+        "lojas",
+        "rede",
+        "franquia",
+        "estabelecimento",
+        "pizzaria",
+        "pizzarias",
+        "restaurante",
+    ),
+    "admin_features": (
+        "painel",
+        "administrativo",
+        "cardapio",
+        "cardápio",
+        "produtos",
+        "status do pedido",
+        "status dos pedidos",
+    ),
+}
+
+FOOD_DELIVERY_DISCOVERY_QUESTIONS = {
+    "business_model": (
+        "Para entrega de alimentos, normalmente o sistema precisa controlar pedidos, clientes, entregadores, "
+        "status da entrega, taxas e painel administrativo. Hoje você quer algo para uso interno do seu negócio "
+        "ou uma plataforma para vários estabelecimentos?"
+    ),
+    "order_channel": (
+        "O pedido será feito por app, site, tablet interno na loja ou uma combinação desses canais?"
+    ),
+    "delivery_model": (
+        "A entrega será feita por entregadores próprios, terceiros ou ambos?"
+    ),
+    "payment": (
+        "Você precisa de pagamento online integrado ou só controle operacional dos pedidos?"
+    ),
+    "scale": (
+        "Quantas unidades ou lojas entram nessa primeira fase?"
+    ),
+    "admin_features": (
+        "Você precisa de painel administrativo com cardápio, produtos e status dos pedidos em tempo real?"
+    ),
+}
 
 EXPLICIT_FORWARDING_TERMS = (
     "quero orcamento",
@@ -193,8 +297,183 @@ def count_substantive_discovery_answers(messages) -> int:
     return count
 
 
-def discovery_minimum_met(messages) -> bool:
-    return count_substantive_discovery_answers(messages) >= MIN_DISCOVERY_ANSWERS
+def is_digital_product_context(normalized_text: str, messages) -> bool:
+    corpus = _normalize(_conversation_text(messages, normalized_text))
+    if any(marker in corpus for marker in DIGITAL_PRODUCT_MARKERS):
+        return True
+    if _is_food_delivery_context(normalized_text, messages):
+        return True
+    helpers = _integration_helpers()
+    if helpers["is_web_system_project_text"](corpus):
+        return True
+    if _is_mobile_app_context(normalized_text, messages):
+        return True
+    return False
+
+
+def _is_mobile_app_context(normalized_text: str, messages) -> bool:
+    corpus = _normalize(_conversation_text(messages, normalized_text))
+    return any(
+        term in corpus
+        for term in (
+            "aplicativo",
+            "aplicativos",
+            "app mobile",
+            "mobile",
+            "moveis",
+            "móveis",
+        )
+    )
+
+
+def _has_discovery_dimension(corpus: str, dimension: str) -> bool:
+    if dimension == "system_type":
+        return any(
+            term in corpus
+            for term in ("sistema", "app", "aplicativo", "plataforma", "software", "delivery", "portal")
+        )
+    if dimension == "business_context":
+        return any(
+            term in corpus
+            for term in (
+                "pizzaria",
+                "pizzarias",
+                "restaurante",
+                "lanchonete",
+                "empresa",
+                "rede",
+                "loja",
+                "lojas",
+                "negocio",
+                "negócio",
+                "franquia",
+                "estabelecimento",
+            )
+        )
+    if dimension == "primary_objective":
+        return any(
+            term in corpus
+            for term in (
+                "entrega",
+                "cardapio",
+                "cardápio",
+                "automatiz",
+                "pedido",
+                "pedidos",
+                "vendas",
+                "gestao",
+                "gestão",
+                "operacao",
+                "operação",
+                "tablet",
+            )
+        )
+    return False
+
+
+def _food_delivery_functional_coverage(corpus: str) -> dict[str, bool]:
+    return {
+        area: any(term in corpus for term in terms)
+        for area, terms in FOOD_DELIVERY_FUNCTIONAL_CHECKS.items()
+    }
+
+
+def _count_food_delivery_functional_areas(corpus: str) -> int:
+    return sum(1 for covered in _food_delivery_functional_coverage(corpus).values() if covered)
+
+
+def _has_rich_digital_business_context(corpus: str) -> bool:
+    rich_markers = (
+        "rede de",
+        "pequena rede",
+        "franquia",
+        "varias lojas",
+        "várias lojas",
+        "entrega automatizada",
+        "cardapio no tablet",
+        "cardápio no tablet",
+    )
+    business_markers = ("pizzaria", "pizzarias", "restaurante", "lanchonete", "hamburgueria", "padaria")
+    has_business = any(marker in corpus for marker in business_markers)
+    has_rich = any(marker in corpus for marker in rich_markers)
+    return has_business and has_rich
+
+
+def _pick_food_delivery_discovery_question(corpus: str) -> str:
+    coverage = _food_delivery_functional_coverage(corpus)
+    priority = ("delivery_model", "payment", "scale", "admin_features", "order_channel", "business_model")
+    for area in priority:
+        if area == "business_model" and coverage.get("scale"):
+            continue
+        if not coverage.get(area, False):
+            return FOOD_DELIVERY_DISCOVERY_QUESTIONS[area]
+    return FOOD_DELIVERY_DISCOVERY_QUESTIONS["delivery_model"]
+
+
+def has_minimum_digital_product_discovery(messages, normalized_text: str = "") -> bool:
+    corpus = _normalize(_conversation_text(messages, normalized_text))
+    if not is_digital_product_context(normalized_text, messages):
+        return count_substantive_discovery_answers(messages) >= MIN_DISCOVERY_ANSWERS
+
+    required_dimensions = ("system_type", "business_context", "primary_objective")
+    if not all(_has_discovery_dimension(corpus, dimension) for dimension in required_dimensions):
+        return False
+
+    if _is_food_delivery_context(normalized_text, messages):
+        coverage = _food_delivery_functional_coverage(corpus)
+        mandatory_areas = ("delivery_model", "payment", "scale", "admin_features")
+        if not all(coverage.get(area) for area in mandatory_areas):
+            return False
+        return _count_food_delivery_functional_areas(corpus) >= MIN_FOOD_DELIVERY_FUNCTIONAL_AREAS
+
+    if _is_mobile_app_context(normalized_text, messages):
+        return count_substantive_discovery_answers(messages) >= MIN_GENERIC_DIGITAL_DISCOVERY_ANSWERS
+
+    helpers = _integration_helpers()
+    if helpers["is_web_system_project_text"](corpus) or helpers["_is_logistics_web_context"](corpus):
+        return count_substantive_discovery_answers(messages) >= MIN_GENERIC_DIGITAL_DISCOVERY_ANSWERS
+
+    return count_substantive_discovery_answers(messages) >= MIN_GENERIC_DIGITAL_DISCOVERY_ANSWERS
+
+
+def build_digital_product_interest_summary(normalized_text: str) -> str:
+    corpus = _normalize(normalized_text)
+    if not is_digital_product_context(corpus, [{"role": "user", "content": corpus}]):
+        return ""
+
+    if _is_food_delivery_context(corpus, [{"role": "user", "content": corpus}]):
+        features: list[str] = []
+        if any(term in corpus for term in ("entrega", "delivery", "delivery de comida")):
+            features.append("delivery de comida")
+        if any(term in corpus for term in ("cardapio", "cardápio", "tablet")):
+            features.append("cardápio em tablet")
+        if any(term in corpus for term in ("app", "aplicativo", "mobile", "moveis", "móveis")):
+            features.append("aplicativo")
+
+        business = "o negócio"
+        if "rede de pizzarias" in corpus or ("rede" in corpus and "pizzaria" in corpus):
+            business = "uma pequena rede de pizzarias"
+        elif "pizzaria" in corpus or "pizzarias" in corpus:
+            business = "pizzaria"
+        elif "restaurante" in corpus:
+            business = "restaurante"
+
+        feature_text = " e ".join(features) if features else "operação digital"
+        return f"sistema/app para {feature_text} para {business}"
+
+    if _is_mobile_app_context(corpus, [{"role": "user", "content": corpus}]):
+        return "desenvolvimento de aplicativo mobile sob medida"
+
+    return ""
+
+
+def discovery_minimum_met(messages, normalized_text: str = "") -> bool:
+    if not normalized_text:
+        for message in reversed(messages or []):
+            if message.get("role") == "user":
+                normalized_text = _normalize(message.get("content") or "")
+                break
+    return has_minimum_digital_product_discovery(messages, normalized_text)
 
 
 def needs_consultative_discovery(
@@ -214,7 +493,7 @@ def needs_consultative_discovery(
         return False
     if not conversation_has_open_solution_need(messages):
         return False
-    return not discovery_minimum_met(messages)
+    return not discovery_minimum_met(messages, normalized_text)
 
 
 def _is_warehouse_context(normalized_text: str, messages) -> bool:
@@ -242,9 +521,13 @@ def _is_food_delivery_context(normalized_text: str, messages) -> bool:
             "entrega de alimentos",
             "entrega de comida",
             "delivery de alimentos",
+            "delivery de comida",
+            "sistema de entrega",
             "entregadores",
             "restaurante",
             "lanchonete",
+            "pizzaria",
+            "pizzarias",
             "ifood",
             "cardapio",
             "cardápio",
@@ -253,12 +536,7 @@ def _is_food_delivery_context(normalized_text: str, messages) -> bool:
 
 
 def _food_delivery_discovery_questions() -> tuple[str, ...]:
-    return (
-        "Para entrega de alimentos, normalmente o sistema precisa controlar pedidos, clientes, entregadores, status da entrega, taxas e painel administrativo. Hoje você quer algo para uso interno do seu negócio ou uma plataforma para vários estabelecimentos?",
-        "Hoje os pedidos chegam por WhatsApp, telefone, app próprio ou de forma manual?",
-        "Você precisa acompanhar entregadores em tempo real e calcular taxa por bairro ou distância?",
-        "O acesso precisa ser pelo celular, computador ou ambos?",
-    )
+    return tuple(FOOD_DELIVERY_DISCOVERY_QUESTIONS.values())
 
 
 def _warehouse_discovery_questions() -> tuple[str, ...]:
@@ -291,13 +569,32 @@ def _generic_solution_discovery_questions() -> tuple[str, ...]:
 def build_consultative_discovery_reply(normalized_text: str, messages) -> str:
     helpers = _integration_helpers()
     normalized = _normalize(normalized_text)
+    corpus = _normalize(_conversation_text(messages, normalized))
     answer_count = count_substantive_discovery_answers(messages)
     is_food_delivery = _is_food_delivery_context(normalized, messages)
+    is_mobile_app = _is_mobile_app_context(normalized, messages)
 
     if is_food_delivery:
-        questions = _food_delivery_discovery_questions()
-        intro = "Entendi. "
-    elif _is_warehouse_context(normalized, messages):
+        question = _pick_food_delivery_discovery_question(corpus)
+        if _has_rich_digital_business_context(corpus):
+            return f"Ótimo, isso já ajuda bastante a entender a operação. {question}"
+        if answer_count == 0:
+            return question
+        acknowledgements = (
+            "Perfeito, isso ajuda bastante. ",
+            "Ótimo, estou entendendo melhor a operação. ",
+            "Certo, com esse contexto já consigo avançar. ",
+        )
+        ack = acknowledgements[min(answer_count - 1, len(acknowledgements) - 1)]
+        return f"{ack}{question}"
+
+    if is_mobile_app and answer_count == 0:
+        return (
+            "Sim, desenvolvemos aplicativos mobile e sistemas web integrados sob medida. "
+            "Qual seria a finalidade principal do app: vendas, entregas, atendimento, operação interna ou outro processo?"
+        )
+
+    if _is_warehouse_context(normalized, messages):
         questions = _warehouse_discovery_questions()
         intro = (
             "Entendi. Um sistema para o depósito pode organizar estoque, movimentações e operação com muito mais controle. "
@@ -311,8 +608,6 @@ def build_consultative_discovery_reply(normalized_text: str, messages) -> str:
 
     question_index = min(answer_count, len(questions) - 1)
     if answer_count == 0:
-        if is_food_delivery:
-            return questions[0]
         return f"{intro}{questions[0]}"
     acknowledgements = (
         "Perfeito, isso ajuda bastante. ",
@@ -327,6 +622,12 @@ def build_discovery_to_collection_handoff(normalized_text: str, messages) -> str
     helpers = _integration_helpers()
     normalized = _normalize(normalized_text)
     corpus = _normalize(_conversation_text(messages, normalized))
+    digital_summary = build_digital_product_interest_summary(corpus)
+    if digital_summary:
+        return (
+            f"Entendi. Temos um bom ponto de partida para {digital_summary}. "
+            "Para nossa equipe avaliar melhor, posso registrar seu atendimento? "
+        )
     if _is_warehouse_context(normalized, messages):
         return (
             "Entendi. Isso já dá para desenhar como um sistema web sob medida para gestão do depósito. "

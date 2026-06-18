@@ -62,6 +62,13 @@ INVALID_NAME_SNIPPETS = (
     "periodo noturno",
     "período noturno",
     "noturno",
+    "entregador",
+    "entregadores",
+    "pagamento",
+    "cardapio",
+    "cardápio",
+    "pizzaria",
+    "pizzarias",
 )
 
 INVALID_COMPANY_OR_CITY_SNIPPETS = (

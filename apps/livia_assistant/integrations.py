@@ -10,6 +10,7 @@ from django.conf import settings
 from .discovery import (
     build_consultative_discovery_reply,
     build_discovery_to_collection_handoff,
+    build_digital_product_interest_summary,
     conversation_has_open_solution_need,
     discovery_minimum_met,
     needs_consultative_discovery,
@@ -186,12 +187,16 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if _is_web_system_capability_question(normalized):
             return build_web_system_capability_answer(normalized, messages)
 
+        if _is_mobile_app_capability_question(normalized):
+            return build_mobile_app_capability_answer(normalized, messages)
+
         qualified_cycle_locked = bool((context or {}).get("qualified_cycle_locked"))
-        if needs_consultative_discovery(
+        discovery_active = needs_consultative_discovery(
             messages,
             normalized,
             qualified_cycle_locked=qualified_cycle_locked,
-        ):
+        )
+        if discovery_active:
             return build_consultative_discovery_reply(normalized, messages)
 
         if _is_locality_question(normalized) or _is_visit_request(normalized):
@@ -200,8 +205,6 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if _should_continue_lead_collection(normalized, messages):
             return build_lead_collection_reply(normalized, messages, service_interest)
 
-        # Quando há intenção explícita de produto, a resposta de conhecimento
-        # deve vencer o enquadramento comercial por palavras como "academia".
         recent_product = str((context or {}).get("recent_product") or "").strip().lower()
         if knowledge_context:
             product_reply = _reply_from_knowledge(knowledge_context, normalized, recent_product=recent_product)
@@ -218,11 +221,11 @@ class FallbackLiviaAIClient(LiviaAIClient):
             return build_maintenance_answer(normalized, knowledge_context)
 
         if lead_detected or (
-            discovery_minimum_met(messages)
+            discovery_minimum_met(messages, normalized)
             and conversation_has_open_solution_need(messages)
-            and not bool((context or {}).get("qualified_cycle_locked"))
+            and not qualified_cycle_locked
         ):
-            if not bool((context or {}).get("conversation_already_notified")):
+            if not discovery_active and not bool((context or {}).get("conversation_already_notified")):
                 return build_lead_collection_reply(normalized, messages, service_interest)
 
         if _asks_for_price(normalized):
@@ -846,6 +849,32 @@ def build_web_system_price_answer():
     )
 
 
+def _is_mobile_app_capability_question(normalized_text):
+    return any(
+        term in normalized_text
+        for term in (
+            "aplicativos moveis",
+            "aplicativos móveis",
+            "aplicativo mobile",
+            "app mobile",
+            "trabalham com aplicativos",
+            "trabalha com aplicativos",
+            "fazem aplicativos",
+            "fazem app",
+            "desenvolvem aplicativos",
+            "desenvolvem app",
+        )
+    )
+
+
+def build_mobile_app_capability_answer(normalized_text, messages):
+    del normalized_text, messages
+    return (
+        "Sim, desenvolvemos aplicativos mobile e sistemas web integrados sob medida para a operação do cliente. "
+        "Qual seria a finalidade principal do app: vendas, entregas, atendimento, operação interna ou outro processo?"
+    )
+
+
 def _is_web_system_capability_question(normalized_text):
     if any(
         term in normalized_text
@@ -891,6 +920,10 @@ def _has_ai_term(normalized_text):
 
 
 def web_system_interest_summary(normalized_text):
+    digital_summary = build_digital_product_interest_summary(normalized_text)
+    if digital_summary:
+        return digital_summary
+
     if _is_consulting_intent(normalized_text) and not _is_system_development_intent(normalized_text):
         return ""
 
@@ -973,7 +1006,7 @@ def build_lead_collection_reply(normalized_text, messages, service_interest):
             f"{question}"
         )
 
-    if discovery_minimum_met(messages):
+    if discovery_minimum_met(messages, normalized_text):
         handoff = build_discovery_to_collection_handoff(normalized_text, messages)
         if handoff:
             return f"{handoff}{question}"

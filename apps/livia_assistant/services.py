@@ -127,7 +127,10 @@ class LiviaAssistantService:
     def generate_response(self, conversation, user_text):
         normalized = self._normalize(user_text)
         lead_detected = (
-            self.detect_lead_intent(user_text)
+            (
+                self.detect_lead_intent(user_text)
+                and not self.needs_consultative_discovery_for_conversation(conversation, user_text)
+            )
             or self.is_lead_collection_active(conversation)
             or self._should_resume_lead_capture_after_discovery(conversation)
         )
@@ -259,7 +262,11 @@ class LiviaAssistantService:
         return conversation_has_open_solution_need(messages) and discovery_minimum_met(messages)
 
     def should_update_lead_capture(self, conversation, message):
-        if self.detect_lead_intent(message) or self.is_lead_collection_active(conversation):
+        if self.is_lead_collection_active(conversation):
+            return True
+        if self.needs_consultative_discovery_for_conversation(conversation, message):
+            return is_lead_data_message(message)
+        if self.detect_lead_intent(message):
             return True
         lead = self._latest_lead_capture(conversation)
         return lead is not None and not lead.is_qualified and not self._is_capture_cycle_locked(lead)
@@ -653,6 +660,15 @@ class LiviaAssistantService:
         return self._build_collect_name_reply(lead)
 
     def _build_collect_name_reply(self, lead):
+        from .discovery import build_digital_product_interest_summary
+
+        corpus = self._normalize(self._technical_corpus(lead))
+        digital_summary = build_digital_product_interest_summary(corpus)
+        if digital_summary:
+            return (
+                f"Entendi. Temos um bom ponto de partida para {digital_summary}. "
+                "Para nossa equipe avaliar melhor, posso registrar seu atendimento? Como posso te chamar?"
+            )
         context_ack = self._technical_context_acknowledgment(lead)
         if context_ack:
             return f"{context_ack} Para encaminhar corretamente, como posso te chamar?"

@@ -1522,3 +1522,48 @@ class TechnicalSummaryTests(TestCase):
         self.assertIn("choque térmico", summary)
         self.assertTrue("Vötsch" in summary or "votsch" in summary.lower())
         self.assertTrue("painel apagou" in summary.lower() or "painel apagado" in summary.lower())
+
+
+class DigitalProductDiscoveryTests(TestCase):
+    def test_rich_pizzaria_context_does_not_meet_minimum_discovery(self):
+        from apps.livia_assistant.discovery import has_minimum_digital_product_discovery
+
+        messages = [
+            {"role": "user", "content": "voces trabalham com aplicativos moveis"},
+            {"role": "user", "content": "quero um sistema de entrega de comida"},
+            {
+                "role": "user",
+                "content": (
+                    "tenho uma pequena rede de pizzarias e gostaria de ter entrega automatizada, "
+                    "bem como cardapio no tablet"
+                ),
+            },
+        ]
+        self.assertFalse(has_minimum_digital_product_discovery(messages))
+
+    def test_complete_food_delivery_context_meets_minimum_discovery(self):
+        from apps.livia_assistant.discovery import has_minimum_digital_product_discovery
+
+        messages = [
+            {"role": "user", "content": "quero um sistema de entrega de comida"},
+            {
+                "role": "user",
+                "content": (
+                    "tenho uma pequena rede de pizzarias com entrega automatizada e cardapio no tablet"
+                ),
+            },
+            {"role": "user", "content": "entregadores proprios"},
+            {"role": "user", "content": "preciso de pagamento online com pix"},
+            {"role": "user", "content": "sao 3 lojas na primeira fase com painel administrativo"},
+        ]
+        self.assertTrue(has_minimum_digital_product_discovery(messages))
+
+    def test_digital_product_summary_uses_business_context(self):
+        from apps.livia_assistant.discovery import build_digital_product_interest_summary
+
+        summary = build_digital_product_interest_summary(
+            "pequena rede de pizzarias entrega automatizada cardapio no tablet delivery de comida"
+        )
+        self.assertIn("pizzaria", summary.lower())
+        self.assertIn("cardápio", summary.lower() or "cardapio" in summary.lower())
+        self.assertNotIn("solução solicitada", summary.lower())

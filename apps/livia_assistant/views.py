@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import LiviaChatForm
 from .integrations import is_clear_technical_issue, is_lead_capture_intent, is_lead_data_message, is_web_system_project_text
+from .lead_state import LeadState
 from .models import LiviaLeadCapture, LiviaMessage
 from .services import LiviaAssistantService
 
@@ -294,4 +295,20 @@ def _resolve_chat_reply(
             lead_capture,
             notification_sent_this_turn=notification_sent_this_turn,
         )
+    snapshot = service._current_state_snapshot(lead_capture, conversation=lead_capture.conversation)
+    default_lower = (default_reply or "").lower()
+    if (
+        not lead_registered
+        and snapshot.state == LeadState.COLLECT_NAME
+        and any(
+            marker in default_lower
+            for marker in (
+                "registrar seu atendimento",
+                "para encaminhar seu pedido",
+                "como posso te chamar",
+                "bom ponto de partida",
+            )
+        )
+    ):
+        return default_reply
     return service.build_progressive_lead_reply(lead_capture)

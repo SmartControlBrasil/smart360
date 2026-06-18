@@ -1769,3 +1769,138 @@ class LiviaChatEndpointTests(TestCase):
         self.assertIn("e2", history)
         self.assertNotIn("duno", notes)
         self.assertTrue(last_response.json()["lead_registered"])
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_food_delivery_pizzaria_rich_context_continues_discovery_before_lead_collection(self):
+        """Discovery digital: contexto rico de pizzaria não deve iniciar coleta de contato cedo."""
+        mail.outbox.clear()
+        session_key = "food-delivery-pizzaria-discovery"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "voces trabalham com aplicativos moveis",
+            "quero um sistema de entrega de comida",
+            (
+                "tenho uma pequena rede de pizzarias e gostaria de ter entrega automatizada, "
+                "bem como cardapio no tablet"
+            ),
+        ]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+
+        reply = last_response.json()["reply"].lower()
+        self.assertNotIn("como posso te chamar", reply)
+        self.assertNotIn("telefone/whatsapp", reply)
+        self.assertNotIn("e-mail", reply)
+        self.assertTrue(
+            any(
+                term in reply
+                for term in (
+                    "entregador",
+                    "pagamento",
+                    "app",
+                    "site",
+                    "tablet",
+                    "unidades",
+                    "lojas",
+                    "painel",
+                )
+            ),
+            msg=reply,
+        )
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(last_response.json()["lead_registered"])
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_explicit_budget_for_delivery_app_starts_lead_collection(self):
+        session_key = "explicit-budget-delivery-app"
+        url = reverse("livia_assistant:chat")
+        response = self.client.post(
+            url,
+            data=json.dumps(
+                {
+                    "message": "quero orçamento para um app de delivery para minha pizzaria",
+                    "session_key": session_key,
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        reply = response.json()["reply"].lower()
+        self.assertIn("como posso te chamar", reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_spontaneous_phone_during_food_delivery_discovery_is_saved_without_notification(self):
+        mail.outbox.clear()
+        session_key = "food-delivery-spontaneous-phone"
+        url = reverse("livia_assistant:chat")
+
+        for message in (
+            "voces trabalham com aplicativos moveis",
+            "quero um sistema de entrega de comida",
+        ):
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        phone_response = self.client.post(
+            url,
+            data=json.dumps({"message": "11988887766", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(phone_response.status_code, 200)
+        self.assertFalse(phone_response.json()["lead_registered"])
+        self.assertEqual(len(mail.outbox), 0)
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).first()
+        self.assertIsNotNone(capture)
+        self.assertEqual(capture.phone, "11988887766")
+        self.assertFalse(capture.is_qualified)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_food_delivery_discovery_handoff_after_minimum_context(self):
+        mail.outbox.clear()
+        session_key = "food-delivery-discovery-handoff"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "voces trabalham com aplicativos moveis",
+            "quero um sistema de entrega de comida",
+            (
+                "tenho uma pequena rede de pizzarias e gostaria de ter entrega automatizada, "
+                "bem como cardapio no tablet"
+            ),
+            "entregadores proprios",
+            "preciso de pagamento online com pix e cartao",
+            "sao 3 lojas na primeira fase",
+            "sim, preciso de painel administrativo com cardapio e status dos pedidos",
+        ]
+        replies = []
+        for message in flow:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+            replies.append(response.json()["reply"].lower())
+
+        handoff_replies = [
+            reply
+            for reply in replies
+            if "registrar seu atendimento" in reply or "bom ponto de partida" in reply
+        ]
+        self.assertTrue(handoff_replies, msg=replies)
+        self.assertTrue(any("como posso te chamar" in reply for reply in handoff_replies))
+        self.assertTrue(
+            any("pizzaria" in reply or "delivery" in reply or "cardápio" in reply or "cardapio" in reply for reply in handoff_replies),
+            msg=handoff_replies,
+        )
+        self.assertNotIn("solução solicitada", " ".join(handoff_replies))

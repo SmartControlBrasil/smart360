@@ -92,3 +92,230 @@ body.home-page .hero1-section-area {
     padding-top: 132px;
   }
 }
+
+/* --- Fase 1: extraído de pages/index.html --- */
+
+.scb-home-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+}
+
+.scb-home-service-section-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-home-work-section-bg {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-home-hero-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.scb-home-principle-label {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+/* Largura inicial; animação via main.js + data-progress */
+.scb-home-progress-bar {
+  width: 0;
+}
+
+
+/* --- Home conversão: Mitsubishi + Xyron --- */
+.home-page .scb-home-conversion-hero {
+  overflow: hidden;
+}
+
+.home-page .scb-home-hero-copy h1 {
+  max-width: 820px;
+}
+
+.home-page .scb-home-hero-copy p {
+  max-width: 700px;
+}
+
+.home-page .scb-home-hero-kicker,
+.home-page .scb-home-section-kicker,
+.home-page .scb-home-cta-kicker {
+  align-items: center;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 8px;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.home-page .scb-home-hero-kicker,
+.home-page .scb-home-cta-kicker {
+  color: #ffffff;
+}
+
+.home-page .scb-home-section-kicker {
+  color: var(--ztc-text-text-4, #5b3df5);
+}
+
+.home-page .scb-home-hero-kicker img {
+  width: 22px;
+}
+
+.home-page .scb-home-hero-actions,
+.home-page .scb-home-final-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.home-page .scb-home-hero-media img,
+.home-page .scb-home-vertical-media img,
+.home-page .scb-home-consultive-media img {
+  height: auto;
+  max-width: 100%;
+}
+
+.home-page .scb-home-verticals-section {
+  background: #f8f9ff;
+  padding: 110px 0;
+}
+
+.home-page .scb-home-vertical-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.home-page .scb-home-vertical-media {
+  align-items: center;
+  background: #eef2ff;
+  display: flex;
+  justify-content: center;
+  min-height: 260px;
+  padding: 28px;
+}
+
+.home-page .scb-home-vertical-card-industrial .scb-home-vertical-media {
+  background: #edf7ff;
+}
+
+.home-page .scb-home-vertical-card-xyron .scb-home-vertical-media {
+  background: #f0f7f3;
+}
+
+.home-page .scb-home-vertical-media img {
+  max-height: 240px;
+  object-fit: contain;
+}
+
+.home-page .scb-home-vertical-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 34px;
+}
+
+.home-page .scb-home-vertical-content h2 {
+  color: var(--ztc-text-text-2, #0d1b33);
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 0 0 18px;
+}
+
+.home-page .scb-home-vertical-content p {
+  color: var(--ztc-text-text-3, #4f5b6b);
+  line-height: 1.75;
+  margin-bottom: 28px;
+}
+
+.home-page .scb-home-vertical-content .vl-btn2 {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.home-page .scb-home-consultive-section {
+  background: #ffffff;
+}
+
+.home-page .scb-home-final-cta {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 92px 0;
+}
+
+.home-page .scb-home-final-cta .cta-header h2,
+.home-page .scb-home-final-cta .cta-header p {
+  color: #ffffff;
+}
+
+.home-page .scb-home-final-cta .cta-header p:not(.scb-home-cta-kicker) {
+  color: rgba(255, 255, 255, 0.86);
+  max-width: 760px;
+}
+
+.home-page .scb-home-final-actions {
+  justify-content: flex-end;
+}
+
+.home-page .scb-home-final-actions .vl-btn6 {
+  text-align: center;
+}
+
+@media (max-width: 991.98px) {
+  .home-page .scb-home-verticals-section {
+    padding: 82px 0;
+  }
+
+  .home-page .scb-home-final-actions {
+    justify-content: flex-start;
+    margin-top: 28px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body.home-page .hero1-section-area.scb-home-conversion-hero {
+    padding-top: 132px;
+  }
+
+  .home-page .scb-home-hero-actions .vl-btn1,
+  .home-page .scb-home-hero-actions .vl-btn2,
+  .home-page .scb-home-final-actions .vl-btn6,
+  .home-page .scb-home-vertical-content .vl-btn2 {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .home-page .scb-home-vertical-content {
+    padding: 26px;
+  }
+
+  .home-page .scb-home-vertical-content h2 {
+    font-size: 24px;
+  }
+
+  .home-page .scb-home-vertical-media {
+    min-height: 220px;
+  }
+}

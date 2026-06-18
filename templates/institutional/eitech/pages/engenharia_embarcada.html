@@ -4,215 +4,14 @@
 {% block title %}Engenharia Embarcada, Microcontroladores PIC e IoT | Smart Control Brasil{% endblock %}
 {% block meta_description %}Engenharia embarcada, microcontroladores PIC, IoT e retrofit eletrônico para controle dedicado, sensores, atuadores e sistemas conectados com confiabilidade operacional.{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-engenharia.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<style>
-  .scb-embarcada-bg-section {
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-  }
-
-  .scb-embarcada-hero-section {
-    min-height: 860px;
-    display: flex;
-    align-items: center;
-  }
-
-  .scb-embarcada-hero-section > .container {
-    width: 100%;
-  }
-
-  .scb-embarcada-hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #ffffff;
-    background: rgba(0, 92, 170, 0.14);
-    border: 1px solid rgba(0, 92, 170, 0.24);
-    border-radius: 999px;
-    padding: 8px 14px;
-  }
-
-  .scb-embarcada-hero-badge img {
-    max-width: 20px;
-  }
-
-  .scb-embarcada-tagline {
-    color: #dcecff;
-    max-width: 620px;
-  }
-
-  .scb-embarcada-counter .counter-box p {
-    min-height: 42px;
-  }
-
-  .scb-embarcada-card-title {
-    display: block;
-    font-weight: 700;
-    color: #061a33;
-  }
-
-  .scb-embarcada-service-note {
-    color: #5c6670;
-    line-height: 1.7;
-  }
-
-  .scb-embarcada-application-card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 28px 24px;
-    height: 100%;
-    box-shadow: 0 14px 40px rgba(5, 25, 50, 0.08);
-    border: 1px solid rgba(0, 92, 170, 0.08);
-    transition: all 0.25s ease;
-  }
-
-  .scb-embarcada-application-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 50px rgba(5, 25, 50, 0.12);
-  }
-
-  .scb-embarcada-application-card span {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: rgba(0, 92, 170, 0.12);
-    color: #005caa;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 18px;
-    font-size: 20px;
-  }
-
-  .scb-embarcada-application-card h4 {
-    margin-bottom: 12px;
-    color: #061a33;
-  }
-
-  .scb-embarcada-application-card p {
-    margin: 0;
-    color: #5c6670;
-    line-height: 1.7;
-  }
-
-  .scb-embarcada-cta-list {
-    margin-top: 24px;
-  }
-
-  .scb-embarcada-cta-list li {
-    color: #ffffff;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .scb-embarcada-cta-list li i {
-    color: #46d369;
-  }
-
-  .scb-embarcada-tab-icon {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-  }
-
-  .scb-embarcada-cta-fix .cta-header h2 {
-    color: #ffffff;
-    max-width: 620px;
-    font-size: 48px;
-    line-height: 1.15;
-  }
-
-  .scb-embarcada-cta-fix .cta-header p {
-    color: rgba(255, 255, 255, 0.86);
-    max-width: 600px;
-    line-height: 1.7;
-  }
-
-  .scb-embarcada-cta-fix .scb-embarcada-cta-list li {
-    color: rgba(255, 255, 255, 0.92);
-  }
-
-  .scb-embarcada-cta-fix .cta-images {
-    position: relative;
-    min-height: 430px;
-  }
-
-  .scb-embarcada-cta-fix .cta-images .img1 {
-    position: relative;
-    z-index: 1;
-  }
-
-  .scb-embarcada-cta-fix .cta-images .aniamtion-key-1 {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-    z-index: 3;
-    margin: 18px 0 0 0;
-    padding: 0;
-    display: grid;
-    gap: 12px;
-    max-width: 320px;
-  }
-
-  .scb-embarcada-cta-fix .cta-images .aniamtion-key-1 li {
-    list-style: none;
-  }
-
-  .scb-embarcada-cta-fix .cta-images .aniamtion-key-1 li a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #ffffff;
-    color: #061a33;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-weight: 700;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
-  }
-
-  @media (max-width: 991px) {
-    .scb-embarcada-cta-fix .cta-header h2 {
-      font-size: 38px;
-    }
-
-    .scb-embarcada-cta-fix .cta-images {
-      min-height: auto;
-      margin-top: 40px;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .scb-embarcada-hero-badge {
-      font-size: 13px;
-    }
-
-    .tabs-btn-area .nav {
-      gap: 12px;
-    }
-
-    .tabs-btn-area .nav-link {
-      width: 100%;
-      justify-content: flex-start;
-      text-align: left;
-    }
-  }
-
-  @media (max-width: 575px) {
-    .scb-embarcada-cta-fix .cta-header h2 {
-      font-size: 32px;
-    }
-  }
-</style>
-
 <!--===== HERO AREA STARTS =======-->
-<div class="hero2-section-area scb-embarcada-bg-section scb-embarcada-hero-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
+<div class="hero2-section-area scb-embarcada-bg-section scb-embarcada-hero-section scb-engenharia-bg-service21">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
@@ -313,7 +112,7 @@
 
 
 <!--===== ABOUT AREA STARTS =======-->
-<div class="about2-section-area sp1 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
+<div class="about2-section-area sp1 scb-embarcada-bg-section scb-engenharia-bg-service2">
   <div class="container">
     <div class="row">
       <div class="col-lg-6 m-auto">
@@ -412,7 +211,7 @@
 
 
 <!--===== WORK AREA STARTS =======-->
-<div class="work2-section-area sp1 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
+<div class="work2-section-area sp1 scb-embarcada-bg-section scb-engenharia-bg-service21">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-7">
@@ -472,21 +271,21 @@
             <div class="progress-bar">
               <label>Microcontroladores PIC <span>95%</span></label>
               <div class="progress">
-                <div class="progress-inner" style="width: 95%;"></div>
+                <div class="progress-inner" data-progress="95"></div>
               </div>
             </div>
 
             <div class="progress-bar">
               <label>Sistemas Embarcados <span>98%</span></label>
               <div class="progress">
-                <div class="progress-inner" style="width: 98%;"></div>
+                <div class="progress-inner" data-progress="98"></div>
               </div>
             </div>
 
             <div class="progress-bar">
               <label>Retrofit Eletrônico <span>97%</span></label>
               <div class="progress">
-                <div class="progress-inner" style="width: 97%;"></div>
+                <div class="progress-inner" data-progress="97"></div>
               </div>
             </div>
           </div>
@@ -509,7 +308,7 @@
 
 
 <!--===== SERVICE AREA STARTS =======-->
-<div class="service2-section-area sp1 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
+<div class="service2-section-area sp1 scb-embarcada-bg-section scb-engenharia-bg-service2">
   <div class="container">
     <div class="row">
       <div class="col-lg-7 m-auto">
@@ -800,7 +599,7 @@
 
 
 <!--===== APPLICATION AREA STARTS =======-->
-<div class="team2-section-area sp2 scb-embarcada-bg-section" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg21.png' %});">
+<div class="team2-section-area sp2 scb-embarcada-bg-section scb-engenharia-bg-service21">
   <div class="container">
     <div class="row">
       <div class="col-lg-6 m-auto">
@@ -874,7 +673,7 @@
 
 
 <!--===== CTA AREA STARTS =======-->
-<div class="cta2-section-area sp1 scb-embarcada-bg-section scb-embarcada-cta-fix" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg2.png' %});">
+<div class="cta2-section-area sp1 scb-embarcada-bg-section scb-embarcada-cta-fix scb-engenharia-bg-service2">
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">

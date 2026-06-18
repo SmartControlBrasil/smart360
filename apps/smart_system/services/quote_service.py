@@ -64,18 +64,20 @@ class ServiceQuoteService:
 
     @classmethod
     def _create_item(cls, *, quote: ServiceQuote, item_data: dict) -> QuoteItem:
-        stock_item = item_data.get("stock_item")
-        part_reference = item_data.get("part_reference") or (stock_item.code if stock_item else "")
+        payload = dict(item_data)
+        stock_item = payload.pop("stock_item", None)
+        part_reference = payload.pop("part_reference", "") or (stock_item.code if stock_item else "")
         available_quantity = stock_item.current_stock if stock_item else None
-        if item_data.get("item_type") == QuoteItem.ItemType.LABOR and item_data.get("estimated_minutes") and item_data.get("hourly_rate"):
-            hours = Decimal(item_data["estimated_minutes"]) / Decimal("60")
-            item_data["quantity"] = hours.quantize(Decimal("0.01"))
-            item_data["unit_price"] = item_data["hourly_rate"]
+        if payload.get("item_type") == QuoteItem.ItemType.LABOR and payload.get("estimated_minutes") and payload.get("hourly_rate"):
+            hours = Decimal(payload["estimated_minutes"]) / Decimal("60")
+            payload["quantity"] = hours.quantize(Decimal("0.01"))
+            payload["unit_price"] = payload["hourly_rate"]
         return QuoteItem.objects.create(
             quote=quote,
             part_reference=part_reference,
             available_quantity=available_quantity,
-            **item_data,
+            stock_item=stock_item,
+            **payload,
         )
 
     @classmethod

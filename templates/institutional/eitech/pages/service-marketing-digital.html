@@ -1,11 +1,15 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-service.css' %}">
+{% endblock %}
+
 {% block body_extra %} class="homepage2-body body-bg2"{% endblock %}
 
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
-  <div class="hero2-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg3.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="hero2-section-area scb-service-hero-marketing-bg">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6">
@@ -301,21 +305,21 @@
               <div class="progress-bar">
                 <label>Entendimento da necessidade digital atual <span>01</span></label>
                 <div class="progress">
-                  <div class="progress-inner" style="width: 100%;"></div>
+                  <div class="progress-inner scb-service-progress-full" data-progress="100"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
                 <label>Definição do objetivo operacional e comercial <span>02</span></label>
                 <div class="progress">
-                  <div class="progress-inner" style="width: 100%;"></div>
+                  <div class="progress-inner scb-service-progress-full" data-progress="100"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
                 <label>Criação, integração e evolução tecnológica <span>03</span></label>
                 <div class="progress">
-                  <div class="progress-inner" style="width: 100%;"></div>
+                  <div class="progress-inner scb-service-progress-full" data-progress="100"></div>
                 </div>
               </div>
             </div>
@@ -634,11 +638,11 @@
   <!--===== PRICING AREA ENDS =======-->
 
   <!--===== FAQ AREA STARTS =======-->
-  <div class="service-sidebar-area sp1" style="background-color: #fff;">
+  <div class="service-sidebar-area sp1 scb-service-sidebar-white">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 m-auto">
-          <div class="service2-widget-sidebar" style="padding: 0 !important;">
+          <div class="service2-widget-sidebar scb-service-widget-reset">
             <h3>Perguntas frequentes</h3>
             <div class="space20"></div>
             <div class="faq-widget-area">
@@ -724,7 +728,7 @@
   <!--===== FAQ AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="service1-section-area sp2 scb-service-section-service-bg">
     <div class="container">
       <div class="row">
         <div class="col-lg-5 m-auto">

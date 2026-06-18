@@ -1,0 +1,31 @@
+/* Smart Control Brasil — Mitsubishi Automação Industrial */
+/* Origem: templates/institutional/eitech/pages/mitsubishi.html (Fase 1) */
+
+.scb-mitsubishi-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg5.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-mitsubishi-h5-uppercase {
+  text-transform: uppercase;
+}
+
+.scb-mitsubishi-section-service-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-mitsubishi-section-cta-bg {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-mitsubishi-progress-bar-last {
+  margin: 0;
+}

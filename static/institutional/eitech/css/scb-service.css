@@ -1,0 +1,93 @@
+/* Smart Control Brasil — Suporte Técnico, TPM e Confiabilidade */
+/* Origem: templates/institutional/eitech/pages/service-manutencao-tpm-confiabilidade.html (Fase 1) */
+
+.scb-service-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg5.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-h5-uppercase {
+  text-transform: uppercase;
+}
+
+.scb-service-section-service-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-section-cta-bg {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-progress-bar-last {
+  margin: 0;
+}
+
+.scb-service-hero-marketing-bg {
+  background-image: url(../img/all-images/bg/hero-bg3.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-hero-robotica-bg {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-about-robotica-bg {
+  background-image: url(../img/all-images/bg/about-bg3.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-progress-full {
+  width: 100%;
+}
+
+.scb-service-sidebar-white {
+  background-color: #fff;
+}
+
+.scb-service-widget-reset {
+  padding: 0 !important;
+}
+
+/* Menu claro só no header fixo da página de robótica (fundo escuro). */
+body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li > a {
+  color: #fff !important;
+}
+
+body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li:hover > a,
+body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li a.nav-link.active {
+  color: var(--ztc-text-text-5) !important;
+}
+
+body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li a.nav-link.active {
+  opacity: 1;
+}
+
+body.service-robotica-page #vl-header-sticky.header-sticky .vl-header-action-item button {
+  color: #fff;
+}
+
+.scb-service-hero-primary-bg {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+}
+
+.scb-service-hero6-section-bg {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}

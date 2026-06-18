@@ -4,9 +4,13 @@
 {% block title %}Mitsubishi Automação Industrial | Smart Control Brasil{% endblock %}
 {% block meta_description %}Soluções em automação industrial com tecnologias Mitsubishi Electric: CLPs, IHMs, inversores, servoacionamentos, robôs industriais, redes industriais, supervisório, dados e integração técnica para máquinas e processos.{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-mitsubishi.css' %}">
+{% endblock %}
+
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
-  <div class="hero4-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg5.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="hero4-section-area scb-mitsubishi-hero-bg">
     <div class="hand-img">
       <img src="{% static 'institutional/eitech/img/elements/elements32.png' %}" alt="" class="elements32">
       <img src="{% static 'institutional/eitech/img/elements/clp-melseg-mitsubishi.png' %}" alt="" class="elements31 keyframe5">
@@ -18,7 +22,7 @@
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="hero4-heading heading3">
-            <h5 data-aos="fade-left" data-aos-duration="800" style="text-transform: uppercase;"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Parceiro técnico em automação industrial</h5>
+            <h5 data-aos="fade-left" data-aos-duration="800" class="scb-mitsubishi-h5-uppercase"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="">Parceiro técnico em automação industrial</h5>
             <div class="space18"></div>
             <h1 class="text-anime-style-3">Mitsubishi Automação Industrial</h1>
             <div class="space16"></div>
@@ -70,9 +74,9 @@
             <p data-aos="fade-left" data-aos-duration="800">Projetos de automação não podem depender apenas da escolha de componentes. É preciso entender processo, segurança, produtividade, diagnóstico, manutenção e expansão futura.</p>
             <div class="space24"></div>
             <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
-              <div class="progress-bar"><label>Controle e automação de máquinas <span>01</span></label><div class="progress"><div class="progress-inner" style="width: 100%;"></div></div></div>
-              <div class="progress-bar"><label>Acionamentos e motion control <span>02</span></label><div class="progress"><div class="progress-inner" style="width: 100%;"></div></div></div>
-              <div class="progress-bar" style="margin: 0;"><label>Dados, supervisão e integração <span>03</span></label><div class="progress"><div class="progress-inner" style="width: 100%;"></div></div></div>
+              <div class="progress-bar"><label>Controle e automação de máquinas <span>01</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
+              <div class="progress-bar"><label>Acionamentos e motion control <span>02</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
+              <div class="progress-bar scb-mitsubishi-progress-bar-last"><label>Dados, supervisão e integração <span>03</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
             </div>
             <div class="space24"></div>
             <p>Uma base técnica sólida para CLPs, IHMs, inversores, servoacionamentos, robôs industriais, redes, supervisórios e dashboards operacionais.</p>
@@ -84,7 +88,7 @@
   <!--===== ABOUT AREA ENDS =======-->
 
 <!--===== ABOUT AREA STARTS =======-->
-<div class="about6-section-area-widget sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+<div class="about6-section-area-widget sp1 scb-mitsubishi-section-service-bg">
   <div class="container">
     <div class="row">
       <div class="col-lg-5">
@@ -151,7 +155,7 @@
 <!--===== ABOUT AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service4-section-area sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-size: cover; background-repeat: no-repeat;">
+  <div class="service4-section-area sp1 scb-mitsubishi-section-service-bg">
     <img src="{% static 'institutional/eitech/img/elements/elements42.png' %}" alt="" class="elements42">
     <div class="container">
       <div class="row">
@@ -201,7 +205,7 @@
   <!--===== ABOUT AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="service1-section-area sp2 scb-mitsubishi-section-service-bg">
     <div class="container">
       <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Tecnologias e aplicações</h2></div></div></div>
       <div class="row">
@@ -240,7 +244,7 @@
   <!--===== WORKS AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="service1-section-area sp2 scb-mitsubishi-section-service-bg">
     <div class="container">
       <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Benefícios para a empresa</h2></div></div></div>
       <div class="row">
@@ -277,7 +281,7 @@
   <!--===== FAQ AREA ENDS =======-->
 
   <!--===== CTA AREA STARTS =======-->
-  <div class="cta5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="cta5-section-area scb-mitsubishi-section-cta-bg">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-5">

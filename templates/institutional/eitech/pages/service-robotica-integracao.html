@@ -4,27 +4,12 @@
 {% block body_extra %} class="homepage5-body service-robotica-page"{% endblock %}
 
 {% block extra_css %}
-<style>
-  /* Menu claro só no header fixo (fundo escuro); demais páginas não têm esta classe no body. */
-  body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li > a {
-    color: #fff !important;
-  }
-  body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li:hover > a {
-    color: var(--ztc-text-text-5) !important;
-  }
-  body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li a.nav-link.active {
-    color: var(--ztc-text-text-5) !important;
-    opacity: 1;
-  }
-  body.service-robotica-page #vl-header-sticky.header-sticky .vl-header-action-item button {
-    color: #fff;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-service.css' %}">
 {% endblock %}
 
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
-  <div class="hero5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="hero5-section-area scb-service-hero-robotica-bg">
     <img src="{% static 'institutional/eitech/img/elements/elements44.png' %}" alt="" class="elements44">
     <img src="{% static 'institutional/eitech/img/elements/elements45.png' %}" alt="" class="elements45">
     <img src="{% static 'institutional/eitech/img/elements/elements46.png' %}" alt="" class="elements46">
@@ -32,7 +17,7 @@
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="hero6-header heading7">
-            <h5 data-aos="fade-left" data-aos-duration="800" style="text-transform: uppercase;"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Robótica Xyron Robotics e automação aplicada</h5>
+            <h5 data-aos="fade-left" data-aos-duration="800" class="scb-service-h5-uppercase"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Robótica Xyron Robotics e automação aplicada</h5>
             <div class="space16"></div>
             <h1 class="text-anime-style-3">Robótica Aplicada e Integração com Sistemas</h1>
             <div class="space24"></div>
@@ -62,7 +47,7 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-5" data-aos="zoom-in" data-aos-duration="1000">
-          <div class="img1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/about-bg3.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+          <div class="img1 scb-service-about-robotica-bg">
             <img src="{% static 'institutional/eitech/img/all-images/about/about-img9.png' %}" alt="" class="about-img9">
             <img src="{% static 'institutional/eitech/img/all-images/about/about-img10.png' %}" alt="" class="about-img10 aniamtion-key-1">
             <img src="{% static 'institutional/eitech/img/elements/elements47.png' %}" alt="" class="elements47">
@@ -96,7 +81,7 @@
   <!--===== ABOUT AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service4-section-area sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-size: cover; background-repeat: no-repeat;">
+  <div class="service4-section-area sp1 scb-service-section-service-bg">
     <img src="{% static 'institutional/eitech/img/elements/elements42.png' %}" alt="" class="elements42">
     <div class="container">
       <div class="row">
@@ -206,7 +191,7 @@
   <!--===== WORKS AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="service1-section-area sp2 scb-service-section-service-bg">
     <div class="container">
       <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Benefícios para a empresa</h2></div></div></div>
       <div class="row">
@@ -249,7 +234,7 @@
   <!--===== FAQ AREA ENDS =======-->
 
   <!--===== CTA AREA STARTS =======-->
-  <div class="cta5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="cta5-section-area scb-service-section-cta-bg">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-5">

@@ -1,0 +1,51 @@
+/* Smart Control Brasil — Projetos */
+/* Origem: templates/institutional/eitech/pages/projects.html (Fase 1) */
+
+.project-mini-case p {
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.project-mini-case strong {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.scb-projects-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-projects-widget-reset {
+  padding: 0 !important;
+}
+
+.scb-projects-section-service-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-project-hero {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-project-widget-reset {
+  padding: 0 !important;
+}
+
+.scb-project-section-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}

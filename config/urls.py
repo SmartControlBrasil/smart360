@@ -94,7 +94,9 @@ urlpatterns = [
     path("api/public/v1/", include(("apps.public_api.urls", "public-api"), namespace="public-api")),
     path("portal/", include(("apps.technical_portal.urls", "technical_portal"), namespace="technical_portal")),
     path("marketplace/", include(("apps.marketplace_ecom.urls", "marketplace_ecom"), namespace="marketplace_ecom")),
-    path("visual-3d/", include(("apps.visual_3d.urls", "visual_3d"), namespace="visual_3d")),
+    # visual_3d: módulo experimental (não está em INSTALLED_APPS). Reativar somente após
+    # registrar apps.visual_3d em LOCAL_APPS e adicionar testes de rota mínimos.
+    # path("visual-3d/", include(("apps.visual_3d.urls", "visual_3d"), namespace="visual_3d")),
     path("", include(("apps.users.urls", "users"), namespace="users")),
     path("livia/", include(("apps.livia_assistant.urls", "livia_assistant"), namespace="livia_assistant")),
     path("automation/", include(("apps.automation.urls", "automation"), namespace="automation")),

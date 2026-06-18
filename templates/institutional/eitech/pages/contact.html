@@ -10,7 +10,7 @@
 
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
-  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="inner-page-hero-area scb-contact-hero-bg">
     <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
     <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
     <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
@@ -97,7 +97,7 @@
                   {% csrf_token %}
                   <input type="text" name="website" tabindex="-1" autocomplete="off" style="display:none">
                   {% if messages %}
-                    <div class="form-messages" style="margin: 18px 0;">
+                    <div class="form-messages scb-contact-form-messages">
                       {% for message in messages %}
                         <div class="alert alert-{{ message.tags }}">
                           {{ message }}

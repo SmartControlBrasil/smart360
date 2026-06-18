@@ -1,9 +1,13 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-service.css' %}">
+{% endblock %}
+
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
-  <div class="hero1-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
+  <div class="hero1-section-area scb-service-hero-primary-bg">
     <img src="{% static 'institutional/eitech/img/elements/elements6.png' %}" alt="" class="elements6">
     <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
     <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
@@ -77,7 +81,7 @@
   <!--===== ABOUT AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="service1-section-area sp2 scb-service-section-service-bg">
     <div class="container">
       <div class="row"><div class="col-lg-6 m-auto"><div class="service-header text-center heading2 space-margin60"><h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Principais dores</h5><div class="space24"></div><h2 class="text-anime-style-3">Problemas que a engenharia da solução ajuda a enxergar</h2></div></div></div>
       <div class="row">
@@ -117,7 +121,7 @@
   <!--===== ABOUT AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service4-section-area sp1" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-size: cover; background-repeat: no-repeat;">
+  <div class="service4-section-area sp1 scb-service-section-service-bg">
     <img src="{% static 'institutional/eitech/img/elements/elements42.png' %}" alt="" class="elements42">
     <div class="container">
       <div class="row"><div class="col-lg-12"><div class="service-header space-margin60"><div class="heading6"><h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="">O que você recebe</h5><div class="space18"></div><h2 class="text-anime-style-3">Entregáveis claros para decidir o próximo passo</h2></div><div class="btn-area1"><a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Alinhar solução</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a></div></div></div></div>
@@ -148,7 +152,7 @@
   <!--===== WORKS AREA ENDS =======-->
 
   <!--===== SERVICE AREA STARTS =======-->
-  <div class="service1-section-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="service1-section-area sp2 scb-service-section-service-bg">
     <div class="container">
       <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 text-center space-margin60"><h2>Oportunidades que podem surgir</h2></div></div></div>
       <div class="row">
@@ -185,7 +189,7 @@
   <!--===== FAQ AREA ENDS =======-->
 
   <!--===== CTA AREA STARTS =======-->
-  <div class="cta5-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg6.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="cta5-section-area scb-service-section-cta-bg">
     <div class="container"><div class="row align-items-center"><div class="col-lg-5"><div class="cta-header heading7"><h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Plano de ação tecnológico</h5><div class="space18"></div><h2 class="text-anime-style-3">Quer descobrir onde equipamentos, softwares, dados e automação podem gerar resultado?</h2><div class="space16"></div><p data-aos="fade-left" data-aos-duration="900">Fale com a Smart Control Brasil e vamos mapear processos, dados e oportunidades para transformar tecnologia em ganho real para sua operação.</p><div class="space32"></div><div class="btn-area1" data-aos="fade-left" data-aos-duration="1000"><a class="vl-btn6" href="{% url 'institutional:contact' %}">Alinhar solução <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a></div></div></div><div class="col-lg-1"></div><div class="col-lg-6"><div class="images-area"><div class="row"><div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000"><div class="img1"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt=""></div><div class="space30 d-md-none d-block"></div></div><div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="1000"><div class="img2"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt=""></div></div></div></div></div></div></div>
   </div>
   <!--===== CTA AREA ENDS =======-->

@@ -280,11 +280,32 @@ class ContractAssetSerializer(ScopedModelSerializer):
             "updated_at",
         )
         read_only_fields = ("public_id", "created_at", "updated_at")
+        extra_kwargs = {
+            "contract": {"required": False},
+        }
+
+
+class ContractAssetWriteSerializer(ScopedModelSerializer):
+    scoped_relation_fields = ("asset",)
+
+    class Meta:
+        model = ContractAsset
+        fields = (
+            "asset",
+            "maintenance_frequency",
+            "maintenance_frequency_days",
+            "estimated_duration_minutes",
+            "last_execution",
+            "next_execution",
+            "is_active",
+            "notes",
+            "metadata",
+        )
 
 
 class MaintenanceContractSerializer(ScopedModelSerializer):
     scoped_relation_fields = ("company", "client", "operational_site")
-    covered_assets = ContractAssetSerializer(many=True, required=False)
+    covered_assets = ContractAssetWriteSerializer(many=True, required=False)
 
     class Meta:
         model = MaintenanceContract
@@ -310,6 +331,9 @@ class MaintenanceContractSerializer(ScopedModelSerializer):
             "updated_at",
         )
         read_only_fields = ("public_id", "last_billing_date", "created_at", "updated_at")
+        extra_kwargs = {
+            "contract_number": {"required": False},
+        }
 
     def create(self, validated_data):
         covered_assets = validated_data.pop("covered_assets", [])

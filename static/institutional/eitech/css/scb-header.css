@@ -1,5 +1,27 @@
 /* Header público — CTA compacto + login alinhado ao menu (Smart Control Brasil) */
 
+.scb-header-logo-main {
+  height: auto;
+  max-width: 170px;
+}
+
+.scb-header-logo-mobile {
+  height: auto;
+  max-width: 150px;
+}
+
+.scb-footer-logo {
+  height: auto;
+  max-width: 220px;
+}
+
+.scb-inner-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 /* Respiro lateral: logo e Painel/Marketplace (site público Smart Control Brasil).
  * Nota: #vl-header-sticky e .vl-header-area estão no MESMO elemento — o seletor
  * ancestral .vl-header-area filho não casava e o padding nem era aplicado. */

@@ -292,7 +292,6 @@ class MaintenanceContractService:
                 schedule_date=target_date,
                 company=contract.company,
                 site=contract.operational_site,
-                generated_by=generated_by,
             )
         cls._log_event(
             contract,

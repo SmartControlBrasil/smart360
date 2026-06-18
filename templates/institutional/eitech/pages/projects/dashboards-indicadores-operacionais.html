@@ -1,11 +1,15 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-projects.css' %}">
+{% endblock %}
+
 {% block title %}Gerenciamento de energia e utilidades | Smart Control Brasil{% endblock %}
 {% block meta_description %}Coleta e visualização de consumo de energia e utilidades para eficiência energética, controle de custos e melhoria contínua.{% endblock %}
 
 {% block content %}
-<div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+<div class="inner-page-hero-area scb-project-hero">
   <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
   <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
   <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
@@ -19,7 +23,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-8 m-auto">
-        <div class="case-sider-widget-area" style="padding: 0 !important;">
+        <div class="case-sider-widget-area scb-project-widget-reset">
           <div class="img1 image-anime reveal"><img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt=""></div>
           <div class="space32"></div>
           <h3>Escopo da frente</h3>
@@ -53,7 +57,7 @@
   </div>
 </div>
 
-<div class="case-inner-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+<div class="case-inner-area sp2 scb-project-section-bg">
   <div class="container">
     <div class="row"><div class="col-lg-5 m-auto"><div class="heading2 space-margin60 text-center"><h2>Projetos relacionados</h2></div></div></div>
     <div class="row">

@@ -1,11 +1,15 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-projects.css' %}">
+{% endblock %}
+
 {% block title %}Supervisão industrial e dados operacionais | Smart Control Brasil{% endblock %}
 {% block meta_description %}Projetos de supervisão industrial, dados operacionais, alarmes, tendências e indicadores para melhorar a visibilidade de máquinas e processos.{% endblock %}
 
 {% block content %}
-<div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+<div class="inner-page-hero-area scb-project-hero">
   <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
   <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
   <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
@@ -27,7 +31,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-8 m-auto">
-        <div class="case-sider-widget-area" style="padding: 0 !important;">
+        <div class="case-sider-widget-area scb-project-widget-reset">
           <div class="img1 image-anime reveal">
             <img src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt="">
           </div>
@@ -76,19 +80,19 @@
             <div class="progress-bar">
               <label>Supervisão e SCADA <span>98%</span></label>
               <div class="progress">
-                <div class="progress-inner" data-progress="98" style="width: 0%;"></div>
+                <div class="progress-inner" data-progress="98"></div>
               </div>
             </div>
             <div class="progress-bar">
               <label>Dados industriais <span>97%</span></label>
               <div class="progress">
-                <div class="progress-inner" data-progress="97" style="width: 0%;"></div>
+                <div class="progress-inner" data-progress="97"></div>
               </div>
             </div>
             <div class="progress-bar">
               <label>Aplicação prática <span>99%</span></label>
               <div class="progress">
-                <div class="progress-inner" data-progress="99" style="width: 0%;"></div>
+                <div class="progress-inner" data-progress="99"></div>
               </div>
             </div>
           </div>
@@ -103,7 +107,7 @@
   </div>
 </div>
 
-<div class="case-inner-area sp2" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+<div class="case-inner-area sp2 scb-project-section-bg">
   <div class="container">
     <div class="row">
       <div class="col-lg-5 m-auto">

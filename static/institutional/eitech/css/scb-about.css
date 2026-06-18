@@ -1,0 +1,16 @@
+/* Smart Control Brasil — Sobre */
+
+.scb-about-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-about-section-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}

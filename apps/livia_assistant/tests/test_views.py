@@ -1485,7 +1485,170 @@ class LiviaChatEndpointTests(TestCase):
         self.assertNotIn("vou encaminhar", reply)
         self.assertNotIn("já encaminhei", reply)
         self.assertNotIn("enviei", reply)
-        self.assertIn("acrescentar", reply)
+        self.assertTrue(
+            any(
+                term in reply
+                for term in (
+                    "entregas",
+                    "rotas",
+                    "frota",
+                    "fretes",
+                    "pedidos",
+                    "logístico",
+                    "logistico",
+                    "painel",
+                    "processo",
+                )
+            ),
+            msg=reply,
+        )
+        self.assertFalse(
+            reply.strip()
+            == "já temos seus dados registrados. vou acrescentar essa informação ao atendimento.",
+            msg=reply,
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_notified_conversation_generic_system_need_continues_discovery(self):
+        mail.outbox.clear()
+        session_key = "test-notified-generic-system-discovery"
+        url = reverse("livia_assistant:chat")
+        first_cycle = [
+            "quero orçamento para um sistema web com IA",
+            "Marcelo",
+            "Smart Control",
+            "São Paulo",
+            "11999999999",
+            "marcelo@smartcontrol.com.br",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        followup = self.client.post(
+            url,
+            data=json.dumps({"message": "ola preciso de um sistema", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(followup.status_code, 200)
+        payload = followup.json()
+        reply = payload["reply"].lower()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse(payload["lead_registered"])
+        self.assertTrue(
+            any(term in reply for term in ("tipo de sistema", "controle interno", "estoque", "vendas", "entregas")),
+            msg=reply,
+        )
+        self.assertFalse(
+            reply.strip()
+            == "já temos seus dados registrados. vou acrescentar essa informação ao atendimento.",
+            msg=reply,
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_notified_conversation_food_delivery_continues_discovery(self):
+        mail.outbox.clear()
+        session_key = "test-notified-food-delivery-discovery"
+        url = reverse("livia_assistant:chat")
+        first_cycle = [
+            "quero orçamento para um sistema web com IA",
+            "Marcelo",
+            "Smart Control",
+            "São Paulo",
+            "11999999999",
+            "marcelo@smartcontrol.com.br",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        followup = self.client.post(
+            url,
+            data=json.dumps(
+                {"message": "preciso de um sistema de entrega de alimentos", "session_key": session_key}
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(followup.status_code, 200)
+        payload = followup.json()
+        reply = payload["reply"].lower()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse(payload["lead_registered"])
+        self.assertTrue(
+            any(
+                term in reply
+                for term in ("entrega", "alimentos", "pedidos", "entregadores", "estabelecimentos", "painel")
+            ),
+            msg=reply,
+        )
+        self.assertFalse(
+            reply.strip()
+            == "já temos seus dados registrados. vou acrescentar essa informação ao atendimento.",
+            msg=reply,
+        )
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_notified_conversation_web_capability_question_gets_clear_answer(self):
+        mail.outbox.clear()
+        session_key = "test-notified-web-capability"
+        url = reverse("livia_assistant:chat")
+        first_cycle = [
+            "quero orçamento para um sistema web com IA",
+            "Marcelo",
+            "Smart Control",
+            "São Paulo",
+            "11999999999",
+            "marcelo@smartcontrol.com.br",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        self.client.post(
+            url,
+            data=json.dumps(
+                {"message": "preciso de um sistema de entrega de alimentos", "session_key": session_key}
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(len(mail.outbox), 1)
+
+        followup = self.client.post(
+            url,
+            data=json.dumps({"message": "voces fazem sistemas web?", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(followup.status_code, 200)
+        payload = followup.json()
+        reply = payload["reply"].lower()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse(payload["lead_registered"])
+        self.assertIn("sim", reply)
+        self.assertTrue(
+            any(term in reply for term in ("sistemas web", "painéis", "paineis", "portais", "gestão", "gestao")),
+            msg=reply,
+        )
+        self.assertFalse(
+            reply.strip()
+            == "já temos seus dados registrados. vou acrescentar essa informação ao atendimento.",
+            msg=reply,
+        )
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_logistics_web_system_flow_summary_not_consulting_ia(self):

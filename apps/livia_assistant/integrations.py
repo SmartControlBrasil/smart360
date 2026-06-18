@@ -153,6 +153,15 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 return f"{technical_reply}\n\nPara encaminhar corretamente, {question[:1].lower() + question[1:]}"
             return technical_reply
 
+        if bool((context or {}).get("conversation_already_notified")):
+            notified_reply = build_notified_commercial_followup_reply(
+                normalized,
+                messages,
+                lead_detected=lead_detected,
+            )
+            if notified_reply:
+                return notified_reply
+
         if bool((context or {}).get("qualified_cycle_locked")):
             post_qualified_reply = build_post_qualified_followup_reply(normalized)
             if post_qualified_reply:
@@ -173,6 +182,9 @@ class FallbackLiviaAIClient(LiviaAIClient):
         continuation_reply = _build_continuation_reply(normalized, messages)
         if continuation_reply:
             return continuation_reply
+
+        if _is_web_system_capability_question(normalized):
+            return build_web_system_capability_answer(normalized, messages)
 
         qualified_cycle_locked = bool((context or {}).get("qualified_cycle_locked"))
         if needs_consultative_discovery(
@@ -210,7 +222,8 @@ class FallbackLiviaAIClient(LiviaAIClient):
             and conversation_has_open_solution_need(messages)
             and not bool((context or {}).get("qualified_cycle_locked"))
         ):
-            return build_lead_collection_reply(normalized, messages, service_interest)
+            if not bool((context or {}).get("conversation_already_notified")):
+                return build_lead_collection_reply(normalized, messages, service_interest)
 
         if _asks_for_price(normalized):
             return (
@@ -833,6 +846,43 @@ def build_web_system_price_answer():
     )
 
 
+def _is_web_system_capability_question(normalized_text):
+    if any(
+        term in normalized_text
+        for term in (
+            "voces desenvolvem",
+            "vocês desenvolvem",
+            "desenvolvem sistemas",
+            "desenvolvem sistema",
+            "fazem sistema",
+            "fazem sistemas",
+            "fazer sistema",
+            "fazer sistemas",
+            "vocês fazem",
+            "voces fazem",
+            "voces fazer",
+            "vocês fazer",
+        )
+    ):
+        return True
+    return _has_web_system_signals(normalized_text) and any(
+        term in normalized_text for term in ("fazem", "fazer", "desenvolvem", "desenvolver")
+    )
+
+
+def build_web_system_capability_answer(normalized_text, messages):
+    corpus = _conversation_text(messages, normalized_text).lower()
+    if any(term in corpus for term in ("entrega de alimentos", "entrega de comida", "delivery", "alimentos")):
+        return (
+            "Sim, desenvolvemos sistemas web sob medida, como painéis administrativos, portais, "
+            "sistemas de gestão, integrações e automações. No seu caso, você está pensando no sistema de entrega de alimentos?"
+        )
+    return (
+        "Sim, desenvolvemos sistemas web sob medida, como painéis administrativos, portais, "
+        "sistemas de gestão, integrações e automações. Qual processo você quer resolver com esse sistema?"
+    )
+
+
 def _has_ai_term(normalized_text):
     return bool(re.search(r"\bia\b", normalized_text)) or any(
         term in normalized_text
@@ -960,6 +1010,43 @@ def build_post_qualified_followup_reply(normalized_text):
         return "Pode me informar a cidade, eu adiciono ao atendimento."
     if normalized_text in {"ok", "obrigado", "obrigada", "valeu", "só isso", "so isso", "somente isso"}:
         return "Perfeito. Atendimento registrado e atualizado. Se precisar, é só me chamar."
+    return ""
+
+
+def build_notified_commercial_followup_reply(normalized_text, messages, *, lead_detected=False):
+    from .discovery import (
+        build_consultative_discovery_reply,
+        needs_consultative_discovery,
+    )
+
+    post_qualified_reply = build_post_qualified_followup_reply(normalized_text)
+    if post_qualified_reply:
+        return post_qualified_reply
+
+    if _is_web_system_capability_question(normalized_text):
+        return build_web_system_capability_answer(normalized_text, messages)
+
+    if needs_consultative_discovery(
+        messages,
+        normalized_text,
+        ignore_explicit_forwarding=True,
+    ):
+        return build_consultative_discovery_reply(normalized_text, messages)
+
+    if lead_detected and (
+        _is_logistics_web_context(normalized_text)
+        or is_web_system_project_text(normalized_text)
+        or any(
+            term in normalized_text
+            for term in ("entregas", "fretes", "rotas", "frota", "logistica", "logística", "delivery")
+        )
+    ):
+        return (
+            "Entendi o novo escopo. Para operações com entregas, rotas, frota e fretes, normalmente estruturamos "
+            "pedidos, agendamentos, rastreamento, painel operacional e integrações. "
+            "Você quer centralizar tudo em um painel interno ou também abrir para clientes acompanharem pedidos?"
+        )
+
     return ""
 
 

@@ -202,16 +202,15 @@ def needs_consultative_discovery(
     normalized_text: str,
     *,
     qualified_cycle_locked: bool = False,
+    ignore_explicit_forwarding: bool = False,
 ) -> bool:
+    del qualified_cycle_locked
     helpers = _integration_helpers()
-    normalized = _normalize(normalized_text)
-    if qualified_cycle_locked:
-        return False
     if helpers["_is_followup_lead_collection"](messages):
         return False
-    if helpers["is_clear_technical_issue"](normalized):
+    if helpers["is_clear_technical_issue"](normalized_text):
         return False
-    if is_explicit_forwarding_intent(normalized):
+    if not ignore_explicit_forwarding and is_explicit_forwarding_intent(normalized_text):
         return False
     if not conversation_has_open_solution_need(messages):
         return False
@@ -235,6 +234,33 @@ def _is_warehouse_context(normalized_text: str, messages) -> bool:
     )
 
 
+def _is_food_delivery_context(normalized_text: str, messages) -> bool:
+    corpus = _normalize(_conversation_text(messages, normalized_text))
+    return any(
+        term in corpus
+        for term in (
+            "entrega de alimentos",
+            "entrega de comida",
+            "delivery de alimentos",
+            "entregadores",
+            "restaurante",
+            "lanchonete",
+            "ifood",
+            "cardapio",
+            "cardápio",
+        )
+    )
+
+
+def _food_delivery_discovery_questions() -> tuple[str, ...]:
+    return (
+        "Para entrega de alimentos, normalmente o sistema precisa controlar pedidos, clientes, entregadores, status da entrega, taxas e painel administrativo. Hoje você quer algo para uso interno do seu negócio ou uma plataforma para vários estabelecimentos?",
+        "Hoje os pedidos chegam por WhatsApp, telefone, app próprio ou de forma manual?",
+        "Você precisa acompanhar entregadores em tempo real e calcular taxa por bairro ou distância?",
+        "O acesso precisa ser pelo celular, computador ou ambos?",
+    )
+
+
 def _warehouse_discovery_questions() -> tuple[str, ...]:
     return (
         "Hoje sua maior dor é controlar estoque, organizar pedidos/entregas ou acompanhar o movimento geral do depósito?",
@@ -255,7 +281,7 @@ def _web_system_discovery_questions() -> tuple[str, ...]:
 
 def _generic_solution_discovery_questions() -> tuple[str, ...]:
     return (
-        "Para eu direcionar melhor, qual é o principal objetivo que você quer resolver?",
+        "Que tipo de sistema você precisa: controle interno, estoque, vendas, entregas, atendimento ou outro processo?",
         "Como vocês fazem esse controle hoje: planilha, sistema pronto, processo manual ou ainda sem padronização?",
         "Qual parte da operação mais precisa de ganho imediato?",
         "Existe prazo ou urgência para colocar isso em uso?",
@@ -266,8 +292,12 @@ def build_consultative_discovery_reply(normalized_text: str, messages) -> str:
     helpers = _integration_helpers()
     normalized = _normalize(normalized_text)
     answer_count = count_substantive_discovery_answers(messages)
+    is_food_delivery = _is_food_delivery_context(normalized, messages)
 
-    if _is_warehouse_context(normalized, messages):
+    if is_food_delivery:
+        questions = _food_delivery_discovery_questions()
+        intro = "Entendi. "
+    elif _is_warehouse_context(normalized, messages):
         questions = _warehouse_discovery_questions()
         intro = (
             "Entendi. Um sistema para o depósito pode organizar estoque, movimentações e operação com muito mais controle. "
@@ -277,10 +307,12 @@ def build_consultative_discovery_reply(normalized_text: str, messages) -> str:
         intro = "Perfeito. Dá para estruturar isso como um sistema web sob medida para a operação. "
     else:
         questions = _generic_solution_discovery_questions()
-        intro = "Entendi o cenário. Antes de encaminhar, quero alinhar alguns pontos para montar a melhor direção. "
+        intro = "Claro. "
 
     question_index = min(answer_count, len(questions) - 1)
     if answer_count == 0:
+        if is_food_delivery:
+            return questions[0]
         return f"{intro}{questions[0]}"
     acknowledgements = (
         "Perfeito, isso ajuda bastante. ",

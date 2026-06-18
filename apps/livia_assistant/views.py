@@ -158,7 +158,15 @@ def chat(request):
     )
     is_technical = is_clear_technical_issue(service._normalize(message))
     discovery_pending = service.needs_consultative_discovery_for_conversation(conversation, message)
-    prefer_provider_reply = (is_technical or discovery_pending) and not collecting_lead and not starting_new_lead
+    continue_after_notification = service.should_continue_conversation_after_notification(
+        conversation,
+        lead_registered=lead_registered,
+    )
+    prefer_provider_reply = (
+        (is_technical or discovery_pending or continue_after_notification)
+        and not collecting_lead
+        and not starting_new_lead
+    )
     post_qualified_collection = (
         collecting_lead and locked_lead is not None and not new_commercial_cycle
     )
@@ -232,6 +240,22 @@ def _should_use_notified_append_reply(service, message, conversation):
     return is_lead_capture_intent(normalized) or is_web_system_project_text(normalized)
 
 
+def _maybe_append_notified_context_ack(reply, lead_capture, service):
+    if lead_capture is None:
+        return reply
+    if not service._conversation_was_notified(lead_capture.conversation):
+        return reply
+    if not service.should_append_notified_context_ack(lead_capture.conversation):
+        return reply
+    ack = service.build_notified_context_ack_phrase()
+    base = (reply or "").rstrip()
+    if not base:
+        return ack
+    if base.endswith((".", "!", "?")):
+        return f"{base} {ack}"
+    return f"{base}. {ack}"
+
+
 def _resolve_chat_reply(
     default_reply,
     lead_registered,
@@ -243,26 +267,31 @@ def _resolve_chat_reply(
 ):
     if lead_capture is None:
         return default_reply
-    if prefer_provider_reply:
-        return default_reply
     notification_sent_this_turn = bool(
         (lead_capture.crm_reference or {}).get("notification_sent_this_turn")
     )
+    if prefer_provider_reply:
+        return _maybe_append_notified_context_ack(default_reply, lead_capture, service)
     if (
         post_qualified_collection
         and service.should_send_qualified_reply(lead_capture)
         and service._conversation_was_notified(lead_capture.conversation)
         and not notification_sent_this_turn
     ):
-        if notified_commercial_append:
-            return service.build_lead_confirmation_reply(
-                lead_capture,
-                notification_sent_this_turn=False,
-            )
-        return default_reply
-    if service.should_send_qualified_reply(lead_capture) or lead_registered:
+        return _maybe_append_notified_context_ack(default_reply, lead_capture, service)
+    if lead_registered:
         return service.build_lead_confirmation_reply(
             lead_capture,
-            notification_sent_this_turn=notification_sent_this_turn or lead_registered,
+            notification_sent_this_turn=True,
+        )
+    if service.should_continue_conversation_after_notification(
+        lead_capture.conversation,
+        lead_registered=lead_registered,
+    ):
+        return _maybe_append_notified_context_ack(default_reply, lead_capture, service)
+    if service.should_send_qualified_reply(lead_capture):
+        return service.build_lead_confirmation_reply(
+            lead_capture,
+            notification_sent_this_turn=notification_sent_this_turn,
         )
     return service.build_progressive_lead_reply(lead_capture)

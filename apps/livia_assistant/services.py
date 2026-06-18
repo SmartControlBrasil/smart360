@@ -133,7 +133,7 @@ class LiviaAssistantService:
         )
         handoff_recommended = is_real_emergency(normalized)
         service_interest = self._detect_service_interest(normalized)
-        history = self._build_recent_messages(conversation)
+        history = self._build_messages_since_notification(conversation)
         rag_context = build_context_for_prompt(user_text)
         knowledge_context = rag_context or LiviaKnowledgeService().build_context(user_text)
         last_assistant = (
@@ -158,6 +158,7 @@ class LiviaAssistantService:
                 "knowledge_context": knowledge_context,
                 "recent_product": recent_product,
                 "qualified_cycle_locked": bool(locked_lead),
+                "conversation_already_notified": self._conversation_was_notified(conversation),
             },
         )
 
@@ -182,14 +183,63 @@ class LiviaAssistantService:
         return is_lead_data_message(message) or is_lead_capture_intent(normalized)
 
     def needs_consultative_discovery_for_conversation(self, conversation, message=""):
-        messages = self._build_recent_messages(conversation)
+        messages = self._build_messages_since_notification(conversation)
         normalized = self._normalize(message)
         locked_lead = self.get_locked_lead_capture(conversation)
         return needs_consultative_discovery(
             messages,
             normalized,
             qualified_cycle_locked=bool(locked_lead),
+            ignore_explicit_forwarding=self._conversation_was_notified(conversation),
         )
+
+    def should_continue_conversation_after_notification(self, conversation, *, lead_registered=False):
+        return (
+            self._conversation_was_notified(conversation)
+            and self._conversation_has_complete_contact(conversation)
+            and not lead_registered
+        )
+
+    def build_notified_context_ack_phrase(self):
+        return "Como já temos seus dados, vou acrescentar esse contexto ao atendimento."
+
+    def should_append_notified_context_ack(self, conversation):
+        recent_assistant_messages = (
+            conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+            .order_by("-created_at", "-id")[:3]
+        )
+        for message in recent_assistant_messages:
+            lowered = (message.content or "").lower()
+            if "acrescentar" in lowered or "já temos seus dados" in lowered:
+                return False
+        return True
+
+    def _build_messages_since_notification(self, conversation, limit=20):
+        from django.utils.dateparse import parse_datetime
+        from django.utils import timezone
+
+        locked = self.get_locked_lead_capture(conversation)
+        cutoff = None
+        if locked:
+            sent_raw = (locked.crm_reference or {}).get("notification_sent_at")
+            if sent_raw:
+                cutoff = parse_datetime(sent_raw)
+                if cutoff and timezone.is_naive(cutoff):
+                    cutoff = timezone.make_aware(cutoff)
+
+        recent_messages = list(conversation.messages.order_by("-created_at", "-id")[: limit * 2])
+        filtered = []
+        for message in reversed(recent_messages):
+            if message.role not in {
+                LiviaMessage.Role.USER,
+                LiviaMessage.Role.ASSISTANT,
+                LiviaMessage.Role.SYSTEM,
+            }:
+                continue
+            if cutoff and message.created_at and message.created_at < cutoff:
+                continue
+            filtered.append({"role": message.role, "content": message.content})
+        return filtered[-limit:]
 
     def should_start_contact_collection(self, conversation, message):
         if self.needs_consultative_discovery_for_conversation(conversation, message):

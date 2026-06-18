@@ -82,7 +82,7 @@ class LiviaCRMBridgeTests(TestCase):
         LiviaCRMBridge().create_or_update_crm_lead(incomplete)
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_bridge_does_not_send_or_create_when_required_and_fields_missing(self):
+    def test_bridge_creates_when_name_contact_and_description_are_present(self):
         incomplete_but_flagged = LiviaLeadCapture.objects.create(
             conversation=self.conversation,
             name="Lead Parcial",
@@ -95,9 +95,9 @@ class LiviaCRMBridgeTests(TestCase):
             is_qualified=True,
         )
         result = LiviaCRMBridge().create_or_update_crm_lead(incomplete_but_flagged)
-        self.assertIsNone(result)
-        self.assertEqual(Lead.objects.count(), 0)
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertIsNotNone(result)
+        self.assertEqual(Lead.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_notification_is_not_duplicated_for_same_conversation(self):
         with self.settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"):

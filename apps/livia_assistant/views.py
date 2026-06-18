@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import LiviaChatForm
+from .integrations import is_clear_technical_issue
 from .models import LiviaLeadCapture, LiviaMessage
 from .services import LiviaAssistantService
 
@@ -49,7 +50,7 @@ def chat(request):
     )
     lead_capture = None
     lead_registered = False
-    if locked_lead is not None and not new_technical_cycle:
+    if locked_lead is not None:
         collecting_lead = service.should_capture_post_qualified_update_for_conversation(message, conversation)
     else:
         collecting_lead = service.is_lead_collection_active(conversation)
@@ -60,16 +61,14 @@ def chat(request):
         extracted_data = service.extract_lead_data(message, conversation=conversation)
         if not collecting_lead:
             extracted_data = service.extract_notes_only_lead_data(extracted_data)
-        if locked_lead is not None and not new_technical_cycle:
+        if locked_lead is not None:
             extracted_data = service.apply_post_qualified_expected_field(extracted_data, message, conversation)
-        target_conversation = conversation
-        if locked_lead is not None and not new_technical_cycle:
-            target_conversation = locked_lead.conversation
+        target_conversation = locked_lead.conversation if locked_lead is not None else conversation
         lead_capture = service.create_or_update_lead_capture(
             target_conversation,
             extracted_data,
             collecting_contact=collecting_lead,
-            explicit_lead=locked_lead if locked_lead is not None and not new_technical_cycle else None,
+            explicit_lead=locked_lead,
         )
         lead_registered = lead_capture.operational_status == LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
 
@@ -84,7 +83,7 @@ def chat(request):
         lead_registered,
         lead_capture,
         service,
-        prefer_provider_reply=locked_lead is not None and not new_technical_cycle,
+        prefer_provider_reply=locked_lead is not None or is_clear_technical_issue(service._normalize(message)),
     )
     if lead_capture is not None and reply != livia_response.reply:
         last_assistant = (

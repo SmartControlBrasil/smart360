@@ -38,6 +38,7 @@ INVALID_GENERIC_VALUES = {
 }
 
 INVALID_NAME_SNIPPETS = (
+    "empresa",
     "camara",
     "câmara",
     "frigorifica",
@@ -139,7 +140,9 @@ def _is_valid_phone(value) -> bool:
     if _is_invalid_generic(value):
         return False
     digits = re.sub(r"\D", "", str(value or ""))
-    return 10 <= len(digits) <= 15
+    if len(digits) in {12, 13} and digits.startswith("55"):
+        digits = digits[2:]
+    return len(digits) in {10, 11}
 
 
 def _is_valid_name(value) -> bool:
@@ -212,12 +215,19 @@ def first_missing_required_field(capture) -> str:
         return "company"
     if not has_valid_city_field(capture):
         return "city"
-    if not has_valid_phone_field(capture):
+    if not (has_valid_phone_field(capture) or has_valid_email_field(capture)):
         return "phone"
-    if not has_valid_email_field(capture):
-        return "email"
     return ""
 
 
 def is_lead_ready_for_notification(capture) -> bool:
-    return not first_missing_required_field(capture)
+    if not has_valid_name_field(capture):
+        return False
+    if not (has_valid_phone_field(capture) or has_valid_email_field(capture)):
+        return False
+    notes = _normalize(getattr(capture, "notes", ""))
+    interest = _normalize(getattr(capture, "service_interest", ""))
+    description = notes or interest
+    if not description or description in INVALID_GENERIC_VALUES:
+        return False
+    return len(description) >= 3

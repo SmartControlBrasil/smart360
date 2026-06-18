@@ -374,6 +374,111 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("vou encaminhar", reply)
         self.assertTrue("em qual cidade" in reply or "qual e-mail" in reply, msg=reply)
 
+    def test_build_lead_confirmation_reply_only_forwards_when_notification_sent(self):
+        """Teste C: linguagem de encaminhamento só com notificação enviada neste turno."""
+        conversation = self.service.get_or_create_conversation(session_key="confirmation-reply-states")
+        qualified_lead = LiviaLeadCapture(
+            conversation=conversation,
+            name="Marcelo",
+            company="LogBrasil",
+            city="São Paulo",
+            phone="11999999999",
+            email="marcelo@logbrasil.com.br",
+            notes="sistema logístico web",
+            is_qualified=True,
+        )
+        qualified_lead.save()
+
+        sent_reply = self.service.build_lead_confirmation_reply(
+            qualified_lead,
+            notification_sent_this_turn=True,
+        ).lower()
+        self.assertIn("vou encaminhar", sent_reply)
+
+        registered_reply = self.service.build_lead_confirmation_reply(
+            qualified_lead,
+            notification_sent_this_turn=False,
+        ).lower()
+        self.assertNotIn("vou encaminhar", registered_reply)
+        self.assertNotIn("já encaminhei", registered_reply)
+        self.assertIn("registrado", registered_reply)
+
+        LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Marcelo",
+            phone="11999999999",
+            email="marcelo@logbrasil.com.br",
+            is_qualified=True,
+            operational_status=LiviaLeadCapture.OperationalStatus.SENT_TO_CRM,
+            crm_reference={"notification_sent_at": "2026-01-01T00:00:00Z"},
+        )
+        append_reply = self.service.build_lead_confirmation_reply(
+            qualified_lead,
+            notification_sent_this_turn=False,
+        ).lower()
+        self.assertIn("acrescentar", append_reply)
+        self.assertNotIn("vou encaminhar", append_reply)
+        self.assertNotIn("já encaminhei", append_reply)
+
+    def test_locked_lead_detected_after_notification_sent_at_only(self):
+        conversation = self.service.get_or_create_conversation(session_key="locked-by-notification-only")
+        lead = LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Marcelo",
+            company="Smart Control",
+            city="São Paulo",
+            phone="11999999999",
+            email="marcelo@smartcontrol.com.br",
+            notes="sistema web com ia",
+            is_qualified=True,
+            crm_reference={"notification_sent_at": "2026-01-01T00:00:00Z"},
+        )
+        self.assertIsNotNone(self.service.get_locked_lead_capture(conversation))
+        message = (
+            "quero orçamento para um sistema logístico web com IA para entregas agendadas, "
+            "rotas, frota e fretes em todo o Brasil"
+        )
+        self.assertFalse(self.service.is_new_commercial_cycle_message(message, conversation))
+        self.assertTrue(self.service.detect_lead_intent(message))
+        updated = self.service.create_or_update_lead_capture(
+            conversation,
+            self.service.extract_notes_only_lead_data(self.service.extract_lead_data(message, conversation=conversation)),
+            collecting_contact=False,
+            explicit_lead=lead,
+        )
+        reply = self.service.build_lead_confirmation_reply(updated, notification_sent_this_turn=False).lower()
+        self.assertIn("acrescentar", reply)
+
+    def test_notified_conversation_append_reply_without_reforwarding(self):
+        """Teste A (serviço): conversa notificada responde acrescentar sem reenviar."""
+        conversation = self.service.get_or_create_conversation(session_key="test-a-service-append")
+        lead = LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Marcelo",
+            company="Smart Control",
+            city="São Paulo",
+            phone="11999999999",
+            email="marcelo@smartcontrol.com.br",
+            notes="sistema web com ia",
+            is_qualified=True,
+            crm_reference={"notification_sent_at": "2026-01-01T00:00:00Z"},
+        )
+        updated = self.service.create_or_update_lead_capture(
+            conversation,
+            self.service.extract_notes_only_lead_data(
+                self.service.extract_lead_data(
+                    "quero orçamento para um sistema logístico web com entregas e rotas",
+                    conversation=conversation,
+                )
+            ),
+            collecting_contact=False,
+            explicit_lead=lead,
+        )
+        reply = self.service.build_lead_confirmation_reply(updated, notification_sent_this_turn=False).lower()
+        self.assertIn("acrescentar", reply)
+        self.assertNotIn("vou encaminhar", reply)
+        self.assertNotIn("já encaminhei", reply)
+
     def test_should_send_qualified_reply_requires_minimum_contact_and_description(self):
         conversation = self.service.get_or_create_conversation(session_key="qualified-reply-gate")
         incomplete = LiviaLeadCapture(

@@ -242,8 +242,8 @@ class LiviaAssistantService:
             urgency = LiviaLeadCapture.Urgency.LOW
 
         service_interest = extracted.service_interest or self._detect_service_interest(normalized)
-        if is_web_system_project_text(normalized):
-            service_interest = "desenvolvimento de sistema web com IA integrada"
+        if is_web_system_project_text(normalized) or self._is_logistics_web_context(normalized):
+            service_interest = self._resolve_web_service_interest_label(normalized)
         if not service_interest and any(
             term in normalized
             for term in (
@@ -331,6 +331,8 @@ class LiviaAssistantService:
         elif explicit_lead is None and not (lead.crm_reference or {}).get("capture_start_message_id") and current_user_message:
             lead.crm_reference = {**(lead.crm_reference or {}), "capture_start_message_id": current_user_message.id}
 
+        self._seed_lead_contact_from_conversation(lead, conversation)
+
         if lead.name and lead.company and self._normalize(lead.company) == self._normalize(lead.name):
             lead.company = ""
 
@@ -404,23 +406,109 @@ class LiviaAssistantService:
             update_fields.append("updated_at")
             conversation.save(update_fields=update_fields)
 
+        was_already_notified = self._conversation_was_notified(conversation)
         if lead.is_qualified:
             try:
                 LiviaCRMBridge().create_or_update_crm_lead(lead)
             except Exception as exc:  # pragma: no cover - defensive CRM bridge guard
                 logger.warning("Lívia CRM bridge failed; lead kept locally. Error type: %s", exc.__class__.__name__)
 
+        notification_sent_this_turn = bool(
+            lead.is_qualified
+            and self._lead_was_notified(lead)
+            and not was_already_notified
+        )
+        lead.crm_reference = {
+            **(lead.crm_reference or {}),
+            "notification_sent_this_turn": notification_sent_this_turn,
+        }
+        if notification_sent_this_turn or lead.is_qualified:
+            lead.save(update_fields=["crm_reference"])
+
         return lead
+
+    def _seed_lead_contact_from_conversation(self, lead, conversation):
+        if not (lead.name or "").strip() and conversation.visitor_name:
+            lead.name = conversation.visitor_name
+        if not (lead.company or "").strip() and conversation.company_name:
+            lead.company = conversation.company_name
+        if not (lead.phone or "").strip() and conversation.visitor_phone:
+            lead.phone = conversation.visitor_phone
+        if not (lead.email or "").strip() and conversation.visitor_email:
+            lead.email = conversation.visitor_email
+        if not (lead.city or "").strip():
+            locked_lead = self.get_locked_lead_capture(conversation)
+            if locked_lead and (locked_lead.city or "").strip():
+                lead.city = locked_lead.city
+
+    def _conversation_was_notified(self, conversation):
+        for capture in LiviaLeadCapture.objects.filter(conversation_id=conversation.id):
+            if (capture.crm_reference or {}).get("notification_sent_at"):
+                return True
+        return False
+
+    def _lead_was_notified(self, lead):
+        return bool((lead.crm_reference or {}).get("notification_sent_at"))
+
+    def is_new_commercial_cycle_message(self, message, conversation):
+        if not self._is_lead_cycle_locked(conversation):
+            return False
+        normalized = self._normalize(message)
+        if self.should_capture_post_qualified_update_for_conversation(message, conversation):
+            return False
+        if is_clear_technical_issue(normalized):
+            return False
+        if self._conversation_has_complete_contact(conversation):
+            return False
+        return is_lead_capture_intent(normalized) or is_web_system_project_text(normalized)
+
+    def _conversation_has_complete_contact(self, conversation):
+        locked_lead = self.get_locked_lead_capture(conversation)
+        if locked_lead is None:
+            return False
+        return is_lead_ready_for_notification(locked_lead)
+
+    def _is_logistics_web_context(self, normalized_text):
+        from .integrations import _is_logistics_web_context
+
+        return _is_logistics_web_context(normalized_text)
+
+    def _resolve_web_service_interest_label(self, normalized_text):
+        if self._is_logistics_web_context(normalized_text):
+            return "desenvolvimento de sistema logístico web com IA integrada"
+        return "desenvolvimento de sistema web com IA integrada"
 
     def should_send_qualified_reply(self, lead):
         if getattr(lead, "pk", None):
             return bool(lead.is_qualified)
         return is_lead_ready_for_notification(lead)
 
-    def build_progressive_lead_reply(self, lead):
-        if self.should_send_qualified_reply(lead):
-            return self.build_qualified_lead_reply(lead)
+    def build_lead_confirmation_reply(self, lead, *, notification_sent_this_turn=False):
+        first_name = (lead.name or "").split()[0] or ""
+        summary = self._build_commercial_context_summary(lead)
+        conversation_already_notified = self._conversation_was_notified(lead.conversation)
 
+        if notification_sent_this_turn:
+            greeting = f"Perfeito, {first_name}. " if first_name else "Perfeito. "
+            return (
+                f"{greeting}Vou encaminhar seu pedido para nossa equipe com este resumo: {summary}. "
+                "Um especialista da Smart Control Brasil entrará em contato."
+            )
+
+        if lead.is_qualified and conversation_already_notified:
+            return "Já temos seus dados registrados. Vou acrescentar essa informação ao atendimento."
+
+        if lead.is_qualified:
+            greeting = f"Perfeito, {first_name}. " if first_name else ""
+            return f"{greeting}Recebi seus dados. Vou deixar registrado para análise da equipe."
+
+        return self.build_progressive_lead_reply(lead)
+
+    def build_existing_attendance_append_reply(self, lead=None):
+        del lead
+        return "Já temos seus dados registrados. Vou acrescentar essa informação ao atendimento."
+
+    def build_progressive_lead_reply(self, lead):
         invalid_field = (lead.crm_reference or {}).get("invalid_contact_field")
         invalid_value = (lead.crm_reference or {}).get("invalid_contact_value")
         if invalid_field == "phone":
@@ -475,11 +563,10 @@ class LiviaAssistantService:
         return f"Claro. Pelo que entendi, é {detail}."
 
     def build_qualified_lead_reply(self, lead):
-        first_name = (lead.name or "").split()[0] or ""
-        summary = self._build_commercial_context_summary(lead)
-        return (
-            f"Perfeito, {first_name}. Vou encaminhar seu pedido para nossa equipe com este resumo: {summary}. "
-            "Um especialista da Smart Control Brasil entrará em contato."
+        notification_sent_this_turn = bool((lead.crm_reference or {}).get("notification_sent_this_turn"))
+        return self.build_lead_confirmation_reply(
+            lead,
+            notification_sent_this_turn=notification_sent_this_turn,
         )
 
     def _enrich_lead_from_conversation(self, lead, conversation):
@@ -529,11 +616,18 @@ class LiviaAssistantService:
             lead.notes = commercial_summary
 
         if web_summary:
-            lead.service_interest = "desenvolvimento de sistema web com IA integrada"
+            lead.service_interest = self._resolve_web_service_interest_label(normalized)
         elif any(term in normalized for term in ("duno", "dune", "hygibot")):
             lead.service_interest = "Duno - robô de limpeza"
-        elif not lead.service_interest:
-            lead.service_interest = self._detect_service_interest(normalized)
+        elif not lead.service_interest or (
+            self._is_logistics_web_context(normalized)
+            and "consultoria" in self._normalize(lead.service_interest or "")
+        ):
+            detected = self._detect_service_interest(normalized)
+            if self._is_logistics_web_context(normalized):
+                lead.service_interest = self._resolve_web_service_interest_label(normalized)
+            elif detected and "consultoria" not in self._normalize(detected):
+                lead.service_interest = detected
 
     def _build_commercial_context_summary(self, lead):
         corpus = self._technical_corpus(lead)
@@ -1209,11 +1303,7 @@ class LiviaAssistantService:
 
     def _is_capture_cycle_locked(self, lead):
         reference = lead.crm_reference or {}
-        return bool(
-            lead.is_qualified
-            and lead.operational_status == LiviaLeadCapture.OperationalStatus.SENT_TO_CRM
-            and reference.get("notification_sent_at")
-        )
+        return bool(lead.is_qualified and reference.get("notification_sent_at"))
 
     def _is_lead_cycle_locked(self, conversation):
         latest = self._latest_lead_capture(conversation)
@@ -1296,18 +1386,29 @@ class LiviaAssistantService:
                 return lead
         return None
 
+    def _extracted_has_valid_post_qualified_contact(self, extracted):
+        from types import SimpleNamespace
+
+        if has_valid_email_field(SimpleNamespace(email=extracted.get("email"))):
+            return True
+        if has_valid_city_field(SimpleNamespace(city=extracted.get("city"))):
+            return True
+        return False
+
     def should_capture_post_qualified_update(self, text):
         extracted = self.extract_lead_data(text)
-        if any(
-            (extracted.get(field) or "").strip()
-            for field in ("name", "email", "phone", "company", "city")
+        if self._extracted_has_valid_post_qualified_contact(extracted):
+            return True
+        normalized = self._normalize(text)
+        if any(term in normalized for term in ("email", "e-mail", "cidade")) and any(
+            term in normalized for term in ("quer", "posso", "informar", "passar", "saber", "qual")
         ):
             return True
         return False
 
     def should_capture_post_qualified_update_for_conversation(self, text, conversation):
         extracted = self.extract_lead_data(text)
-        if (extracted.get("email") or "").strip() or (extracted.get("city") or "").strip():
+        if self._extracted_has_valid_post_qualified_contact(extracted):
             return True
         normalized = self._normalize(text)
         if "cidade" in normalized and any(

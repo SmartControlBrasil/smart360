@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from apps.growth_engine.models import Lead
 from apps.livia_assistant.models import LiviaConversation, LiviaLeadCapture, LiviaMessage
+from apps.livia_assistant.qualification import is_lead_ready_for_notification
 from apps.livia_assistant.services import LiviaAssistantService
 
 
@@ -1383,7 +1384,151 @@ class LiviaChatEndpointTests(TestCase):
         self.assertTrue("ar condicionado" in history or "ar-condicionado" in history, msg=history)
         self.assertIn("e2", history)
         self.assertFalse(last_reply.startswith("olá"), msg=last_reply)
-        self.assertTrue(response.json()["lead_registered"])
+        self.assertFalse(response.json()["lead_registered"])
+        self.assertNotIn("vou encaminhar", last_reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_notified_conversation_new_logistics_subject_appends_without_duplicate_email(self):
+        """Teste A: lead já notificado + novo assunto logístico não duplica e-mail nem diz 'já encaminhei'."""
+        mail.outbox.clear()
+        session_key = "test-a-logistics-after-notified"
+        url = reverse("livia_assistant:chat")
+
+        first_cycle = [
+            "quero orçamento para um sistema web com IA",
+            "Marcelo",
+            "Smart Control",
+            "São Paulo",
+            "11999999999",
+            "marcelo@smartcontrol.com.br",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        first_lead = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).first()
+        self.assertTrue(first_lead.is_qualified)
+        self.assertIn("notification_sent_at", first_lead.crm_reference)
+        self.assertEqual(len(mail.outbox), 1)
+        first_lead.refresh_from_db()
+        service = LiviaAssistantService()
+        self.assertIsNotNone(
+            service.get_locked_lead_capture(first_lead.conversation),
+            msg=first_lead.crm_reference,
+        )
+        self.assertTrue(is_lead_ready_for_notification(first_lead))
+        self.assertTrue(service._conversation_was_notified(first_lead.conversation))
+        self.assertEqual(LiviaConversation.objects.filter(session_key=session_key).count(), 1)
+        self.assertFalse(
+            service.is_new_commercial_cycle_message(
+                "quero orçamento para um sistema logístico web com IA para entregas",
+                first_lead.conversation,
+            )
+        )
+
+        followup = self.client.post(
+            url,
+            data=json.dumps(
+                {
+                    "message": (
+                        "quero orçamento para um sistema logístico web com IA para entregas agendadas, "
+                        "rotas, frota e fretes em todo o Brasil"
+                    ),
+                    "session_key": session_key,
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(followup.status_code, 200)
+        reply = followup.json()["reply"].lower()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse(followup.json()["lead_registered"])
+        self.assertTrue(followup.json()["lead_detected"])
+        self.assertEqual(LiviaLeadCapture.objects.filter(conversation__session_key=session_key).count(), 1)
+        self.assertNotIn("vou encaminhar", reply)
+        self.assertNotIn("já encaminhei", reply)
+        self.assertNotIn("enviei", reply)
+        self.assertIn("acrescentar", reply)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_logistics_web_system_flow_summary_not_consulting_ia(self):
+        """Teste B: fluxo logístico web mantém interesse correto no resumo."""
+        mail.outbox.clear()
+        session_key = "test-b-logistics-web-flow"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "quero orçamento para um sistema web com IA integrada",
+            "preciso de um sistema logístico para entregas",
+            "o SaaS atual será perdido e preciso de sistema novo",
+            "gestão operacional com entregas agendadas e on demand",
+            "rodar no Brasil todo",
+            "Marcelo",
+            "LogBrasil",
+            "São Paulo",
+            "11988887777",
+            "marcelo@logbrasil.com.br",
+        ]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
+        self.assertTrue(capture.is_qualified)
+        summary = (capture.notes or "").lower()
+        interest = (capture.service_interest or "").lower()
+        self.assertTrue(
+            "sistema logístico web" in summary or "sistema logístico" in summary or "sistema web" in summary,
+            msg=summary,
+        )
+        self.assertTrue(
+            any(term in summary for term in ("entregas", "rotas", "fretes", "frota", "motoristas")),
+            msg=summary,
+        )
+        self.assertNotIn("consultoria em inteligência artificial", summary)
+        self.assertNotIn("consultoria em inteligencia artificial", summary)
+        self.assertNotIn("consultoria", interest)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("vou encaminhar", last_response.json()["reply"].lower())
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_fresh_conversation_sends_single_notification_and_confirms_forwarding(self):
+        """Teste D: conversa nova completa envia notificação uma vez e confirma encaminhamento."""
+        mail.outbox.clear()
+        session_key = "test-d-fresh-notification"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "quero orçamento para desenvolvimento de sistema web",
+            "Ana",
+            "Empresa Beta",
+            "Campinas",
+            "11977776666",
+            "ana@empresa.com.br",
+        ]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(last_response.json()["lead_registered"])
+        reply = last_response.json()["reply"].lower()
+        self.assertIn("vou encaminhar", reply)
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).first()
+        self.assertTrue((capture.crm_reference or {}).get("notification_sent_this_turn"))
+        self.assertIn("notification_sent_at", capture.crm_reference)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_air_conditioner_e2_full_flow_qualifies_without_duno_contamination(self):

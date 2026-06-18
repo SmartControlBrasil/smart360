@@ -101,6 +101,10 @@ INVALID_COMPANY_OR_CITY_SNIPPETS = (
     "eu não falei",
     "empresa de automacao para cuidar",
     "empresa de automação para cuidar",
+    "todo o brasil",
+    "brasil todo",
+    "todo brasil",
+    "nacional",
 )
 
 

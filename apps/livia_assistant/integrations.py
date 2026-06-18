@@ -84,8 +84,34 @@ SERVICE_KEYWORDS = {
     "manutenção industrial": ("manutenção industrial", "manutencao industrial", "máquina", "maquina"),
     "contratos de manutenção": ("contrato", "recorrente", "preventiva"),
     "Smart360": ("smart360", "ordem de serviço", "os", "dashboard"),
-    "sistemas web com IA": ("sistema web", "sistemas web", "crm", "dashboard", "portal", "planilha", "automação de processo", "automacao de processo", "ia no sistema", "ia integrada"),
-    "sistemas, sites e soluções digitais": ("site", "sistema", "django", "python", "digital"),
+    "sistemas web com IA": (
+        "sistema web",
+        "sistemas web",
+        "sistema logistico",
+        "sistema logístico",
+        "sistema proprio",
+        "sistema próprio",
+        "gestao operacional",
+        "gestão operacional",
+        "entregas",
+        "logistica",
+        "logística",
+        "fretes",
+        "rotas",
+        "frota",
+        "motoristas",
+        "on demand",
+        "saas",
+        "crm",
+        "dashboard",
+        "portal",
+        "planilha",
+        "automação de processo",
+        "automacao de processo",
+        "ia no sistema",
+        "ia integrada",
+    ),
+    "sistemas, sites e soluções digitais": ("site", "django", "python", "digital"),
 }
 
 
@@ -111,18 +137,18 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 "Se houver risco elétrico, incêndio ou vazamento de gás, siga o protocolo de emergência da planta e acione atendimento humano."
             )
 
-        if bool((context or {}).get("qualified_cycle_locked")):
-            post_qualified_reply = build_post_qualified_followup_reply(normalized)
-            if post_qualified_reply:
-                return post_qualified_reply
-
         if is_clear_technical_issue(normalized):
             technical_reply = build_clear_technical_issue_answer(normalized)
-            if lead_detected:
+            if lead_detected and not bool((context or {}).get("qualified_cycle_locked")):
                 known = _collect_known_contact_fields(messages)
                 question = _lead_field_question(first_missing_required_field(_known_contact_snapshot(known)), known)
                 return f"{technical_reply}\n\nPara encaminhar corretamente, {question[:1].lower() + question[1:]}"
             return technical_reply
+
+        if bool((context or {}).get("qualified_cycle_locked")):
+            post_qualified_reply = build_post_qualified_followup_reply(normalized)
+            if post_qualified_reply:
+                return post_qualified_reply
 
         if is_price_question(normalized):
             if is_web_system_context(messages, normalized):
@@ -667,9 +693,33 @@ def _conversation_text(messages, current_normalized=""):
 
 def is_web_system_context(messages, current_normalized=""):
     corpus = _conversation_text(messages, current_normalized)
+    return _has_web_system_signals(corpus)
+
+
+def _has_web_system_signals(normalized_text):
     web_terms = (
         "sistema web",
         "sistemas web",
+        "sistema logistico",
+        "sistema logístico",
+        "sistema proprio",
+        "sistema próprio",
+        "sistema novo",
+        "desenvolver sistema",
+        "desenvolvimento de sistema",
+        "plataforma propria",
+        "plataforma própria",
+        "gestao operacional",
+        "gestão operacional",
+        "entregas",
+        "logistica",
+        "logística",
+        "fretes",
+        "rotas",
+        "frota",
+        "motoristas",
+        "on demand",
+        "saas",
         "crm",
         "dashboard",
         "portal",
@@ -682,11 +732,77 @@ def is_web_system_context(messages, current_normalized=""):
         "automacao de processo",
         "automação de processo",
     )
-    return any(term in corpus for term in web_terms)
+    return any(term in normalized_text for term in web_terms)
 
 
 def is_web_system_project_text(normalized_text):
-    return is_web_system_context([], normalized_text)
+    return _has_web_system_signals(normalized_text)
+
+
+def _is_logistics_web_context(normalized_text):
+    logistics_terms = (
+        "logistica",
+        "logística",
+        "entregas",
+        "fretes",
+        "rotas",
+        "frota",
+        "motoristas",
+        "on demand",
+        "agendadas",
+        "gestao operacional",
+        "gestão operacional",
+    )
+    system_terms = (
+        "sistema",
+        "plataforma",
+        "saas",
+        "desenvolvimento",
+        "orcamento",
+        "orçamento",
+    )
+    return any(term in normalized_text for term in logistics_terms) and any(
+        term in normalized_text for term in system_terms
+    )
+
+
+def _is_consulting_intent(normalized_text):
+    return any(
+        term in normalized_text
+        for term in (
+            "consultoria",
+            "mentoria",
+            "avaliacao de ia",
+            "avaliação de ia",
+            "diagnostico de ia",
+            "diagnóstico de ia",
+            "consultoria em inteligencia artificial",
+            "consultoria em inteligência artificial",
+        )
+    )
+
+
+def _is_system_development_intent(normalized_text):
+    return any(
+        term in normalized_text
+        for term in (
+            "sistema web",
+            "sistemas web",
+            "sistema logistico",
+            "sistema logístico",
+            "sistema proprio",
+            "sistema próprio",
+            "sistema novo",
+            "desenvolver sistema",
+            "desenvolvimento de sistema",
+            "plataforma",
+            "orcamento para um sistema",
+            "orçamento para um sistema",
+            "quero orcamento",
+            "quero orçamento",
+            "mvp",
+        )
+    )
 
 
 def build_web_system_price_answer():
@@ -698,20 +814,34 @@ def build_web_system_price_answer():
 
 
 def _has_ai_term(normalized_text):
-    return bool(re.search(r"ia", normalized_text)) or any(
+    return bool(re.search(r"\bia\b", normalized_text)) or any(
         term in normalized_text
         for term in ("inteligencia artificial", "inteligência artificial", "ia integrada", "ia no sistema")
     )
 
 
 def web_system_interest_summary(normalized_text):
+    if _is_consulting_intent(normalized_text) and not _is_system_development_intent(normalized_text):
+        return ""
+
+    if _is_logistics_web_context(normalized_text) or (
+        _is_system_development_intent(normalized_text) and any(
+            term in normalized_text
+            for term in ("logistica", "logística", "entregas", "fretes", "rotas", "frota", "motoristas", "on demand")
+        )
+    ):
+        return (
+            "Cliente interessado em desenvolvimento de sistema logístico web próprio com IA integrada "
+            "para gestão de entregas, rotas, frota/motoristas e fretes."
+        )
+
     if is_web_system_project_text(normalized_text) and _has_ai_term(normalized_text):
         return "Cliente interessado em desenvolvimento de sistema web com IA integrada para automatizar processos/planilhas."
     if any(term in normalized_text for term in ("planilha", "excel")):
         return "Cliente interessado em transformar controle por planilha em sistema web com relatórios e automações."
     if any(term in normalized_text for term in ("crm", "dashboard", "portal")):
         return "Solicitação de CRM/dashboard/portal com possível integração de IA."
-    if _has_ai_term(normalized_text):
+    if _has_ai_term(normalized_text) and _is_system_development_intent(normalized_text):
         return "Solicitação de orçamento para desenvolvimento de sistema web com IA integrada."
     if is_web_system_project_text(normalized_text):
         return "Lead interessado em automatizar processo com sistema web."

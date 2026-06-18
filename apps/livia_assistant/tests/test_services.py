@@ -100,11 +100,19 @@ class LiviaAssistantServiceTests(TestCase):
     def test_generate_response_saves_assistant_message(self):
         conversation = self.service.get_or_create_conversation(session_key="response-session")
         self.service.register_user_message(conversation, "Olá")
+        client = RecordingClient()
+        expected_reply = "Resposta registrada pela Lívia."
 
-        response = self.service.generate_response(conversation, "Olá")
+        with patch("apps.livia_assistant.services.get_livia_ai_client", return_value=client):
+            response = self.service.generate_response(conversation, "Olá")
 
-        self.assertIn("lívia", response.reply.lower())
-        self.assertEqual(conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT).count(), 1)
+        self.assertTrue(response.reply.strip())
+        self.assertEqual(response.reply, expected_reply)
+        assistant_messages = conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
+        self.assertEqual(assistant_messages.count(), 1)
+        assistant_message = assistant_messages.first()
+        self.assertEqual(assistant_message.conversation_id, conversation.id)
+        self.assertEqual(assistant_message.content, response.reply)
 
     def test_generate_response_uses_knowledge_context(self):
         conversation = self.service.get_or_create_conversation(session_key="knowledge-session")

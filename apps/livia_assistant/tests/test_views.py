@@ -88,6 +88,7 @@ class LiviaChatEndpointTests(TestCase):
             "Smart Control",
             "Itapevi",
             "11999999999",
+            "marcelo@smartcontrol.com.br",
         ]:
             response = self.client.post(
                 url,
@@ -135,6 +136,30 @@ class LiviaChatEndpointTests(TestCase):
         self.assertFalse(capture.is_qualified)
         self.assertEqual(len(mail.outbox), 0)
         self.assertIn("pode confirmar com ddd", response.json()["reply"].lower())
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_invalid_email_does_not_qualify_and_asks_confirmation(self):
+        mail.outbox.clear()
+        session_key = "invalid-email-confirmation"
+        url = reverse("livia_assistant:chat")
+        for message in ["Quero orçamento para um sistema web com IA", "Marcelo", "Smart Control", "São Paulo", "11999999999"]:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            url,
+            data=json.dumps({"message": "marcelo@", "session_key": session_key}),
+            content_type="application/json",
+        )
+        capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).first()
+        self.assertFalse(capture.is_qualified)
+        self.assertEqual(capture.email, "")
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIn("parece estar fora do formato", response.json()["reply"].lower())
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_web_system_price_question_answers_scope_before_collecting_lead(self):
@@ -204,17 +229,34 @@ class LiviaChatEndpointTests(TestCase):
 
         capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).first()
         self.assertIsNotNone(capture)
+        self.assertFalse(capture.is_qualified)
+        self.assertFalse(last_response.json()["lead_registered"])
+        self.assertEqual(capture.email, "")
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", last_response.json()["reply"].lower())
+
+        last_response = self.client.post(
+            url,
+            data=json.dumps({"message": "marcelo@smartcontrol.com.br", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(last_response.status_code, 200)
+        capture.refresh_from_db()
         self.assertTrue(capture.is_qualified)
+        self.assertEqual(capture.email, "marcelo@smartcontrol.com.br")
         self.assertTrue(last_response.json()["lead_registered"])
         summary = (capture.notes or "").lower()
         reply = last_response.json()["reply"].lower()
-        self.assertTrue("sistema web" in summary or "ia integrada" in summary, msg=summary)
-        self.assertTrue("sistema web" in reply or "ia integrada" in reply, msg=reply)
+        self.assertIn("sistema web com ia", summary, msg=summary)
+        self.assertIn("sistema web", reply, msg=reply)
         self.assertNotIn("solução solicitada", summary)
         self.assertNotIn("máquina", summary)
         self.assertNotIn("ihm", summary)
+        self.assertNotIn("em que tipo de solução", reply)
         self.assertEqual((capture.crm_reference or {}).get("category"), "sistemas_web_ia")
         self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("E-mail: marcelo@smartcontrol.com.br", mail.outbox[0].body)
+        self.assertNotIn("E-mail: Não informado", mail.outbox[0].body)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_web_system_questions_are_not_industrial_without_industrial_terms(self):
@@ -227,6 +269,7 @@ class LiviaChatEndpointTests(TestCase):
             "Empresa Alfa",
             "Campinas",
             "11988887777",
+            "ana@empresa.com.br",
         ]:
             response = self.client.post(
                 url,
@@ -337,9 +380,22 @@ class LiviaChatEndpointTests(TestCase):
         capture.refresh_from_db()
         self.assertEqual(capture.phone, "11 962196100")
         self.assertEqual(capture.email, "")
+        self.assertFalse(capture.is_qualified)
+        self.assertFalse(fifth.json()["lead_registered"])
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", fifth.json()["reply"].lower())
+        self.assertEqual(Lead.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+
+        sixth = self.client.post(
+            url,
+            data=json.dumps({"message": "marcelo@smartcontrol.com.br", "session_key": session_key}),
+            content_type="application/json",
+        )
+        capture.refresh_from_db()
+        self.assertEqual(capture.email, "marcelo@smartcontrol.com.br")
         self.assertTrue(capture.is_qualified)
-        self.assertTrue(fifth.json()["lead_registered"])
-        self.assertIn("vou encaminhar seu pedido", fifth.json()["reply"].lower())
+        self.assertTrue(sixth.json()["lead_registered"])
+        self.assertIn("vou encaminhar seu pedido", sixth.json()["reply"].lower())
         self.assertEqual(Lead.objects.count(), 1)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -483,7 +539,15 @@ class LiviaChatEndpointTests(TestCase):
             data=json.dumps({"message": "11923456789", "session_key": session_key}),
             content_type="application/json",
         )
-        qualified = phone
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", phone.json()["reply"].lower())
+        self.assertFalse(phone.json()["lead_registered"])
+        self.assertEqual(len(mail.outbox), 0)
+
+        qualified = self.client.post(
+            url,
+            data=json.dumps({"message": "marcos@gocil.com.br", "session_key": session_key}),
+            content_type="application/json",
+        )
         expected = (
             "Perfeito, Marcos. Vou encaminhar seu pedido para nossa equipe com este resumo: "
             "robô Duno para limpeza noturna em supermercado de aproximadamente 12.000 m², "
@@ -501,7 +565,7 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(capture.name, "Marcos Antonio")
         self.assertEqual(capture.company, "Gocil")
         self.assertEqual(capture.phone, "11923456789")
-        self.assertEqual(capture.email, "")
+        self.assertEqual(capture.email, "marcos@gocil.com.br")
         self.assertEqual(capture.city, "São Paulo")
         self.assertEqual(capture.service_interest, "Duno - robô de limpeza")
         for context in ("Duno", "limpeza", "supermercado", "12.000 m²", "noturn", "infraestrutura", "São Paulo"):
@@ -682,15 +746,15 @@ class LiviaChatEndpointTests(TestCase):
             "empresa govip",
             "São Paulo",
             "11962196100",
-            "Marcos",
         ]
+        last_response = None
         for message in flow:
-            response = self.client.post(
+            last_response = self.client.post(
                 url,
                 data=json.dumps({"message": message, "session_key": session_key}),
                 content_type="application/json",
             )
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(last_response.status_code, 200)
 
         capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
         self.assertIsNotNone(capture)
@@ -699,6 +763,18 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(capture.city, "São Paulo")
         self.assertEqual(capture.phone, "11962196100")
         self.assertEqual(capture.email, "")
+        self.assertFalse(capture.is_qualified)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", last_response.json()["reply"].lower())
+
+        email_response = self.client.post(
+            url,
+            data=json.dumps({"message": "marcos@govip.com", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(email_response.status_code, 200)
+        capture.refresh_from_db()
+        self.assertEqual(capture.email, "marcos@govip.com")
         self.assertTrue(capture.is_qualified)
         self.assertEqual(capture.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
 
@@ -773,7 +849,7 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_flow_without_email_qualifies_with_valid_phone_and_description(self):
+    def test_flow_without_email_asks_email_without_notification(self):
         mail.outbox.clear()
         session_key = "requires-email-qualification"
         url = reverse("livia_assistant:chat")
@@ -794,9 +870,10 @@ class LiviaChatEndpointTests(TestCase):
             self.assertEqual(response.status_code, 200)
 
         pre_email_capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
-        self.assertTrue(pre_email_capture.is_qualified)
+        self.assertFalse(pre_email_capture.is_qualified)
         self.assertEqual(pre_email_capture.email, "")
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", response.json()["reply"].lower())
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_name_and_phone_only_does_not_qualify_and_keeps_collecting_required_fields(self):
@@ -846,7 +923,7 @@ class LiviaChatEndpointTests(TestCase):
         self.assertIn("qual cidade", last_response.json()["reply"].lower())
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_name_phone_company_city_without_email_qualifies(self):
+    def test_name_phone_company_city_without_email_asks_email(self):
         mail.outbox.clear()
         session_key = "scenario-c-no-email"
         url = reverse("livia_assistant:chat")
@@ -859,11 +936,11 @@ class LiviaChatEndpointTests(TestCase):
                 content_type="application/json",
             )
         capture = LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("-created_at").first()
-        self.assertTrue(capture.is_qualified)
+        self.assertFalse(capture.is_qualified)
         self.assertEqual(capture.city, "São Paulo")
         self.assertEqual(capture.email, "")
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("vou encaminhar seu pedido", last_response.json()["reply"].lower())
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", last_response.json()["reply"].lower())
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_all_five_fields_valid_sends_single_notification(self):
@@ -1058,7 +1135,9 @@ class LiviaChatEndpointTests(TestCase):
             "quero um atendimento, pode agendar uma visita?",
             "Marcelo",
             "control lab",
+            "São Paulo",
             "11 78457878",
+            "marcelo@controllab.com.br",
         ]
         last_response = None
         for message in flow:

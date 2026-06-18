@@ -705,6 +705,8 @@ def _has_ai_term(normalized_text):
 
 
 def web_system_interest_summary(normalized_text):
+    if is_web_system_project_text(normalized_text) and _has_ai_term(normalized_text):
+        return "Cliente interessado em desenvolvimento de sistema web com IA integrada para automatizar processos/planilhas."
     if any(term in normalized_text for term in ("planilha", "excel")):
         return "Cliente interessado em transformar controle por planilha em sistema web com relatórios e automações."
     if any(term in normalized_text for term in ("crm", "dashboard", "portal")):
@@ -871,7 +873,13 @@ def _requested_lead_field(text):
             "agora preciso do nome da empresa",
         )),
         ("phone", ("qual e o melhor telefone", "telefone/whatsapp")),
-        ("email", ("qual e o melhor e-mail", "qual e o seu e-mail")),
+        ("email", (
+            "qual é o melhor e-mail",
+            "qual e o melhor e-mail",
+            "qual é o seu e-mail",
+            "qual e o seu e-mail",
+            "qual e-mail podemos usar para formalizar o atendimento",
+        )),
         ("city", ("em qual cidade",)),
     )
     for field, markers in prompts:

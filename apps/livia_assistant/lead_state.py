@@ -64,7 +64,7 @@ def resolve_state(
 ) -> LeadStateSnapshot:
     if locked:
         return LeadStateSnapshot(state=LeadState.CLOSED, next_field="", is_terminal=True)
-    if has_name and (has_phone or has_email):
+    if has_name and has_company and has_city and has_phone and has_email:
         return LeadStateSnapshot(state=LeadState.QUALIFIED, next_field="", is_terminal=True)
     if not has_intent and not has_name and not has_company and not has_city and not has_phone and not has_email:
         return LeadStateSnapshot(state=LeadState.DISCOVERY, next_field="", is_terminal=False)
@@ -72,8 +72,10 @@ def resolve_state(
         return LeadStateSnapshot(state=LeadState.COLLECT_NAME, next_field="name", is_terminal=False)
     if not has_company:
         return LeadStateSnapshot(state=LeadState.COLLECT_COMPANY, next_field="company", is_terminal=False)
-    if not has_city and not city_skippable:
+    if not has_city:
         return LeadStateSnapshot(state=LeadState.COLLECT_CITY, next_field="city", is_terminal=False)
-    if not (has_phone or has_email):
+    if not has_phone:
         return LeadStateSnapshot(state=LeadState.COLLECT_PHONE, next_field="phone", is_terminal=False)
+    if not has_email:
+        return LeadStateSnapshot(state=LeadState.COLLECT_EMAIL, next_field="email", is_terminal=False)
     return LeadStateSnapshot(state=LeadState.OFFER_HANDOFF, next_field="", is_terminal=False)

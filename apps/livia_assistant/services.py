@@ -595,7 +595,13 @@ class LiviaAssistantService:
             ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome")),
             ("company", self.COMPANY_ASSISTANT_MARKERS),
             ("phone", ("telefone/whatsapp", "qual é o melhor telefone", "qual e o melhor telefone")),
-            ("email", ("qual é o melhor e-mail", "qual e o melhor e-mail", "qual é o seu e-mail", "qual e o seu e-mail")),
+            ("email", (
+                "qual é o melhor e-mail",
+                "qual e o melhor e-mail",
+                "qual é o seu e-mail",
+                "qual e o seu e-mail",
+                "qual e-mail podemos usar para formalizar o atendimento",
+            )),
             ("city", ("em qual cidade", "qual cidade você está")),
         )
         for field, markers in prompts:
@@ -1039,7 +1045,13 @@ class LiviaAssistantService:
             ("name", ("como posso te chamar", "qual é o seu nome", "qual e o seu nome", "informe seu nome", "informar seu nome", "me diga seu nome")),
             ("company", self.COMPANY_ASSISTANT_MARKERS),
             ("phone", ("qual é o melhor telefone", "qual e o melhor telefone", "telefone/whatsapp")),
-            ("email", ("qual é o melhor e-mail", "qual e o melhor e-mail", "qual é o seu e-mail", "qual e o seu e-mail")),
+            ("email", (
+                "qual é o melhor e-mail",
+                "qual e o melhor e-mail",
+                "qual é o seu e-mail",
+                "qual e o seu e-mail",
+                "qual e-mail podemos usar para formalizar o atendimento",
+            )),
             ("city", ("em qual cidade", "qual cidade você está")),
         )
         for field, markers in prompts:

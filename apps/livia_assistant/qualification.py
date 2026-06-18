@@ -215,15 +215,23 @@ def first_missing_required_field(capture) -> str:
         return "company"
     if not has_valid_city_field(capture):
         return "city"
-    if not (has_valid_phone_field(capture) or has_valid_email_field(capture)):
+    if not has_valid_phone_field(capture):
         return "phone"
+    if not has_valid_email_field(capture):
+        return "email"
     return ""
 
 
 def is_lead_ready_for_notification(capture) -> bool:
     if not has_valid_name_field(capture):
         return False
-    if not (has_valid_phone_field(capture) or has_valid_email_field(capture)):
+    if not has_valid_company_field(capture):
+        return False
+    if not has_valid_city_field(capture):
+        return False
+    if not has_valid_phone_field(capture):
+        return False
+    if not has_valid_email_field(capture):
         return False
     notes = _normalize(getattr(capture, "notes", ""))
     interest = _normalize(getattr(capture, "service_interest", ""))

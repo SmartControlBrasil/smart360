@@ -209,18 +209,20 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertEqual(data["company"], "")
         self.assertIn("equipamentos", data["notes"].lower())
 
-    def test_is_lead_ready_for_notification_accepts_name_phone_and_description(self):
+    def test_is_lead_ready_for_notification_requires_phone_email_and_description(self):
         capture = LiviaLeadCapture(
             name="João",
             company="Arteb",
             city="São Paulo",
             phone="1156487854",
-            email="",
+            email="joao@arteb.com.br",
             notes="preciso de automação",
         )
         self.assertTrue(is_lead_ready_for_notification(capture))
-        capture.phone = "12345"
         capture.email = ""
+        self.assertFalse(is_lead_ready_for_notification(capture))
+        capture.email = "joao@arteb.com.br"
+        capture.phone = "12345"
         self.assertFalse(is_lead_ready_for_notification(capture))
 
     def test_is_lead_ready_for_notification_rejects_invalid_generic_values(self):
@@ -387,6 +389,7 @@ class LiviaAssistantServiceTests(TestCase):
             company="Control Lab",
             city="Campinas",
             phone="1178457878",
+            email="marcelo@controllab.com.br",
             notes="IHM apagou",
         )
         self.assertFalse(self.service.should_send_qualified_reply(incomplete))
@@ -1060,7 +1063,8 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, second_text)
         lowered = response.reply.lower()
         self.assertNotIn("cidade", lowered)
-        self.assertIn("qual detalhe técnico", lowered)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", lowered)
+        self.assertNotIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
@@ -1071,7 +1075,8 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, text)
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
-        self.assertIn("qual detalhe técnico", lowered)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", lowered)
+        self.assertNotIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
@@ -1112,7 +1117,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_when_minimum_contact_and_description_present_does_not_ask_email(self):
+    def test_when_contact_and_description_present_without_email_asks_email(self):
         conversation = self.service.get_or_create_conversation(session_key="lead-only-email-missing")
         first = "quero um diagnóstico"
         self.service.register_user_message(conversation, first)
@@ -1122,9 +1127,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("qual detalhe técnico", lowered)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", lowered)
+        self.assertNotIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
-        self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -1138,9 +1143,9 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("qual detalhe técnico", lowered)
+        self.assertIn("qual e-mail podemos usar para formalizar o atendimento", lowered)
+        self.assertNotIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
-        self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
@@ -1263,7 +1268,19 @@ class LiviaAssistantServiceTests(TestCase):
             city_skippable=False,
             locked=False,
         )
-        self.assertEqual(snapshot.state, LeadState.QUALIFIED)
+        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
+
+        snapshot = resolve_state(
+            has_intent=True,
+            has_name=True,
+            has_company=True,
+            has_city=True,
+            has_phone=True,
+            has_email=False,
+            city_skippable=False,
+            locked=False,
+        )
+        self.assertEqual(snapshot.state, LeadState.COLLECT_EMAIL)
 
         snapshot = resolve_state(
             has_intent=True,

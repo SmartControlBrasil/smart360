@@ -44,7 +44,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertEqual(conversation.source_page, "/")
         self.assertEqual(conversation.status, LiviaConversation.Status.OPEN)
 
-    def test_get_or_create_conversation_opens_new_cycle_after_locked_capture(self):
+    def test_get_or_create_conversation_keeps_locked_cycle_for_new_question(self):
         conversation = self.service.get_or_create_conversation(session_key="cycle-session")
         LiviaLeadCapture.objects.create(
             conversation=conversation,
@@ -59,7 +59,7 @@ class LiviaAssistantServiceTests(TestCase):
             session_key="cycle-session",
             current_message="preciso fazer uma placa eletrônica",
         )
-        self.assertNotEqual(conversation.id, next_conversation.id)
+        self.assertEqual(conversation.id, next_conversation.id)
 
     def test_get_or_create_conversation_keeps_cycle_for_explicit_contact_followup_message(self):
         conversation = self.service.get_or_create_conversation(session_key="cycle-followup")
@@ -209,7 +209,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertEqual(data["company"], "")
         self.assertIn("equipamentos", data["notes"].lower())
 
-    def test_is_lead_ready_for_notification_requires_and(self):
+    def test_is_lead_ready_for_notification_accepts_name_phone_and_description(self):
         capture = LiviaLeadCapture(
             name="João",
             company="Arteb",
@@ -218,9 +218,10 @@ class LiviaAssistantServiceTests(TestCase):
             email="",
             notes="preciso de automação",
         )
-        self.assertFalse(is_lead_ready_for_notification(capture))
-        capture.email = "joao@arteb.com.br"
         self.assertTrue(is_lead_ready_for_notification(capture))
+        capture.phone = "12345"
+        capture.email = ""
+        self.assertFalse(is_lead_ready_for_notification(capture))
 
     def test_is_lead_ready_for_notification_rejects_invalid_generic_values(self):
         capture = LiviaLeadCapture(
@@ -371,7 +372,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("vou encaminhar", reply)
         self.assertTrue("em qual cidade" in reply or "qual e-mail" in reply, msg=reply)
 
-    def test_should_send_qualified_reply_requires_all_five_fields(self):
+    def test_should_send_qualified_reply_requires_minimum_contact_and_description(self):
         conversation = self.service.get_or_create_conversation(session_key="qualified-reply-gate")
         incomplete = LiviaLeadCapture(
             conversation=conversation,
@@ -386,7 +387,7 @@ class LiviaAssistantServiceTests(TestCase):
             company="Control Lab",
             city="Campinas",
             phone="1178457878",
-            email="marcelo@controllab.com.br",
+            notes="IHM apagou",
         )
         self.assertFalse(self.service.should_send_qualified_reply(incomplete))
         self.assertTrue(self.service.should_send_qualified_reply(complete))
@@ -994,14 +995,16 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_commercial_intent_quanto_custa_requests_lead_data(self):
+    def test_commercial_price_question_answers_scope_without_collecting_lead_data(self):
         conversation = self.service.get_or_create_conversation(session_key="lead-intent-quanto-custa")
         text = "quanto custa"
         self.service.register_user_message(conversation, text)
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
-        self.assertIn("especialista", lowered)
-        self.assertIn("como posso te chamar", lowered)
+        self.assertIn("valor depende", lowered)
+        self.assertIn("escopo", lowered)
+        self.assertFalse(response.lead_detected)
+        self.assertNotIn("como posso te chamar", lowered)
         self.assertNotIn("telefone/whatsapp", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
@@ -1057,7 +1060,7 @@ class LiviaAssistantServiceTests(TestCase):
         response = self.service.generate_response(conversation, second_text)
         lowered = response.reply.lower()
         self.assertNotIn("cidade", lowered)
-        self.assertIn("qual e-mail", lowered)
+        self.assertIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
@@ -1068,7 +1071,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, text)
         response = self.service.generate_response(conversation, text)
         lowered = response.reply.lower()
-        self.assertIn("qual e-mail", lowered)
+        self.assertIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
@@ -1109,7 +1112,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_when_only_email_missing_asks_only_email(self):
+    def test_when_minimum_contact_and_description_present_does_not_ask_email(self):
         conversation = self.service.get_or_create_conversation(session_key="lead-only-email-missing")
         first = "quero um diagnóstico"
         self.service.register_user_message(conversation, first)
@@ -1119,13 +1122,13 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("qual e-mail", lowered)
+        self.assertIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_when_only_email_and_description_missing_requests_exactly_both(self):
+    def test_when_minimum_contact_present_without_specific_description_continues_contextually(self):
         conversation = self.service.get_or_create_conversation(session_key="lead-email-description-missing")
         first = "quero um diagnóstico"
         self.service.register_user_message(conversation, first)
@@ -1135,7 +1138,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, second)
         response = self.service.generate_response(conversation, second)
         lowered = response.reply.lower()
-        self.assertIn("qual e-mail", lowered)
+        self.assertIn("qual detalhe técnico", lowered)
         self.assertNotIn("já tenho um contato", lowered)
         self.assertNotIn("sou a lívia", lowered)
         self.assertNotIn("sou a lívia", lowered)
@@ -1260,7 +1263,7 @@ class LiviaAssistantServiceTests(TestCase):
             city_skippable=False,
             locked=False,
         )
-        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
+        self.assertEqual(snapshot.state, LeadState.QUALIFIED)
 
         snapshot = resolve_state(
             has_intent=True,

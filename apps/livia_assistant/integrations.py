@@ -47,7 +47,6 @@ LEAD_INTENT_TERMS = (
     "cotação",
     "cotacao",
     "proposta",
-    "quanto custa",
     "diagnostico",
     "visita tecnica",
     "visita técnica",
@@ -84,7 +83,8 @@ SERVICE_KEYWORDS = {
     "automação industrial": ("automação", "automacao", "clp", "plc", "ihm"),
     "manutenção industrial": ("manutenção industrial", "manutencao industrial", "máquina", "maquina"),
     "contratos de manutenção": ("contrato", "recorrente", "preventiva"),
-    "Smart360": ("smart360", "ordem de serviço", "os", "dashboard", "sistema"),
+    "Smart360": ("smart360", "ordem de serviço", "os", "dashboard"),
+    "sistemas web com IA": ("sistema web", "sistemas web", "crm", "dashboard", "portal", "planilha", "automação de processo", "automacao de processo", "ia no sistema", "ia integrada"),
     "sistemas, sites e soluções digitais": ("site", "sistema", "django", "python", "digital"),
 }
 
@@ -115,6 +115,26 @@ class FallbackLiviaAIClient(LiviaAIClient):
             post_qualified_reply = build_post_qualified_followup_reply(normalized)
             if post_qualified_reply:
                 return post_qualified_reply
+
+        if is_clear_technical_issue(normalized):
+            technical_reply = build_clear_technical_issue_answer(normalized)
+            if lead_detected:
+                known = _collect_known_contact_fields(messages)
+                question = _lead_field_question(first_missing_required_field(_known_contact_snapshot(known)), known)
+                return f"{technical_reply}\n\nPara encaminhar corretamente, {question[:1].lower() + question[1:]}"
+            return technical_reply
+
+        if is_price_question(normalized):
+            if is_web_system_context(messages, normalized):
+                return build_web_system_price_answer()
+            return (
+                "O valor depende da configuração, aplicação, disponibilidade e escopo de implantação. "
+                "Para estimar corretamente, preciso entender objetivo, volume de uso, integrações e nível de implantação."
+            )
+
+        ai_data_reply = build_ai_data_answer(normalized)
+        if ai_data_reply:
+            return ai_data_reply
 
         continuation_reply = _build_continuation_reply(normalized, messages)
         if continuation_reply:
@@ -548,6 +568,154 @@ def build_maintenance_answer(normalized_text, rag_context):
     )
 
 
+def is_clear_technical_issue(normalized_text):
+    issue_terms = (
+        "ihm apagou",
+        "ihm apagada",
+        "maquina parada",
+        "máquina parada",
+        "maquina parou",
+        "máquina parou",
+        "linha parada",
+        "inversor em falha",
+        "inversor falha",
+        "painel apagou",
+        "painel apagado",
+        "clp sem comunicacao",
+        "clp sem comunicação",
+        "clp nao comunica",
+        "clp não comunica",
+    )
+    if any(term in normalized_text for term in issue_terms):
+        return True
+    if "inversor" in normalized_text and "falha" in normalized_text:
+        return True
+    if "ihm" in normalized_text and any(term in normalized_text for term in ("apagou", "apagada")):
+        return True
+    if "painel" in normalized_text and any(term in normalized_text for term in ("apagou", "apagado")):
+        return True
+    if "clp" in normalized_text and any(term in normalized_text for term in ("sem comunicacao", "sem comunicação", "nao comunica", "não comunica")):
+        return True
+    return False
+
+
+def build_clear_technical_issue_answer(normalized_text):
+    if "ihm" in normalized_text and any(term in normalized_text for term in ("apagou", "apagada")):
+        return (
+            "Quando uma IHM apaga, pode ser alimentação elétrica, fonte 24V, cabo, disjuntor/fusível, falha da própria IHM ou problema no painel. "
+            "Como envolve sistema elétrico, o ideal é não intervir sem técnico habilitado. "
+            "O painel da máquina também apagou ou somente a IHM?"
+        )
+    if "painel" in normalized_text and any(term in normalized_text for term in ("apagou", "apagado")):
+        return (
+            "Quando um painel apaga, pode haver falta de alimentação, disjuntor/fusível aberto, fonte com falha, proteção atuada ou problema interno no quadro. "
+            "Como envolve elétrica, mantenha o equipamento em condição segura e acione técnico habilitado antes de abrir o painel. "
+            "A máquina inteira parou ou apenas o painel ficou sem indicação?"
+        )
+    if "clp" in normalized_text and any(term in normalized_text for term in ("sem comunicacao", "sem comunicação", "nao comunica", "não comunica")):
+        return (
+            "CLP sem comunicação pode estar ligado a alimentação, rede industrial, cabo, endereço/configuração, módulo de comunicação ou falha no próprio controlador. "
+            "Antes de qualquer intervenção em painel, siga o bloqueio seguro e use técnico habilitado. "
+            "A falha aparece em uma IHM/supervisório ou nenhum equipamento comunica com o CLP?"
+        )
+    if "inversor" in normalized_text and "falha" in normalized_text:
+        return (
+            "Inversor em falha pode indicar sobrecorrente, subtensão/sobretensão, sobretemperatura, falha de motor, cabo ou parametrização. "
+            "Se houver painel energizado, não faça reset ou medições sem procedimento seguro e profissional habilitado. "
+            "Qual código de falha aparece no inversor?"
+        )
+    return (
+        "Máquina parada pode envolver alimentação, proteção atuada, falha elétrica, automação, sensores, inversor, CLP/IHM ou condição mecânica. "
+        "Se houver painel elétrico envolvido, não intervenha sem técnico habilitado e procedimento de segurança. "
+        "A parada começou após algum alarme, queda de energia ou intervenção recente?"
+    )
+
+
+def build_ai_data_answer(normalized_text):
+    if not any(term in normalized_text for term in (" ia", "ia ", "inteligencia artificial", "inteligência artificial", "prever falha", "previsao de falha", "previsão de falha")):
+        return ""
+    if not any(term in normalized_text for term in ("planilha", "dados", "historico", "histórico", "csv", "excel")):
+        return ""
+    return (
+        "Dá para avaliar o uso de IA, mas primeiro precisamos analisar a qualidade dos dados. "
+        "Antes de falar em previsão de falhas, precisamos verificar volume, histórico, estrutura, lacunas e consistência dos registros. "
+        "A planilha tem datas, equipamento, falha, causa, tempo parado e ação tomada?"
+    )
+
+
+def is_price_question(normalized_text):
+    price_terms = (
+        "preço",
+        "preco",
+        "valor",
+        "quanto custa",
+        "quanto fica",
+        "cobram quanto",
+        "custa colocar",
+        "investimento",
+    )
+    return any(term in normalized_text for term in price_terms)
+
+
+def _conversation_text(messages, current_normalized=""):
+    parts = [current_normalized]
+    for message in messages or []:
+        if message.get("role") in {"user", "assistant"}:
+            parts.append(_normalize(message.get("content", "")))
+    return " ".join(part for part in parts if part)
+
+
+def is_web_system_context(messages, current_normalized=""):
+    corpus = _conversation_text(messages, current_normalized)
+    web_terms = (
+        "sistema web",
+        "sistemas web",
+        "crm",
+        "dashboard",
+        "portal",
+        "planilha",
+        "relatorio",
+        "relatório",
+        "ia no sistema",
+        "ia integrada",
+        "automatizar processo",
+        "automacao de processo",
+        "automação de processo",
+    )
+    return any(term in corpus for term in web_terms)
+
+
+def is_web_system_project_text(normalized_text):
+    return is_web_system_context([], normalized_text)
+
+
+def build_web_system_price_answer():
+    return (
+        "O valor depende do escopo. Para estimar corretamente, precisamos entender quais processos o sistema deve automatizar, "
+        "quantidade de usuários, telas, relatórios, integrações e se haverá IA. Normalmente começamos definindo um MVP "
+        "com as funções essenciais para gerar resultado mais rápido. Qual processo você quer automatizar primeiro?"
+    )
+
+
+def _has_ai_term(normalized_text):
+    return bool(re.search(r"ia", normalized_text)) or any(
+        term in normalized_text
+        for term in ("inteligencia artificial", "inteligência artificial", "ia integrada", "ia no sistema")
+    )
+
+
+def web_system_interest_summary(normalized_text):
+    if any(term in normalized_text for term in ("planilha", "excel")):
+        return "Cliente interessado em transformar controle por planilha em sistema web com relatórios e automações."
+    if any(term in normalized_text for term in ("crm", "dashboard", "portal")):
+        return "Solicitação de CRM/dashboard/portal com possível integração de IA."
+    if _has_ai_term(normalized_text):
+        return "Solicitação de orçamento para desenvolvimento de sistema web com IA integrada."
+    if is_web_system_project_text(normalized_text):
+        return "Lead interessado em automatizar processo com sistema web."
+    return ""
+
+
 def build_rag_based_fallback(normalized_text, rag_context):
     if is_maintenance_question(normalized_text):
         return build_maintenance_answer(normalized_text, rag_context)
@@ -953,7 +1121,7 @@ def _format_missing_fields(fields):
 
 
 def _asks_for_price(normalized_text):
-    return any(term in normalized_text for term in ("preço", "preco", "valor", "quanto custa", "investimento"))
+    return is_price_question(normalized_text)
 
 
 def _asks_availability(normalized_text):

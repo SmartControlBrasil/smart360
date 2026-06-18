@@ -66,6 +66,8 @@ class LiviaCRMBridgeTests(TestCase):
         self.assertIn("Telefone/WhatsApp: 11999999999", body)
         self.assertIn("E-mail: cliente@example.com", body)
         self.assertIn("Interesse/problema: quero orçamento", body)
+        self.assertIn("Resumo executivo:", body)
+        self.assertIn("Histórico da conversa:", body)
 
     def test_notification_does_not_send_for_incomplete_lead(self):
         incomplete = LiviaLeadCapture.objects.create(

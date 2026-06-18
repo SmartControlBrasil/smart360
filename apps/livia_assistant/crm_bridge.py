@@ -8,6 +8,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.utils import timezone
 
+from .conversation_summary import build_lead_notification_body
 from .models import LiviaHandoffRequest, LiviaLeadCapture
 from .qualification import is_lead_ready_for_notification
 
@@ -220,20 +221,7 @@ class LiviaCRMBridge:
         display_name = (livia_lead.name or livia_lead.company or "Lead sem identificação").strip()
         subject = f"Novo lead da Lívia - {display_name}"
         timestamp = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M")
-        body = "\n".join(
-            [
-                "Novo lead qualificado pela Lívia",
-                "",
-                f"Nome: {livia_lead.name or 'Não informado'}",
-                f"Empresa: {livia_lead.company or 'Não informado'}",
-                f"Cidade: {livia_lead.city or 'Não informada'}",
-                f"Telefone/WhatsApp: {livia_lead.phone or 'Não informado'}",
-                f"E-mail: {livia_lead.email or 'Não informado'}",
-                f"Interesse/problema: {livia_lead.notes or 'Não informado'}",
-                "Origem: livia_assistant",
-                f"Data/hora: {timestamp}",
-            ]
-        )
+        body = build_lead_notification_body(livia_lead, timestamp=timestamp)
 
         email = EmailMultiAlternatives(
             subject=subject,

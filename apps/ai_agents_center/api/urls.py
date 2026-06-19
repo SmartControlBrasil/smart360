@@ -16,6 +16,7 @@ from apps.ai_agents_center.api.views import (
     AgentRecommendationViewSet,
     AgentRunViewSet,
     AgentScheduleHealthFlagViewSet,
+    CommercialOpportunityViewSet,
     AnomalyAnalysisRunView,
     MaintenanceAnalysisRunView,
     ManagerCopilotContextView,
@@ -43,6 +44,7 @@ router.register("marketplace-health", AgentMarketplaceRequestFlagViewSet, basena
 router.register("anomaly-health", AgentAnomalyAttentionFlagViewSet, basename="ai-agent-anomaly-health")
 router.register("copilot/sessions", ManagerCopilotSessionViewSet, basename="ai-agent-copilot-sessions")
 router.register("briefings", AIBriefingViewSet, basename="ai-agent-briefings")
+router.register("commercial-opportunities", CommercialOpportunityViewSet, basename="ai-agent-commercial-opportunities")
 
 urlpatterns = [
     path("manual-run/", AgentManualRunView.as_view(), name="ai-agent-manual-run"),

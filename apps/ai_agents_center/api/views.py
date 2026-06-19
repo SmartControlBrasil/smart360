@@ -19,6 +19,7 @@ from apps.ai_agents_center.api.serializers import (
     AgentRecommendationSerializer,
     AgentRunSerializer,
     AgentScheduleHealthFlagSerializer,
+    CommercialOpportunitySerializer,
     ManagerCopilotMessageSerializer,
     ManagerCopilotQuerySerializer,
     ManagerCopilotSessionSerializer,
@@ -37,10 +38,12 @@ from apps.ai_agents_center.models import (
     AgentRecommendation,
     AgentRun,
     AgentScheduleHealthFlag,
+    CommercialOpportunity,
     ManagerCopilotSession,
 )
 from apps.ai_agents_center.services.briefing_composer import AIBriefingComposer
 from apps.ai_agents_center.services.manager_copilot import ManagerCopilotService
+from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
 from apps.companies.models import Membership
 from apps.observability_center.services.observability_service import SystemEventService
@@ -281,6 +284,73 @@ class AgentActionProposalViewSet(ScopedAIAgentsMixin, viewsets.ReadOnlyModelView
             reason=serializer.validated_data.get("reason", ""),
         )
         return Response(AgentActionProposalSerializer(proposal).data, status=status.HTTP_200_OK)
+
+
+class CommercialOpportunityViewSet(ScopedAIAgentsMixin, viewsets.ReadOnlyModelViewSet):
+    serializer_class = CommercialOpportunitySerializer
+    permission_classes = [AIAgentsPermission]
+    lookup_field = "public_id"
+    filterset_fields = ("status", "source", "segment", "city", "state", "company")
+    search_fields = ("company_name", "title", "opportunity_description", "recommended_product", "recommended_solution")
+    ordering_fields = ("created_at", "updated_at", "confidence_score", "commercial_score")
+
+    def get_queryset(self):
+        queryset = CommercialOpportunity.objects.select_related("company", "lead", "agent_run").all()
+        queryset = self._apply_company_scope(queryset, "company")
+        status_filter = self.request.query_params.get("status")
+        source = self.request.query_params.get("source")
+        segment = self.request.query_params.get("segment")
+        city = self.request.query_params.get("city")
+        state = self.request.query_params.get("state")
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        if source:
+            queryset = queryset.filter(source=source)
+        if segment:
+            queryset = queryset.filter(segment__icontains=segment)
+        if city:
+            queryset = queryset.filter(city__icontains=city)
+        if state:
+            queryset = queryset.filter(state__iexact=state)
+        return queryset
+
+    @action(detail=True, methods=["post"], url_path="approve", permission_classes=[AIAgentsPermission])
+    def approve(self, request, public_id=None):
+        self.permission_action = "approve"
+        opportunity = self.get_object()
+        try:
+            OpportunityBuilderService.approve(opportunity=opportunity, user=request.user)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(self.get_serializer(opportunity).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="reject", permission_classes=[AIAgentsPermission])
+    def reject(self, request, public_id=None):
+        self.permission_action = "approve"
+        opportunity = self.get_object()
+        try:
+            OpportunityBuilderService.reject(
+                opportunity=opportunity,
+                user=request.user,
+                reason=request.data.get("reason", ""),
+            )
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(self.get_serializer(opportunity).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="convert-to-lead", permission_classes=[AIAgentsPermission])
+    def convert_to_lead(self, request, public_id=None):
+        self.permission_action = "approve"
+        opportunity = self.get_object()
+        try:
+            lead = OpportunityBuilderService.convert_to_lead(opportunity=opportunity, user=request.user)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        opportunity.refresh_from_db()
+        payload = self.get_serializer(opportunity).data
+        payload["lead_public_id"] = str(lead.public_id)
+        return Response(payload, status=status.HTTP_200_OK)
+
 
 
 class AgentMemoryEntryViewSet(ScopedAIAgentsMixin, viewsets.ReadOnlyModelViewSet):

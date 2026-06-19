@@ -133,8 +133,8 @@ class OpportunityBuilderService:
 
     @classmethod
     def approve(cls, *, opportunity, user=None):
-        if opportunity.status != CommercialOpportunity.Status.READY_FOR_REVIEW:
-            raise ValueError("Only READY_FOR_REVIEW opportunities can be approved.")
+        if opportunity.status not in {CommercialOpportunity.Status.NEW, CommercialOpportunity.Status.READY_FOR_REVIEW}:
+            raise ValueError("Only NEW or READY_FOR_REVIEW opportunities can be approved.")
         opportunity.status = CommercialOpportunity.Status.APPROVED
         opportunity.reviewed_by = user
         opportunity.reviewed_at = timezone.now()
@@ -143,6 +143,8 @@ class OpportunityBuilderService:
 
     @classmethod
     def reject(cls, *, opportunity, user=None, reason=""):
+        if opportunity.status not in {CommercialOpportunity.Status.NEW, CommercialOpportunity.Status.READY_FOR_REVIEW}:
+            raise ValueError("Only NEW or READY_FOR_REVIEW opportunities can be rejected.")
         opportunity.status = CommercialOpportunity.Status.REJECTED
         opportunity.reviewed_by = user
         opportunity.reviewed_at = timezone.now()
@@ -153,10 +155,10 @@ class OpportunityBuilderService:
     @classmethod
     @transaction.atomic
     def convert_to_lead(cls, *, opportunity, user=None):
+        if opportunity.status == CommercialOpportunity.Status.CONVERTED_TO_LEAD or opportunity.lead_id:
+            raise ValueError("Commercial opportunity has already been converted to a lead.")
         if opportunity.status != CommercialOpportunity.Status.APPROVED:
             raise ValueError("Only APPROVED opportunities can be converted to Growth Engine leads.")
-        if opportunity.lead_id:
-            return opportunity.lead
         metadata = opportunity.metadata or {}
         lead = LeadService.create_lead(
             user=user,

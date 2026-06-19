@@ -1,5 +1,6 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 
+from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 from apps.ai_agents_center.models import (
     AgentActionProposal,
     AgentAnomalyAttentionFlag,
@@ -100,10 +101,73 @@ class AgentAnomalyAttentionFlagAdmin(admin.ModelAdmin):
 
 @admin.register(CommercialOpportunity)
 class CommercialOpportunityAdmin(admin.ModelAdmin):
-    list_display = ("company_name", "segment", "source", "commercial_score", "confidence_score", "status", "created_at")
-    list_filter = ("status", "source", "state")
-    search_fields = ("company_name", "segment", "city", "problem_detected", "recommended_solution", "recommended_product")
+    list_display = (
+        "title",
+        "company_name",
+        "segment",
+        "city",
+        "state",
+        "source",
+        "confidence_score",
+        "commercial_score",
+        "status",
+        "created_at",
+    )
+    list_filter = ("status", "source", "segment", "city", "state")
+    search_fields = (
+        "company_name",
+        "title",
+        "opportunity_description",
+        "recommended_product",
+        "recommended_solution",
+    )
     readonly_fields = ("public_id", "created_at", "updated_at", "converted_at", "reviewed_at")
+    actions = ("approve_selected_opportunities", "reject_selected_opportunities", "convert_approved_opportunities_to_lead")
+
+    @admin.action(description="Approve selected opportunities")
+    def approve_selected_opportunities(self, request, queryset):
+        approved = 0
+        blocked = 0
+        for opportunity in queryset:
+            try:
+                OpportunityBuilderService.approve(opportunity=opportunity, user=request.user)
+                approved += 1
+            except ValueError:
+                blocked += 1
+        if approved:
+            self.message_user(request, f"{approved} opportunity/opportunities approved.", messages.SUCCESS)
+        if blocked:
+            self.message_user(request, f"{blocked} opportunity/opportunities could not be approved.", messages.WARNING)
+
+    @admin.action(description="Reject selected opportunities")
+    def reject_selected_opportunities(self, request, queryset):
+        rejected = 0
+        blocked = 0
+        for opportunity in queryset:
+            try:
+                OpportunityBuilderService.reject(opportunity=opportunity, user=request.user, reason="Rejected from admin action.")
+                rejected += 1
+            except ValueError:
+                blocked += 1
+        if rejected:
+            self.message_user(request, f"{rejected} opportunity/opportunities rejected.", messages.SUCCESS)
+        if blocked:
+            self.message_user(request, f"{blocked} opportunity/opportunities could not be rejected.", messages.WARNING)
+
+    @admin.action(description="Convert approved opportunities to lead")
+    def convert_approved_opportunities_to_lead(self, request, queryset):
+        converted = 0
+        blocked = 0
+        for opportunity in queryset:
+            try:
+                OpportunityBuilderService.convert_to_lead(opportunity=opportunity, user=request.user)
+                converted += 1
+            except ValueError:
+                blocked += 1
+        if converted:
+            self.message_user(request, f"{converted} opportunity/opportunities converted to lead.", messages.SUCCESS)
+        if blocked:
+            self.message_user(request, f"{blocked} opportunity/opportunities were not approved or already converted.", messages.WARNING)
 
 
 @admin.register(AgentMemoryEntry)

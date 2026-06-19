@@ -14,6 +14,7 @@ from apps.ai_agents_center.models import (
     AgentRecommendation,
     AgentRun,
     AgentScheduleHealthFlag,
+    CommercialOpportunity,
     ManagerCopilotConfiguration,
     ManagerCopilotMessage,
     ManagerCopilotSession,
@@ -190,6 +191,34 @@ class AgentActionProposalSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+
+class CommercialOpportunitySerializer(serializers.ModelSerializer):
+    lead_public_id = serializers.UUIDField(source="lead.public_id", read_only=True)
+
+    class Meta:
+        model = CommercialOpportunity
+        fields = (
+            "public_id",
+            "title",
+            "company_name",
+            "segment",
+            "city",
+            "state",
+            "source",
+            "problem_detected",
+            "opportunity_description",
+            "recommended_solution",
+            "recommended_product",
+            "confidence_score",
+            "commercial_score",
+            "status",
+            "metadata",
+            "lead_public_id",
+            "created_at",
+            "updated_at",
+        )
+
 
 
 class AgentMemoryEntrySerializer(serializers.ModelSerializer):

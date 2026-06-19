@@ -270,6 +270,9 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 "com evolução em pré-lançamento e implantação assistida. Você quer avaliar gestão de OS, manutenção ou dashboards?"
             )
 
+        if bool((context or {}).get("qualified_cycle_locked")):
+            return "Perfeito. Registrei essa informação como um complemento à sua solicitação já encaminhada. A equipe avaliará os detalhes."
+
         return (
             "Sou a Lívia, assistente da Smart Control Brasil. Posso ajudar com automação industrial, robótica Xyron, "
             "Mitsubishi Electric, integração de sistemas, manutenção técnica e soluções digitais. "
@@ -353,17 +356,17 @@ def _detect_service_interest(normalized_text):
 def _system_prompt_with_context(system_prompt, context=None):
     context = context or {}
     knowledge_context = context.get("knowledge_context", "")
-    locked_technical_followup = context.get("locked_technical_followup", False)
+    qualified_cycle_locked = context.get("qualified_cycle_locked", False)
     
     prompt = system_prompt.rstrip()
     
-    if locked_technical_followup:
+    if qualified_cycle_locked:
         prompt += (
-            "\n\nIMPORTANTE: O usuário já registrou seus dados e o atendimento já foi encaminhado. "
-            "Ele está apenas enviando mais detalhes técnicos ou continuando o assunto anterior. "
-            "Responda à dúvida dele, mas NÃO tente coletar dados comerciais, "
-            "NÃO reabra o fluxo de lead, e NÃO pergunte 'posso anotar um resumo e encaminhar?'. "
-            "Apenas responda e, se fizer sentido, diga que a informação foi adicionada ao atendimento."
+            "\n\nIMPORTANTE: Os dados do cliente já foram coletados nesta conversa e a solicitação inicial já foi encaminhada. "
+            "Sob nenhuma hipótese peça novamente nome, empresa, telefone, WhatsApp, e-mail ou cidade. "
+            "Se o usuário demonstrar interesse em serviço adicional, proposta complementar, contrato de manutenção, "
+            "assistência técnica, treinamento, acessórios, peças ou outro produto, registre como complemento da "
+            "solicitação existente e continue a conversa normalmente."
         )
 
     if knowledge_context:

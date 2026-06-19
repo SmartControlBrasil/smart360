@@ -2235,3 +2235,57 @@ class LeadCycleFieldCorrectionViewTests(TestCase):
         body = mail.outbox[0].body.lower()
         self.assertIn("marmoraria", body)
         self.assertTrue(any(term in body for term in ("estoque", "clientes", "vendas", "captação", "captacao")))
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_livia_does_not_recollect_data_after_qualified_lead_on_short_confirmation(self):
+        mail.outbox.clear()
+        session_key = "test-post-lead-protection"
+        url = reverse("livia_assistant:chat")
+        
+        # 1-3. Usuário pede orçamento e Lívia qualifica o lead
+        flow = [
+            "quero orçamento para robô",
+            "Ricardo",
+            "ABB",
+            "1123232323",
+            "dadoi@dodoi.com.br",
+            "são paulo",
+        ]
+        
+        for message in flow:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+            
+        self.assertTrue(response.json()["lead_registered"])
+        
+        # 4. Usuário pergunta sobre assistência técnica
+        response = self.client.post(
+            url,
+            data=json.dumps({"message": "como funciona a assistência técnica?", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        
+        # 6. Usuário responde: "sim gostaria"
+        response = self.client.post(
+            url,
+            data=json.dumps({"message": "sim gostaria", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        
+        # 7. Validar que a resposta NÃO pede dados comerciais
+        reply = response.json()["reply"].lower()
+        self.assertNotIn("empresa e telefone", reply)
+        self.assertNotIn("qual sua empresa", reply)
+        self.assertNotIn("qual telefone", reply)
+        self.assertNotIn("e-mail", reply)
+        self.assertNotIn("como posso te chamar", reply)
+        
+        # 8. Validar que a resposta contém complemento
+        self.assertIn("complemento", reply)
+

@@ -17,6 +17,7 @@ from apps.ai_agents_center.models import (
     AIBriefingConfiguration,
     AIBriefingDelivery,
     CommercialOpportunity,
+    EduardoProspectImportBatch,
     ClientPortalCopilotConfiguration,
     ClientPortalCopilotMessage,
     ClientPortalCopilotSession,
@@ -111,9 +112,11 @@ class CommercialOpportunityAdmin(admin.ModelAdmin):
         "confidence_score",
         "commercial_score",
         "status",
+        "outreach_channel",
+        "outreach_status",
         "created_at",
     )
-    list_filter = ("status", "source", "segment", "city", "state")
+    list_filter = ("status", "source", "segment", "city", "state", "outreach_channel", "outreach_status")
     search_fields = (
         "company_name",
         "title",
@@ -121,7 +124,18 @@ class CommercialOpportunityAdmin(admin.ModelAdmin):
         "recommended_product",
         "recommended_solution",
     )
-    readonly_fields = ("public_id", "created_at", "updated_at", "converted_at", "reviewed_at")
+    readonly_fields = (
+        "public_id",
+        "created_at",
+        "updated_at",
+        "converted_at",
+        "reviewed_at",
+        "outreach_channel",
+        "outreach_sender_email",
+        "outreach_domain",
+        "outreach_status",
+        "outreach_notes",
+    )
     actions = ("approve_selected_opportunities", "reject_selected_opportunities", "convert_approved_opportunities_to_lead")
 
     @admin.action(description="Approve selected opportunities")
@@ -168,6 +182,41 @@ class CommercialOpportunityAdmin(admin.ModelAdmin):
             self.message_user(request, f"{converted} opportunity/opportunities converted to lead.", messages.SUCCESS)
         if blocked:
             self.message_user(request, f"{blocked} opportunity/opportunities were not approved or already converted.", messages.WARNING)
+
+
+@admin.register(EduardoProspectImportBatch)
+class EduardoProspectImportBatchAdmin(admin.ModelAdmin):
+    list_display = (
+        "public_id",
+        "source",
+        "filename",
+        "status",
+        "total_rows",
+        "processed_rows",
+        "created_opportunities",
+        "skipped_duplicates",
+        "skipped_empty_rows",
+        "company",
+        "created_at",
+    )
+    list_filter = ("status", "source", "company")
+    search_fields = ("filename", "public_id")
+    readonly_fields = (
+        "public_id",
+        "company",
+        "created_by",
+        "source",
+        "filename",
+        "total_rows",
+        "processed_rows",
+        "created_opportunities",
+        "skipped_duplicates",
+        "skipped_empty_rows",
+        "errors",
+        "status",
+        "created_at",
+        "updated_at",
+    )
 
 
 @admin.register(AgentMemoryEntry)

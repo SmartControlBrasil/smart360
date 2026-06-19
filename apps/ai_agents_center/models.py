@@ -789,6 +789,18 @@ class CommercialOpportunity(models.Model):
         PARTNER = "partner", "Partner"
         EVENT = "event", "Event"
         PUBLIC_DATA = "public_data", "Public Data"
+        CSV = "csv", "CSV"
+
+    class OutreachChannel(models.TextChoices):
+        NONE = "none", "None"
+        EMAIL = "email", "Email"
+
+    class OutreachStatus(models.TextChoices):
+        NOT_STARTED = "not_started", "Not Started"
+        QUEUED = "queued", "Queued"
+        SENT = "sent", "Sent"
+        FAILED = "failed", "Failed"
+        CANCELLED = "cancelled", "Cancelled"
 
     id = models.BigAutoField(primary_key=True)
     public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -843,6 +855,21 @@ class CommercialOpportunity(models.Model):
         blank=True,
     )
     converted_at = models.DateTimeField(null=True, blank=True)
+    outreach_channel = models.CharField(
+        max_length=30,
+        choices=OutreachChannel.choices,
+        default=OutreachChannel.NONE,
+        db_index=True,
+    )
+    outreach_sender_email = models.CharField(max_length=254, blank=True, default="")
+    outreach_domain = models.CharField(max_length=120, blank=True, default="")
+    outreach_status = models.CharField(
+        max_length=30,
+        choices=OutreachStatus.choices,
+        default=OutreachStatus.NOT_STARTED,
+        db_index=True,
+    )
+    outreach_notes = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -856,6 +883,59 @@ class CommercialOpportunity(models.Model):
 
     def __str__(self):
         return f"{self.company_name}: {self.title}"
+
+
+class EduardoProspectImportBatch(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    company = models.ForeignKey(
+        "companies.Company",
+        on_delete=models.CASCADE,
+        related_name="edu_prospect_import_batches",
+        null=True,
+        blank=True,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="edu_prospect_import_batches",
+        null=True,
+        blank=True,
+    )
+    source = models.CharField(max_length=30, default=CommercialOpportunity.Source.MANUAL, db_index=True)
+    filename = models.CharField(max_length=255, blank=True, default="")
+    total_rows = models.PositiveIntegerField(default=0)
+    processed_rows = models.PositiveIntegerField(default=0)
+    created_opportunities = models.PositiveIntegerField(default=0)
+    skipped_duplicates = models.PositiveIntegerField(default=0)
+    skipped_empty_rows = models.PositiveIntegerField(default=0)
+    errors = models.JSONField(default=list, blank=True)
+    status = models.CharField(
+        max_length=30,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "ai_agents_edu_prospect_import_batches"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status", "created_at"], name="ai_edu_imp_status_created_idx"),
+            models.Index(fields=["source", "created_at"], name="ai_edu_imp_source_created_idx"),
+        ]
+
+    def __str__(self):
+        label = self.filename or self.source
+        return f"EDU import {label} ({self.status})"
 
 
 class ManagerCopilotConfiguration(models.Model):

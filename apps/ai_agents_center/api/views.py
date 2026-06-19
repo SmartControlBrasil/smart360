@@ -20,6 +20,8 @@ from apps.ai_agents_center.api.serializers import (
     AgentRunSerializer,
     AgentScheduleHealthFlagSerializer,
     CommercialOpportunitySerializer,
+    EduardoProspectImportBatchSerializer,
+    EduardoProspectImportSerializer,
     ManagerCopilotMessageSerializer,
     ManagerCopilotQuerySerializer,
     ManagerCopilotSessionSerializer,
@@ -42,6 +44,7 @@ from apps.ai_agents_center.models import (
     ManagerCopilotSession,
 )
 from apps.ai_agents_center.services.briefing_composer import AIBriefingComposer
+from apps.ai_agents_center.services.eduardo_importer import EduardoImporterService
 from apps.ai_agents_center.services.manager_copilot import ManagerCopilotService
 from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
@@ -350,6 +353,27 @@ class CommercialOpportunityViewSet(ScopedAIAgentsMixin, viewsets.ReadOnlyModelVi
         payload = self.get_serializer(opportunity).data
         payload["lead_public_id"] = str(lead.public_id)
         return Response(payload, status=status.HTTP_200_OK)
+
+
+class EduardoProspectImportView(APIView):
+    permission_classes = [AIAgentsPermission]
+    permission_action = "manage"
+
+    def post(self, request, *args, **kwargs):
+        serializer = EduardoProspectImportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        company = serializer.validated_data["company"]
+        membership = Membership.objects.filter(user=request.user, company=company).first()
+        if membership is None and not getattr(request.user, "is_superuser", False):
+            return Response({"detail": "Company not accessible for current user."}, status=status.HTTP_403_FORBIDDEN)
+        batch = EduardoImporterService.import_rows(
+            rows=serializer.validated_data["rows"],
+            company=company,
+            source=serializer.validated_data.get("source", CommercialOpportunity.Source.MANUAL),
+            filename=serializer.validated_data.get("filename", ""),
+            created_by=request.user,
+        )
+        return Response(EduardoProspectImportBatchSerializer(batch).data, status=status.HTTP_201_CREATED)
 
 
 

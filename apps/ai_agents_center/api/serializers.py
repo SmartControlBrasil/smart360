@@ -15,6 +15,7 @@ from apps.ai_agents_center.models import (
     AgentRun,
     AgentScheduleHealthFlag,
     CommercialOpportunity,
+    EduardoProspectImportBatch,
     ManagerCopilotConfiguration,
     ManagerCopilotMessage,
     ManagerCopilotSession,
@@ -214,11 +215,63 @@ class CommercialOpportunitySerializer(serializers.ModelSerializer):
             "commercial_score",
             "status",
             "metadata",
+            "outreach_channel",
+            "outreach_sender_email",
+            "outreach_domain",
+            "outreach_status",
+            "outreach_notes",
             "lead_public_id",
             "created_at",
             "updated_at",
         )
 
+
+class EduardoProspectRowSerializer(serializers.Serializer):
+    company_name = serializers.CharField(required=False, allow_blank=True)
+    segment = serializers.CharField(required=False, allow_blank=True)
+    city = serializers.CharField(required=False, allow_blank=True)
+    state = serializers.CharField(required=False, allow_blank=True)
+    website = serializers.CharField(required=False, allow_blank=True)
+    contact_email = serializers.CharField(required=False, allow_blank=True)
+    contact_phone = serializers.CharField(required=False, allow_blank=True)
+    contact_name = serializers.CharField(required=False, allow_blank=True)
+    notes = serializers.CharField(required=False, allow_blank=True)
+    source = serializers.CharField(required=False, allow_blank=True)
+
+
+class EduardoProspectImportSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from apps.companies.models import Company
+
+        self.fields["company"] = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())
+
+    source = serializers.ChoiceField(
+        choices=CommercialOpportunity.Source.choices,
+        default=CommercialOpportunity.Source.MANUAL,
+        required=False,
+    )
+    filename = serializers.CharField(required=False, allow_blank=True, default="")
+    rows = EduardoProspectRowSerializer(many=True)
+
+
+class EduardoProspectImportBatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EduardoProspectImportBatch
+        fields = (
+            "public_id",
+            "source",
+            "filename",
+            "total_rows",
+            "processed_rows",
+            "created_opportunities",
+            "skipped_duplicates",
+            "skipped_empty_rows",
+            "errors",
+            "status",
+            "created_at",
+            "updated_at",
+        )
 
 
 class AgentMemoryEntrySerializer(serializers.ModelSerializer):

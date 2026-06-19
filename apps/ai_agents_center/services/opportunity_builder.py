@@ -43,6 +43,7 @@ class OpportunityBuilderService:
         )
         source = source if source in cls.VALID_SOURCES else CommercialOpportunity.Source.MANUAL
         relation_fields = cls._relation_fields(company=company, company_id=company_id, agent_run=agent_run, agent_run_id=agent_run_id)
+        raw = opportunity.get("raw") or {}
         metadata = {
             "origin_agent": "eduardo-commercial-intelligence-agent",
             "facts": analysis.facts,
@@ -50,6 +51,9 @@ class OpportunityBuilderService:
             "missing_information": analysis.missing_information,
             "score_label": analysis.score_label,
             "institutional_contacts": opportunity.get("institutional_contacts") or [],
+            "contact_name": raw.get("contact_name") or "",
+            "contact_email": raw.get("contact_email") or "",
+            "contact_phone": raw.get("contact_phone") or "",
             "website": opportunity.get("website") or "",
             "evidence": opportunity.get("evidence") or [],
             "source_urls": opportunity.get("source_urls") or [],
@@ -79,6 +83,10 @@ class OpportunityBuilderService:
             company_name=company_name,
             source=source,
             problem_detected=problem_detected,
+            outreach_channel=CommercialOpportunity.OutreachChannel.NONE,
+            outreach_sender_email="",
+            outreach_domain="",
+            outreach_status=CommercialOpportunity.OutreachStatus.NOT_STARTED,
             **defaults,
         )
 

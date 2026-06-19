@@ -142,6 +142,7 @@ class CommercialIntelligenceService:
             "innovation_potential": data.get("innovation_potential") or data.get("potencial_inovacao") or UNCONFIRMED,
             "problems": problems,
             "evidence": evidence,
+            "source": data.get("source") or data.get("origem") or "manual",
             "source_urls": data.get("source_urls") or data.get("fontes") or [],
             "raw": data,
         }

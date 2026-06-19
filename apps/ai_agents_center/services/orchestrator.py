@@ -168,6 +168,7 @@ class AgentCoordinatorService:
                 trigger_reference=trigger_reference,
                 triggered_by=triggered_by,
             )
+            context["agent_run_id"] = run.id
             if experiment_assignment is not None:
                 context["experiment"] = {
                     "experiment_public_id": str(experiment_assignment.experiment.public_id),

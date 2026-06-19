@@ -771,6 +771,93 @@ class AgentMemoryEntry(models.Model):
         return f"{self.agent.slug}:{self.memory_kind}"
 
 
+class CommercialOpportunity(models.Model):
+    class Status(models.TextChoices):
+        NEW = "new", "New"
+        ENRICHING = "enriching", "Enriching"
+        READY_FOR_REVIEW = "ready_for_review", "Ready for Review"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+        CONVERTED_TO_LEAD = "converted_to_lead", "Converted to Lead"
+
+    class Source(models.TextChoices):
+        MANUAL = "manual", "Manual"
+        WEBSITE = "website", "Website"
+        LINKEDIN = "linkedin", "LinkedIn"
+        INSTAGRAM = "instagram", "Instagram"
+        GOOGLE_MAPS = "google_maps", "Google Maps"
+        PARTNER = "partner", "Partner"
+        EVENT = "event", "Event"
+        PUBLIC_DATA = "public_data", "Public Data"
+
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    agent_run = models.ForeignKey(
+        "ai_agents_center.AgentRun",
+        on_delete=models.SET_NULL,
+        related_name="commercial_opportunities",
+        null=True,
+        blank=True,
+    )
+    company = models.ForeignKey(
+        "companies.Company",
+        on_delete=models.CASCADE,
+        related_name="commercial_opportunities",
+        null=True,
+        blank=True,
+    )
+    lead = models.ForeignKey(
+        "growth_engine.Lead",
+        on_delete=models.SET_NULL,
+        related_name="commercial_opportunities",
+        null=True,
+        blank=True,
+    )
+    company_name = models.CharField(max_length=180)
+    segment = models.CharField(max_length=120, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    source = models.CharField(max_length=30, choices=Source.choices, default=Source.MANUAL, db_index=True)
+    title = models.CharField(max_length=240)
+    problem_detected = models.TextField()
+    opportunity_description = models.TextField(blank=True)
+    recommended_solution = models.TextField(blank=True)
+    recommended_product = models.CharField(max_length=240, blank=True)
+    commercial_score = models.PositiveSmallIntegerField(default=0, db_index=True)
+    confidence_score = models.DecimalField(max_digits=3, decimal_places=2, default=0, db_index=True)
+    status = models.CharField(max_length=30, choices=Status.choices, default=Status.NEW, db_index=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="reviewed_commercial_opportunities",
+        null=True,
+        blank=True,
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    converted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="converted_commercial_opportunities",
+        null=True,
+        blank=True,
+    )
+    converted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "ai_agents_commercial_opportunities"
+        ordering = ["-commercial_score", "-confidence_score", "-created_at"]
+        indexes = [
+            models.Index(fields=["status", "commercial_score"], name="ai_comm_opp_status_score_idx"),
+            models.Index(fields=["source", "created_at"], name="ai_comm_opp_source_created_idx"),
+        ]
+
+    def __str__(self):
+        return f"{self.company_name}: {self.title}"
+
+
 class ManagerCopilotConfiguration(models.Model):
     id = models.BigAutoField(primary_key=True)
     public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)

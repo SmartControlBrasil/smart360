@@ -166,8 +166,9 @@ class AgentRegistryService:
                     "query_public_institutional_contacts",
                     "analyze_market_problem_fit",
                     "score_commercial_opportunity",
-                    "create_growth_lead_from_public_opportunity",
-                    "enrich_growth_lead_public_evidence",
+                    "review_commercial_opportunity",
+                    "enrich_commercial_opportunity",
+                    "convert_commercial_opportunity_to_lead",
                 ],
                 "portfolio": {
                     "robotics": ["NeoBot", "HostBot", "ConnectBot", "Buddy", "OrbitBot", "PatrolBot", "LIRO", "LittleBot", "HygiBot", "Duno", "MowerBot"],
@@ -283,8 +284,9 @@ class AgentRegistryService:
                         "review_marketplace_regional_coverage",
                         "review_contract_profitability_shift",
                         "open_operational_attention_committee",
-                        "create_growth_lead_from_public_opportunity",
-                        "enrich_growth_lead_public_evidence",
+                        "review_commercial_opportunity",
+                        "enrich_commercial_opportunity",
+                        "convert_commercial_opportunity_to_lead",
                     ],
                 },
             )

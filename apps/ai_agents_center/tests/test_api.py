@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 
 from apps.access_control_center.services.smart_system_access import assign_smart_system_role, bootstrap_smart_system_access
 from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentAssetAttentionFlag, AgentMarketplaceRequestFlag, AgentProfitabilityAttentionFlag, AgentRecommendation, AgentRun
-from apps.ai_agents_center.models import AgentAnomalyAttentionFlag, ManagerCopilotMessage, ManagerCopilotSession
+from apps.ai_agents_center.models import AgentAnomalyAttentionFlag, CommercialOpportunity, ManagerCopilotMessage, ManagerCopilotSession
 from apps.analytics_platform.models import ContractProfitability, OperationalMetrics
 from apps.analytics_platform.services.analytics_service import ExecutiveAnalyticsService
 from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
@@ -241,10 +241,12 @@ class AIAgentsCenterApiTests(APITestCase):
         self.assertEqual(run.status, AgentRun.Status.COMPLETED)
         recommendation = AgentRecommendation.objects.filter(agent_run__agent__slug="eduardo-commercial-intelligence-agent").latest("created_at")
         proposal = AgentActionProposal.objects.filter(agent_run__agent__slug="eduardo-commercial-intelligence-agent").latest("created_at")
+        opportunity = CommercialOpportunity.objects.get(company_name="Hospital Exemplo")
         self.assertEqual(recommendation.payload["score"]["label"], "Estrategico")
-        self.assertEqual(proposal.action_type, "create_growth_lead_from_public_opportunity")
-        self.assertEqual(proposal.proposed_payload["company_name"], "Hospital Exemplo")
-        self.assertIn("HygiBot", proposal.proposed_payload["metadata"]["product_recommended"])
+        self.assertEqual(proposal.action_type, "review_commercial_opportunity")
+        self.assertEqual(proposal.target_entity_id, str(opportunity.public_id))
+        self.assertEqual(opportunity.agent_run, run)
+        self.assertIn("HygiBot", opportunity.recommended_product)
 
     def test_agent_detects_recurring_failure_pattern(self):
         response = self.client.post(

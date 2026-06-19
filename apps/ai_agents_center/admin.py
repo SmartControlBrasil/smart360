@@ -15,6 +15,7 @@ from apps.ai_agents_center.models import (
     AIBriefing,
     AIBriefingConfiguration,
     AIBriefingDelivery,
+    CommercialOpportunity,
     ClientPortalCopilotConfiguration,
     ClientPortalCopilotMessage,
     ClientPortalCopilotSession,
@@ -95,6 +96,14 @@ class AgentAnomalyAttentionFlagAdmin(admin.ModelAdmin):
     list_display = ("focus_type", "display_label", "company", "site", "risk_level", "attention_score", "status", "updated_at")
     list_filter = ("focus_type", "risk_level", "status", "company", "site")
     search_fields = ("display_label", "summary", "target_entity_type", "target_entity_id")
+
+
+@admin.register(CommercialOpportunity)
+class CommercialOpportunityAdmin(admin.ModelAdmin):
+    list_display = ("company_name", "segment", "source", "commercial_score", "confidence_score", "status", "created_at")
+    list_filter = ("status", "source", "state")
+    search_fields = ("company_name", "segment", "city", "problem_detected", "recommended_solution", "recommended_product")
+    readonly_fields = ("public_id", "created_at", "updated_at", "converted_at", "reviewed_at")
 
 
 @admin.register(AgentMemoryEntry)

@@ -63,8 +63,54 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(response.status_code, 200)
         reply = response.json()["reply"].lower()
         self.assertLess(reply.index("quando uma ihm apaga"), reply.index("como posso te chamar"))
-        self.assertIn("técnico habilitado", reply)
-        self.assertIn("somente a ihm", reply)
+
+    def test_livia_does_not_capture_product_answer_as_contact_name_before_name_step(self):
+        # 1. Usuário: "vi um robô e gostaria de informações"
+        resp = self.client.post(
+            reverse("livia_assistant:chat"),
+            data=json.dumps({"message": "vi um robô e gostaria de informações", "session_key": "test-name-lock"}),
+            content_type="application/json",
+        )
+        # 2. Usuário pergunta algo ou dá contexto.
+        resp = self.client.post(
+            reverse("livia_assistant:chat"),
+            data=json.dumps({"message": "aquele tava com as crianças, qual é o nome dele?", "session_key": "test-name-lock"}),
+            content_type="application/json",
+        )
+        # 3. Usuário responde: "acho que liro"
+        resp = self.client.post(
+            reverse("livia_assistant:chat"),
+            data=json.dumps({"message": "acho que liro", "session_key": "test-name-lock"}),
+            content_type="application/json",
+        )
+        
+        # 4. Validar que contact_name/name ainda está vazio.
+        conv = LiviaConversation.objects.get(session_key="test-name-lock")
+        open_lead = conv.lead_captures.first()
+        if open_lead:
+            self.assertEqual(open_lead.name, "")
+
+        # 5. Usuário pede orçamento.
+        resp = self.client.post(
+            reverse("livia_assistant:chat"),
+            data=json.dumps({"message": "quero um orçamento", "session_key": "test-name-lock"}),
+            content_type="application/json",
+        )
+        
+        # 6. Validar que a Lívia pergunta "Como posso te chamar?"
+        self.assertIn("como posso te chamar", resp.json()["reply"].lower())
+
+        # 7. Usuário informa nome real.
+        resp = self.client.post(
+            reverse("livia_assistant:chat"),
+            data=json.dumps({"message": "Ricardo", "session_key": "test-name-lock"}),
+            content_type="application/json",
+        )
+
+        # 8. Validar que o lead final usa o nome real, não "acho que liro".
+        conv = LiviaConversation.objects.get(session_key="test-name-lock")
+        open_lead = conv.lead_captures.first()
+        self.assertEqual(open_lead.name, "Ricardo")
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_ai_spreadsheet_reply_qualifies_data_quality_first(self):

@@ -387,6 +387,18 @@ class LiviaAssistantService:
         if not company_value and "marmoraria" in normalized:
             company_value = "Marmoraria"
         expected_field = self._expected_lead_field(conversation)
+        
+        has_email = bool(email_match)
+        has_phone = bool(phone_match)
+        has_separator = "," in text or ";" in text or "\n" in text
+        parts = [p.strip() for p in re.split(r"[,;\n]", str(text or "")) if p.strip()]
+        is_compact_contact = has_email and has_phone and has_separator and len(parts) >= 3
+
+        if expected_field != "name" and not is_compact_contact:
+            name_value = ""
+            explicit_name = ""
+            compact_name = ""
+
         conversational_value = self._extract_conversational_field_value(text, expected_field)
         if expected_field == "name":
             if not self._is_discovery_context_message(text):
@@ -1196,29 +1208,11 @@ class LiviaAssistantService:
         recent_texts = [message.content.strip() for message in messages[-8:] if message.content.strip()]
 
         if not lead.name:
-            single_word_candidates = [
-                text
-                for text in reversed(recent_texts)
-                if len(text.split()) == 1
-                and _is_valid_name(text)
-                and not self._is_technical_note_message(self._normalize(text))
-                and not self._is_discovery_context_message(text)
-            ]
-            if single_word_candidates:
-                lead.name = single_word_candidates[0]
-            else:
-                multi_word_candidates = [
-                    text
-                    for text in reversed(recent_texts)
-                    if self._extract_conversational_field_value(text, "name")
-                    and self._looks_like_personal_only_input(text)
-                    and len(text.split()) >= 2
-                    and not self._looks_like_problem_description(text)
-                    and not self._is_discovery_context_message(text)
-                    and self._normalize(text) not in {"sim", "nao", "não"}
-                ]
-                if multi_word_candidates:
-                    lead.name = multi_word_candidates[0]
+            for text in reversed(recent_texts):
+                explicit_name = self._extract_explicit_name(text)
+                if explicit_name:
+                    lead.name = explicit_name
+                    break
 
         if not lead.company and expected_field in {"company", "city", "phone", "email"}:
             for text in reversed(recent_texts):

@@ -72,6 +72,16 @@ INVALID_NAME_SNIPPETS = (
     "cardápio",
     "pizzaria",
     "pizzarias",
+    "liro",
+    "duno",
+    "orcamento",
+    "orçamento",
+    "proposta",
+    "escola",
+    "condominio",
+    "condomínio",
+    "manutencao",
+    "manutenção",
 )
 
 INVALID_COMPANY_OR_CITY_SNIPPETS = (

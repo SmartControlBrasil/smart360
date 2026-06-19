@@ -1382,6 +1382,10 @@ class LiviaChatEndpointTests(TestCase):
             .first()
         )
         self.assertIsNotNone(first_lead)
+        captures = list(LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("created_at", "id"))
+        print(f"DEBUG: lead_count={len(captures)}")
+        for cap in captures:
+            print(f"DEBUG CAPTURE: id={cap.id}, name={cap.name}, company={cap.company}, city={cap.city}, phone={cap.phone}, email={cap.email}, notes={cap.notes}, interest={cap.service_interest}, qualified={cap.is_qualified}")
         self.assertTrue(first_lead.is_qualified)
         self.assertEqual(first_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
 

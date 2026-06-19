@@ -190,6 +190,10 @@ class LiviaAssistantService:
         if starts_new_cycle:
             locked_lead = None
 
+        locked_technical_followup = self.should_append_technical_followup_to_locked_lead(
+            conversation, user_text, locked_lead=explicit_lead if "explicit_lead" in locals() else locked_lead
+        )
+
         reply = get_livia_ai_client().generate_reply(
             system_prompt=LIVIA_SYSTEM_PROMPT,
             messages=history,
@@ -205,6 +209,7 @@ class LiviaAssistantService:
                 "conversation_already_notified": (
                     self._conversation_was_notified(conversation) and not starts_new_cycle and not commercial_cycle_candidate
                 ),
+                "locked_technical_followup": locked_technical_followup,
             },
         )
 
@@ -622,6 +627,11 @@ class LiviaAssistantService:
         lead.is_qualified = is_lead_ready_for_notification(lead)
         if self._is_pending_required_field_unanswered(expected_field_before_update, lead):
             lead.is_qualified = False
+        
+        self._enrich_lead_from_conversation(lead, conversation)
+
+        print(f"DEBUG CAPTURE UPDATE: msg='{current_user_message.content if current_user_message else ''}', extracting={extracted_data}, expected={expected_field_before_update}, lead.name='{lead.name}', lead.company='{lead.company}'")
+
         self._persist_lead_state(lead, conversation, extracted_data)
         lead.save()
 
@@ -920,6 +930,10 @@ class LiviaAssistantService:
         corpus = " ".join(selected_messages)
         normalized = self._normalize(corpus)
 
+        normalized_notes = self._normalize(lead.notes or "")
+        if (not lead.notes or normalized_notes in INVALID_GENERIC_VALUES) and corpus:
+            lead.notes = corpus
+
         technical_reference = {
             **(lead.crm_reference or {}),
             "technical_history": selected_messages,
@@ -1068,7 +1082,7 @@ class LiviaAssistantService:
         if any(snippet in normalized for snippet in INVALID_COMPANY_OR_CITY_SNIPPETS):
             if not self._is_technical_note_message(normalized):
                 return ""
-        if not self._looks_like_problem_description(value) and not self._is_technical_note_message(normalized) and not is_web_system_project_text(normalized):
+        if not self._looks_like_problem_description(value) and not self._is_technical_note_message(normalized) and not is_web_system_project_text(normalized) and not is_lead_capture_intent(normalized):
             return ""
         sanitized = re.sub(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", "", value, flags=re.IGNORECASE)
         sanitized = re.sub(r"(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}", "", sanitized)
@@ -1503,68 +1517,16 @@ class LiviaAssistantService:
             term in normalized
             for term in (
                 "problema",
-                "objetivo",
                 "falha",
                 "falhas",
                 "parada",
                 "paradas",
-                "diagnostico",
-                "diagnóstico",
-                "suporte",
-                "manutencao",
-                "manutenção",
-                "orcamento",
-                "orçamento",
-                "linha",
-                "maquina",
-                "máquina",
-                "robô",
-                "robo",
-                "supermercado",
-                "limpeza",
-                "infraestrutura",
-                "equipamento",
-                "atendimento tecnico",
-                "atendimento técnico",
-                "camara",
-                "câmara",
-                "frigorifica",
-                "frigorífica",
-                "gelo",
-                "ventilador",
-                "painel",
                 "apagou",
                 "low pressure",
-                "avaliacao",
-                "avaliação",
-                "contrato",
-                "possivel contrato",
-                "possível contrato",
                 "choque",
-                "ar condicionado",
-                "ar-condicionado",
                 "erro e2",
-                "condicionado",
-                "disjuntor",
-                "weiss",
-                "votsch",
-                "noturno",
-                "noturna",
-                "período noturno",
-                "periodo noturno",
-                "m²",
-                "m2",
-                "sistema web",
-                "sistema",
-                "crm",
-                "dashboard",
-                "portal",
-                "planilha",
-                "relatorio",
-                "relatório",
-                "ia integrada",
-                "ia no sistema",
-                "automatizar",
+                "curto",
+                "queimado",
             )
         )
 

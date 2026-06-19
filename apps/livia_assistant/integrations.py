@@ -82,6 +82,8 @@ LEAD_INTENT_TERMS = (
     "quero um diagnóstico",
     "pode encaminhar",
     "pode encaminhar meu pedido",
+    "quero atendimento",
+    "preciso de atendimento",
 )
 
 SERVICE_KEYWORDS = {
@@ -152,7 +154,13 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 known = _collect_known_contact_fields(messages)
                 question = _lead_field_question(first_missing_required_field(_known_contact_snapshot(known)), known)
                 return f"{technical_reply}\n\nPara encaminhar corretamente, {question[:1].lower() + question[1:]}"
+            if bool((context or {}).get("locked_technical_followup")):
+                return f"{technical_reply}\n\nAnotei essa informação técnica adicional no seu atendimento."
             return technical_reply
+
+        if bool((context or {}).get("locked_technical_followup")):
+            return "Perfeito, adicionei essa nota técnica ao seu atendimento. Nossa equipe já vai avaliar esse detalhe adicional."
+
 
         if bool((context or {}).get("conversation_already_notified")):
             notified_reply = build_notified_commercial_followup_reply(
@@ -343,14 +351,28 @@ def _detect_service_interest(normalized_text):
 
 
 def _system_prompt_with_context(system_prompt, context=None):
-    knowledge_context = (context or {}).get("knowledge_context", "")
-    if not knowledge_context:
-        return system_prompt
-    return (
-        f"{system_prompt.rstrip()}\n\n"
-        "Use o contexto abaixo como apoio. Se ele não for suficiente, seja transparente e faça uma pergunta objetiva.\n"
-        f"{knowledge_context}"
-    )
+    context = context or {}
+    knowledge_context = context.get("knowledge_context", "")
+    locked_technical_followup = context.get("locked_technical_followup", False)
+    
+    prompt = system_prompt.rstrip()
+    
+    if locked_technical_followup:
+        prompt += (
+            "\n\nIMPORTANTE: O usuário já registrou seus dados e o atendimento já foi encaminhado. "
+            "Ele está apenas enviando mais detalhes técnicos ou continuando o assunto anterior. "
+            "Responda à dúvida dele, mas NÃO tente coletar dados comerciais, "
+            "NÃO reabra o fluxo de lead, e NÃO pergunte 'posso anotar um resumo e encaminhar?'. "
+            "Apenas responda e, se fizer sentido, diga que a informação foi adicionada ao atendimento."
+        )
+
+    if knowledge_context:
+        prompt += (
+            "\n\nUse o contexto abaixo como apoio. Se ele não for suficiente, seja transparente e faça uma pergunta objetiva.\n"
+            f"{knowledge_context}"
+        )
+        
+    return prompt
 
 
 def _summarize_knowledge_context(knowledge_context):

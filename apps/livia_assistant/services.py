@@ -187,7 +187,7 @@ class LiviaAssistantService:
             or system_need_candidate
         )
         starts_new_cycle = self.should_start_new_commercial_cycle(conversation, user_text, locked_lead)
-        if starts_new_cycle or commercial_cycle_candidate:
+        if starts_new_cycle:
             locked_lead = None
 
         reply = get_livia_ai_client().generate_reply(
@@ -571,7 +571,7 @@ class LiviaAssistantService:
             if value:
                 sanitized_value = self._sanitize_lead_field_before_save(field, value)
                 if not sanitized_value:
-                    if field == "city":
+                    if field == "city" and collecting_contact:
                         setattr(lead, field, "")
                     continue
                 existing_value = (getattr(lead, field) or "").strip()

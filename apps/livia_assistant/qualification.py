@@ -117,6 +117,57 @@ INVALID_COMPANY_OR_CITY_SNIPPETS = (
     "nacional",
 )
 
+INVALID_CITY_VALUES = {
+    "celular",
+    "computador",
+    "ambos",
+    "tablet",
+    "sistema",
+    "app",
+    "aplicativo",
+    "estoque",
+    "vendas",
+    "atendimento",
+    "entrega",
+    "caderno",
+    "anotacao",
+    "anotação",
+    "planilha",
+    "excel",
+    "operacao",
+    "operação",
+    "cliente",
+    "clientes",
+    "frota",
+    "manutencao",
+    "manutenção",
+    "pedido",
+    "pedidos",
+}
+
+CITY_FORBIDDEN_TERMS = (
+    "sistema",
+    "marmoraria",
+    "deposito",
+    "depósito",
+    "caderno",
+    "anotacao",
+    "anotação",
+    "planilha",
+    "excel",
+    "celular",
+    "tablet",
+    "computador",
+    "cliente",
+    "clientes",
+    "estoque",
+    "vendas",
+    "pedido",
+    "pedidos",
+    "foto",
+    "arte",
+)
+
 
 def _normalize(value) -> str:
     return str(value or "").strip().lower()
@@ -211,7 +262,17 @@ def has_valid_company_field(capture) -> bool:
 
 
 def has_valid_city_field(capture) -> bool:
-    return _is_valid_company_or_city(getattr(capture, "city", ""))
+    city = strip_repetition_noise(getattr(capture, "city", ""))
+    normalized = _normalize(city)
+    if normalized in INVALID_CITY_VALUES:
+        return False
+    if len(city.split()) > 5:
+        return False
+    if any(term in normalized for term in CITY_FORBIDDEN_TERMS):
+        return False
+    if re.search(r"\b(?:faço|faco|acho|tenho|preciso|quero|uso|usamos|controlar|vender|captar|organizar|transformar)\b", normalized):
+        return False
+    return _is_valid_company_or_city(city)
 
 
 def has_valid_phone_field(capture) -> bool:
@@ -227,12 +288,12 @@ def first_missing_required_field(capture) -> str:
         return "name"
     if not has_valid_company_field(capture):
         return "company"
-    if not has_valid_city_field(capture):
-        return "city"
     if not has_valid_phone_field(capture):
         return "phone"
     if not has_valid_email_field(capture):
         return "email"
+    if not has_valid_city_field(capture):
+        return "city"
     return ""
 
 

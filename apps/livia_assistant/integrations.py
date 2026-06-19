@@ -1028,7 +1028,7 @@ def _lead_field_question(field, known):
     if field == "email":
         return "Qual e-mail podemos usar para formalizar o atendimento?"
     if field == "city":
-        return "Em qual cidade você está?"
+        return "Em qual cidade fica sua empresa?"
     return "Qual detalhe técnico você quer avaliar agora?"
 
 

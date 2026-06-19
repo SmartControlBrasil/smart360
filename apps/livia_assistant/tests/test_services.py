@@ -1417,7 +1417,7 @@ class LiviaAssistantServiceTests(TestCase):
             city_skippable=False,
             locked=False,
         )
-        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
+        self.assertEqual(snapshot.state, LeadState.COLLECT_PHONE)
 
         snapshot = resolve_state(
             has_intent=True,
@@ -1429,19 +1429,19 @@ class LiviaAssistantServiceTests(TestCase):
             city_skippable=False,
             locked=False,
         )
-        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
+        self.assertEqual(snapshot.state, LeadState.COLLECT_EMAIL)
 
         snapshot = resolve_state(
             has_intent=True,
             has_name=True,
             has_company=True,
-            has_city=True,
+            has_city=False,
             has_phone=True,
-            has_email=False,
+            has_email=True,
             city_skippable=False,
             locked=False,
         )
-        self.assertEqual(snapshot.state, LeadState.COLLECT_EMAIL)
+        self.assertEqual(snapshot.state, LeadState.COLLECT_CITY)
 
         snapshot = resolve_state(
             has_intent=True,
@@ -1567,3 +1567,96 @@ class DigitalProductDiscoveryTests(TestCase):
         self.assertIn("pizzaria", summary.lower())
         self.assertIn("cardápio", summary.lower() or "cardapio" in summary.lower())
         self.assertNotIn("solução solicitada", summary.lower())
+
+
+class LeadStateCorrectionTests(TestCase):
+    def setUp(self):
+        self.service = LiviaAssistantService()
+
+    def test_new_cycle_does_not_leak_previous_visitor_name_in_provider_history(self):
+        conversation = self.service.get_or_create_conversation(session_key="lorena-provider-history")
+        conversation.visitor_name = "Lorena"
+        conversation.save(update_fields=["visitor_name", "updated_at"])
+        LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Lorena",
+            email="lorena@old.com",
+            phone="11988887777",
+            company="Empresa Lorena",
+            city="Campinas",
+            is_qualified=True,
+            operational_status=LiviaLeadCapture.OperationalStatus.SENT_TO_CRM,
+            crm_reference={"notification_sent_at": "2026-01-01T00:00:00Z"},
+        )
+        self.service.register_user_message(
+            conversation,
+            "quero criar um app para artesanato e transformar fotos em arte",
+        )
+        client = RecordingClient()
+        with patch("apps.livia_assistant.services.get_livia_ai_client", return_value=client):
+            response = self.service.generate_response(
+                conversation,
+                "quero criar um app para artesanato e transformar fotos em arte",
+            )
+        self.assertNotIn("lorena", response.reply.lower())
+        history_blob = " ".join((message.get("content") or "").lower() for message in (client.messages or []))
+        self.assertNotIn("lorena", history_blob)
+
+    def test_name_correction_clears_inherited_name_without_saving_celular_as_city(self):
+        conversation = self.service.get_or_create_conversation(session_key="name-correction-service")
+        conversation.visitor_name = "Lorena"
+        conversation.save(update_fields=["visitor_name", "updated_at"])
+        lead = LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            name="Lorena",
+            company="Empresa X",
+            city="Campinas",
+        )
+        text = "celular, mas Livia eu não sou a Lorena nem conheço e ainda não te falei meu nome"
+        self.service.register_user_message(conversation, text)
+        extracted = self.service.extract_lead_data(text, conversation=conversation)
+        updated = self.service.create_or_update_lead_capture(conversation, extracted, explicit_lead=lead)
+        self.assertEqual(updated.name, "")
+        self.assertNotEqual((updated.city or "").lower(), "celular")
+        self.assertNotEqual((updated.company or "").lower(), "celular")
+        conversation.refresh_from_db()
+        self.assertEqual(conversation.visitor_name, "")
+
+    def test_discovery_device_answer_does_not_extract_city(self):
+        conversation = self.service.get_or_create_conversation(session_key="celular-not-city-service")
+        self.service.register_user_message(conversation, "quero um app para artesanato")
+        self.service.register_assistant_message(conversation, "Você pretende usar no celular, tablet ou computador?")
+        extracted = self.service.extract_lead_data("celular", conversation=conversation)
+        self.assertEqual(extracted["city"], "")
+
+    def test_long_discovery_phrase_does_not_extract_city(self):
+        text = "faço tudo em caderno de anotação as vezes acho que to na idade da pedra"
+        extracted = self.service.extract_lead_data(text)
+        self.assertEqual(extracted["city"], "")
+        self.assertTrue(extracted["notes"])
+
+    def test_marmoraria_summary_mentions_operational_needs(self):
+        from apps.livia_assistant.discovery import build_digital_product_interest_summary
+
+        summary = build_digital_product_interest_summary(
+            "marmoraria controle de estoque clientes vendas captação de contatos"
+        )
+        lowered = summary.lower()
+        self.assertIn("marmoraria", lowered)
+        self.assertIn("estoque", lowered)
+        self.assertIn("clientes", lowered)
+        self.assertIn("vendas", lowered)
+        self.assertNotIn("smart360", lowered)
+        self.assertNotIn("solução solicitada", lowered)
+
+    def test_artesanato_summary_mentions_photos_and_clients(self):
+        from apps.livia_assistant.discovery import build_digital_product_interest_summary
+
+        summary = build_digital_product_interest_summary(
+            "app artesanato transformar foto em arte cadastro de clientes"
+        )
+        lowered = summary.lower()
+        self.assertTrue(any(term in lowered for term in ("artesanato", "arte", "aplicativo", "sistema")))
+        self.assertTrue(any(term in lowered for term in ("foto", "fotos", "clientes")))
+        self.assertNotIn("smart360", lowered)
+        self.assertNotIn("solução solicitada", lowered)

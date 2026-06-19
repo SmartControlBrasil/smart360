@@ -20,9 +20,9 @@ STATE_ORDER = (
     LeadState.OFFER_HANDOFF,
     LeadState.COLLECT_NAME,
     LeadState.COLLECT_COMPANY,
-    LeadState.COLLECT_CITY,
     LeadState.COLLECT_PHONE,
     LeadState.COLLECT_EMAIL,
+    LeadState.COLLECT_CITY,
     LeadState.QUALIFIED,
     LeadState.CLOSED,
 )
@@ -72,10 +72,10 @@ def resolve_state(
         return LeadStateSnapshot(state=LeadState.COLLECT_NAME, next_field="name", is_terminal=False)
     if not has_company:
         return LeadStateSnapshot(state=LeadState.COLLECT_COMPANY, next_field="company", is_terminal=False)
-    if not has_city:
-        return LeadStateSnapshot(state=LeadState.COLLECT_CITY, next_field="city", is_terminal=False)
     if not has_phone:
         return LeadStateSnapshot(state=LeadState.COLLECT_PHONE, next_field="phone", is_terminal=False)
     if not has_email:
         return LeadStateSnapshot(state=LeadState.COLLECT_EMAIL, next_field="email", is_terminal=False)
+    if not has_city:
+        return LeadStateSnapshot(state=LeadState.COLLECT_CITY, next_field="city", is_terminal=False)
     return LeadStateSnapshot(state=LeadState.OFFER_HANDOFF, next_field="", is_terminal=False)

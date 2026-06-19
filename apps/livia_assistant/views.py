@@ -101,12 +101,22 @@ def chat(request):
             and not service.should_capture_post_qualified_update_for_conversation(message, conversation)
         )
     )
+    locked_technical_followup = (
+        locked_lead is not None
+        and not new_commercial_cycle
+        and service.should_append_technical_followup_to_locked_lead(
+            conversation,
+            message,
+            locked_lead=locked_lead,
+        )
+    )
     updating_lead = (
         collecting_lead
         or service.should_update_lead_capture(conversation, message)
         or commercial_locked_followup
         or notified_commercial_followup
         or notified_commercial_append
+        or locked_technical_followup
     )
     if updating_lead:
         extracted_data = service.extract_lead_data(message, conversation=conversation)
@@ -120,6 +130,9 @@ def chat(request):
         target_conversation = locked_lead.conversation if locked_lead is not None else conversation
         explicit_lead = None if new_commercial_cycle else locked_lead
         if (commercial_locked_followup or notified_commercial_followup or notified_commercial_append) and locked_lead is not None:
+            collecting_lead = False
+            explicit_lead = locked_lead
+        elif locked_technical_followup and locked_lead is not None:
             collecting_lead = False
             explicit_lead = locked_lead
         elif notified_commercial_followup and locked_lead is None:

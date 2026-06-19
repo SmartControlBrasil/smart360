@@ -438,6 +438,16 @@ def has_minimum_digital_product_discovery(messages, normalized_text: str = "") -
 
 def build_digital_product_interest_summary(normalized_text: str) -> str:
     corpus = _normalize(normalized_text)
+    if "marmoraria" in corpus:
+        return (
+            "Sistema web para gestão operacional de marmoraria, com controle de estoque, "
+            "clientes, vendas e captação de contatos."
+        )
+    if any(term in corpus for term in ("artesanato", "artes", "foto em arte", "transformar foto", "fotos em arte")):
+        return (
+            "Aplicativo/sistema web para organização de artes, cadastro de clientes e "
+            "apoio à criação/transformação de fotos em arte."
+        )
     if not is_digital_product_context(corpus, [{"role": "user", "content": corpus}]):
         return ""
 

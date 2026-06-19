@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 from datetime import timedelta
 
@@ -11,6 +12,7 @@ from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentA
 from apps.ai_agents_center.models import AgentAnomalyAttentionFlag, ManagerCopilotMessage, ManagerCopilotSession
 from apps.analytics_platform.models import ContractProfitability, OperationalMetrics
 from apps.analytics_platform.services.analytics_service import ExecutiveAnalyticsService
+from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
 from apps.ai_agents_center.services.registry import AgentRegistryService
 from apps.ai_agents_center.services.briefing_composer import AIBriefingComposer
 from apps.observability_center.models import SystemEventLog
@@ -113,6 +115,7 @@ class AIAgentsCenterApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(any(item["slug"] == "maintenance-agent" for item in response.data["results"]))
+        self.assertTrue(any(item["slug"] == "eduardo-commercial-intelligence-agent" for item in response.data["results"]))
 
     def test_briefing_generation_personalizes_by_audience(self):
         technician_briefing = AIBriefingComposer.generate_briefing(
@@ -212,6 +215,36 @@ class AIAgentsCenterApiTests(APITestCase):
         self.assertTrue(recommendation.explanation)
         self.assertTrue(recommendation.evidence_summary)
         self.assertTrue(recommendation.suggested_action)
+
+    def test_eduardo_agent_qualifies_public_opportunity_for_growth_engine(self):
+        trigger_reference = json.dumps(
+            {
+                "empresa": "Hospital Exemplo",
+                "segmento": "Hospital",
+                "cidade": "Sao Paulo",
+                "estado": "SP",
+                "site": "https://hospital.example.com.br",
+                "contatos_institucionais": ["contato@hospital.example.com.br"],
+                "problemas": ["alto fluxo de limpeza e higienizacao em areas comuns"],
+                "evidencias": ["Site institucional informa atendimento hospitalar 24 horas"],
+                "presenca_digital": "site institucional ativo",
+            }
+        )
+
+        run = AgentCoordinatorService.run_agent(
+            agent_slug="eduardo-commercial-intelligence-agent",
+            company=self.company,
+            triggered_by=self.user,
+            trigger_reference=trigger_reference,
+        )
+
+        self.assertEqual(run.status, AgentRun.Status.COMPLETED)
+        recommendation = AgentRecommendation.objects.filter(agent_run__agent__slug="eduardo-commercial-intelligence-agent").latest("created_at")
+        proposal = AgentActionProposal.objects.filter(agent_run__agent__slug="eduardo-commercial-intelligence-agent").latest("created_at")
+        self.assertEqual(recommendation.payload["score"]["label"], "Estrategico")
+        self.assertEqual(proposal.action_type, "create_growth_lead_from_public_opportunity")
+        self.assertEqual(proposal.proposed_payload["company_name"], "Hospital Exemplo")
+        self.assertIn("HygiBot", proposal.proposed_payload["metadata"]["product_recommended"])
 
     def test_agent_detects_recurring_failure_pattern(self):
         response = self.client.post(

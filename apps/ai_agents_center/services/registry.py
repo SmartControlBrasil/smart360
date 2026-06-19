@@ -5,6 +5,7 @@ from apps.ai_agents_center.models import AgentDefinition, AgentExecutionPolicy
 
 def get_agent_class_map():
     from apps.ai_agents_center.agents.anomaly import AnomalyDetectionAgent
+    from apps.ai_agents_center.agents.eduardo import EduardoCommercialIntelligenceAgent
     from apps.ai_agents_center.agents.maintenance import MaintenanceIntelligenceAgent
     from apps.ai_agents_center.agents.marketplace import MarketplaceAllocationAgent
     from apps.ai_agents_center.agents.profitability import ProfitabilityAgent
@@ -16,6 +17,7 @@ def get_agent_class_map():
         ProfitabilityAgent.slug: ProfitabilityAgent,
         MarketplaceAllocationAgent.slug: MarketplaceAllocationAgent,
         AnomalyDetectionAgent.slug: AnomalyDetectionAgent,
+        EduardoCommercialIntelligenceAgent.slug: EduardoCommercialIntelligenceAgent,
     }
 
 
@@ -151,6 +153,39 @@ class AgentRegistryService:
             },
         },
         {
+            "slug": "eduardo-commercial-intelligence-agent",
+            "name": "Eduardo Commercial Intelligence Agent",
+            "description": "Identifica oportunidades comerciais publicas, qualifica problemas e propoe leads para o Growth Engine.",
+            "domain": AgentDefinition.Domain.MARKETPLACE,
+            "autonomy_level": AgentDefinition.AutonomyLevel.PROPOSE,
+            "config": {
+                "prompt_reference": "knowledge/comercial/agente_eduardo.md",
+                "tools": [
+                    "query_public_company_profile",
+                    "query_public_digital_presence",
+                    "query_public_institutional_contacts",
+                    "analyze_market_problem_fit",
+                    "score_commercial_opportunity",
+                    "create_growth_lead_from_public_opportunity",
+                    "enrich_growth_lead_public_evidence",
+                ],
+                "portfolio": {
+                    "robotics": ["NeoBot", "HostBot", "ConnectBot", "Buddy", "OrbitBot", "PatrolBot", "LIRO", "LittleBot", "HygiBot", "Duno", "MowerBot"],
+                    "engineering": ["Automacao Industrial", "CLPs", "IHMs", "Supervisorios", "SCADA", "Servoacionamentos", "Inversores de frequencia", "IoT Industrial", "Retrofit de maquinas", "Engenharia embarcada", "Confiabilidade", "TPM", "Manutencao industrial"],
+                    "technology": ["Smart360", "Sistemas Web", "Sistemas corporativos", "Integracoes", "Inteligencia Artificial", "Assistentes virtuais", "Dashboards", "Portais corporativos"],
+                },
+                "heuristics": {
+                    "minimum_required_fields": ["company_name", "problems"],
+                    "public_sources_only": True,
+                    "institutional_contacts_only": True,
+                    "never_invent_missing_data": True,
+                    "strategic_score": 85,
+                    "high_score": 70,
+                    "medium_score": 45,
+                },
+            },
+        },
+        {
             "slug": "anomaly-agent",
             "name": "Anomaly Detection Agent",
             "description": "Detecta desvios operacionais, financeiros e comerciais em falhas, backlog, SLA, pecas, marketplace e rentabilidade.",
@@ -248,6 +283,8 @@ class AgentRegistryService:
                         "review_marketplace_regional_coverage",
                         "review_contract_profitability_shift",
                         "open_operational_attention_committee",
+                        "create_growth_lead_from_public_opportunity",
+                        "enrich_growth_lead_public_evidence",
                     ],
                 },
             )

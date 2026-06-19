@@ -1635,6 +1635,72 @@ class LeadStateCorrectionTests(TestCase):
         self.assertEqual(extracted["city"], "")
         self.assertTrue(extracted["notes"])
 
+    def test_livia_does_not_return_to_name_after_capture_complete(self):
+        conversation = self.service.get_or_create_conversation(session_key="andreia-capture-loop")
+        lead = LiviaLeadCapture.objects.create(
+            conversation=conversation,
+            service_interest="desenvolvimento de sistema e aplicativo para celular",
+            notes="pet shop precisa organizar contatos, medicamentos, banhos e follow-up pelo celular",
+        )
+        self.service.register_assistant_message(conversation, "Para avançar, posso saber seu nome?")
+
+        with patch("apps.livia_assistant.services.LiviaCRMBridge.create_or_update_crm_lead"):
+            for text in (
+                "Andreia",
+                "11945688457",
+                "andreia@gnv.com.br",
+                "pet gtv",
+                "Rio Claro",
+            ):
+                self.service.register_user_message(conversation, text)
+                extracted = self.service.extract_lead_data(text, conversation=conversation)
+                lead = self.service.create_or_update_lead_capture(
+                    conversation,
+                    extracted,
+                    explicit_lead=lead,
+                )
+                self.service.register_assistant_message(
+                    conversation,
+                    self.service.build_progressive_lead_reply(lead),
+                )
+
+        lead.refresh_from_db()
+        self.assertEqual(lead.name, "Andreia")
+        self.assertEqual(lead.company, "pet gtv")
+        self.assertEqual(lead.phone, "11945688457")
+        self.assertEqual(lead.email, "andreia@gnv.com.br")
+        self.assertEqual(lead.city, "Rio Claro")
+        self.assertEqual(self.service._expected_lead_field(conversation), "")
+
+        final_reply = self.service.build_progressive_lead_reply(lead).lower()
+        self.assertNotIn("como posso te chamar", final_reply)
+        self.assertNotIn("qual seu nome", final_reply)
+        self.assertNotIn("para encaminhar seu pedido, como posso te chamar", final_reply)
+
+    def test_livia_does_not_capture_product_answer_as_contact_name_before_name_step(self):
+        conversation = self.service.get_or_create_conversation(session_key="liro-not-name")
+        lead = None
+
+        for text in (
+            "vi um robô e gostaria de informações",
+            "esse robô pode ficar perto de crianças?",
+            "acho que liro",
+        ):
+            self.service.register_user_message(conversation, text)
+            extracted = self.service.extract_lead_data(text, conversation=conversation)
+            lead = self.service.create_or_update_lead_capture(conversation, extracted, explicit_lead=lead)
+
+        lead.refresh_from_db()
+        self.assertEqual(lead.name, "")
+
+        self.service.register_user_message(conversation, "quero orçamento")
+        extracted = self.service.extract_lead_data("quero orçamento", conversation=conversation)
+        lead = self.service.create_or_update_lead_capture(conversation, extracted, explicit_lead=lead)
+        reply = self.service.build_progressive_lead_reply(lead).lower()
+
+        self.assertEqual(lead.name, "")
+        self.assertIn("como posso te chamar", reply)
+
     def test_marmoraria_summary_mentions_operational_needs(self):
         from apps.livia_assistant.discovery import build_digital_product_interest_summary
 

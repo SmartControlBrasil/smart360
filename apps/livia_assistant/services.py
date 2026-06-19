@@ -871,6 +871,7 @@ class LiviaAssistantService:
         return self._ask_for_field(missing_field, lead)
 
     def _ask_for_field(self, field, lead):
+        field = self._next_required_field_for_lead(lead, field)
         if field == "name":
             return self._build_collect_name_reply(lead)
         if field == "company":
@@ -884,7 +885,7 @@ class LiviaAssistantService:
             return "Qual é o melhor telefone/WhatsApp para nossa equipe falar com você?"
         if field == "email":
             return "Qual e-mail podemos usar para formalizar o atendimento?"
-        return self._build_collect_name_reply(lead)
+        return "Recebi seus dados. Vou deixar registrado para análise da equipe."
 
     def _build_collect_name_reply(self, lead):
         from .discovery import build_digital_product_interest_summary
@@ -1260,6 +1261,15 @@ class LiviaAssistantService:
             return
         if self._is_discovery_context_message(text):
             return
+        if (
+            expected_field == "name"
+            and has_valid_name_field(lead)
+            and self._message_answers_expected_field(text, "name")
+        ):
+            return
+        expected_field = self._next_required_field_for_lead(lead, expected_field)
+        if not expected_field:
+            return
         if expected_field == "company":
             stripped_company = strip_repetition_noise(text)
             if (
@@ -1622,7 +1632,7 @@ class LiviaAssistantService:
         )
         for field, markers in prompts:
             if any(marker in normalized for marker in markers):
-                return field
+                return self._next_required_field_for_lead(lead, field)
         return ""
 
     def _extract_conversational_field_value(self, text, expected_field):
@@ -1812,6 +1822,9 @@ class LiviaAssistantService:
     def _is_pending_required_field_unanswered(self, expected_field, lead):
         if not expected_field:
             return False
+        expected_field = self._next_required_field_for_lead(lead, expected_field)
+        if not expected_field:
+            return False
         field_validators = {
             "name": has_valid_name_field,
             "company": has_valid_company_field,
@@ -1823,6 +1836,21 @@ class LiviaAssistantService:
         if validator is None:
             return False
         return not validator(lead)
+
+    def _next_required_field_for_lead(self, lead, preferred_field=""):
+        if lead is None:
+            return preferred_field or ""
+        field_validators = {
+            "name": has_valid_name_field,
+            "company": has_valid_company_field,
+            "city": has_valid_city_field,
+            "phone": has_valid_phone_field,
+            "email": has_valid_email_field,
+        }
+        validator = field_validators.get(preferred_field)
+        if validator is not None and not validator(lead):
+            return preferred_field
+        return first_missing_required_field(lead)
 
     def _explicitly_refused_email(self, text):
         normalized = self._normalize(text)

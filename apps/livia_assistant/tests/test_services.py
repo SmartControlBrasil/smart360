@@ -446,7 +446,7 @@ class LiviaAssistantServiceTests(TestCase):
             "quero orçamento para um sistema logístico web com IA para entregas agendadas, "
             "rotas, frota e fretes em todo o Brasil"
         )
-        self.assertFalse(self.service.is_new_commercial_cycle_message(message, conversation))
+        self.assertTrue(self.service.is_new_commercial_cycle_message(message, conversation))
         self.assertTrue(self.service.detect_lead_intent(message))
         updated = self.service.create_or_update_lead_capture(
             conversation,

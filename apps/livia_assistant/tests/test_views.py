@@ -858,7 +858,8 @@ class LiviaChatEndpointTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(offer_city.status_code, 200)
-        self.assertIn("pode me informar a cidade, eu adiciono ao atendimento", offer_city.json()["reply"].lower())
+        self.assertFalse(offer_city.json()["lead_registered"])
+        self.assertEqual(len(mail.outbox), 1)
         self.assertNotIn("telefone/whatsapp", offer_city.json()["reply"].lower())
 
         provide_city = self.client.post(
@@ -1404,16 +1405,17 @@ class LiviaChatEndpointTests(TestCase):
         captures = list(
             LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("created_at", "id")
         )
-        self.assertEqual(len(captures), 1)
-        updated_lead = captures[0]
+        self.assertEqual(len(captures), 2)
+        first_lead, new_lead = captures
 
-        self.assertTrue(updated_lead.is_qualified)
-        self.assertEqual(updated_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
-        self.assertEqual((updated_lead.name or "").lower(), "marcelo")
+        self.assertTrue(first_lead.is_qualified)
+        self.assertEqual(first_lead.operational_status, LiviaLeadCapture.OperationalStatus.SENT_TO_CRM)
+        self.assertEqual((first_lead.name or "").lower(), "marcelo")
+        self.assertFalse(new_lead.is_qualified)
 
-        notes = (updated_lead.notes or updated_lead.service_interest or "").lower()
+        notes = (first_lead.notes or first_lead.service_interest or "").lower()
         self.assertIn("duno", notes)
-        history = " ".join((updated_lead.crm_reference or {}).get("technical_history", [])).lower()
+        history = " ".join((new_lead.crm_reference or {}).get("technical_history", [])).lower()
         self.assertTrue("ar condicionado" in history or "ar-condicionado" in history, msg=history)
         self.assertIn("e2", history)
         self.assertFalse(last_reply.startswith("olá"), msg=last_reply)
@@ -1456,7 +1458,7 @@ class LiviaChatEndpointTests(TestCase):
         self.assertTrue(is_lead_ready_for_notification(first_lead))
         self.assertTrue(service._conversation_was_notified(first_lead.conversation))
         self.assertEqual(LiviaConversation.objects.filter(session_key=session_key).count(), 1)
-        self.assertFalse(
+        self.assertTrue(
             service.is_new_commercial_cycle_message(
                 "quero orçamento para um sistema logístico web com IA para entregas",
                 first_lead.conversation,
@@ -1481,27 +1483,12 @@ class LiviaChatEndpointTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertFalse(followup.json()["lead_registered"])
         self.assertTrue(followup.json()["lead_detected"])
-        self.assertEqual(LiviaLeadCapture.objects.filter(conversation__session_key=session_key).count(), 1)
+        self.assertEqual(LiviaLeadCapture.objects.filter(conversation__session_key=session_key).count(), 2)
         self.assertNotIn("vou encaminhar", reply)
         self.assertNotIn("já encaminhei", reply)
         self.assertNotIn("enviei", reply)
-        self.assertTrue(
-            any(
-                term in reply
-                for term in (
-                    "entregas",
-                    "rotas",
-                    "frota",
-                    "fretes",
-                    "pedidos",
-                    "logístico",
-                    "logistico",
-                    "painel",
-                    "processo",
-                )
-            ),
-            msg=reply,
-        )
+        self.assertIn("como posso te chamar", reply)
+        self.assertNotIn("já temos seus dados", reply)
         self.assertFalse(
             reply.strip()
             == "já temos seus dados registrados. vou acrescentar essa informação ao atendimento.",
@@ -1904,3 +1891,151 @@ class LiviaChatEndpointTests(TestCase):
             msg=handoff_replies,
         )
         self.assertNotIn("solução solicitada", " ".join(handoff_replies))
+
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_notified_previous_lead_does_not_block_new_marmoraria_cycle(self):
+        mail.outbox.clear()
+        session_key = "marmoraria-new-cycle-after-old-lead"
+        url = reverse("livia_assistant:chat")
+
+        first_cycle = [
+            "quero orçamento para um sistema para meu depósito",
+            "Ed",
+            "Depósito Ed",
+            "São Paulo",
+            "11911112222",
+            "ed@ed.com",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+        start = self.client.post(
+            url,
+            data=json.dumps({
+                "message": "boa noite vi uma postagem no facebook e estou interessado em criar um sistema para minha marmoraria",
+                "session_key": session_key,
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(start.status_code, 200)
+        start_reply = start.json()["reply"].lower()
+        self.assertNotIn("como já temos seus dados", start_reply)
+        self.assertNotIn("já temos seus dados registrados", start_reply)
+        self.assertFalse(start.json()["lead_registered"])
+
+        flow = ["Antonio", "1145454545", "antonio@marmore.com.br", "Osasco"]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+
+        captures = list(LiviaLeadCapture.objects.filter(conversation__session_key=session_key).order_by("created_at", "id"))
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue(last_response.json()["lead_registered"])
+        self.assertEqual(len(captures), 2)
+        first_lead, second_lead = captures
+        self.assertEqual(first_lead.email, "ed@ed.com")
+        self.assertEqual(second_lead.name, "Antonio")
+        self.assertEqual(second_lead.email, "antonio@marmore.com.br")
+        self.assertEqual(second_lead.phone, "1145454545")
+        self.assertEqual(second_lead.city, "Osasco")
+        self.assertTrue((second_lead.crm_reference or {}).get("notification_sent_this_turn"))
+        second_body = mail.outbox[-1].body.lower()
+        self.assertIn("antonio@marmore.com.br", second_body)
+        self.assertIn("marmoraria", second_body)
+        self.assertNotIn("ed@ed.com", second_body)
+        self.assertNotIn("depósito ed", second_body)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_same_cycle_followup_after_notification_does_not_send_duplicate_email(self):
+        mail.outbox.clear()
+        session_key = "same-cycle-followup-no-duplicate"
+        url = reverse("livia_assistant:chat")
+        flow = [
+            "quero orçamento para um sistema para minha marmoraria",
+            "Antonio",
+            "1145454545",
+            "antonio@marmore.com.br",
+            "Osasco",
+        ]
+        last_response = None
+        for message in flow:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(last_response.json()["lead_registered"])
+
+        followup = self.client.post(
+            url,
+            data=json.dumps({"message": "também preciso controlar chapas e orçamento por metro", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(followup.status_code, 200)
+        self.assertFalse(followup.json()["lead_registered"])
+        self.assertEqual(len(mail.outbox), 1)
+        captures = LiviaLeadCapture.objects.filter(conversation__session_key=session_key)
+        self.assertEqual(captures.count(), 1)
+        history = " ".join((captures.first().crm_reference or {}).get("technical_history", [])).lower()
+        self.assertIn("chapas", history)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_closed_cycle_allows_new_commercial_cycle(self):
+        mail.outbox.clear()
+        session_key = "closed-cycle-allows-new-lead"
+        url = reverse("livia_assistant:chat")
+        first_cycle = [
+            "quero orçamento para um sistema para meu depósito",
+            "Ed",
+            "Depósito Ed",
+            "São Paulo",
+            "11911112222",
+            "ed@ed.com",
+        ]
+        for message in first_cycle:
+            response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+        close = self.client.post(
+            url,
+            data=json.dumps({"message": "por hora é só", "session_key": session_key}),
+            content_type="application/json",
+        )
+        self.assertEqual(close.status_code, 200)
+
+        second_cycle = [
+            "agora quero orçamento para um sistema para minha marmoraria",
+            "Antonio",
+            "1145454545",
+            "antonio@marmore.com.br",
+            "Osasco",
+        ]
+        last_response = None
+        for message in second_cycle:
+            last_response = self.client.post(
+                url,
+                data=json.dumps({"message": message, "session_key": session_key}),
+                content_type="application/json",
+            )
+            self.assertEqual(last_response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue(last_response.json()["lead_registered"])

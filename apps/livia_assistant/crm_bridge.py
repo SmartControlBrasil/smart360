@@ -206,7 +206,7 @@ class LiviaCRMBridge:
             return
         if (crm_lead.metadata or {}).get("source") != "livia_assistant":
             return
-        if self._conversation_already_notified(livia_lead):
+        if (livia_lead.crm_reference or {}).get("notification_sent_at"):
             return
 
         recipients = list(
@@ -240,10 +240,7 @@ class LiviaCRMBridge:
         livia_lead.save(update_fields=["crm_reference"])
 
     def _conversation_already_notified(self, livia_lead):
-        for capture in livia_lead.conversation.lead_captures.all():
-            if capture.crm_reference.get("notification_sent_at"):
-                return True
-        return False
+        return bool((livia_lead.crm_reference or {}).get("notification_sent_at"))
 
     def _notify_n8n_if_needed(self, *, livia_lead, crm_lead):
         webhook_url = str(getattr(settings, "N8N_LIVIA_LEAD_WEBHOOK_URL", "") or "").strip()

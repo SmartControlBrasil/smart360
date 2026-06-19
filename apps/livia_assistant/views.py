@@ -44,6 +44,8 @@ def chat(request):
         current_message=message,
     )
     locked_lead = service.get_locked_lead_capture(conversation)
+    if service.get_open_lead_capture(conversation) is not None:
+        locked_lead = None
     new_commercial_cycle = bool(
         locked_lead and service.is_new_commercial_cycle_message(message, conversation)
     )
@@ -54,6 +56,11 @@ def chat(request):
         metadata={"source_page": source_page} if source_page else {},
     )
     locked_lead = locked_lead or service.get_locked_lead_capture(conversation)
+    if service.get_open_lead_capture(conversation) is not None and not new_commercial_cycle:
+        locked_lead = None
+    if service.is_cycle_closing_message(message):
+        service.close_current_commercial_cycle(conversation)
+        locked_lead = None
     notified_commercial_append = _should_use_notified_append_reply(service, message, conversation)
     lead_capture = None
     lead_registered = False
@@ -66,6 +73,10 @@ def chat(request):
         locked_lead = locked_lead or service.get_locked_lead_capture(conversation)
     else:
         collecting_lead = service.should_start_contact_collection(conversation, message)
+    open_lead_for_message = service.get_open_lead_capture(conversation)
+    if open_lead_for_message is not None and service._looks_like_personal_only_input(message):
+        collecting_lead = True
+        locked_lead = None
     if notified_commercial_append:
         collecting_lead = False
         locked_lead = locked_lead or service.get_locked_lead_capture(conversation)
@@ -159,9 +170,15 @@ def chat(request):
     )
     is_technical = is_clear_technical_issue(service._normalize(message))
     discovery_pending = service.needs_consultative_discovery_for_conversation(conversation, message)
-    continue_after_notification = service.should_continue_conversation_after_notification(
-        conversation,
-        lead_registered=lead_registered,
+    continue_after_notification = (
+        service.should_continue_conversation_after_notification(
+            conversation,
+            lead_registered=lead_registered,
+        )
+        and not service.detect_lead_intent(message)
+        and not is_web_system_project_text(service._normalize(message))
+        and not service._looks_like_problem_description(message)
+        and not _is_substantive_system_need(service, message)
     )
     prefer_provider_reply = (
         (is_technical or discovery_pending or continue_after_notification)
@@ -179,7 +196,21 @@ def chat(request):
         prefer_provider_reply=prefer_provider_reply,
         post_qualified_collection=post_qualified_collection,
         notified_commercial_append=notified_commercial_append,
+        continue_after_notification=continue_after_notification,
     )
+    if _is_substantive_system_need(service, message):
+        reply = re.sub(
+            r"\s*Como já temos seus dados, vou acrescentar esse contexto ao atendimento\.?",
+            "",
+            reply or "",
+            flags=re.IGNORECASE,
+        ).strip()
+        reply = re.sub(
+            r"\s*Já temos seus dados registrados\. Vou acrescentar essa informação ao atendimento\.?",
+            "",
+            reply or "",
+            flags=re.IGNORECASE,
+        ).strip()
     if lead_capture is not None and reply != livia_response.reply:
         last_assistant = (
             conversation.messages.filter(role=LiviaMessage.Role.ASSISTANT)
@@ -223,8 +254,18 @@ def _has_explicit_contact_update(text):
     return False
 
 
+def _is_substantive_system_need(service, message):
+    normalized = service._normalize(message)
+    return "sistema" in normalized and any(
+        term in normalized
+        for term in ("interessado", "interesse", "criar", "preciso", "quero", "marmoraria", "deposito", "depósito")
+    )
+
+
 def _should_use_notified_append_reply(service, message, conversation):
     normalized = service._normalize(message)
+    if service.is_new_commercial_cycle_message(message, conversation) or _is_substantive_system_need(service, message):
+        return False
     if not (
         service._conversation_was_notified(conversation)
         and service._conversation_has_complete_contact(conversation)
@@ -265,6 +306,7 @@ def _resolve_chat_reply(
     prefer_provider_reply=False,
     post_qualified_collection=False,
     notified_commercial_append=False,
+    continue_after_notification=False,
 ):
     if lead_capture is None:
         return default_reply
@@ -285,10 +327,7 @@ def _resolve_chat_reply(
             lead_capture,
             notification_sent_this_turn=True,
         )
-    if service.should_continue_conversation_after_notification(
-        lead_capture.conversation,
-        lead_registered=lead_registered,
-    ):
+    if continue_after_notification:
         return _maybe_append_notified_context_ack(default_reply, lead_capture, service)
     if service.should_send_qualified_reply(lead_capture):
         return service.build_lead_confirmation_reply(

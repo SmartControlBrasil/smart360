@@ -148,6 +148,19 @@ class LiviaAssistantService:
         if last_assistant:
             recent_product = str(last_assistant.metadata.get("product_hint") or "").strip().lower()
         locked_lead = self.get_locked_lead_capture(conversation)
+        system_need_candidate = "sistema" in normalized and any(
+            term in normalized
+            for term in ("interessado", "interesse", "criar", "preciso", "quero", "marmoraria", "deposito", "depósito")
+        )
+        commercial_cycle_candidate = (
+            self.detect_lead_intent(user_text)
+            or is_web_system_project_text(normalized)
+            or self._looks_like_problem_description(user_text)
+            or system_need_candidate
+        )
+        starts_new_cycle = self.should_start_new_commercial_cycle(conversation, user_text, locked_lead)
+        if starts_new_cycle or commercial_cycle_candidate:
+            locked_lead = None
 
         reply = get_livia_ai_client().generate_reply(
             system_prompt=LIVIA_SYSTEM_PROMPT,
@@ -161,7 +174,9 @@ class LiviaAssistantService:
                 "knowledge_context": knowledge_context,
                 "recent_product": recent_product,
                 "qualified_cycle_locked": bool(locked_lead),
-                "conversation_already_notified": self._conversation_was_notified(conversation),
+                "conversation_already_notified": (
+                    self._conversation_was_notified(conversation) and not starts_new_cycle and not commercial_cycle_candidate
+                ),
             },
         )
 
@@ -264,6 +279,10 @@ class LiviaAssistantService:
     def should_update_lead_capture(self, conversation, message):
         if self.is_lead_collection_active(conversation):
             return True
+        active_lead = self._get_active_lead_capture(conversation)
+        if active_lead is not None and first_missing_required_field(active_lead):
+            if self._looks_like_personal_only_input(message) or is_lead_data_message(message):
+                return True
         if self.needs_consultative_discovery_for_conversation(conversation, message):
             return is_lead_data_message(message)
         if self.detect_lead_intent(message):
@@ -310,6 +329,8 @@ class LiviaAssistantService:
         explicit_company = self._extract_explicit_company(text)
         name_value = explicit_name or (compact_name if compact_name and compact_company else "")
         company_value = explicit_company or (compact_company if compact_name and compact_company else "")
+        if not company_value and "marmoraria" in normalized:
+            company_value = "Marmoraria"
         expected_field = self._expected_lead_field(conversation)
         conversational_value = self._extract_conversational_field_value(text, expected_field)
         if expected_field == "name":
@@ -364,14 +385,20 @@ class LiviaAssistantService:
             service_interest = "atendimento técnico"
 
         city_value = extracted.city or self._clean_match(city_match)
+        if city_value and any(term in self._normalize(city_value) for term in ("sistema", "marmoraria", "deposito", "depósito")):
+            city_value = ""
         if city_value and not _is_valid_company_or_city(city_value):
             city_value = ""
         if expected_field == "city" and not city_value:
             city_value = conversational_value
+            if city_value and any(term in self._normalize(city_value) for term in ("sistema", "marmoraria", "deposito", "depósito")):
+                city_value = ""
             if city_value and not _is_valid_company_or_city(city_value):
                 city_value = ""
         if not city_value:
             city_value = self._extract_city_from_comma_parts(text, excluded_values=(name_value, company_value))
+            if city_value and any(term in self._normalize(city_value) for term in ("sistema", "marmoraria", "deposito", "depósito")):
+                city_value = ""
             if city_value and not _is_valid_company_or_city(city_value):
                 city_value = ""
 
@@ -507,7 +534,7 @@ class LiviaAssistantService:
             update_fields.append("updated_at")
             conversation.save(update_fields=update_fields)
 
-        was_already_notified = self._conversation_was_notified(conversation)
+        was_already_notified = self._lead_was_notified(lead)
         if lead.is_qualified:
             try:
                 LiviaCRMBridge().create_or_update_crm_lead(lead)
@@ -529,6 +556,8 @@ class LiviaAssistantService:
         return lead
 
     def _seed_lead_contact_from_conversation(self, lead, conversation):
+        if any(self._is_capture_cycle_locked(existing) for existing in conversation.lead_captures.order_by("-created_at", "-id")):
+            return
         if not (lead.name or "").strip() and conversation.visitor_name:
             lead.name = conversation.visitor_name
         if not (lead.company or "").strip() and conversation.company_name:
@@ -543,6 +572,8 @@ class LiviaAssistantService:
                 lead.city = locked_lead.city
 
     def _conversation_was_notified(self, conversation):
+        if self.get_open_lead_capture(conversation) is not None:
+            return False
         for capture in LiviaLeadCapture.objects.filter(conversation_id=conversation.id):
             if (capture.crm_reference or {}).get("notification_sent_at"):
                 return True
@@ -551,17 +582,82 @@ class LiviaAssistantService:
     def _lead_was_notified(self, lead):
         return bool((lead.crm_reference or {}).get("notification_sent_at"))
 
-    def is_new_commercial_cycle_message(self, message, conversation):
-        if not self._is_lead_cycle_locked(conversation):
+    def get_open_lead_capture(self, conversation):
+        return self._get_active_lead_capture(conversation)
+
+    def should_start_new_commercial_cycle(self, conversation, user_message, existing_capture=None):
+        existing_capture = existing_capture or self.get_locked_lead_capture(conversation)
+        if existing_capture is None or not self._is_capture_cycle_locked(existing_capture):
             return False
-        normalized = self._normalize(message)
-        if self.should_capture_post_qualified_update_for_conversation(message, conversation):
+        normalized = self._normalize(user_message)
+        if self.is_cycle_closing_message(normalized):
+            return False
+        if any(term in normalized for term in ("tambem", "também", "alem disso", "além disso", "mais uma coisa")):
             return False
         if is_clear_technical_issue(normalized):
             return False
-        if self._conversation_has_complete_contact(conversation):
+        system_need = "sistema" in normalized and any(
+            term in normalized
+            for term in ("interessado", "interesse", "criar", "preciso", "quero", "marmoraria", "deposito", "depósito")
+        )
+        if system_need:
+            return True
+        if self.should_capture_post_qualified_update_for_conversation(user_message, conversation):
             return False
-        return is_lead_capture_intent(normalized) or is_web_system_project_text(normalized)
+        return (
+            is_lead_capture_intent(normalized)
+            or is_web_system_project_text(normalized)
+            or self._looks_like_problem_description(user_message)
+            or system_need
+        )
+
+    def is_same_contact_cycle(self, existing_lead, new_contact_data):
+        if existing_lead is None:
+            return False
+        normalized_name = self._normalize(new_contact_data.get("name", ""))
+        normalized_existing_name = self._normalize(getattr(existing_lead, "name", ""))
+        if normalized_name and normalized_existing_name and normalized_name != normalized_existing_name:
+            return False
+        phone = re.sub(r"\D", "", str(new_contact_data.get("phone", "")))
+        existing_phone = re.sub(r"\D", "", str(getattr(existing_lead, "phone", "")))
+        if phone and existing_phone and phone != existing_phone:
+            return False
+        email = self._normalize(new_contact_data.get("email", ""))
+        existing_email = self._normalize(getattr(existing_lead, "email", ""))
+        if email and existing_email and email != existing_email:
+            return False
+        return bool(normalized_name or phone or email)
+
+    def is_cycle_closing_message(self, text):
+        normalized = self._normalize(text)
+        closing_terms = (
+            "por hora e so",
+            "por hora é só",
+            "por enquanto e so",
+            "por enquanto é só",
+            "obrigado",
+            "obrigada",
+            "ate mais",
+            "até mais",
+            "valeu",
+            "só isso",
+            "so isso",
+        )
+        return any(term in normalized for term in closing_terms)
+
+    def close_current_commercial_cycle(self, conversation):
+        lead = self._latest_lead_capture(conversation)
+        if lead is None:
+            return None
+        reference = dict(lead.crm_reference or {})
+        reference["lead_state"] = LeadState.CLOSED
+        reference["closed_by_user"] = True
+        lead.crm_reference = reference
+        lead.save(update_fields=["crm_reference"])
+        return lead
+
+    def is_new_commercial_cycle_message(self, message, conversation):
+        return self.should_start_new_commercial_cycle(conversation, message)
 
     def _conversation_has_complete_contact(self, conversation):
         locked_lead = self.get_locked_lead_capture(conversation)

@@ -6,10 +6,10 @@
             <h1>{{ form_heading }}</h1>
             <p class="muted-block">Formatos: JPG, PNG ou WEBP — máximo 5 MB. Na edição, deixe o arquivo em branco para manter a imagem atual.</p>
         </header>
-        {% if asset and asset.image %}
+        {% if asset and asset.original_file %}
         <div class="ml-current-preview">
             <p class="shell-text-muted">Imagem atual</p>
-            <img src="{{ asset.image.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-current-preview-img" loading="lazy">
+            <img src="{{ asset.original_file.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-current-preview-img" loading="lazy">
         </div>
         {% endif %}
         <div class="form-card-body">
@@ -24,9 +24,9 @@
                     {% if form.title.errors %}<p class="form-error">{{ form.title.errors.0 }}</p>{% endif %}
                 </div>
                 <div class="form-field full">
-                    <label class="form-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
-                    {{ form.image }}
-                    {% if form.image.errors %}<p class="form-error">{{ form.image.errors.0 }}</p>{% endif %}
+                    <label class="form-label" for="{{ form.original_file.id_for_label }}">{{ form.original_file.label }}</label>
+                    {{ form.original_file }}
+                    {% if form.original_file.errors %}<p class="form-error">{{ form.original_file.errors.0 }}</p>{% endif %}
                 </div>
                 <div class="form-field full">
                     <label class="form-label" for="{{ form.alt_text.id_for_label }}">{{ form.alt_text.label }}</label>

@@ -10,7 +10,7 @@ from apps.media_library.models import ALLOWED_IMAGE_EXTENSIONS, MAX_UPLOAD_BYTES
 
 class MediaAssetForm(forms.ModelForm):
     # FileField evita PIL duplo do ImageField Django (fecha o stream antes de clean_image).
-    image = forms.FileField(
+    original_file = forms.FileField(
         label="Imagem",
         required=False,
         widget=forms.FileInput(
@@ -30,7 +30,7 @@ class MediaAssetForm(forms.ModelForm):
 
     class Meta:
         model = MediaAsset
-        fields = ("title", "image", "alt_text", "is_active")
+        fields = ("title", "original_file", "alt_text", "is_active")
         widgets = {
             "title": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "Título para identificar a imagem", "required": True}
@@ -41,7 +41,7 @@ class MediaAssetForm(forms.ModelForm):
         }
         labels = {
             "title": "Título",
-            "image": "Imagem",
+            "original_file": "Imagem",
             "alt_text": "Texto alternativo",
         }
 
@@ -51,9 +51,9 @@ class MediaAssetForm(forms.ModelForm):
         if self.instance.pk is not None:
             self.initial["is_active"] = "1" if self.instance.is_active else "0"
             # Permite edição sem reenviar arquivo (ImageField já existente na instância).
-            self.fields["image"].required = False
+            self.fields["original_file"].required = False
         else:
-            self.fields["image"].required = True
+            self.fields["original_file"].required = True
             self.initial.setdefault("is_active", "1")
 
     def _ensure_allowed_image(self, upload):
@@ -142,13 +142,13 @@ class MediaAssetForm(forms.ModelForm):
         except Exception:
             raise forms.ValidationError("Não foi possível ler a imagem. Verifique se o arquivo não está corrompido.") from None
 
-    def clean_image(self):
-        image = self.cleaned_data.get("image")
+    def clean_original_file(self):
+        image = self.cleaned_data.get("original_file")
         # ModelForm multipart: novo upload ausente preserva arquivo existente
         if image in (None, False):
             if not getattr(self.instance, "pk", None):
                 raise forms.ValidationError("Selecione uma imagem para enviar.")
-            inst_img = getattr(self.instance, "image", None)
+            inst_img = getattr(self.instance, "original_file", None)
             if inst_img:
                 return inst_img
             raise forms.ValidationError("Selecione uma imagem para enviar.")

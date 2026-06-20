@@ -6,12 +6,12 @@ import mimetypes
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .models import MediaAsset
+    from ..models import MediaAsset
 
 
 def gather_image_metadata(media_asset: MediaAsset) -> dict:
     """Retorna dict de campos do model a atualizar (sem salvar na instância)."""
-    mf = getattr(media_asset, "image", None)
+    mf = getattr(media_asset, "original_file", None)
     if not mf or not getattr(mf, "name", None):
         return {}
 

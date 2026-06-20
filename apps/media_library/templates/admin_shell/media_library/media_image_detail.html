@@ -7,8 +7,8 @@
             <p>Arquivo enviado para a biblioteca.</p>
         </div>
         <div class="widget-card-body ml-detail-preview-body">
-            {% if asset.image %}
-            <img src="{{ asset.image.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-detail-large-img" loading="lazy">
+            {% if asset.original_file %}
+            <img src="{{ asset.original_file.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-detail-large-img" loading="lazy">
             {% else %}
             <p class="shell-text-muted">Sem arquivo de imagem.</p>
             {% endif %}

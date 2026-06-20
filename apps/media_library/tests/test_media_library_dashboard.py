@@ -43,12 +43,12 @@ class MediaLibraryDashboardTests(TestCase):
                 "title": "Imagem equipamento",
                 "alt_text": "Detalhe",
                 "is_active": "1",
-                "image": (BytesIO(jpeg_content), "foto-demo.jpg"),
+                "original_file": (BytesIO(jpeg_content), "foto-demo.jpg"),
             },
         )
         self.assertEqual(rsp_ok.status_code, 302)
         asset = MediaAsset.objects.get(title="Imagem equipamento")
-        self.assertTrue(asset.image.name.endswith(".jpg"))
+        self.assertTrue(asset.original_file.name.endswith(".jpg"))
         self.assertEqual(asset.uploaded_by_id, self.super_user.id)
         self.assertIsNotNone(asset.file_size)
         self.assertGreater(asset.file_size or 0, 0)
@@ -62,7 +62,7 @@ class MediaLibraryDashboardTests(TestCase):
             {
                 "title": "Ícone svg",
                 "is_active": "1",
-                "image": (BytesIO(b"<svg></svg>"), "evil.svg"),
+                "original_file": (BytesIO(b"<svg></svg>"), "evil.svg"),
             },
         )
         self.assertEqual(rsp.status_code, 400)
@@ -76,7 +76,7 @@ class MediaLibraryDashboardTests(TestCase):
             {
                 "title": "Arquivo grande",
                 "is_active": "1",
-                "image": (oversized, "big.jpg"),
+                "original_file": (oversized, "big.jpg"),
             },
         )
         self.assertEqual(rsp.status_code, 400)
@@ -89,7 +89,7 @@ class MediaLibraryDashboardTests(TestCase):
             {
                 "title": "Asset ativo",
                 "is_active": "1",
-                "image": (BytesIO(_make_jpeg_bytes("one")), "a.jpg"),
+                "original_file": (BytesIO(_make_jpeg_bytes("one")), "a.jpg"),
             },
         )
         self.client.post(
@@ -97,7 +97,7 @@ class MediaLibraryDashboardTests(TestCase):
             {
                 "title": "Asset inativo",
                 "is_active": "1",
-                "image": (BytesIO(_make_jpeg_bytes("two")), "b.jpg"),
+                "original_file": (BytesIO(_make_jpeg_bytes("two")), "b.jpg"),
             },
         )
         inactive_pk = MediaAsset.objects.get(title="Asset inativo").pk
@@ -121,7 +121,7 @@ class MediaLibraryDashboardTests(TestCase):
                 "title": "Bomba hidráulica",
                 "alt_text": "Bomba",
                 "is_active": "1",
-                "image": (BytesIO(jpeg), "bomba.jpg"),
+                "original_file": (BytesIO(jpeg), "bomba.jpg"),
             },
         )
         pk = MediaAsset.objects.get(title="Bomba hidráulica").pk

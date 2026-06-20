@@ -49,10 +49,10 @@
     {% for row in media_assets %}
     <article class="widget-card ml-card">
         <a href="{% url 'admin-shell:media-image-detail' pk=row.pk %}" class="ml-card-thumb-wrap">
-            {% if row.image %}
+            {% if row.original_file %}
             <img
                 class="ml-card-thumb"
-                src="{{ row.image.url }}"
+                src="{{ row.original_file.url }}"
                 alt="{{ row.alt_text|default:row.title }}"
                 loading="lazy"
                 width="{{ row.width|default:'160' }}"

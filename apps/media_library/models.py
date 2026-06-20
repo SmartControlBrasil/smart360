@@ -10,13 +10,42 @@ ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 class MediaAsset(models.Model):
     """Imagem cadastrável no Admin Shell para reutilização posterior."""
 
+    class AssetType(models.TextChoices):
+        IMAGE = "IMAGE", "Imagem"
+
+    class ProcessingStatus(models.TextChoices):
+        PENDING = "PENDING", "Pendente"
+        PROCESSING = "PROCESSING", "Processando"
+        DONE = "DONE", "Concluído"
+        FAILED = "FAILED", "Falhou"
+
     title = models.CharField("título", max_length=180)
-    image = models.ImageField(
-        "imagem",
+    asset_type = models.CharField(
+        "tipo de arquivo",
+        max_length=20,
+        choices=AssetType.choices,
+        default=AssetType.IMAGE,
+    )
+    original_file = models.ImageField(
+        "arquivo original",
         upload_to="media_library/images/%Y/%m/",
         blank=False,
         null=False,
     )
+    processed_file = models.ImageField(
+        "arquivo tratado",
+        upload_to="media_library/processed/%Y/%m/",
+        blank=True,
+        null=True,
+        editable=False,
+    )
+    processing_status = models.CharField(
+        "status do processamento",
+        max_length=20,
+        choices=ProcessingStatus.choices,
+        default=ProcessingStatus.PENDING,
+    )
+    processing_notes = models.TextField("observações do processamento", blank=True)
     alt_text = models.CharField("texto alternativo", max_length=255, blank=True)
     file_size = models.PositiveIntegerField(null=True, blank=True, editable=False)
     mime_type = models.CharField(max_length=100, blank=True, editable=False)
@@ -45,7 +74,7 @@ class MediaAsset(models.Model):
         """Atualiza metadados persistidos conforme arquivo salvo."""
         if not self.pk:
             return
-        image_field = getattr(self, "image", None)
+        image_field = getattr(self, "original_file", None)
         if not image_field or not getattr(image_field, "name", None):
             return
         blob = gather_image_metadata(self)
@@ -61,7 +90,7 @@ class MediaAsset(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.image and self.pk:
+        if self.original_file and self.pk:
             self.sync_metadata_after_save()
 
     def human_file_size(self) -> str:

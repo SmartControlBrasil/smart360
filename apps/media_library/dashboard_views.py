@@ -14,6 +14,7 @@ from django.views.generic.list import ListView
 from apps.admin_shell.views import ShellContextMixin
 from apps.media_library.forms import MediaAssetForm
 from apps.media_library.models import MediaAsset
+from apps.media_library.services.image_processing import optimize_image
 
 
 class MediaLibraryBaseMixin(ShellContextMixin):
@@ -94,6 +95,10 @@ class MediaAssetCreateView(MediaLibraryBaseMixin, FormView):
         if user and user.is_authenticated:
             asset.uploaded_by = user
         asset.save()
+        try:
+            optimize_image(asset)
+        except Exception:
+            messages.warning(self.request, "A imagem foi salva, mas o tratamento automático falhou.")
         messages.success(self.request, "Imagem enviada com sucesso.")
         return redirect(reverse("admin-shell:media-image-detail", kwargs={"pk": asset.pk}))
 
@@ -111,8 +116,8 @@ class MediaAssetDetailView(MediaLibraryBaseMixin, DetailView):
         ctx["page_description"] = "Detalhes do arquivo cadastrado."
         ctx["breadcrumbs"] = self.get_breadcrumbs()
         ctx["breadcrumbs"].append({"label": obj.title, "url": None})
-        if obj.image:
-            ctx["absolute_image_url"] = self.request.build_absolute_uri(obj.image.url)
+        if obj.original_file:
+            ctx["absolute_image_url"] = self.request.build_absolute_uri(obj.original_file.url)
         ctx["formatted_size"] = obj.human_file_size()
         if obj.metadata:
             ctx["metadata_json"] = json.dumps(obj.metadata, indent=2, ensure_ascii=False)
@@ -177,7 +182,13 @@ class MediaAssetUpdateView(MediaLibraryBaseMixin, FormView):
         return ctx
 
     def form_valid(self, form):
+        should_process = "original_file" in form.changed_data
         asset = form.save()
+        if should_process:
+            try:
+                optimize_image(asset)
+            except Exception:
+                messages.warning(self.request, "A imagem foi salva, mas o tratamento automático falhou.")
         messages.success(self.request, "Imagem atualizada com sucesso.")
         return redirect(reverse("admin-shell:media-image-detail", kwargs={"pk": asset.pk}))
 

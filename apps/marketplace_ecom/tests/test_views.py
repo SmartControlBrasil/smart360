@@ -107,6 +107,8 @@ class MarketplaceEcomViewTests(MarketplaceCatalogTestCase):
         self.assertNotContains(response, ">Smart360<")
         self.assertContains(response, "logo-cores-03.png")
         self.assertContains(response, "data-marketplace-theme-toggle")
+        self.assertContains(response, "Solicitar orçamento")
+        self.assertContains(response, "marketplace-search-form")
         self.assertContains(response, "smart360-marketplace.js")
         self.assertContains(response, "marketplace-shell")
         self.assertContains(response, 'data-marketplace-theme')

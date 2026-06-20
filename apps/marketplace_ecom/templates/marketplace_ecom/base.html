@@ -22,69 +22,77 @@
   <title>{% block title %}Catálogo Técnico | Smart Control Brasil{% endblock %}</title>
 </head>
 <body class="marketplace-shell">
-  <header class="header marketplace-header">
-    <div class="container marketplace-header__container">
-      <div class="marketplace-header__main">
+  <div class="marketplace-top-shell">
+    <header class="marketplace-header" role="banner">
+      <div class="mp-container marketplace-header__inner">
         <a class="marketplace-header__logo" href="{% url 'marketplace_ecom:home' %}">
           <img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-03.png' %}" alt="Smart Control Brasil">
         </a>
 
-        <nav class="marketplace-header__nav nav-main-menu d-none d-xl-block" aria-label="Navegação do catálogo">
-          <ul class="main-menu marketplace-header__menu">
-            <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
-            <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
-            <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
-            <li>
-              <a
-                id="marketplace-back-to-site"
-                class="marketplace-header__back-link marketplace-back-link"
-                href="/"
-                data-fallback-href="/"
-              >Voltar ao site</a>
-            </li>
-          </ul>
+        <nav class="marketplace-header__nav d-none d-xl-flex" aria-label="Navegação do catálogo">
+          <div class="marketplace-header__nav-track">
+            <a class="marketplace-nav-link" href="{% url 'marketplace_ecom:home' %}">Catálogo</a>
+            <a class="marketplace-nav-link" href="{% url 'marketplace_ecom:products' %}">Produtos</a>
+            <a class="marketplace-nav-link" href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a>
+            <a
+              id="marketplace-back-to-site"
+              class="marketplace-nav-link marketplace-nav-link--outline marketplace-back-link"
+              href="/"
+              data-fallback-href="/"
+            >Voltar ao site</a>
+          </div>
         </nav>
 
-        <div class="marketplace-header__actions">
+        <div class="marketplace-header__tools">
           <button
             type="button"
-            class="marketplace-theme-toggle"
+            class="mp-theme-btn"
             data-marketplace-theme-toggle
             aria-label="Ativar modo escuro"
             title="Modo escuro"
             aria-pressed="false"
           >
-            <span class="marketplace-theme-toggle__icon" aria-hidden="true">☾</span>
-            <span class="marketplace-theme-toggle__label">Modo escuro</span>
+            <svg class="mp-theme-btn__icon mp-theme-btn__icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z" fill="currentColor"/>
+            </svg>
+            <svg class="mp-theme-btn__icon mp-theme-btn__icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 4a1 1 0 0 1-1-1v-1.1a1 1 0 1 1 2 0V20a1 1 0 0 1-1 1Zm0-18a1 1 0 0 1-1-1V1a1 1 0 1 1 2 0v1a1 1 0 0 1-1 1Zm10 9h-1.1a1 1 0 1 1 0-2H22a1 1 0 1 1 0 2ZM3.1 12a1 1 0 1 1 0-2H2a1 1 0 1 1 0 2h1.1Zm15.6 6.4a1 1 0 0 1-1.4 0l-.8-.8a1 1 0 1 1 1.4-1.4l.8.8a1 1 0 0 1 0 1.4ZM6.5 7.7a1 1 0 0 1 0-1.4l.8-.8a1 1 0 1 1 1.4 1.4l-.8.8a1 1 0 0 1-1.4 0Zm11.4-1.4a1 1 0 0 1 1.4 0l.8.8a1 1 0 0 1-1.4 1.4l-.8-.8a1 1 0 0 1 0-1.4ZM7.3 16.1a1 1 0 0 1 1.4 0l.8.8a1 1 0 0 1-1.4 1.4l-.8-.8a1 1 0 0 1 0-1.4Z" fill="currentColor"/>
+            </svg>
           </button>
-          <a class="marketplace-header__action" href="/login/">Entrar</a>
-          <a class="marketplace-header__action marketplace-header__action--primary" href="{% url 'marketplace_ecom:products' %}">Orçamento</a>
-          <div class="burger-icon burger-icon-white" role="button" tabindex="0" aria-label="Abrir menu">
+          <a class="mp-link-quiet d-none d-lg-inline-flex" href="/login/">Entrar</a>
+          <a class="mp-btn mp-btn--primary d-none d-md-inline-flex" href="{% url 'marketplace_ecom:products' %}">Solicitar orçamento</a>
+          <div class="burger-icon burger-icon-white marketplace-header__burger" role="button" tabindex="0" aria-label="Abrir menu">
             <span class="burger-icon-top"></span>
             <span class="burger-icon-mid"></span>
             <span class="burger-icon-bottom"></span>
           </div>
         </div>
       </div>
+    </header>
 
-      <div class="marketplace-header__search">
-        <div class="box-header-search marketplace-header__search-box">
-          <form class="form-search" method="get" action="{% url 'marketplace_ecom:products' %}">
-            <div class="box-category">
-              <select class="select-active" name="brand" aria-label="Filtrar por linha técnica">
-                <option value="">Todas as linhas</option>
-                <option value="Xyron Robotics">Robótica Xyron</option>
-                <option value="Mitsubishi Electric">Automação Mitsubishi</option>
-              </select>
-            </div>
-            <div class="box-keysearch">
-              <input class="form-control font-xs" type="search" name="q" placeholder="Buscar no catálogo técnico" aria-label="Buscar no catálogo técnico">
-            </div>
-          </form>
-        </div>
+    <div class="marketplace-toolbar" role="search">
+      <div class="mp-container">
+        <form class="marketplace-search-form" method="get" action="{% url 'marketplace_ecom:products' %}">
+          <div class="marketplace-search-form__field marketplace-search-form__field--select">
+            <label class="mp-sr-only" for="marketplace-brand-filter">Filtrar por linha técnica</label>
+            <select id="marketplace-brand-filter" class="marketplace-search-form__select" name="brand">
+              <option value="">Todas as linhas</option>
+              <option value="Xyron Robotics">Robótica Xyron</option>
+              <option value="Mitsubishi Electric">Automação Mitsubishi</option>
+            </select>
+          </div>
+          <div class="marketplace-search-form__field marketplace-search-form__field--search">
+            <label class="mp-sr-only" for="marketplace-search-input">Buscar no catálogo</label>
+            <span class="marketplace-search-form__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm8.9 2.1-4.2-4.2a1 1 0 0 0-1.4 1.4l4.2 4.2a1 1 0 0 0 1.4-1.4Z" fill="currentColor"/></svg>
+            </span>
+            <input id="marketplace-search-input" class="marketplace-search-form__input" type="search" name="q" placeholder="Buscar produtos, fabricantes ou aplicações">
+          </div>
+          <button class="mp-btn mp-btn--secondary marketplace-search-form__submit" type="submit">Buscar</button>
+        </form>
       </div>
     </div>
-  </header>
+  </div>
 
   <div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
     <div class="mobile-header-wrapper-inner">
@@ -97,24 +105,20 @@
         <div class="perfect-scroll">
           <div class="mobile-menu-wrap mobile-header-border">
             <nav class="mt-15" aria-label="Menu mobile do catálogo">
-              <ul class="mobile-menu font-heading">
+              <ul class="mobile-menu font-heading marketplace-mobile-menu">
                 <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
                 <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
                 <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
+                <li><a class="marketplace-back-link" href="/" data-fallback-href="/">Voltar ao site</a></li>
                 <li>
-                  <a
-                    class="marketplace-back-link"
-                    href="/"
-                    data-fallback-href="/"
-                  >Voltar ao site</a>
-                </li>
-                <li>
-                  <button type="button" class="marketplace-theme-toggle marketplace-theme-toggle--menu" data-marketplace-theme-toggle>
-                    <span class="marketplace-theme-toggle__icon" aria-hidden="true">☾</span>
-                    <span class="marketplace-theme-toggle__label">Modo escuro</span>
+                  <button type="button" class="mp-theme-btn mp-theme-btn--menu" data-marketplace-theme-toggle aria-label="Ativar modo escuro">
+                    <svg class="mp-theme-btn__icon mp-theme-btn__icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z" fill="currentColor"/></svg>
+                    <svg class="mp-theme-btn__icon mp-theme-btn__icon--sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 4a1 1 0 0 1-1-1v-1.1a1 1 0 1 1 2 0V20a1 1 0 0 1-1 1Zm0-18a1 1 0 0 1-1-1V1a1 1 0 1 1 2 0v1a1 1 0 0 1-1 1Zm10 9h-1.1a1 1 0 1 1 0-2H22a1 1 0 1 1 0 2ZM3.1 12a1 1 0 1 1 0-2H2a1 1 0 1 1 0 2h1.1Z" fill="currentColor"/></svg>
+                    <span class="mp-theme-btn__menu-label">Alternar tema</span>
                   </button>
                 </li>
                 <li><a href="/login/">Entrar</a></li>
+                <li><a class="mp-btn mp-btn--primary mp-btn--block" href="{% url 'marketplace_ecom:products' %}">Solicitar orçamento</a></li>
               </ul>
             </nav>
           </div>
@@ -129,7 +133,7 @@
 
   <footer class="footer marketplace-footer">
     <div class="footer-1">
-      <div class="container">
+      <div class="mp-container">
         <div class="row">
           <div class="col-lg-4 width-25 mb-30">
             <h4 class="mb-30 marketplace-footer__title">Catálogo Técnico B2B</h4>

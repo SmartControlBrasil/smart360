@@ -3,36 +3,47 @@
 {% block title %}Catálogo Técnico | Smart Control Brasil{% endblock %}
 {% block meta_description %}Catálogo técnico B2B da Smart Control Brasil — robótica Xyron, automação Mitsubishi e soluções industriais sob consulta.{% endblock %}
 {% block content %}
-<section class="section-box">
-  <div class="banner-hero banner-1">
-    <div class="container">
-      <div class="row align-items-center">
+<section class="marketplace-hero">
+  <div class="mp-container">
+    <div class="marketplace-hero__card">
+      <div class="row align-items-center g-4">
         <div class="col-lg-6">
-          <div class="marketplace-hero-copy">
+          <div class="marketplace-hero__copy">
             <span class="marketplace-smart-badge">Catálogo Técnico B2B</span>
-            <h1 class="color-brand-3">Catálogo Técnico</h1>
-            <p>Catálogo técnico B2B com fabricantes representados e parceiros técnicos. Robótica Xyron, automação Mitsubishi Electric e soluções industriais sob consulta.</p>
-            <a class="btn btn-buy" href="{% url 'marketplace_ecom:products' %}">Ver produtos e soluções técnicas</a>
+            <h1 class="marketplace-hero__title">Soluções técnicas para projetos industriais e comerciais</h1>
+            <p class="marketplace-hero__lead">Robótica Xyron, automação Mitsubishi Electric e integrações técnicas sob consulta. Explore o catálogo, compare aplicações e solicite orçamento com a Smart Control Brasil.</p>
+            <div class="marketplace-hero__actions">
+              <a class="mp-btn mp-btn--primary mp-btn--lg" href="{% url 'marketplace_ecom:products' %}">Ver produtos e soluções técnicas</a>
+            </div>
             <p class="marketplace-disabled-note">Fluxo oficial: produto → solicitar orçamento → qualificação comercial → proposta técnica.</p>
           </div>
         </div>
         <div class="col-lg-6">
-          <div class="marketplace-hero-visual" style="background-image: url({% static 'institutional/eitech/img/all-images/hero/neo-robot-assistence-xyron.png' %})"></div>
+          <div class="marketplace-hero__visual" aria-hidden="true">
+            <div class="marketplace-hero__visual-ring"></div>
+            <div class="marketplace-hero__visual-glow"></div>
+            <img
+              class="marketplace-hero__robot"
+              src="{% static 'institutional/eitech/img/all-images/hero/neo-robot-assistence-xyron.png' %}"
+              alt=""
+            >
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-<section class="section-box mt-50">
-  <div class="container">
-    <div class="head-main">
-      <h3 class="mb-5">Categorias em destaque</h3>
-      <p class="font-base color-gray-500">Vitrines organizadas por linha técnica para orientar projetos e consultas comerciais.</p>
+
+<section class="marketplace-section">
+  <div class="mp-container">
+    <div class="marketplace-section__head">
+      <h2 class="marketplace-section__title">Categorias em destaque</h2>
+      <p class="marketplace-section__subtitle">Vitrines organizadas por linha técnica para orientar projetos e consultas comerciais.</p>
     </div>
     <div class="row mt-30">
       {% for category in categories %}
       <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12 mb-20">
-        <div class="card-grid-style-2 card-grid-style-2-small hover-up marketplace-category-card">
+        <div class="card-grid-style-2 card-grid-style-2-small hover-up marketplace-category-card mp-card">
           <div class="image-box"><img src="{% static category.image %}" alt="{{ category.title }}"></div>
           <div class="info-right">
             <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:products' %}?{{ category.filter_param }}={{ category.filter_value|urlencode }}">{{ category.title }}</a><br>
@@ -45,16 +56,16 @@
   </div>
 </section>
 
-<section class="section-box mt-50">
-  <div class="container">
-    <div class="head-main">
-      <h3 class="mb-5">Fabricantes representados</h3>
-      <p class="font-base color-gray-500">Representadas posicionadas para projetos B2B técnicos, sob consulta.</p>
+<section class="marketplace-section">
+  <div class="mp-container">
+    <div class="marketplace-section__head">
+      <h2 class="marketplace-section__title">Fabricantes representados</h2>
+      <p class="marketplace-section__subtitle">Representadas posicionadas para projetos B2B técnicos, sob consulta.</p>
     </div>
     <div class="row mt-30">
       {% for item in brand_partners %}
       <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-20">
-        <div class="card-grid-style-2 card-grid-style-2-small hover-up marketplace-category-card">
+        <div class="card-grid-style-2 card-grid-style-2-small hover-up marketplace-category-card mp-card">
           <div class="info-right">
             <span class="marketplace-mini-pill">{{ item.role }}</span>
             <div class="mt-15"><strong class="color-brand-3 font-lg-bold">{{ item.name }}</strong></div>
@@ -65,40 +76,50 @@
     </div>
   </div>
 </section>
-<section class="section-box pt-50">
-  <div class="container">
-    <div class="head-main">
-      <h3 class="mb-5">Soluções em destaque</h3>
-      <a class="btn btn-buy" href="{% url 'marketplace_ecom:products' %}">Ver todos</a>
+
+<section class="marketplace-section">
+  <div class="mp-container">
+    <div class="marketplace-section__head marketplace-section__head--split">
+      <div>
+        <h2 class="marketplace-section__title">Soluções em destaque</h2>
+        <p class="marketplace-section__subtitle">Seleção comercial de produtos técnicos com solicitação de orçamento integrada.</p>
+      </div>
+      <a class="mp-btn mp-btn--secondary" href="{% url 'marketplace_ecom:products' %}">Ver todos</a>
     </div>
     <div class="row mt-30">
       {% for product in featured_products %}
       <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-  <div class="card-grid-style-3">
-    <div class="card-grid-inner">
-      <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% include "marketplace_ecom/partials/product_image.html" with image_class="marketplace-product-image" %}</a>
+        <div class="card-grid-style-3 mp-card">
+          <div class="card-grid-inner">
+            <div class="image-box">
+              <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% include "marketplace_ecom/partials/product_image.html" with image_class="marketplace-product-image" %}</a>
+            </div>
+            <div class="info-right">
+              <span class="font-xs color-gray-500">{{ product.category }}</span><br>
+              <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:product-detail' product.slug %}">{{ product.title }}</a>
+              <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt=""><span class="font-xs color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
+              <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">{{ product.price_label }}</strong></div>
+              <div class="mt-20 box-btn-cart"><a class="mp-btn mp-btn--secondary mp-btn--sm" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="info-right">
-        <span class="font-xs color-gray-500">{{ product.category }}</span><br>
-        <a class="color-brand-3 font-sm-bold" href="{% url 'marketplace_ecom:product-detail' product.slug %}">{{ product.title }}</a>
-        <div class="rating"><img src="{% static 'marketplace/ecom/img/template/icons/star.svg' %}" alt="rating"><span class="font-xs color-gray-500"> Fabricante: {{ product.brand }}<br>Parceiro: {{ product.supplier }}<br>Aplicação: {{ product.application_area }}</span></div>
-        <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">{{ product.price_label }}</strong></div>
-        <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">Solicitar orçamento</a></div>
-      </div>
-    </div>
-  </div>
-</div>
       {% endfor %}
     </div>
   </div>
 </section>
-<section id="representadas-parceiros" class="section-box box-newsletter mt-50">
-  <div class="container">
-    <div class="box-form-newsletter">
+
+<section id="representadas-parceiros" class="marketplace-section marketplace-section--cta">
+  <div class="mp-container">
+    <div class="marketplace-cta-band mp-card">
       <div class="row align-items-center">
-        <div class="col-lg-8"><h3 class="color-brand-3">Representadas e parceiros</h3><p class="font-lg color-gray-500">Consulte produtos técnicos, compare aplicações e solicite orçamento com a equipe comercial da Smart Control Brasil.</p></div>
-        <div class="col-lg-4 text-lg-end"><a class="btn btn-buy" href="{% url 'marketplace_ecom:products' %}">Explorar catálogo</a></div>
+        <div class="col-lg-8">
+          <h2 class="marketplace-section__title mb-10">Representadas e parceiros</h2>
+          <p class="marketplace-section__subtitle mb-0">Consulte produtos técnicos, compare aplicações e solicite orçamento com a equipe comercial da Smart Control Brasil.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-20 mt-lg-0">
+          <a class="mp-btn mp-btn--primary" href="{% url 'marketplace_ecom:products' %}">Explorar catálogo</a>
+        </div>
       </div>
     </div>
   </div>

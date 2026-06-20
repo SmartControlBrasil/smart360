@@ -16,16 +16,6 @@
             button.setAttribute("aria-label", isDark ? "Ativar modo claro" : "Ativar modo escuro");
             button.setAttribute("title", isDark ? "Modo claro" : "Modo escuro");
             button.setAttribute("aria-pressed", isDark ? "true" : "false");
-
-            var label = button.querySelector(".marketplace-theme-toggle__label");
-            if (label) {
-                label.textContent = isDark ? "Modo claro" : "Modo escuro";
-            }
-
-            var icon = button.querySelector(".marketplace-theme-toggle__icon");
-            if (icon) {
-                icon.textContent = isDark ? "☀" : "☾";
-            }
         });
     }
 

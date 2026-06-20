@@ -1,77 +1,520 @@
+/* ===== Smart360 — Catálogo Técnico B2B (override scoped) ===== */
 
-/* Logo institucional (mesmo ativo do site público institutional/eitech) */
-.marketplace-scb-brand-logo {
+html[data-marketplace-theme="light"],
+html:not([data-marketplace-theme]) {
+  --mp-bg: #e8eef4;
+  --mp-bg-soft: #f1f5f9;
+  --mp-surface: #ffffff;
+  --mp-surface-soft: #f8fafc;
+  --mp-border: #c5d2df;
+  --mp-border-soft: #d9e2ec;
+  --mp-text: #1a2b3c;
+  --mp-text-muted: #52657a;
+  --mp-brand: #0b5f8a;
+  --mp-brand-strong: #094d71;
+  --mp-accent: #0d9488;
+  --mp-header-bg: #ffffff;
+  --mp-breadcrumb-bg: #d9e4ef;
+  --mp-card-shadow: 0 10px 28px rgba(15, 35, 58, 0.07);
+  --mp-input-bg: #ffffff;
+  --mp-input-border: #c5d2df;
+  --mp-footer-bg: #1e293b;
+  --mp-footer-text: #cbd5e1;
+  --mp-image-bg: #f4f7fb;
+  --mp-toggle-bg: #eef3f8;
+  --mp-toggle-border: #c5d2df;
+}
+
+html[data-marketplace-theme="dark"] {
+  --mp-bg: #0f172a;
+  --mp-bg-soft: #131d31;
+  --mp-surface: #1e293b;
+  --mp-surface-soft: #253246;
+  --mp-border: #334155;
+  --mp-border-soft: #3d4f66;
+  --mp-text: #e2e8f0;
+  --mp-text-muted: #94a3b8;
+  --mp-brand: #38bdf8;
+  --mp-brand-strong: #7dd3fc;
+  --mp-accent: #2dd4bf;
+  --mp-header-bg: #162032;
+  --mp-breadcrumb-bg: #162032;
+  --mp-card-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  --mp-input-bg: #1e293b;
+  --mp-input-border: #475569;
+  --mp-footer-bg: #0b1220;
+  --mp-footer-text: #94a3b8;
+  --mp-image-bg: #253246;
+  --mp-toggle-bg: #253246;
+  --mp-toggle-border: #475569;
+}
+
+body.marketplace-shell {
+  background-color: var(--mp-bg);
+  color: var(--mp-text);
+}
+
+body.marketplace-shell .marketplace-main,
+body.marketplace-shell .main {
+  background-color: var(--mp-bg);
+}
+
+body.marketplace-shell .section-box {
+  background-color: transparent;
+}
+
+/* ----- Header ----- */
+body.marketplace-shell .marketplace-header {
+  background: var(--mp-header-bg) !important;
+  border-bottom: 1px solid var(--mp-border-soft) !important;
+  float: none !important;
+  padding: 0 !important;
+  position: relative;
+  width: 100%;
+}
+
+body.marketplace-shell .marketplace-header__container {
+  max-width: 1280px !important;
+  padding: 12px 16px 14px;
+}
+
+body.marketplace-shell .marketplace-header__main {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+  min-height: 52px;
+}
+
+body.marketplace-shell .marketplace-header__logo {
+  display: block;
+  flex: 0 0 auto;
+  max-width: 148px;
+  width: 148px;
+}
+
+body.marketplace-shell .marketplace-header__nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+  width: auto !important;
+}
+
+body.marketplace-shell .marketplace-header__menu {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.marketplace-shell .marketplace-header__menu li a {
+  border-radius: 8px;
+  color: var(--mp-text);
+  display: inline-block;
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  text-decoration: none;
+  transition: background-color 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+}
+
+body.marketplace-shell .marketplace-header__menu li a:hover,
+body.marketplace-shell .marketplace-header__menu li a:focus-visible {
+  background: var(--mp-bg-soft);
+  color: var(--mp-brand);
+  outline: none;
+}
+
+body.marketplace-shell .marketplace-header__back-link {
+  border: 1px solid var(--mp-border-soft);
+}
+
+body.marketplace-shell .marketplace-header__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+body.marketplace-shell .marketplace-header__action {
+  border-radius: 8px;
+  color: var(--mp-text);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+body.marketplace-shell .marketplace-header__action--primary {
+  background: var(--mp-brand);
+  color: #fff !important;
+}
+
+body.marketplace-shell .marketplace-header__action--primary:hover {
+  background: var(--mp-brand-strong);
+  color: #fff !important;
+}
+
+body.marketplace-shell .marketplace-header__search {
+  margin-top: 10px;
+}
+
+body.marketplace-shell .marketplace-header__search-box {
+  border: 1px solid var(--mp-border) !important;
+  border-radius: 10px !important;
+  background: var(--mp-surface) !important;
+  padding: 6px 8px !important;
+  width: 100%;
+}
+
+body.marketplace-shell .marketplace-header__search .form-search {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+body.marketplace-shell .marketplace-header__search .box-category {
+  flex: 0 0 200px;
+  margin-right: 0 !important;
+  min-width: 160px;
+}
+
+body.marketplace-shell .marketplace-header__search .box-keysearch {
+  flex: 1 1 auto;
+  width: auto !important;
+}
+
+body.marketplace-shell .marketplace-header__search select,
+body.marketplace-shell .marketplace-header__search input {
+  background: var(--mp-input-bg) !important;
+  border-color: var(--mp-input-border) !important;
+  color: var(--mp-text) !important;
+}
+
+body.marketplace-shell .marketplace-theme-toggle {
+  align-items: center;
+  background: var(--mp-toggle-bg);
+  border: 1px solid var(--mp-toggle-border);
+  border-radius: 8px;
+  color: var(--mp-text);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  gap: 6px;
+  height: 36px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+body.marketplace-shell .marketplace-theme-toggle:hover {
+  border-color: var(--mp-brand);
+  color: var(--mp-brand);
+}
+
+body.marketplace-shell .marketplace-theme-toggle--menu {
+  background: transparent;
+  border: 0;
+  height: auto;
+  padding: 12px 0;
+  width: 100%;
+}
+
+body.marketplace-shell .marketplace-theme-toggle__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Logo institucional atual */
+body.marketplace-shell .marketplace-scb-brand-logo {
   display: block;
   height: auto;
-  max-height: 52px;
-  max-width: 170px;
+  max-height: 48px;
+  max-width: 148px;
   object-fit: contain;
   width: auto;
 }
 
-@media (max-width: 575.98px) {
-  .marketplace-scb-brand-logo {
-    max-height: 44px;
-    max-width: 150px;
-  }
+/* ----- Breadcrumb ----- */
+body.marketplace-shell .breadcrumbs-div {
+  background: var(--mp-breadcrumb-bg);
+  border-bottom: 1px solid var(--mp-border-soft);
 }
 
-.marketplace-smart-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  background: #e8f6ff;
-  color: #0b5f8a;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 8px 14px;
-  margin-bottom: 16px;
+body.marketplace-shell .breadcrumb li,
+body.marketplace-shell .breadcrumb li a,
+body.marketplace-shell .breadcrumb li span {
+  color: var(--mp-text-muted);
 }
-.marketplace-hero-copy {
-  max-width: 560px;
+
+body.marketplace-shell .breadcrumb li a:hover {
+  color: var(--mp-brand);
 }
-.marketplace-hero-copy h1 {
-  font-size: 48px;
-  line-height: 1.04;
-  letter-spacing: 0;
+
+/* ----- Cards e superfícies ----- */
+body.marketplace-shell .card-grid-style-2,
+body.marketplace-shell .card-grid-style-3,
+body.marketplace-shell .card-grid-inner,
+body.marketplace-shell .sidebar-border,
+body.marketplace-shell .product-info,
+body.marketplace-shell .box-contact-form,
+body.marketplace-shell .box-contact-support,
+body.marketplace-shell .gallery-image,
+body.marketplace-shell .detail-gallery,
+body.marketplace-shell .box-form-newsletter {
+  background: var(--mp-surface) !important;
+  border: 1px solid var(--mp-border-soft);
+  border-radius: 14px;
+  box-shadow: var(--mp-card-shadow);
 }
-.marketplace-hero-copy p {
-  font-size: 17px;
-  color: #425466;
-  margin: 18px 0 26px;
+
+body.marketplace-shell .card-grid-style-3 .card-grid-inner,
+body.marketplace-shell .card-grid-style-2 {
+  padding: 16px;
 }
-.marketplace-hero-visual {
+
+body.marketplace-shell .image-box,
+body.marketplace-shell .marketplace-product-image,
+body.marketplace-shell .product-image-slider figure {
+  background: var(--mp-image-bg);
+  border-radius: 10px;
+}
+
+body.marketplace-shell .marketplace-product-image {
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
+body.marketplace-shell .shop-template {
+  background: transparent;
+}
+
+body.marketplace-shell .box-filters {
+  background: var(--mp-surface-soft);
+  border: 1px solid var(--mp-border-soft) !important;
+  border-radius: 12px;
+  padding: 14px 16px !important;
+}
+
+/* ----- Tipografia / cores utilitárias do tema Ecom ----- */
+body.marketplace-shell .color-brand-3 {
+  color: var(--mp-brand) !important;
+}
+
+body.marketplace-shell .color-gray-500,
+body.marketplace-shell .color-gray-700,
+body.marketplace-shell .color-gray-900,
+body.marketplace-shell .font-sm,
+body.marketplace-shell .font-base,
+body.marketplace-shell .font-md,
+body.marketplace-shell p,
+body.marketplace-shell li,
+body.marketplace-shell h1,
+body.marketplace-shell h2,
+body.marketplace-shell h3,
+body.marketplace-shell h4,
+body.marketplace-shell h5,
+body.marketplace-shell h6 {
+  color: inherit;
+}
+
+body.marketplace-shell .color-gray-500 {
+  color: var(--mp-text-muted) !important;
+}
+
+body.marketplace-shell .color-gray-700,
+body.marketplace-shell .color-gray-900 {
+  color: var(--mp-text) !important;
+}
+
+body.marketplace-shell .marketplace-smart-badge {
+  background: color-mix(in srgb, var(--mp-brand) 14%, transparent);
+  color: var(--mp-brand);
+}
+
+body.marketplace-shell .marketplace-mini-pill {
+  background: var(--mp-surface-soft);
+  border-color: var(--mp-border);
+  color: var(--mp-text-muted);
+}
+
+body.marketplace-shell .marketplace-hero-copy p {
+  color: var(--mp-text-muted);
+}
+
+/* ----- Formulários ----- */
+body.marketplace-shell .form-control,
+body.marketplace-shell select.form-control,
+body.marketplace-shell textarea.form-control {
+  background: var(--mp-input-bg) !important;
+  border-color: var(--mp-input-border) !important;
+  color: var(--mp-text) !important;
+}
+
+body.marketplace-shell .form-control::placeholder {
+  color: var(--mp-text-muted);
+}
+
+body.marketplace-shell .table {
+  color: var(--mp-text);
+}
+
+body.marketplace-shell .table th,
+body.marketplace-shell .table td {
+  border-color: var(--mp-border-soft);
+}
+
+/* ----- Footer ----- */
+body.marketplace-shell .marketplace-footer {
+  background: var(--mp-footer-bg) !important;
+  border-top: 1px solid var(--mp-border);
+}
+
+body.marketplace-shell .marketplace-footer__title {
+  color: #f8fafc !important;
+}
+
+body.marketplace-shell .marketplace-footer__text,
+body.marketplace-shell .marketplace-footer .menu-footer a {
+  color: var(--mp-footer-text) !important;
+}
+
+body.marketplace-shell .marketplace-footer .menu-footer a:hover {
+  color: #fff !important;
+}
+
+/* ----- Mobile menu ----- */
+body.marketplace-shell .mobile-header-wrapper-style {
+  background: var(--mp-surface);
+}
+
+body.marketplace-shell .mobile-header-wrapper-style .mobile-menu li a,
+body.marketplace-shell .mobile-header-wrapper-style .mobile-menu li button {
+  color: var(--mp-text);
+}
+
+html[data-marketplace-theme="dark"] body.marketplace-shell .mobile-header-wrapper-style .mobile-header-border {
+  border-color: var(--mp-border);
+}
+
+/* ----- Hero ----- */
+body.marketplace-shell .banner-hero,
+body.marketplace-shell .banner-1 {
+  background: linear-gradient(135deg, var(--mp-surface) 0%, var(--mp-bg-soft) 100%);
+  border: 1px solid var(--mp-border-soft);
+  border-radius: 16px;
+}
+
+body.marketplace-shell .marketplace-hero-visual {
   min-height: 420px;
   background-position: center right;
   background-repeat: no-repeat;
   background-size: contain;
 }
-.marketplace-disabled-note {
-  color: #667085;
-  font-size: 13px;
-  margin-top: 10px;
-}
-.marketplace-product-image {
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-}
-.marketplace-category-card {
+
+body.marketplace-shell .marketplace-category-card {
   height: 100%;
 }
-.marketplace-category-card img {
+
+body.marketplace-shell .marketplace-category-card img {
   max-height: 86px;
   object-fit: contain;
 }
-.marketplace-mini-pill {
-  border: 1px solid #d5dde5;
-  border-radius: 999px;
-  color: #425466;
-  display: inline-flex;
+
+body.marketplace-shell .marketplace-disabled-note {
+  color: var(--mp-text-muted);
   font-size: 13px;
-  font-weight: 700;
-  padding: 8px 14px;
+  margin-top: 10px;
 }
+
+/* ----- Responsivo header ----- */
+@media (max-width: 1399.98px) {
+  body.marketplace-shell .marketplace-header__menu li a {
+    font-size: 0.82rem;
+    padding: 7px 8px;
+  }
+
+  body.marketplace-shell .marketplace-header__action {
+    font-size: 0.8rem;
+    padding: 7px 8px;
+  }
+
+  body.marketplace-shell .marketplace-theme-toggle__label {
+    display: none;
+  }
+
+  body.marketplace-shell .marketplace-theme-toggle {
+    padding: 0 9px;
+    width: 36px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  body.marketplace-shell .marketplace-header__main {
+    gap: 10px;
+  }
+
+  body.marketplace-shell .marketplace-header__logo {
+    max-width: 132px;
+    width: 132px;
+  }
+
+  body.marketplace-shell .marketplace-header__action:not(.marketplace-header__action--primary) {
+    display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body.marketplace-shell .marketplace-scb-brand-logo {
+    max-height: 40px;
+    max-width: 128px;
+  }
+
+  body.marketplace-shell .marketplace-header__search .box-category {
+    flex: 0 0 140px;
+    min-width: 130px;
+  }
+
+  body.marketplace-shell .marketplace-hero-copy h1 {
+    font-size: 32px;
+  }
+
+  body.marketplace-shell .marketplace-hero-visual {
+    min-height: 220px;
+  }
+}
+
 @media (max-width: 991px) {
-  .marketplace-hero-copy h1 { font-size: 36px; }
-  .marketplace-hero-visual { min-height: 260px; }
+  body.marketplace-shell .marketplace-hero-copy h1 {
+    font-size: 36px;
+  }
+
+  body.marketplace-shell .marketplace-hero-visual {
+    min-height: 260px;
+  }
+}
+
+@media (min-width: 1200px) {
+  body.marketplace-shell .marketplace-hero-copy h1 {
+    font-size: 48px;
+    line-height: 1.04;
+  }
+
+  body.marketplace-shell .marketplace-hero-copy {
+    max-width: 560px;
+  }
+
+  body.marketplace-shell .marketplace-hero-copy p {
+    font-size: 17px;
+    margin: 18px 0 26px;
+  }
 }

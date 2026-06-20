@@ -8,66 +8,112 @@
   <meta name="description" content="{% block meta_description %}Produtos e soluções técnicas B2B — robótica Xyron e automação Mitsubishi. Solicite orçamento com a Smart Control Brasil.{% endblock %}">
   <link rel="shortcut icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
   <link rel="icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("marketplace-theme") === "dark") {
+          document.documentElement.setAttribute("data-marketplace-theme", "dark");
+        }
+      } catch (error) {}
+    })();
+  </script>
   <link href="{% static 'marketplace/ecom/css/style.css' %}" rel="stylesheet">
   <link href="{% static 'marketplace/ecom/css/smart360-marketplace.css' %}" rel="stylesheet">
   <title>{% block title %}Catálogo Técnico | Smart Control Brasil{% endblock %}</title>
 </head>
-<body>
-  <header class="header">
-    <div class="container">
-      <div class="main-header">
-        <div class="header-left">
-          <div class="header-logo">
-            <a class="d-flex" href="{% url 'marketplace_ecom:home' %}">
-              <img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-02.png' %}" alt="Smart Control Brasil">
-            </a>
+<body class="marketplace-shell">
+  <header class="header marketplace-header">
+    <div class="container marketplace-header__container">
+      <div class="marketplace-header__main">
+        <a class="marketplace-header__logo" href="{% url 'marketplace_ecom:home' %}">
+          <img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-03.png' %}" alt="Smart Control Brasil">
+        </a>
+
+        <nav class="marketplace-header__nav nav-main-menu d-none d-xl-block" aria-label="Navegação do catálogo">
+          <ul class="main-menu marketplace-header__menu">
+            <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
+            <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+            <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
+            <li>
+              <a
+                id="marketplace-back-to-site"
+                class="marketplace-header__back-link marketplace-back-link"
+                href="/"
+                data-fallback-href="/"
+              >Voltar ao site</a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="marketplace-header__actions">
+          <button
+            type="button"
+            class="marketplace-theme-toggle"
+            data-marketplace-theme-toggle
+            aria-label="Ativar modo escuro"
+            title="Modo escuro"
+            aria-pressed="false"
+          >
+            <span class="marketplace-theme-toggle__icon" aria-hidden="true">☾</span>
+            <span class="marketplace-theme-toggle__label">Modo escuro</span>
+          </button>
+          <a class="marketplace-header__action" href="/login/">Entrar</a>
+          <a class="marketplace-header__action marketplace-header__action--primary" href="{% url 'marketplace_ecom:products' %}">Orçamento</a>
+          <div class="burger-icon burger-icon-white" role="button" tabindex="0" aria-label="Abrir menu">
+            <span class="burger-icon-top"></span>
+            <span class="burger-icon-mid"></span>
+            <span class="burger-icon-bottom"></span>
           </div>
-          <div class="header-search">
-            <div class="box-header-search">
-              <form class="form-search" method="get" action="{% url 'marketplace_ecom:products' %}">
-                <div class="box-category">
-                  <select class="select-active" name="brand">
-                    <option value="">Todas as linhas</option>
-                    <option value="Xyron Robotics">Robótica Xyron</option>
-                    <option value="Mitsubishi Electric">Automação Mitsubishi</option>
-                  </select>
-                </div>
-                <div class="box-keysearch">
-                  <input class="form-control font-xs" type="text" name="q" placeholder="Buscar no catálogo técnico">
-                </div>
-              </form>
+        </div>
+      </div>
+
+      <div class="marketplace-header__search">
+        <div class="box-header-search marketplace-header__search-box">
+          <form class="form-search" method="get" action="{% url 'marketplace_ecom:products' %}">
+            <div class="box-category">
+              <select class="select-active" name="brand" aria-label="Filtrar por linha técnica">
+                <option value="">Todas as linhas</option>
+                <option value="Xyron Robotics">Robótica Xyron</option>
+                <option value="Mitsubishi Electric">Automação Mitsubishi</option>
+              </select>
             </div>
-          </div>
-          <div class="header-nav">
-            <nav class="nav-main-menu d-none d-xl-block">
-              <ul class="main-menu">
-                <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo Técnico</a></li>
-                <li><a href="{% url 'marketplace_ecom:products' %}">Produtos e soluções técnicas</a></li>
-                <li><a href="#representadas-parceiros">Representadas e parceiros</a></li>
-                <li><a href="/">Smart360</a></li>
-              </ul>
-            </nav>
-            <div class="burger-icon burger-icon-white"><span class="burger-icon-top"></span><span class="burger-icon-mid"></span><span class="burger-icon-bottom"></span></div>
-          </div>
-          <div class="header-shop">
-            <a class="font-lg icon-list icon-account" href="/login/"><span>Entrar</span></a>
-            <a class="font-lg icon-list" href="{% url 'marketplace_ecom:products' %}"><span>Solicitar orçamento</span></a>
-          </div>
+            <div class="box-keysearch">
+              <input class="form-control font-xs" type="search" name="q" placeholder="Buscar no catálogo técnico" aria-label="Buscar no catálogo técnico">
+            </div>
+          </form>
         </div>
       </div>
     </div>
   </header>
+
   <div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
     <div class="mobile-header-wrapper-inner">
       <div class="mobile-header-content-area">
-        <div class="mobile-logo"><a class="d-flex" href="{% url 'marketplace_ecom:home' %}"><img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-02.png' %}" alt="Smart Control Brasil"></a></div>
+        <div class="mobile-logo">
+          <a class="d-flex" href="{% url 'marketplace_ecom:home' %}">
+            <img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-03.png' %}" alt="Smart Control Brasil">
+          </a>
+        </div>
         <div class="perfect-scroll">
           <div class="mobile-menu-wrap mobile-header-border">
-            <nav class="mt-15">
+            <nav class="mt-15" aria-label="Menu mobile do catálogo">
               <ul class="mobile-menu font-heading">
-                <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo Técnico</a></li>
-                <li><a href="{% url 'marketplace_ecom:products' %}">Produtos e soluções técnicas</a></li>
-                <li><a href="#representadas-parceiros">Representadas e parceiros</a></li>
+                <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
+                <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+                <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
+                <li>
+                  <a
+                    class="marketplace-back-link"
+                    href="/"
+                    data-fallback-href="/"
+                  >Voltar ao site</a>
+                </li>
+                <li>
+                  <button type="button" class="marketplace-theme-toggle marketplace-theme-toggle--menu" data-marketplace-theme-toggle>
+                    <span class="marketplace-theme-toggle__icon" aria-hidden="true">☾</span>
+                    <span class="marketplace-theme-toggle__label">Modo escuro</span>
+                  </button>
+                </li>
                 <li><a href="/login/">Entrar</a></li>
               </ul>
             </nav>
@@ -76,33 +122,37 @@
       </div>
     </div>
   </div>
-  <main class="main">
+
+  <main class="main marketplace-main">
     {% block content %}{% endblock %}
   </main>
-  <footer class="footer">
+
+  <footer class="footer marketplace-footer">
     <div class="footer-1">
       <div class="container">
         <div class="row">
           <div class="col-lg-4 width-25 mb-30">
-            <h4 class="mb-30 color-gray-1000">Catálogo Técnico</h4>
-            <div class="font-md color-gray-900">Revenda, representação e soluções técnicas de fabricantes representados e parceiros. Consulte produtos sob orçamento com a Smart Control Brasil.</div>
+            <h4 class="mb-30 marketplace-footer__title">Catálogo Técnico B2B</h4>
+            <div class="font-md marketplace-footer__text">Revenda, representação e soluções técnicas de fabricantes representados e parceiros. Consulte produtos sob orçamento com a Smart Control Brasil.</div>
           </div>
           <div class="col-lg-2 width-20 mb-30">
-            <h4 class="mb-30 color-gray-1000">Navegacao</h4>
+            <h4 class="mb-30 marketplace-footer__title">Navegação</h4>
             <ul class="menu-footer">
-              <li><a href="{% url 'marketplace_ecom:home' %}">Inicio</a></li>
-              <li><a href="{% url 'marketplace_ecom:products' %}">Produtos e soluções técnicas</a></li>
-              <li><a href="#representadas-parceiros">Representadas e parceiros</a></li>
+              <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
+              <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+              <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
+              <li><a href="/" data-fallback-href="/" class="marketplace-back-link">Voltar ao site</a></li>
             </ul>
           </div>
           <div class="col-lg-3 width-25 mb-30">
-            <h4 class="mb-30 color-gray-1000">Status</h4>
-            <p class="font-md color-gray-900">Catálogo técnico B2B dedicado à avaliação de soluções e solicitação de orçamento.</p>
+            <h4 class="mb-30 marketplace-footer__title">Status</h4>
+            <p class="font-md marketplace-footer__text">Catálogo técnico B2B dedicado à avaliação de soluções e solicitação de orçamento.</p>
           </div>
         </div>
       </div>
     </div>
   </footer>
+
   <script src="{% static 'marketplace/ecom/js/vendors/modernizr-3.6.0.min.js' %}"></script>
   <script src="{% static 'marketplace/ecom/js/vendors/jquery-3.6.0.min.js' %}"></script>
   <script src="{% static 'marketplace/ecom/js/vendors/jquery-migrate-3.3.0.min.js' %}"></script>
@@ -114,5 +164,6 @@
   <script src="{% static 'marketplace/ecom/js/vendors/slick.js' %}"></script>
   <script src="{% static 'marketplace/ecom/js/main.js' %}"></script>
   <script src="{% static 'marketplace/ecom/js/shop.js' %}"></script>
+  <script src="{% static 'marketplace/ecom/js/smart360-marketplace.js' %}"></script>
 </body>
 </html>

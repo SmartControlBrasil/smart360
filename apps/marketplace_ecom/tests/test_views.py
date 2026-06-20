@@ -99,6 +99,28 @@ class MarketplaceEcomViewTests(MarketplaceCatalogTestCase):
 
         self.assertContains(response, "Catálogo Técnico")
 
+    def test_catalog_header_polish_assets(self):
+        response = self.client.get(reverse("marketplace_ecom:products"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Voltar ao site")
+        self.assertNotContains(response, ">Smart360<")
+        self.assertContains(response, "logo-cores-03.png")
+        self.assertContains(response, "data-marketplace-theme-toggle")
+        self.assertContains(response, "smart360-marketplace.js")
+        self.assertContains(response, "marketplace-shell")
+        self.assertContains(response, 'data-marketplace-theme')
+
+    def test_product_detail_includes_theme_and_back_link(self):
+        response = self.client.get(
+            reverse("marketplace_ecom:product-detail", kwargs={"slug": "xyron-liro-littlebot"}),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Voltar ao site")
+        self.assertContains(response, "marketplace-back-to-site")
+        self.assertContains(response, "smart360-marketplace.css")
+
     def test_quote_request_valid_post_creates_lead(self):
         response = self.client.post(
             reverse("marketplace_ecom:request-quote", kwargs={"slug": "mitsubishi-clp-melsec"}),

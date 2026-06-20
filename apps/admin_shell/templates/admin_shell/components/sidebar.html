@@ -37,7 +37,7 @@
                                         <li>
                                             <a
                                                 class="nav-sublink {% if child.active %}is-active{% endif %}"
-                                                href="{% if child.slug %}{% url child.url_name module_slug=child.slug %}{% else %}{% url child.url_name %}{% endif %}"
+                                                href="{% if child.href %}{{ child.href }}{% elif child.slug %}{% url child.url_name module_slug=child.slug %}{% else %}{% url child.url_name %}{% endif %}"
                                             >
                                                 {{ child.label }}
                                             </a>
@@ -47,7 +47,7 @@
                             {% else %}
                                 <a
                                     class="nav-link {% if item.active %}is-active{% endif %}"
-                                    href="{% if item.slug %}{% url item.url_name module_slug=item.slug %}{% else %}{% url item.url_name %}{% endif %}"
+                                    href="{% if item.href %}{{ item.href }}{% elif item.slug %}{% url item.url_name module_slug=item.slug %}{% else %}{% url item.url_name %}{% endif %}"
                                 >
                                     <span class="nav-icon icon-{{ item.icon }}"></span>
                                     <span class="nav-label">{{ item.label }}</span>

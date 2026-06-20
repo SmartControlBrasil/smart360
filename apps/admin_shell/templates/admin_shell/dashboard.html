@@ -25,5 +25,11 @@
             {% include "admin_shell/components/widget_container.html" with title="Status operacional" subtitle="Resumo rapido de filas, eventos e quick actions." content_template="admin_shell/components/widget_operational_stream.html" %}
         </div>
     </div>
+
+    <div class="content-grid">
+        <div class="column-span-12">
+            {% include "admin_shell/components/widget_container.html" with title="Catálogo Técnico B2B" subtitle="Operação comercial do marketplace técnico sem duplicar CRUD no shell." content_template="admin_shell/components/widget_technical_catalog_b2b.html" %}
+        </div>
+    </div>
 </section>
 {% endblock %}

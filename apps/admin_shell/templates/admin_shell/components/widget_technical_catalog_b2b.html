@@ -1,0 +1,8 @@
+<p class="shell-text-muted">
+    Atalhos para o Django Admin e a biblioteca de mídia. O cadastro oficial do catálogo público permanece no admin padrão.
+</p>
+<div class="quick-actions" role="group" aria-label="Atalhos do catálogo técnico B2B">
+    {% for action in technical_catalog_shortcuts %}
+        {% include "admin_shell/components/quick_action_button.html" with action=action %}
+    {% endfor %}
+</div>

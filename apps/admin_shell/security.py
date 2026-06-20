@@ -19,7 +19,13 @@ from .services.client_portal import (
 )
 
 
-ACTION_LIST_KEYS = {"page_actions", "quick_actions", "action_panel", "shell_quick_actions"}
+ACTION_LIST_KEYS = {
+    "page_actions",
+    "quick_actions",
+    "action_panel",
+    "shell_quick_actions",
+    "technical_catalog_shortcuts",
+}
 
 
 def filter_context_actions(payload, permission_map):

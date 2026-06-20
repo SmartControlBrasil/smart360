@@ -98,7 +98,42 @@ MODULE_PAGES = {
 }
 
 
+def get_technical_catalog_b2b_links():
+    from django.urls import reverse
+
+    return {
+        "manage_products": reverse("admin:marketplace_ecom_technicalproduct_changelist"),
+        "add_product": reverse("admin:marketplace_ecom_technicalproduct_add"),
+        "media_library": reverse("admin-shell:media-image-upload"),
+    }
+
+
+def get_technical_catalog_b2b_shortcuts():
+    links = get_technical_catalog_b2b_links()
+    return [
+        {
+            "label": "Gerenciar produtos",
+            "href": links["manage_products"],
+            "permission_domain": "dashboard",
+            "permission_action": "view",
+        },
+        {
+            "label": "Adicionar produto",
+            "href": links["add_product"],
+            "permission_domain": "dashboard",
+            "permission_action": "view",
+        },
+        {
+            "label": "Biblioteca de imagens",
+            "href": links["media_library"],
+            "permission_domain": "dashboard",
+            "permission_action": "view",
+        },
+    ]
+
+
 def get_navigation(current_url_name="", current_module_slug="", permission_map=None):
+    catalog_links = get_technical_catalog_b2b_links()
     sections = [
         {
             "label": "Dashboard",
@@ -433,6 +468,40 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                         },
                     ],
                 },
+                {
+                    "label": "Catálogo Técnico B2B",
+                    "icon": "bag",
+                    "children": [
+                        {
+                            "label": "Gerenciar produtos",
+                            "icon": "list",
+                            "href": catalog_links["manage_products"],
+                            "permission_domain": "dashboard",
+                            "permission_action": "view",
+                        },
+                        {
+                            "label": "Adicionar produto",
+                            "icon": "check",
+                            "href": catalog_links["add_product"],
+                            "permission_domain": "dashboard",
+                            "permission_action": "view",
+                        },
+                        {
+                            "label": "Biblioteca de imagens",
+                            "icon": "layout",
+                            "href": catalog_links["media_library"],
+                            "url_name": "admin-shell:media-image-upload",
+                            "match_names": [
+                                "admin-shell:media-image-upload",
+                                "admin-shell:media-image-list",
+                                "admin-shell:media-image-detail",
+                                "admin-shell:media-image-edit",
+                            ],
+                            "permission_domain": "dashboard",
+                            "permission_action": "view",
+                        },
+                    ],
+                },
             ],
         },
         {
@@ -750,6 +819,7 @@ def get_dashboard_context(tenant_context=None, request=None):
             {"label": "Eventos do ecossistema", "items": "182 eventos hoje", "description": "Integration bus e automacoes com alto volume controlado."},
             {"label": "Atalhos rapidos", "items": "7 acoes", "description": "Bootstrap, observability, billing e configuracoes de rollout."},
         ],
+        "technical_catalog_shortcuts": get_technical_catalog_b2b_shortcuts(),
         "quick_actions": [
             {"label": "Executive War Room", "route_name": "admin-shell:executive-war-room", "permission_domain": "dashboard", "permission_action": "view"},
             {"label": "Abrir Smart System", "slug": "smart-system", "permission_domain": "dashboard", "permission_action": "view"},

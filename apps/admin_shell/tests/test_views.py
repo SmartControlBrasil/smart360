@@ -2310,6 +2310,17 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "Pecas")
         self.assertContains(response, "Relatorios")
 
+    def test_dashboard_contains_technical_catalog_b2b_shortcuts(self):
+        response = self.client.get(reverse("admin-shell:dashboard-entry"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Catálogo Técnico B2B")
+        self.assertContains(response, "Gerenciar produtos")
+        self.assertContains(response, "Adicionar produto")
+        self.assertContains(response, "Biblioteca de imagens")
+        self.assertContains(response, reverse("admin:marketplace_ecom_technicalproduct_changelist"))
+        self.assertContains(response, reverse("admin:marketplace_ecom_technicalproduct_add"))
+        self.assertContains(response, reverse("admin-shell:media-image-upload"))
+
     def test_requires_authentication(self):
         self.client.logout()
         response = self.client.get(reverse("admin-shell:dashboard"))

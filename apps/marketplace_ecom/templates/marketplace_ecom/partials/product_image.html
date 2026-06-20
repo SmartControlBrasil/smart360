@@ -1,0 +1,6 @@
+{% load static %}
+{% if product.featured_image_url %}
+<img class="{{ image_class|default:'' }}" src="{{ product.featured_image_url }}" alt="{{ product.title }}">
+{% else %}
+<img class="{{ image_class|default:'' }}" src="{% static product.image|default:'marketplace/ecom/img/template/devices.svg' %}" alt="{{ product.title }}">
+{% endif %}

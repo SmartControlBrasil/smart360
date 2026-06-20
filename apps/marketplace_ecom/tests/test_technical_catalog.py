@@ -83,13 +83,17 @@ class MarketplaceTechnicalCatalogTests(TestCase):
         self.assertEqual(metadata["product_type"], "Controladores lógicos programáveis")
         self.assertEqual(metadata["origin"], "marketplace_ecom")
 
-    def test_all_catalog_products_use_neutral_default_image(self):
+    def test_catalog_products_use_real_images_not_only_placeholder(self):
         products = get_products()
 
         self.assertTrue(products)
-        self.assertTrue(all(product["image"] == DEFAULT_IMAGE for product in products))
+        products_with_real_image = [
+            product for product in products
+            if product["image"] != DEFAULT_IMAGE or product.get("featured_image_url")
+        ]
+        self.assertGreater(len(products_with_real_image), len(products) // 2)
         response = self.client.get(reverse("marketplace_ecom:products"))
-        self.assertContains(response, "marketplace/ecom/img/template/devices.svg")
+        self.assertContains(response, "institutional/eitech/img/elements/liro-robo-educacional.png")
 
     def test_public_pages_do_not_offer_retail_flows(self):
         for route in ("marketplace_ecom:home", "marketplace_ecom:products"):
@@ -98,3 +102,10 @@ class MarketplaceTechnicalCatalogTests(TestCase):
             self.assertNotIn("checkout", content)
             self.assertNotIn("pagamento", content)
             self.assertNotIn("carrinho", content)
+
+    def test_home_category_links_filter_products(self):
+        response = self.client.get(reverse("marketplace_ecom:products"), {"category": "Automação industrial"})
+
+        self.assertContains(response, "CLPs Mitsubishi MELSEC")
+        self.assertContains(response, "Retrofit e modernização industrial")
+        self.assertNotContains(response, "NeoBot")

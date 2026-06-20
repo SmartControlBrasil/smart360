@@ -54,11 +54,11 @@ class PersistedTechnicalCatalogTests(TestCase):
         )
         self.assertEqual(rsp.status_code, 404)
 
-    def test_mock_fallback_when_catalog_table_empty(self):
+    def test_catalog_fallback_when_table_empty(self):
         self.assertFalse(TechnicalProduct.objects.exists())
         rsp = self.client.get(reverse("marketplace_ecom:products"))
         self.assertContains(rsp, f"Exibindo {len(PRODUCTS)} soluções")
-        self.assertContains(rsp, "Littlebot")
+        self.assertContains(rsp, "LIRO / LittleBot")
 
     def test_quote_request_lead_metadata_for_persisted_product(self):
         _persist_catalog_product(

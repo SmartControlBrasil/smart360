@@ -17,48 +17,48 @@ class MarketplaceEcomViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f"Exibindo {len(PRODUCTS)} soluções")
-        self.assertContains(response, "Littlebot")
-        self.assertContains(response, "Hi Wall Inverter")
+        self.assertContains(response, "LIRO / LittleBot")
+        self.assertContains(response, "CLPs Mitsubishi MELSEC")
         self.assertContains(response, "Fabricante")
         self.assertContains(response, "Parceiro")
 
     def test_products_filter_by_brand(self):
-        response = self.client.get(reverse("marketplace_ecom:products"), {"brand": "LG"})
+        response = self.client.get(reverse("marketplace_ecom:products"), {"brand": "Mitsubishi Electric"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Hi Wall Inverter")
-        self.assertContains(response, "Fabricante: LG")
-        self.assertNotContains(response, "Littlebot")
+        self.assertContains(response, "CLPs Mitsubishi MELSEC")
+        self.assertContains(response, "Fabricante: Mitsubishi Electric")
+        self.assertNotContains(response, "LIRO / LittleBot")
 
     def test_products_filter_by_supplier(self):
-        response = self.client.get(reverse("marketplace_ecom:products"), {"supplier": "BHP Ar Condicionado"})
+        response = self.client.get(reverse("marketplace_ecom:products"), {"supplier": "Smart Control Brasil"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "BHP Ar Condicionado")
-        self.assertContains(response, "Hi Wall Inverter")
-        self.assertContains(response, "Fancolete Hidronico")
-        self.assertNotContains(response, "Littlebot")
+        self.assertContains(response, "Smart Control Brasil")
+        self.assertContains(response, "NeoBot")
+        self.assertContains(response, "Inversores Mitsubishi FR")
+        self.assertNotContains(response, "Hi Wall Inverter")
 
     def test_products_filter_by_category(self):
-        response = self.client.get(reverse("marketplace_ecom:products"), {"category": "Robótica e IA"})
+        response = self.client.get(reverse("marketplace_ecom:products"), {"category": "Robótica educacional"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Littlebot")
+        self.assertContains(response, "LIRO / LittleBot")
         self.assertContains(response, "Xyron Robotics")
-        self.assertNotContains(response, "Hi Wall Inverter")
+        self.assertNotContains(response, "CLPs Mitsubishi MELSEC")
 
     def test_products_search_by_text(self):
         response = self.client.get(reverse("marketplace_ecom:products"), {"q": "littlebot"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Littlebot")
-        self.assertNotContains(response, "Orbit")
+        self.assertContains(response, "LIRO / LittleBot")
+        self.assertNotContains(response, "OrbitBot / Patrol Bot")
 
     def test_products_search_accepts_accented_query(self):
         response = self.client.get(reverse("marketplace_ecom:products"), {"q": "robô"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Littlebot")
+        self.assertContains(response, "LIRO / LittleBot")
         self.assertContains(response, "Xyron Robotics")
 
     def test_products_unknown_filter_shows_empty_state(self):
@@ -70,20 +70,22 @@ class MarketplaceEcomViewTests(TestCase):
     def test_products_multiple_filters_work(self):
         response = self.client.get(
             reverse("marketplace_ecom:products"),
-            {"brand": "LG", "supplier": "BHP Ar Condicionado"},
+            {"brand": "Mitsubishi Electric", "category": "Automação industrial"},
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Hi Wall Inverter")
-        self.assertContains(response, "Fabricante: LG")
-        self.assertContains(response, "Parceiro: BHP Ar Condicionado")
-        self.assertNotContains(response, "Multi Split")
+        self.assertContains(response, "CLPs Mitsubishi MELSEC")
+        self.assertContains(response, "Fabricante: Mitsubishi Electric")
+        self.assertContains(response, "Categoria: Automação industrial")
+        self.assertNotContains(response, "Inversores Mitsubishi FR")
 
     def test_product_detail_returns_200(self):
-        response = self.client.get(reverse("marketplace_ecom:product-detail", kwargs={"slug": "xyron-littlebot"}))
+        response = self.client.get(
+            reverse("marketplace_ecom:product-detail", kwargs={"slug": "xyron-liro-littlebot"}),
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Littlebot")
+        self.assertContains(response, "LIRO / LittleBot")
 
     def test_unknown_product_returns_404(self):
         response = self.client.get(reverse("marketplace_ecom:product-detail", kwargs={"slug": "produto-inexistente"}))
@@ -97,35 +99,38 @@ class MarketplaceEcomViewTests(TestCase):
 
     def test_quote_request_valid_post_creates_lead(self):
         response = self.client.post(
-            reverse("marketplace_ecom:request-quote", kwargs={"slug": "lg-hi-wall-inverter"}),
+            reverse("marketplace_ecom:request-quote", kwargs={"slug": "mitsubishi-clp-melsec"}),
             {
                 "name": "Maria Silva",
                 "company": "Clima Sul",
                 "email": "maria@example.com",
                 "phone": "11999990000",
                 "city": "Sao Paulo",
-                "message": "Preciso de orçamento para climatização comercial.",
+                "message": "Preciso de orçamento para automação industrial.",
             },
         )
 
-        self.assertRedirects(response, reverse("marketplace_ecom:product-detail", kwargs={"slug": "lg-hi-wall-inverter"}))
+        self.assertRedirects(
+            response,
+            reverse("marketplace_ecom:product-detail", kwargs={"slug": "mitsubishi-clp-melsec"}),
+        )
         lead = Lead.objects.get(email="maria@example.com")
         self.assertEqual(lead.company_name, "Clima Sul")
         self.assertEqual(lead.contact_name, "Maria Silva")
         self.assertEqual(lead.phone, "11999990000")
         self.assertEqual(lead.status, Lead.Status.NEW)
         self.assertEqual(lead.source.name, "marketplace_ecom")
-        self.assertEqual(lead.metadata["product_slug"], "lg-hi-wall-inverter")
-        self.assertEqual(lead.metadata["product_title"], "Hi Wall Inverter")
-        self.assertEqual(lead.metadata["brand"], "LG")
-        self.assertEqual(lead.metadata["supplier"], "BHP Ar Condicionado")
-        self.assertEqual(lead.metadata["category"], "Ar-condicionado")
+        self.assertEqual(lead.metadata["product_slug"], "mitsubishi-clp-melsec")
+        self.assertEqual(lead.metadata["product_title"], "CLPs Mitsubishi MELSEC")
+        self.assertEqual(lead.metadata["brand"], "Mitsubishi Electric")
+        self.assertEqual(lead.metadata["supplier"], "Smart Control Brasil")
+        self.assertEqual(lead.metadata["category"], "Automação industrial")
         self.assertEqual(lead.metadata["origin"], "marketplace_ecom")
         self.assertEqual(lead.metadata["request_type"], "quote_request")
 
     def test_quote_request_without_company_uses_contact_name_as_company_name(self):
         self.client.post(
-            reverse("marketplace_ecom:request-quote", kwargs={"slug": "xyron-littlebot"}),
+            reverse("marketplace_ecom:request-quote", kwargs={"slug": "xyron-liro-littlebot"}),
             {
                 "name": "Joao Santos",
                 "company": "",
@@ -142,7 +147,7 @@ class MarketplaceEcomViewTests(TestCase):
 
     def test_quote_request_invalid_post_returns_errors(self):
         response = self.client.post(
-            reverse("marketplace_ecom:request-quote", kwargs={"slug": "lg-hi-wall-inverter"}),
+            reverse("marketplace_ecom:request-quote", kwargs={"slug": "mitsubishi-clp-melsec"}),
             {
                 "name": "",
                 "company": "Clima Sul",
@@ -175,14 +180,14 @@ class MarketplaceEcomViewTests(TestCase):
 
     def test_quote_request_creates_lead_interaction(self):
         self.client.post(
-            reverse("marketplace_ecom:request-quote", kwargs={"slug": "lg-hi-wall-inverter"}),
+            reverse("marketplace_ecom:request-quote", kwargs={"slug": "mitsubishi-clp-melsec"}),
             {
                 "name": "Maria Silva",
                 "company": "Clima Sul",
                 "email": "maria@example.com",
                 "phone": "11999990000",
                 "city": "Sao Paulo",
-                "message": "Preciso de orçamento para climatização comercial.",
+                "message": "Preciso de orçamento para automação industrial.",
             },
         )
 
@@ -190,4 +195,4 @@ class MarketplaceEcomViewTests(TestCase):
         interaction = LeadInteraction.objects.get(lead=lead)
         self.assertEqual(interaction.interaction_type, LeadInteraction.InteractionType.NOTE)
         self.assertEqual(interaction.channel, LeadInteraction.Channel.OTHER)
-        self.assertEqual(interaction.summary, "Solicitação de orçamento via marketplace.")
+        self.assertEqual(interaction.summary, "Solicitação de orçamento via catálogo técnico.")

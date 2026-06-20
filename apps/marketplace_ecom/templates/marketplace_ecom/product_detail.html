@@ -1,7 +1,7 @@
 {% extends "marketplace_ecom/base.html" %}
 {% load static %}
 {% block title %}{{ product.title }} | Catálogo Técnico{% endblock %}
-{% block meta_description %}{{ product.short_description }} Solicite orçamento com a Smart Control Brasil — catálogo técnico em automação, robótica e HVAC.{% endblock %}
+{% block meta_description %}{{ product.short_description }} Solicite orçamento com a Smart Control Brasil — catálogo técnico B2B em automação e robótica.{% endblock %}
 {% block content %}
 <div class="section-box">
   <div class="breadcrumbs-div">
@@ -12,7 +12,7 @@
   <div class="container">
     <div class="row mt-30">
       <div class="col-lg-6">
-        <div class="gallery-image"><div class="galleries"><div class="detail-gallery"><div class="product-image-slider"><figure class="border-radius-10"><img src="{% static product.image|default:'marketplace/ecom/img/template/devices.svg' %}" alt="{{ product.title }}"></figure></div></div></div></div>
+        <div class="gallery-image"><div class="galleries"><div class="detail-gallery"><div class="product-image-slider"><figure class="border-radius-10">{% include "marketplace_ecom/partials/product_image.html" %}</figure></div></div></div></div>
       </div>
       <div class="col-lg-6">
         <div class="product-info">
@@ -130,7 +130,7 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image|default:'marketplace/ecom/img/template/devices.svg' %}" alt="{{ product.title }}"></a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% include "marketplace_ecom/partials/product_image.html" with image_class="marketplace-product-image" %}</a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.category }}</span><br>

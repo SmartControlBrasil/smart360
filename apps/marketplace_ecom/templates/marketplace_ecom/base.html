@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="description" content="{% block meta_description %}Produtos e soluções técnicas para automação, robótica, HVAC e tecnologia industrial. Solicite orçamento com a Smart Control Brasil.{% endblock %}">
+  <meta name="description" content="{% block meta_description %}Produtos e soluções técnicas B2B — robótica Xyron e automação Mitsubishi. Solicite orçamento com a Smart Control Brasil.{% endblock %}">
   <link rel="shortcut icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
   <link rel="icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
   <link href="{% static 'marketplace/ecom/css/style.css' %}" rel="stylesheet">
@@ -26,12 +26,10 @@
             <div class="box-header-search">
               <form class="form-search" method="get" action="{% url 'marketplace_ecom:products' %}">
                 <div class="box-category">
-                  <select class="select-active">
-                    <option>Todas</option>
-                    <option>Robótica e IA</option>
-                    <option>Ar-condicionado</option>
-                    <option>Automação industrial</option>
-                    <option>Soluções prediais</option>
+                  <select class="select-active" name="brand">
+                    <option value="">Todas as linhas</option>
+                    <option value="Xyron Robotics">Robótica Xyron</option>
+                    <option value="Mitsubishi Electric">Automação Mitsubishi</option>
                   </select>
                 </div>
                 <div class="box-keysearch">

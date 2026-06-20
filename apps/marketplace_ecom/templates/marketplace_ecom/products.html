@@ -1,7 +1,7 @@
 {% extends "marketplace_ecom/base.html" %}
 {% load static %}
 {% block title %}Produtos e soluções técnicas | Catálogo Técnico{% endblock %}
-{% block meta_description %}Listagem do catálogo técnico — automação, robótica, HVAC e soluções industriais. Solicite orçamento com a Smart Control Brasil.{% endblock %}
+{% block meta_description %}Listagem do catálogo técnico — robótica Xyron, automação Mitsubishi e soluções industriais. Solicite orçamento com a Smart Control Brasil.{% endblock %}
 {% block content %}
 <div class="section-box">
   <div class="breadcrumbs-div">
@@ -17,7 +17,7 @@
           <div class="sidebar-content">
             <h6 class="color-gray-900 mb-10">Categorias</h6>
             <ul class="list-nav-arrow">
-              {% for category in categories %}<li><a href="?category={{ category.title|urlencode }}">{{ category.title }}</a></li>{% endfor %}
+              {% for category in available_categories %}<li><a href="?category={{ category|urlencode }}">{{ category }}</a></li>{% endfor %}
             </ul>
             <div class="border-bottom pt-10 mb-20"></div>
             <h6 class="color-gray-900 mb-10">Fabricantes</h6>
@@ -38,7 +38,7 @@
         <div class="box-filters mt-0 pb-5 border-bottom">
           <div class="row">
             <div class="col-xl-8 col-lg-8 mb-10 text-lg-start text-center"><h4 class="color-brand-3">Produtos e soluções técnicas</h4><span class="font-sm color-gray-500">Exibindo {{ result_count }} soluções</span></div>
-            <div class="col-xl-4 col-lg-4 mb-10 text-lg-end text-center"><span class="marketplace-mini-pill">Catálogo em evolução</span></div>
+            <div class="col-xl-4 col-lg-4 mb-10 text-lg-end text-center"><span class="marketplace-mini-pill">Catálogo Técnico B2B</span></div>
           </div>
         </div>
         <form method="get" class="mt-20 mb-25">
@@ -88,7 +88,7 @@
   <div class="card-grid-style-3">
     <div class="card-grid-inner">
       <div class="image-box">
-        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request"><img class="marketplace-product-image" src="{% static product.image|default:'marketplace/ecom/img/template/devices.svg' %}" alt="{{ product.title }}"></a>
+        <a href="{% url 'marketplace_ecom:product-detail' product.slug %}#quote-request">{% include "marketplace_ecom/partials/product_image.html" with image_class="marketplace-product-image" %}</a>
       </div>
       <div class="info-right">
         <span class="font-xs color-gray-500">{{ product.brand }} · {{ product.category }}</span><br>

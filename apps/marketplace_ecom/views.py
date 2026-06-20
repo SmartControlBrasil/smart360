@@ -9,36 +9,16 @@ from django.views.generic import TemplateView
 from apps.growth_engine.models import Lead, LeadInteraction, LeadSource
 from apps.marketplace_ecom.models import TechnicalProduct
 
-from .catalog import DEFAULT_IMAGE, TECHNICAL_PRODUCTS
+from .catalog import (
+    CATALOG_BRAND_PARTNERS,
+    CATALOG_HOME_CATEGORIES,
+    DEFAULT_IMAGE,
+    TECHNICAL_PRODUCTS,
+    resolve_catalog_image,
+)
 from .forms import MarketplaceQuoteRequestForm
 
-
-CATEGORIES = [{'title': 'Robótica e IA', 'image': 'marketplace/ecom/img/page/homepage1/gaming.png'}, {'title': 'Ar-condicionado', 'image': 'marketplace/ecom/img/page/homepage1/electric.png'}, {'title': 'Automação industrial', 'image': 'marketplace/ecom/img/page/homepage1/controller.png'}, {'title': 'Soluções prediais', 'image': 'marketplace/ecom/img/page/homepage1/electronic.png'}, {'title': 'Equipamentos profissionais', 'image': 'marketplace/ecom/img/page/homepage1/computer.png'}]
-
-BRAND_PARTNERS = [{'name': 'LG', 'role': 'Fabricante HVAC'}, {'name': 'Carrier', 'role': 'Fabricante HVAC'}, {'name': 'Daikin', 'role': 'Fabricante HVAC'}, {'name': 'Midea', 'role': 'Fabricante HVAC'}, {'name': 'Mitsubishi Electric', 'role': 'Fabricante automação e HVAC'}, {'name': 'Xyron Robotics', 'role': 'Fabricante robótica e IA'}, {'name': 'BHP Ar Condicionado', 'role': 'Parceiro / revenda credenciada'}]
-
-PRODUCTS = [{'title': 'Littlebot', 'slug': 'xyron-littlebot', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo compacto para recepcao, interacao guiada e apresentacoes em ambientes comerciais.', 'application_area': 'Atendimento, demonstracoes e educacao', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp1.png', 'rating': 'Sob consulta'}, {'title': 'Orbit', 'slug': 'xyron-orbit', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Plataforma robotica para circulacao, apoio operacional e experiencias interativas.', 'application_area': 'Operacao assistida e relacionamento com clientes', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp2.png', 'rating': 'Sob consulta'}, {'title': 'Neo', 'slug': 'xyron-neo', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo social para recepcao, orientacao de visitantes e apoio a equipes de atendimento.', 'application_area': 'Recepcao corporativa e eventos', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp3.png', 'rating': 'Sob consulta'}, {'title': 'Waiterbot', 'slug': 'xyron-waiterbot', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo de apoio para entrega e atendimento em restaurantes, hoteis e ambientes de servico.', 'application_area': 'Food service, hotelaria e hospitalidade', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp4.png', 'rating': 'Sob consulta'}, {'title': 'Carebot', 'slug': 'xyron-carebot', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo de suporte para cuidados, orientacao e acompanhamento em ambientes sensiveis.', 'application_area': 'Saude, cuidado e apoio assistido', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp5.png', 'rating': 'Sob consulta'}, {'title': 'Hygibot', 'slug': 'xyron-hygibot', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo voltado a higiene operacional e apoio a rotinas de limpeza profissional.', 'application_area': 'Limpeza, facilities e ambientes publicos', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp6.png', 'rating': 'Sob consulta'}, {'title': 'Hostbot', 'slug': 'xyron-hostbot', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo anfitriao para acolhimento, informacao e experiencia de visitantes.', 'application_area': 'Eventos, showrooms e recepcao', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp7.png', 'rating': 'Sob consulta'}, {'title': 'Buddy', 'slug': 'xyron-buddy', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo companion para interacao, presenca digital e experiencias educacionais.', 'application_area': 'Educacao, demonstracao e relacionamento', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/electronic.png', 'rating': 'Sob consulta'}, {'title': 'Mowerbot', 'slug': 'xyron-mowerbot', 'brand': 'Xyron Robotics', 'supplier': 'Smart Control Brasil', 'category': 'Robótica e IA', 'short_description': 'Robo para apoio a manutencao de areas externas e automacao de rotinas de jardinagem.', 'application_area': 'Areas externas, condominios e facilities', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/computer.png', 'rating': 'Sob consulta'}, {'title': 'Hi Wall Inverter', 'slug': 'lg-hi-wall-inverter', 'brand': 'LG', 'supplier': 'BHP Ar Condicionado', 'category': 'Ar-condicionado', 'short_description': 'Equipamento tipo hi wall inverter para climatizacao eficiente de ambientes residenciais e comerciais.', 'application_area': 'Climatizacao residencial e comercial', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp1.png', 'rating': 'Sob consulta'}, {'title': 'Multi Split', 'slug': 'daikin-multi-split', 'brand': 'Daikin', 'supplier': 'BHP Ar Condicionado', 'category': 'Ar-condicionado', 'short_description': 'Solucao multi split para atender varios ambientes com uma composicao compacta e flexivel.', 'application_area': 'Projetos multiambiente', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp2.png', 'rating': 'Sob consulta'}, {'title': 'Teto', 'slug': 'carrier-teto', 'brand': 'Carrier', 'supplier': 'BHP Ar Condicionado', 'category': 'Ar-condicionado', 'short_description': 'Unidade tipo teto para climatizacao de areas amplas com distribuicao de ar consistente.', 'application_area': 'Lojas, salas amplas e areas tecnicas', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp3.png', 'rating': 'Sob consulta'}, {'title': 'Cassete', 'slug': 'midea-cassete', 'brand': 'Midea', 'supplier': 'BHP Ar Condicionado', 'category': 'Ar-condicionado', 'short_description': 'Sistema cassete para instalacao embutida e distribuicao uniforme em ambientes corporativos.', 'application_area': 'Escritorios, lojas e salas comerciais', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp4.png', 'rating': 'Sob consulta'}, {'title': 'Duto', 'slug': 'samsung-duto', 'brand': 'Samsung', 'supplier': 'BHP Ar Condicionado', 'category': 'Ar-condicionado', 'short_description': 'Equipamento dutado para climatizacao integrada a projetos arquitetonicos e prediais.', 'application_area': 'Solucoes prediais e climatizacao central', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp5.png', 'rating': 'Sob consulta'}, {'title': 'Splitão', 'slug': 'tcl-splitao', 'brand': 'TCL', 'supplier': 'BHP Ar Condicionado', 'category': 'Ar-condicionado', 'short_description': 'Sistema de maior capacidade para ambientes comerciais, tecnicos e operacoes profissionais.', 'application_area': 'Ambientes comerciais e equipamentos profissionais', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp6.png', 'rating': 'Sob consulta'}, {'title': 'Cortina de Ar', 'slug': 'elgin-cortina-de-ar', 'brand': 'Elgin', 'supplier': 'BHP Ar Condicionado', 'category': 'Soluções prediais', 'short_description': 'Cortina de ar para separacao termica, conforto e apoio a eficiencia energetica.', 'application_area': 'Portas comerciais, recepcoes e acessos', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp7.png', 'rating': 'Sob consulta'}, {'title': 'Fancolete Hidronico', 'slug': 'fujitsu-fancolete-hidronico', 'brand': 'Fujitsu', 'supplier': 'BHP Ar Condicionado', 'category': 'Soluções prediais', 'short_description': 'Fancolete hidronico para climatizacao predial integrada a sistemas de agua gelada.', 'application_area': 'Climatizacao predial e sistemas hidronicos', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/electronic.png', 'rating': 'Sob consulta'}, {'title': 'Sistemas de Climatização', 'slug': 'mitsubishi-electric-sistemas-de-climatizacao', 'brand': 'Mitsubishi Electric', 'supplier': 'Smart Control Brasil', 'category': 'Ar-condicionado', 'short_description': 'Solucoes de climatizacao para projetos corporativos, comerciais e prediais.', 'application_area': 'Climatizacao profissional', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/computer.png', 'rating': 'Sob consulta'}, {'title': 'Automação Predial', 'slug': 'mitsubishi-electric-automacao-predial', 'brand': 'Mitsubishi Electric', 'supplier': 'Smart Control Brasil', 'category': 'Soluções prediais', 'short_description': 'Solucoes para controle, integracao e eficiencia operacional de edificios.', 'application_area': 'Edificios comerciais e infraestrutura predial', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp1.png', 'rating': 'Sob consulta'}, {'title': 'Inversores de Frequência', 'slug': 'mitsubishi-electric-inversores-de-frequencia', 'brand': 'Mitsubishi Electric', 'supplier': 'Smart Control Brasil', 'category': 'Automação industrial', 'short_description': 'Inversores para controle de motores, eficiencia energetica e automacao de processos.', 'application_area': 'Motores, bombas, ventiladores e maquinas', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp2.png', 'rating': 'Sob consulta'}, {'title': 'Automação Industrial', 'slug': 'mitsubishi-electric-automacao-industrial', 'brand': 'Mitsubishi Electric', 'supplier': 'Smart Control Brasil', 'category': 'Automação industrial', 'short_description': 'Solucoes de controle e integracao para processos industriais e linhas produtivas.', 'application_area': 'Industria, maquinas e processos', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp3.png', 'rating': 'Sob consulta'}, {'title': 'Sistemas Visuais', 'slug': 'mitsubishi-electric-sistemas-visuais', 'brand': 'Mitsubishi Electric', 'supplier': 'Smart Control Brasil', 'category': 'Equipamentos profissionais', 'short_description': 'Sistemas visuais profissionais para monitoramento, operacao e comunicacao.', 'application_area': 'Operacao, supervisao e ambientes corporativos', 'price_label': 'Sob consulta', 'button_label': 'Solicitar orçamento', 'image': 'marketplace/ecom/img/page/homepage1/imgsp4.png', 'rating': 'Sob consulta'}]
-
-for _mock_entry in PRODUCTS:
-    _mock_entry.setdefault("description", "")
-    _mock_entry.setdefault("is_featured", False)
-    _mock_entry["image"] = DEFAULT_IMAGE
-    _mock_entry["featured_image_url"] = ""
-    _mock_entry.setdefault("vendor", _mock_entry["brand"])
-    _mock_entry.setdefault("product_type", "Solução técnica")
-    _mock_entry.setdefault("technical_description", _mock_entry["short_description"])
-    _mock_entry.setdefault("applications", [_mock_entry["application_area"]])
-    _mock_entry.setdefault("features", [])
-    _mock_entry.setdefault("specs", [])
-    _mock_entry.setdefault("tags", [])
-    _mock_entry.setdefault("cta_label", _mock_entry["button_label"])
-    _mock_entry.setdefault("lead_interest", f"{_mock_entry['brand']} - {_mock_entry['title']}")
-
-_technical_slugs = {product["slug"] for product in TECHNICAL_PRODUCTS}
-PRODUCTS = TECHNICAL_PRODUCTS + [product for product in PRODUCTS if product["slug"] not in _technical_slugs]
-
-
-CATALOG_FALLBACK_STATIC_IMAGE = DEFAULT_IMAGE
+PRODUCTS = TECHNICAL_PRODUCTS
 
 
 def normalize_filter_value(value):
@@ -125,7 +105,10 @@ def technical_product_to_catalog_entry(instance: TechnicalProduct) -> dict:
     price_label = "Sob consulta"
     rating = "Sob consulta"
     button_label = "Solicitar orçamento"
-    image = CATALOG_FALLBACK_STATIC_IMAGE
+    static_image, featured_image_url = resolve_catalog_image(
+        featured_image=instance.featured_image,
+        catalog_image=metadata.get("catalog_image", ""),
+    )
 
     return {
         "title": instance.title,
@@ -148,9 +131,9 @@ def technical_product_to_catalog_entry(instance: TechnicalProduct) -> dict:
         "button_label": metadata.get("cta_label", button_label),
         "cta_label": metadata.get("cta_label", button_label),
         "lead_interest": metadata.get("lead_interest", f"{instance.brand} - {instance.title}"),
-        "image": image,
+        "image": static_image,
         "is_featured": instance.is_featured,
-        "featured_image_url": "",
+        "featured_image_url": featured_image_url,
     }
 
 
@@ -166,10 +149,10 @@ def merge_catalog_products() -> list:
         merged.append(technical_product_to_catalog_entry(row))
         consumed_slugs.add(row.slug)
 
-    for mock_product in PRODUCTS:
-        if mock_product["slug"] in consumed_slugs:
+    for catalog_product in TECHNICAL_PRODUCTS:
+        if catalog_product["slug"] in consumed_slugs:
             continue
-        merged.append(mock_product)
+        merged.append(catalog_product)
 
     return merged
 
@@ -182,17 +165,24 @@ def catalog_product_for_slug(slug: str) -> dict:
     if persisted:
         return technical_product_to_catalog_entry(persisted)
 
-    for mock_product in PRODUCTS:
-        if mock_product["slug"] == slug:
-            return mock_product
+    for catalog_product in TECHNICAL_PRODUCTS:
+        if catalog_product["slug"] == slug:
+            return catalog_product
 
     raise Http404("Produto nao encontrado")
 
 
 def get_products():
-    """Catálogo: produtos ativos persistidos (prioridade por slug exclusivo), depois mocks como fallback."""
-
+    """Catálogo: produtos ativos persistidos (prioridade por slug), depois catálogo estático."""
     return merge_catalog_products()
+
+
+def get_featured_products(products=None, limit=8):
+    products = products or get_products()
+    featured = [product for product in products if product.get("is_featured")]
+    if featured:
+        return featured[:limit]
+    return products[:limit]
 
 
 def get_product_or_404(slug: str):
@@ -204,7 +194,7 @@ def get_marketplace_lead_source():
         name="marketplace_ecom",
         defaults={
             "source_type": LeadSource.SourceType.ORGANIC,
-            "description": "Solicitações de orçamento geradas pelo marketplace visual Smart360.",
+            "description": "Solicitações de orçamento geradas pelo catálogo técnico Smart360.",
         },
     )
     return source
@@ -238,7 +228,7 @@ def create_quote_request_lead(product, form):
         lead=lead,
         interaction_type=LeadInteraction.InteractionType.NOTE,
         channel=LeadInteraction.Channel.OTHER,
-        summary="Solicitação de orçamento via marketplace.",
+        summary="Solicitação de orçamento via catálogo técnico.",
     )
     return lead
 
@@ -248,10 +238,11 @@ class MarketplaceHomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["products"] = get_products()
-        context["featured_products"] = get_products()[:8]
-        context["categories"] = CATEGORIES
-        context["brand_partners"] = BRAND_PARTNERS
+        products = get_products()
+        context["products"] = products
+        context["featured_products"] = get_featured_products(products)
+        context["categories"] = CATALOG_HOME_CATEGORIES
+        context["brand_partners"] = CATALOG_BRAND_PARTNERS
         return context
 
 
@@ -271,7 +262,7 @@ class ProductListView(TemplateView):
         filtered_products = filter_products(products, filters)
 
         context["products"] = filtered_products
-        context["categories"] = CATEGORIES
+        context["categories"] = CATALOG_HOME_CATEGORIES
         context["brands"] = unique_values(products, "brand")
         context["suppliers"] = unique_values(products, "supplier")
         context["available_brands"] = context["brands"]

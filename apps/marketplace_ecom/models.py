@@ -23,12 +23,18 @@ class TechnicalProduct(models.Model):
     )
     is_active = models.BooleanField("ativo no catálogo", default=True, db_index=True)
     is_featured = models.BooleanField("destacar na home", default=False, db_index=True)
+    display_order = models.PositiveIntegerField(
+        "ordem de exibição",
+        default=0,
+        db_index=True,
+        help_text="Ordem de exibição no catálogo (menor aparece primeiro).",
+    )
     metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ("-is_featured", "-updated_at")
+        ordering = ("display_order", "-is_featured", "-updated_at")
         verbose_name = "produto técnico"
         verbose_name_plural = "produtos técnicos do catálogo"
 

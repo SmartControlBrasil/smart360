@@ -3,7 +3,8 @@ from django.urls import reverse
 
 from apps.growth_engine.models import Lead
 from apps.marketplace_ecom.catalog import DEFAULT_IMAGE
-from apps.marketplace_ecom.views import get_products
+from apps.marketplace_ecom.selectors import get_active_products
+from apps.marketplace_ecom.tests.base import MarketplaceCatalogTestCase
 
 
 QUOTE_DATA = {
@@ -16,7 +17,7 @@ QUOTE_DATA = {
 }
 
 
-class MarketplaceTechnicalCatalogTests(TestCase):
+class MarketplaceTechnicalCatalogTests(MarketplaceCatalogTestCase):
     def test_list_contains_xyron_and_mitsubishi_products(self):
         response = self.client.get(reverse("marketplace_ecom:products"))
 
@@ -84,7 +85,7 @@ class MarketplaceTechnicalCatalogTests(TestCase):
         self.assertEqual(metadata["origin"], "marketplace_ecom")
 
     def test_catalog_products_use_real_images_not_only_placeholder(self):
-        products = get_products()
+        products = get_active_products()
 
         self.assertTrue(products)
         products_with_real_image = [

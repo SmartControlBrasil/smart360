@@ -1,3 +1,8 @@
+"""Seed técnico do catálogo B2B — não é fonte pública do /marketplace/.
+
+Use `python manage.py seed_technical_catalog` para popular TechnicalProduct
+em ambiente novo. A vitrine pública lê apenas produtos ativos do banco.
+"""
 DEFAULT_IMAGE = "marketplace/ecom/img/template/devices.svg"
 
 _IMG = "institutional/eitech/img"

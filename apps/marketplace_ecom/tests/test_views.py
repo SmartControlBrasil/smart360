@@ -2,10 +2,11 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.growth_engine.models import Lead, LeadInteraction
-from apps.marketplace_ecom.views import PRODUCTS
+from apps.marketplace_ecom.models import TechnicalProduct
+from apps.marketplace_ecom.tests.base import MarketplaceCatalogTestCase
 
 
-class MarketplaceEcomViewTests(TestCase):
+class MarketplaceEcomViewTests(MarketplaceCatalogTestCase):
     def test_home_returns_200(self):
         response = self.client.get(reverse("marketplace_ecom:home"))
 
@@ -14,9 +15,10 @@ class MarketplaceEcomViewTests(TestCase):
 
     def test_products_returns_all_products(self):
         response = self.client.get(reverse("marketplace_ecom:products"))
+        active_count = TechnicalProduct.objects.filter(is_active=True).count()
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f"Exibindo {len(PRODUCTS)} soluções")
+        self.assertContains(response, f"Exibindo {active_count} soluções")
         self.assertContains(response, "LIRO / LittleBot")
         self.assertContains(response, "CLPs Mitsubishi MELSEC")
         self.assertContains(response, "Fabricante")
@@ -196,3 +198,11 @@ class MarketplaceEcomViewTests(TestCase):
         self.assertEqual(interaction.interaction_type, LeadInteraction.InteractionType.NOTE)
         self.assertEqual(interaction.channel, LeadInteraction.Channel.OTHER)
         self.assertEqual(interaction.summary, "Solicitação de orçamento via catálogo técnico.")
+
+
+class EmptyCatalogTests(TestCase):
+    def test_empty_database_shows_no_products(self):
+        response = self.client.get(reverse("marketplace_ecom:products"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Exibindo 0 soluções")

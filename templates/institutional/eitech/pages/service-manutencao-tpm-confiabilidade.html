@@ -1,8 +1,25 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
+{% block title %}Manutenção Industrial de Campo | Smart Control Brasil{% endblock %}
+{% block meta_description %}Manutenção técnica industrial: câmaras frias, câmaras climáticas, equipamentos, painéis elétricos e automação. Preventiva, corretiva e comissionamento em campo pela Smart Control Brasil.{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-service.css' %}">
+<style>
+  .scb-maintenance-scope-note {
+    margin-top: 1.5rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: 14px;
+    border: 1px solid rgba(253, 150, 54, 0.35);
+    background: rgba(253, 150, 54, 0.08);
+    color: #35558f;
+    line-height: 1.55;
+  }
+  .scb-maintenance-scope-note strong {
+    color: #1e3a5f;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -19,16 +36,16 @@
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="hero4-heading heading3">
-            <h5 data-aos="fade-left" data-aos-duration="800" class="scb-service-h5-uppercase"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="" aria-hidden="true">Suporte técnico como apoio à solução</h5>
+            <h5 data-aos="fade-left" data-aos-duration="800" class="scb-service-h5-uppercase"><img src="{% static 'institutional/eitech/img/icons/sub-logo2.svg' %}" alt="" aria-hidden="true">Execução técnica em campo</h5>
             <div class="space18"></div>
-            <h1 class="text-anime-style-3">Suporte Técnico, Retrofit e Confiabilidade</h1>
+            <h1 class="text-anime-style-3">Manutenção Industrial de Campo</h1>
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="1000">Apoie equipamentos, automações e operações com suporte técnico especializado, retrofit, dados de ativos e rotinas de confiabilidade.</p>
+            <p data-aos="fade-left" data-aos-duration="1000">Executamos manutenção preventiva, corretiva e comissionamento em equipamentos industriais, câmaras frias, câmaras climáticas, painéis elétricos e sistemas de automação.</p>
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="1100">A Smart Control Brasil apoia empresas após a implantação, conectando suporte técnico, retrofit, indicadores, documentação, dados e melhoria contínua.</p>
+            <p data-aos="fade-left" data-aos-duration="1100">A Smart Control Brasil atua na planta, na linha e no painel — com diagnóstico, intervenção técnica, organização documental e evolução para TPM, confiabilidade e Smart360 quando fizer sentido.</p>
             <div class="space32"></div>
             <div class="btn-area1" data-aos="fade-left" data-aos-duration="1200">
-              <a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Alinhar solução</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+              <a href="{% url 'institutional:contact' %}?interest=manutencao" class="vl-btn5"><span class="demo">Solicitar visita técnica</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
               <a href="{% url 'institutional:projects' %}" class="vl-btn5"><span class="demo">Ver projetos</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
             </div>
           </div>
@@ -64,19 +81,22 @@
         <div class="col-lg-1"></div>
         <div class="col-lg-5">
           <div class="about-header heading6">
-            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="" aria-hidden="true"></span>Suporte técnico protege a solução implantada.</h5>
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="" aria-hidden="true"></span>Manutenção que sustenta a operação.</h5>
             <div class="space24"></div>
-            <h2 class="text-anime-style-3">Da correção pontual ao ciclo de vida da solução</h2>
+            <h2 class="text-anime-style-3">Da parada emergencial à rotina planejada</h2>
             <div class="space16"></div>
-            <p data-aos="fade-left" data-aos-duration="800">Quando equipamentos, softwares e automações não têm suporte adequado, a operação perde produtividade e previsibilidade. Com processos organizados, indicadores e análise de falhas, o suporte técnico protege ativos e decisões.</p>
+            <p data-aos="fade-left" data-aos-duration="800">Atuamos em ambientes industriais e críticos onde falha de equipamento, refrigeração, painel ou automação impacta produção, qualidade e segurança. O foco é resolver em campo e deixar a operação mais previsível.</p>
             <div class="space24"></div>
             <div class="bg-progress" data-aos="fade-left" data-aos-duration="900">
-              <div class="progress-bar"><label>Menos paradas inesperadas <span>01</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
-              <div class="progress-bar"><label>Mais controle sobre ativos <span>02</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
-              <div class="progress-bar scb-service-progress-bar-last"><label>Apoio à decisão com dados <span>03</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
+              <div class="progress-bar"><label>Preventiva e corretiva em planta <span>01</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
+              <div class="progress-bar"><label>Diagnóstico e comissionamento <span>02</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
+              <div class="progress-bar scb-service-progress-bar-last"><label>Retrofit e melhoria de confiabilidade <span>03</span></label><div class="progress"><div class="progress-inner" data-progress="100"></div></div></div>
             </div>
             <div class="space24"></div>
-            <p>Uma base mais clara para TPM, confiabilidade, histórico técnico, priorização de demandas e melhoria contínua.</p>
+            <p>Quando a operação amadurece, evoluímos para TPM, indicadores, histórico técnico e gestão no Smart360.</p>
+            <div class="scb-maintenance-scope-note" data-aos="fade-left" data-aos-duration="1000">
+              <strong>Escopo comercial:</strong> robôs Xyron Robotics são comercializados e integrados pela Smart Control; a manutenção oficial desses equipamentos permanece com a Xyron e sua rede de suporte.
+            </div>
           </div>
         </div>
       </div>
@@ -91,20 +111,18 @@
       <div class="row">
         <div class="col-lg-12">
           <div class="service-header space-margin60">
-            <div class="heading6"><h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="" aria-hidden="true">Frentes de atuação</h5><div class="space18"></div><h2 class="text-anime-style-3">Suporte, ativos, indicadores e melhoria contínua</h2></div>
-            <div class="btn-area1"><a href="{% url 'institutional:contact' %}" class="vl-btn5"><span class="demo">Alinhar solução</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a></div>
+            <div class="heading6"><h5><img src="{% static 'institutional/eitech/img/icons/sub-logo4.svg' %}" alt="" aria-hidden="true">O que executamos em campo</h5><div class="space18"></div><h2 class="text-anime-style-3">Manutenção técnica para ativos industriais e ambientes críticos</h2></div>
+            <div class="btn-area1"><a href="{% url 'institutional:contact' %}?interest=manutencao" class="vl-btn5"><span class="demo">Solicitar visita técnica</span><span class="arrow"><i class="fa-solid fa-arrow-right"></i></span></a></div>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="700"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Gestão de ativos e equipamentos</a><div class="space16"></div><p>Organização de máquinas, equipamentos, locais, criticidade, histórico técnico e informações essenciais para suporte especializado e confiabilidade.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Rotinas preventivas e suporte</a><div class="space16"></div><p>Estruturação de planos preventivos, inspeções, checklists e rotinas técnicas de acordo com a realidade operacional da empresa.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">TPM aplicado à operação</a><div class="space16"></div><p>Aplicação prática de conceitos de TPM para reduzir perdas, melhorar disciplina operacional e aumentar o envolvimento das equipes.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Análise técnica de falhas</a><div class="space16"></div><p>Identificação de causas, recorrências, modos de falha, sintomas e oportunidades de melhoria para reduzir problemas repetitivos.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Indicadores de suporte técnico</a><div class="space16"></div><p>Acompanhamento de MTTR, MTBF, disponibilidade, backlog, recorrência, preventivas, corretivas e desempenho operacional.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Confiabilidade e melhoria contínua</a><div class="space16"></div><p>Uso de histórico, dados e análise técnica para melhorar a confiabilidade dos ativos e orientar decisões de suporte e retrofit.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Ordens de serviço e rastreabilidade</a><div class="space16"></div><p>Organização de chamados, ordens de serviço, responsáveis, status, evidências, histórico e documentação técnica.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}" class="service-btn">Alinhar solução</a></div></div></div></div>
-        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:parceiro_xyron_robotics' %}">Integração com Smart360</a><div class="space16"></div><p>Conexão do suporte técnico com o Smart360 para ativos, ordens de serviço, relatórios, dashboards, documentos e dados aplicados.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:parceiro_xyron_robotics' %}" class="service-btn">Conhecer Smart360</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="700"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}?interest=manutencao">Câmaras frias e refrigeração industrial</a><div class="space16"></div><p>Instalação, diagnóstico, comissionamento, ajustes e manutenção em sistemas de refrigeração e ambientes controlados por temperatura.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}?interest=manutencao" class="service-btn">Solicitar atendimento</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon12.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}?interest=manutencao">Câmaras climáticas e ensaios</a><div class="space16"></div><p>Suporte a câmaras climáticas, estabilidade térmica, sensores, controladores e rotinas de verificação para laboratórios e processos críticos.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}?interest=manutencao" class="service-btn">Solicitar atendimento</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="900"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon13.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}?interest=manutencao">Equipamentos industriais</a><div class="space16"></div><p>Manutenção preventiva e corretiva em máquinas, linhas, utilidades e ativos que sustentam produção, qualidade e continuidade operacional.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}?interest=manutencao" class="service-btn">Solicitar atendimento</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1000"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon14.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:service_automacao_industrial_clps' %}">Painéis elétricos e baixa tensão</a><div class="space16"></div><p>Montagem, organização, retrofit, diagnóstico e manutenção de painéis, comandos, proteção e infraestrutura elétrica industrial.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}?interest=retrofit" class="service-btn">Solicitar atendimento</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1100"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon15.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:service_automacao_industrial_clps' %}">Automação industrial</a><div class="space16"></div><p>CLPs, IHMs, inversores, redes industriais, supervisão e integração — manutenção, ajustes e suporte em sistemas automatizados.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}?interest=automacao" class="service-btn">Solicitar atendimento</a></div></div></div></div>
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="1200"><div class="service-single-boxarea"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon16.svg' %}" alt="" aria-hidden="true"></div><div class="space28"></div><div class="content-area"><a href="{% url 'institutional:contact' %}?interest=manutencao">Preventiva, corretiva e emergencial</a><div class="space16"></div><p>Planos de manutenção, chamados técnicos, análise de falhas, documentação de intervenções e priorização de riscos operacionais.</p><div class="space24"></div><div class="btn-area"><a href="{% url 'institutional:contact' %}?interest=manutencao" class="service-btn">Solicitar atendimento</a></div></div></div></div>
       </div>
     </div>
   </div>
@@ -116,7 +134,7 @@
       <div class="row">
         <div class="col-lg-5">
           <div class="about6-header heading8">
-            <h5 data-aos="fade-left" data-aos-duration="800">TPM, confiabilidade e dados</h5>
+            <h5 data-aos="fade-left" data-aos-duration="800">TPM, confiabilidade e Smart360</h5>
             <div class="space18"></div>
             <h2 class="text-anime-style-3">Disciplina operacional, conhecimento técnico e dados confiáveis</h2>
             <div class="space16"></div>
@@ -194,9 +212,11 @@
   <!--===== FAQ AREA STARTS =======-->
   <div class="faq5-section-area sp1">
     <div class="container">
-      <div class="row"><div class="col-lg-6 m-auto"><div class="faq-header text-center heading8 space-margin60"><h5>Perguntas frequentes</h5><div class="space18"></div><h2 class="text-anime-style-3">Dúvidas sobre suporte, retrofit e confiabilidade</h2></div></div></div>
+      <div class="row"><div class="col-lg-6 m-auto"><div class="faq-header text-center heading8 space-margin60"><h5>Perguntas frequentes</h5><div class="space18"></div><h2 class="text-anime-style-3">Dúvidas sobre manutenção industrial e evolução operacional</h2></div></div></div>
       <div class="row"><div class="col-lg-10 m-auto"><div class="faq-widget-area"><div class="accordion" id="accordionMaintenance">
-        <div class="accordion-item" data-aos="fade-up" data-aos-duration="800"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceOne" aria-expanded="true" aria-controls="maintenanceOne">Minha empresa precisa de TPM mesmo sendo pequena?</button></h2><div id="maintenanceOne" class="accordion-collapse collapse show" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Sim, desde que aplicado com bom senso. TPM não precisa começar complexo. Pequenas empresas podem iniciar com organização de ativos, rotinas, inspeções, responsabilidades e análise simples das principais perdas.</p></div></div></div>
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="750"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceZero" aria-expanded="true" aria-controls="maintenanceZero">Vocês fazem manutenção de robôs Xyron?</button></h2><div id="maintenanceZero" class="accordion-collapse collapse show" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Não executamos manutenção de campo dos robôs Xyron Robotics. Atuamos na comercialização e integração dessas soluções; o suporte e a manutenção oficial permanecem com a Xyron e sua rede autorizada.</p></div></div></div>
+        <div class="space32"></div>
+        <div class="accordion-item" data-aos="fade-up" data-aos-duration="800"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceOne" aria-expanded="false" aria-controls="maintenanceOne">Minha empresa precisa de TPM mesmo sendo pequena?</button></h2><div id="maintenanceOne" class="accordion-collapse collapse" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>Sim, desde que aplicado com bom senso. TPM não precisa começar complexo. Pequenas empresas podem iniciar com organização de ativos, rotinas, inspeções, responsabilidades e análise simples das principais perdas.</p></div></div></div>
         <div class="space32"></div>
         <div class="accordion-item" data-aos="fade-up" data-aos-duration="900"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceTwo" aria-expanded="false" aria-controls="maintenanceTwo">Qual a diferença entre suporte preventivo e confiabilidade?</button></h2><div id="maintenanceTwo" class="accordion-collapse collapse" data-bs-parent="#accordionMaintenance"><div class="accordion-body"><p>A preventiva define rotinas planejadas para reduzir falhas. A confiabilidade analisa comportamento dos ativos, falhas recorrentes, histórico e indicadores para melhorar decisões técnicas.</p></div></div></div>
         <div class="space32"></div>
@@ -212,7 +232,7 @@
 
   <!--===== CTA AREA STARTS =======-->
   <div class="cta5-section-area scb-service-section-cta-bg">
-    <div class="container"><div class="row align-items-center"><div class="col-lg-5"><div class="cta-header heading7"><h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt="" aria-hidden="true"></span>Suporte técnico e confiabilidade</h5><div class="space18"></div><h2 class="text-anime-style-3">Quer sustentar sua solução tecnológica com mais controle?</h2><div class="space16"></div><p data-aos="fade-left" data-aos-duration="900">Fale com a Smart Control Brasil e vamos identificar como organizar ativos, rotinas, indicadores e dados para apoiar suporte técnico, retrofit e confiabilidade.</p><div class="space32"></div><div class="btn-area1" data-aos="fade-left" data-aos-duration="1000"><a class="vl-btn6" href="{% url 'institutional:contact' %}">Alinhar solução <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a></div></div></div><div class="col-lg-1"></div><div class="col-lg-6"><div class="images-area"><div class="row"><div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000"><div class="img1"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt="" aria-hidden="true"></div><div class="space30 d-md-none d-block"></div></div><div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="1000"><div class="img2"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt="" aria-hidden="true"></div></div></div></div></div></div></div>
+    <div class="container"><div class="row align-items-center"><div class="col-lg-5"><div class="cta-header heading7"><h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt="" aria-hidden="true"></span>Manutenção industrial de campo</h5><div class="space18"></div><h2 class="text-anime-style-3">Precisa de suporte técnico na sua planta?</h2><div class="space16"></div><p data-aos="fade-left" data-aos-duration="900">Fale com a Smart Control Brasil e vamos entender seu cenário: equipamentos, refrigeração, painéis, automação e prioridades de atendimento em campo.</p><div class="space32"></div><div class="btn-area1" data-aos="fade-left" data-aos-duration="1000"><a class="vl-btn6" href="{% url 'institutional:contact' %}?interest=manutencao">Solicitar visita técnica <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a></div></div></div><div class="col-lg-1"></div><div class="col-lg-6"><div class="images-area"><div class="row"><div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000"><div class="img1"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt="" aria-hidden="true"></div><div class="space30 d-md-none d-block"></div></div><div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="1000"><div class="img2"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt="" aria-hidden="true"></div></div></div></div></div></div></div>
   </div>
   <!--===== CTA AREA ENDS =======-->
 {% endblock %}

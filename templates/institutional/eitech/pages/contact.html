@@ -141,12 +141,14 @@
                     <div class="input-area">
                       <select name="interest" class="form-select" aria-label="Interesse principal">
                         <option value="">Selecione a principal necessidade</option>
-                        <option value="automacao">Automação, CLPs, IHMs e Equipamentos</option>
-                        <option value="robotica">Robótica, Xyron Robotics e Inovação</option>
-                        <option value="software">Softwares, Sistemas Web e Dashboards</option>
-                        <option value="iot_dados">IoT, Sensores, Dados e Integração</option>
-                        <option value="produtos">Produtos, Kits, Robôs e Componentes</option>
-                        <option value="retrofit_suporte">Retrofit, Suporte Técnico e Manutenção</option>
+                        <option value="automacao" {% if request.GET.interest == "automacao" %}selected{% endif %}>Automação, CLPs, IHMs e Equipamentos</option>
+                        <option value="robotica" {% if request.GET.interest == "robotica" %}selected{% endif %}>Robótica, Xyron Robotics e Inovação</option>
+                        <option value="software" {% if request.GET.interest == "software" %}selected{% endif %}>Softwares, Sistemas Web e Dashboards</option>
+                        <option value="iot_dados" {% if request.GET.interest == "iot_dados" %}selected{% endif %}>IoT, Sensores, Dados e Integração</option>
+                        <option value="produtos" {% if request.GET.interest == "produtos" %}selected{% endif %}>Produtos, Kits, Robôs e Componentes</option>
+                        <option value="manutencao" {% if request.GET.interest == "manutencao" %}selected{% endif %}>Manutenção Técnica Industrial de Campo</option>
+                        <option value="retrofit" {% if request.GET.interest == "retrofit" %}selected{% endif %}>Retrofit de Máquinas e Painéis Elétricos</option>
+                        <option value="retrofit_suporte" {% if request.GET.interest == "retrofit_suporte" %}selected{% endif %}>Retrofit, Suporte Técnico e Manutenção</option>
                       </select>
                     </div>
                   </div>

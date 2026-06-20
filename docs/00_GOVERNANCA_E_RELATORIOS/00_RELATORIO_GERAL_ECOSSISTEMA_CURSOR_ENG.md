@@ -1106,11 +1106,11 @@ Atenção:
 
 ---
 
-## 21. Eduardo / importador de prospects
+## 21. Atlas / importador de prospects
 
 ### 21.1. Visão
 
-Existe frente de importação de prospects, possivelmente chamada internamente de Eduardo.
+Existe frente de importação de prospects, chamada internamente de **Atlas** (agente de inteligência comercial).
 
 Objetivo:
 

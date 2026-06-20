@@ -63,24 +63,6 @@
   padding: 0 !important;
 }
 
-/* Menu claro só no header fixo da página de robótica (fundo escuro). */
-body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li > a {
-  color: #fff !important;
-}
-
-body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li:hover > a,
-body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li a.nav-link.active {
-  color: var(--ztc-text-text-5) !important;
-}
-
-body.service-robotica-page #vl-header-sticky.header-sticky .vl-main-menu ul > li a.nav-link.active {
-  opacity: 1;
-}
-
-body.service-robotica-page #vl-header-sticky.header-sticky .vl-header-action-item button {
-  color: #fff;
-}
-
 .scb-service-hero-primary-bg {
   background-image: url(../img/all-images/bg/hero-bg1.png);
 }
@@ -90,4 +72,102 @@ body.service-robotica-page #vl-header-sticky.header-sticky .vl-header-action-ite
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+.scb-service-hero-websystems-bg {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-service-about-websystems-bg {
+  background-image: url(../img/all-images/bg/about-bg3.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-web-systems-proof .work-boxarea p {
+  margin-bottom: 0;
+  line-height: 1.6;
+}
+
+/* Index5 (Eitech): body homepage5-body + header row-bg3 do site público */
+body.homepage5-body .homepage1-body .vl-transparent-header,
+body.homepage5-body #vl-header-sticky.vl-transparent-header {
+  padding: 16px 0;
+  position: relative;
+}
+
+body.homepage5-body .homepage1-body .row-bg3,
+body.homepage5-body #vl-header-sticky .row-bg3 {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: transparent;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  margin: 0 18px;
+  padding: 16px 0;
+}
+
+@media (max-width: 767.98px) {
+  body.homepage5-body .homepage1-body .row-bg3,
+  body.homepage5-body #vl-header-sticky .row-bg3 {
+    border-radius: 4px;
+    margin: 0;
+  }
+}
+
+body.homepage5-body .vl-header-action-item button {
+  color: var(--ztc-text-text-14, #090b0e);
+}
+
+body.homepage5-body .header-sticky .homepage1-body .row-bg3,
+body.homepage5-body .header-sticky .row-bg3 {
+  background: var(--ztc-bg-bg-1, #ffffff);
+  box-shadow: 0 20px 30px rgba(1, 15, 28, 0.1);
+  padding: 14px 0;
+}
+
+body.service-web-systems-page .hero5-section-area .hero6-header .btn-area1 {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body.service-web-systems-page .hero5-section-area .hero6-header .btn-area1 .vl-btn6.btn2 {
+  margin-left: 0;
+}
+
+body.service-web-systems-page .service5-section-area .service5-slider-box {
+  min-height: 340px;
+}
+
+@media (max-width: 991.98px) {
+  body.service-web-systems-page .service5-section-area .service5-slider-box {
+    min-height: 0;
+  }
+}
+
+body.service-web-systems-page .scb-web-systems-ecosystem .work-boxarea a {
+  color: inherit;
+  display: inline-block;
+  pointer-events: auto;
+  text-decoration: none;
+}
+
+body.service-web-systems-page .scb-web-systems-ecosystem .work-boxarea a:hover {
+  color: var(--ztc-text-text-13, #6d4bfb);
+}
+
+.scb-service-featured-card {
+  border: 2px solid rgba(15, 118, 110, 0.22);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.scb-service-featured-card h5 {
+  color: #0f766e;
+  font-weight: 700;
 }

@@ -90,8 +90,8 @@
   font-family: var(--ztc-family-font1);
   font-size: 16px;
   font-weight: 600;
-  line-height: 1;
-  padding: 10px 0;
+  line-height: 1.25;
+  padding: 0;
   text-decoration: none;
   transition: opacity 0.25s ease, color 0.25s ease;
   white-space: nowrap;
@@ -251,27 +251,108 @@
   gap: 14px;
 }
 
-.scb-nav-parent {
-  color: #fff;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  font-family: inherit;
+/* ===== Navegação pública unificada (menu, Soluções, Entrar) ===== */
+
+/* Tipografia única — links de primeiro nível (inclui Soluções) */
+.homepage1-body .vl-main-menu nav > ul > li > a,
+body.homepage5-body .homepage1-body .vl-main-menu nav > ul > li > a {
   display: inline-block;
-  cursor: pointer;
+  font-family: var(--ztc-family-font1);
+  font-size: 16px !important;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.25;
+  padding: 0 14px !important;
+  position: relative;
   text-decoration: none;
+  transition: color 0.25s ease, opacity 0.25s ease;
 }
 
-.scb-nav-dropdown:hover .scb-nav-parent {
-  color: #fff;
+/* Modo escuro — header padrão (home e internas sem homepage5-body) */
+.homepage1-body .vl-main-menu nav > ul > li > a {
+  color: var(--ztc-text-text-1, #ffffff);
 }
 
-/* Ajuste visual do submenu principal */
-.header-area .main-menu ul li ul.sub-menu li a,
-.header-area .main-menu ul li ul.dropdown-menu li a {
-    font-family: inherit;
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1.3;
-    color: #ffffff;
+.homepage1-body .vl-main-menu nav > ul > li:hover > a,
+.homepage1-body .vl-main-menu nav > ul > li.scb-nav-dropdown:hover > a.scb-nav-parent,
+.homepage1-body .vl-main-menu nav > ul > li > a.nav-link.active {
+  color: var(--ztc-text-text-1, #ffffff);
+  opacity: 0.75;
+}
+
+/* Páginas claras (index5 / homepage5-body no body) */
+body.homepage5-body .homepage1-body .vl-main-menu nav > ul > li > a,
+body.homepage5-body #vl-header-sticky .vl-main-menu nav > ul > li > a {
+  color: var(--ztc-text-text-14, #010225) !important;
+  opacity: 1 !important;
+}
+
+body.homepage5-body .homepage1-body .vl-main-menu nav > ul > li:hover > a,
+body.homepage5-body .homepage1-body .vl-main-menu nav > ul > li.scb-nav-dropdown:hover > a.scb-nav-parent,
+body.homepage5-body .homepage1-body .vl-main-menu nav > ul > li > a.nav-link.active,
+body.homepage5-body #vl-header-sticky .vl-main-menu nav > ul > li:hover > a,
+body.homepage5-body #vl-header-sticky .vl-main-menu nav > ul > li.scb-nav-dropdown:hover > a.scb-nav-parent,
+body.homepage5-body #vl-header-sticky .vl-main-menu nav > ul > li > a.nav-link.active {
+  color: var(--ztc-text-text-13, #6d4bfb) !important;
+  opacity: 1 !important;
+}
+
+body.homepage5-body .header-login-link {
+  color: var(--ztc-text-text-14, #010225) !important;
+}
+
+body.homepage5-body .header-login-link:hover,
+body.homepage5-body .header-login-link:focus-visible {
+  color: var(--ztc-text-text-13, #6d4bfb) !important;
+  opacity: 1;
+}
+
+body.homepage5-body .header-sticky .homepage1-body .vl-main-menu nav > ul > li > a,
+body.homepage5-body .header-sticky #vl-header-sticky .vl-main-menu nav > ul > li > a,
+body.homepage5-body .header-sticky .header-login-link {
+  color: var(--ztc-text-text-14, #010225) !important;
+  opacity: 1 !important;
+}
+
+body.homepage5-body .header-sticky .homepage1-body .vl-main-menu nav > ul > li:hover > a,
+body.homepage5-body .header-sticky .homepage1-body .vl-main-menu nav > ul > li.scb-nav-dropdown:hover > a.scb-nav-parent,
+body.homepage5-body .header-sticky #vl-header-sticky .vl-main-menu nav > ul > li:hover > a,
+body.homepage5-body .header-sticky #vl-header-sticky .vl-main-menu nav > ul > li.scb-nav-dropdown:hover > a.scb-nav-parent,
+body.homepage5-body .header-sticky .header-login-link:hover,
+body.homepage5-body .header-sticky .header-login-link:focus-visible {
+  color: var(--ztc-text-text-13, #6d4bfb) !important;
+  opacity: 1 !important;
+}
+
+/* Robótica: sticky com fundo escuro — texto claro */
+body.service-robotica-page .header-sticky .vl-main-menu nav > ul > li > a,
+body.service-robotica-page .header-sticky .header-login-link {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+body.service-robotica-page .header-sticky .vl-main-menu nav > ul > li:hover > a,
+body.service-robotica-page .header-sticky .vl-main-menu nav > ul > li.scb-nav-dropdown:hover > a.scb-nav-parent,
+body.service-robotica-page .header-sticky .header-login-link:hover,
+body.service-robotica-page .header-sticky .header-login-link:focus-visible {
+  color: var(--ztc-text-text-5, #c8d0e0) !important;
+  opacity: 1 !important;
+}
+
+body.service-robotica-page .header-sticky .vl-header-action-item button {
+  color: #ffffff;
+}
+
+/* Off-canvas: mesma tipografia do menu desktop */
+.vl-offcanvas-menu nav > ul > li > a,
+.vl-offcanvas-menu nav > ul > li > a.scb-nav-parent {
+  font-family: var(--ztc-family-font1);
+  font-size: 16px !important;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.vl-offcanvas-menu nav .scb-nav-dropdown .sub-menu > li > a {
+  font-size: 15px;
+  font-weight: 600;
 }

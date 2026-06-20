@@ -101,6 +101,10 @@ def service_inteligencia_artificial(request):
     return render(request, "institutional/eitech/pages/service-inteligencia-artificial.html")
 
 
+def service_sistemas_web_aplicativos(request):
+    return render(request, "institutional/eitech/pages/service-sistemas-web-aplicativos.html")
+
+
 def service_robotica_integracao(request):
     return render(request, "institutional/eitech/pages/service-robotica-integracao.html")
 

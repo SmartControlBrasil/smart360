@@ -19,6 +19,16 @@ urlpatterns = [
     path("parceiros/marketing-digital-sites-conteudo/", views.service_marketing_digital, name="service_marketing_digital"),
     path("parceiros/automacao-industrial-clps/", views.service_automacao_industrial_clps, name="service_automacao_industrial_clps"),
     path("parceiros/saipos/", views.service_inteligencia_artificial, name="service_inteligencia_artificial"),
+    path(
+        "solucoes/sistemas-web-aplicativos/",
+        views.service_sistemas_web_aplicativos,
+        name="service_sistemas_web_aplicativos",
+    ),
+    path(
+        "parceiros/sistemas-web-aplicativos/",
+        RedirectView.as_view(pattern_name="institutional:service_sistemas_web_aplicativos", permanent=False),
+        name="service_sistemas_web_aplicativos_parceiros",
+    ),
     path("parceiros/robotica-integracao-sistemas/", views.service_robotica_integracao, name="service_robotica_integracao"),
     path("parceiros/mitsubishi-automacao/", views.representada_mitsubishi_automacao, name="representada_mitsubishi_automacao"),
     path(

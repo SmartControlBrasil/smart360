@@ -28,8 +28,9 @@
                               </li> {% endcomment %}
 
                               <li class="nav-item nav-item--has-dropdown scb-nav-dropdown">
-                                <span class="scb-nav-parent">Parceiros</span>
+                                <a href="{% url 'institutional:services' %}" class="scb-nav-parent">Soluções</a>
                                   <ul class="sub-menu solutions-dropdown">
+                                    <li><a href="{% url 'institutional:service_sistemas_web_aplicativos' %}">Sistemas Web e Aplicativos com IA</a></li>
                                     <li><a href="{% url 'institutional:representada_mitsubishi_automacao' %}">Mitsubishi Automação</a></li>
                                     <li><a href="{% url 'institutional:parceiro_xyron_robotics' %}">Xyron Robotics</a></li>
                                     <li><a href="{% url 'institutional:engenharia_embarcada' %}">Engenharia Embarcada</a></li>

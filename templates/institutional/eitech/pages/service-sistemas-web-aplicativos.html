@@ -1,0 +1,340 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}Sistemas Web e Aplicativos com IA | Smart Control Brasil{% endblock %}
+{% block meta_description %}Desenvolvimento de sistemas web, painéis administrativos, portais e aplicativos com IA integrada. Construímos o Smart360, a Lívia e automações que usamos na nossa operação — e entregamos o mesmo para clientes.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-service.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="homepage5-body service-web-systems-page"{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="hero5-section-area scb-service-hero-websystems-bg">
+    <img src="{% static 'institutional/eitech/img/elements/elements44.png' %}" alt="" class="elements44">
+    <img src="{% static 'institutional/eitech/img/elements/elements45.png' %}" alt="" class="elements45">
+    <img src="{% static 'institutional/eitech/img/elements/elements46.png' %}" alt="" class="elements46">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <div class="hero6-header heading7">
+            <h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Desenvolvimento sob medida com IA</h5>
+            <div class="space16"></div>
+            <h1 class="text-anime-style-3">Sistemas Web e Aplicativos com IA Integrada</h1>
+            <div class="space24"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Saia da planilha, do WhatsApp solto e do retrabalho manual. Criamos painéis, portais, apps e fluxos inteligentes para organizar a operação da sua empresa.</p>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="1000">Não vendemos promessa de IA genérica: <strong>construímos na prática o que entregamos</strong> — plataforma Smart360, assistente Lívia, agentes comerciais e CRM integrado — e replicamos essa engenharia para o seu negócio.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1100">
+              <a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+              <a class="vl-btn6 btn2" href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pela%20p%C3%A1gina%20de%20Sistemas%20Web%20e%20gostaria%20de%20entender%20como%20automatizar%20minha%20opera%C3%A7%C3%A3o.">Falar com a Lívia <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-3">
+          <div class="img1 image-anime reveal">
+            <img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt="Sistemas web, painéis e aplicativos com inteligência artificial">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== ECOSYSTEM AREA STARTS =======-->
+  <div class="work5-section-area sp8 scb-web-systems-ecosystem">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="work-header text-center space-margin60 heading8">
+            <h5>O que já construímos para nós</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">A mesma base que usamos internamente, adaptada para o seu cenário</h2>
+            <div class="space16"></div>
+            <p>Antes de vender, operamos. O ecossistema Smart360 é nosso laboratório vivo — e é isso que colocamos à disposição dos clientes que precisam de sistema sob medida, não de template engessado.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="work-widget-boxes">
+            <div class="row">
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="800">
+                <div class="work-boxarea">
+                  <h5>Smart360</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work1.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:supervisao_dados_industriais' %}">Plataforma operacional</a>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="900">
+                <div class="work-boxarea">
+                  <h5>Lívia</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work2.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">Assistente com IA</a>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="1000">
+                <div class="work-boxarea">
+                  <h5>Atlas</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work3.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">Inteligência comercial</a>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="1100">
+                <div class="work-boxarea box2">
+                  <h5>Growth Engine</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work4.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">CRM e propostas</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ECOSYSTEM AREA ENDS =======-->
+
+  <!--===== WORKS AREA STARTS =======-->
+  <div class="work5-section-area sp8">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="work-header text-center space-margin60 heading8">
+            <h5>Como desenvolvemos</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Do diagnóstico ao sistema em produção</h2>
+            <div class="space16"></div>
+            <p>Começamos pelo processo real da empresa — não pelo framework. Cada entrega é pensada para gerar controle, clareza e retorno operacional.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="work-widget-boxes">
+            <div class="row">
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="800">
+                <div class="work-boxarea">
+                  <h5>Etapa 1</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work1.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">Entender processo e dor</a>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="900">
+                <div class="work-boxarea">
+                  <h5>Etapa 2</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work2.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">Definir escopo MVP</a>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="1000">
+                <div class="work-boxarea">
+                  <h5>Etapa 3</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work3.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">Projetar telas e fluxos</a>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-6" data-aos="zoom-in" data-aos-duration="1100">
+                <div class="work-boxarea box2">
+                  <h5>Etapa 4</h5>
+                  <div class="space20"></div>
+                  <div class="icons"><img src="{% static 'institutional/eitech/img/icons/work4.svg' %}" alt=""></div>
+                  <div class="space24"></div>
+                  <a href="{% url 'institutional:contact' %}">Publicar e evoluir</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== WORKS AREA ENDS =======-->
+
+  <!--===== ABOUT AREA STARTS =======-->
+  <div class="about5-section-area sp1">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-5" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="img1 scb-service-about-websystems-bg">
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img9.png' %}" alt="" class="about-img9">
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img10.png' %}" alt="" class="about-img10 aniamtion-key-1">
+            <img src="{% static 'institutional/eitech/img/elements/elements47.png' %}" alt="" class="elements47">
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6">
+          <div class="about5-header heading8">
+            <h5 data-aos="fade-left" data-aos-duration="800">Para quem é esta frente</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Empresas que precisam de sistema, não de mais planilha</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Atendemos operações que cresceram no improviso — vendas no WhatsApp, controle em planilha, informação espalhada — e precisam de um sistema web confiável, com login, histórico, relatórios e, quando fizer sentido, IA para atendimento e apoio à decisão.</p>
+            <div class="space32"></div>
+            <div class="counter-boxarea">
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-6" data-aos="zoom-in" data-aos-duration="800"><div class="counter-box"><h2>Painéis</h2><div class="space16"></div><p>administrativos</p></div></div>
+                <div class="col-lg-4 col-md-4 col-6" data-aos="zoom-in" data-aos-duration="900"><div class="counter-box"><h2>Portais</h2><div class="space16"></div><p>para clientes</p></div></div>
+                <div class="col-lg-4 col-md-4" data-aos="zoom-in" data-aos-duration="1000"><div class="space30 d-md-none d-block"></div><div class="counter-box box2"><h2>Apps</h2><div class="space16"></div><p>web responsivos</p></div></div>
+              </div>
+            </div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1100">
+              <a class="vl-btn6" href="{% url 'institutional:contact' %}">Quero um sistema sob medida <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== ABOUT AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service5-section-area scb-service-hero6-section-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="service-header heading7 space-margin60">
+            <h5><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>O que entregamos</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Sistemas web, aplicativos e IA aplicada ao seu processo</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="service5-slider-box owl-carousel">
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Painéis administrativos</a><div class="space18"></div><p>Cadastros, fluxos, permissões, auditoria e operação diária em interface clara para equipes internas.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Portais e áreas do cliente</a><div class="space18"></div><p>Acesso seguro para clientes, parceiros ou fornecedores acompanhar pedidos, chamados, documentos e status.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Dashboards e relatórios</a><div class="space18"></div><p>Indicadores, gráficos e visão executiva para decisão rápida — sem depender de planilhas soltas.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Aplicativos web responsivos</a><div class="space18"></div><p>Sistemas acessíveis no celular e no desktop para equipes de campo, vendas e operação.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Assistente com IA integrado</a><div class="space18"></div><p>Atendimento, triagem, consulta a base de conhecimento e apoio consultivo — como fazemos com a Lívia.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">CRM e funil comercial</a><div class="space18"></div><p>Captação, qualificação, histórico e evolução de leads com rastreabilidade e revisão humana.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Integrações e APIs</a><div class="space18"></div><p>Conexão com e-mail, WhatsApp, pagamentos, ERPs e sistemas legados conforme maturidade do projeto.</p></div></div>
+            <div class="service-slider-box"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="space24"></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Evolução por fases (MVP)</a><div class="space18"></div><p>Entrega incremental: começa enxuto, valida com a operação e evolui sem quebrar o que já funciona.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+  <div class="space80 d-lg-block d-none"></div>
+
+  <!--===== USE CASES AREA STARTS =======-->
+  <div class="about6-section-area sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="about6-header heading8">
+            <h5 data-aos="fade-left" data-aos-duration="800">Exemplos reais de aplicação</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Onde sistemas web com IA geram resultado</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Cada projeto nasce de uma dor concreta. Estes são cenários frequentes — e é assim que estruturamos soluções para clientes a partir do que já rodamos internamente.</p>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1000"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Gestão comercial e atendimento</a><div class="space16"></div><p>Site institucional, assistente IA, qualificação de leads, CRM e propostas — o mesmo fluxo que usamos na Smart Control.</p></div></div>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1100"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Operação e manutenção</a><div class="space16"></div><p>Ordens de serviço, ativos, checklists, indicadores e painéis para equipes técnicas — base Smart System.</p></div></div>
+            <div class="space24"></div>
+            <div class="about-boxarea" data-aos="fade-left" data-aos-duration="1200"><div class="icons"><img src="{% static 'institutional/eitech/img/icons/service-icon17.svg' %}" alt=""></div><div class="content-area"><a href="{% url 'institutional:contact' %}">Serviços, clínicas e operações administrativas</a><div class="space16"></div><p>Agenda, histórico, portal do cliente, relatórios e automações para reduzir retrabalho no dia a dia.</p></div></div>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1300">
+              <a class="vl-btn6" href="{% url 'institutional:contact' %}">Descrever meu projeto <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-5">
+          <div class="images">
+            <div class="img1 reveal image-anime"><img src="{% static 'institutional/eitech/img/all-images/about/about-img11.png' %}" alt="Desenvolvimento de sistemas web"></div>
+            <img src="{% static 'institutional/eitech/img/all-images/about/about-img12.png' %}" alt="" class="about-img12 aniamtion-key-1">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== USE CASES AREA ENDS =======-->
+
+  <!--===== FAQ AREA STARTS =======-->
+  <div class="faq5-section-area sp1">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="faq-header text-center heading8 space-margin60">
+            <h5>Perguntas frequentes</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Dúvidas sobre sistemas web sob medida</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-10 m-auto">
+          <div class="faq-widget-area">
+            <div class="accordion" id="accordionWebSystems">
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="800"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#wsCollapseOne" aria-expanded="true" aria-controls="wsCollapseOne">Vocês desenvolvem sistemas sob medida ou só usam template?</button></h2><div id="wsCollapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionWebSystems"><div class="accordion-body"><p>Desenvolvemos sob medida com base em engenharia real — Django/Python, arquitetura modular e UI profissional. Templates servem como referência visual, mas o sistema é construído para o processo do cliente.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="900"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wsCollapseTwo" aria-expanded="false" aria-controls="wsCollapseTwo">Como funciona a IA integrada?</button></h2><div id="wsCollapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionWebSystems"><div class="accordion-body"><p>A IA entra onde gera valor: atendimento, qualificação, consulta a documentos, resumos, apoio à decisão e automações. Usamos gateway próprio, base de conhecimento e revisão humana quando necessário — como na Lívia e nos agentes do Smart360.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="1000"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wsCollapseThree" aria-expanded="false" aria-controls="wsCollapseThree">Quanto custa um sistema?</button></h2><div id="wsCollapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionWebSystems"><div class="accordion-body"><p>O investimento depende de funcionalidades, usuários, integrações, prazo e nível de automação. Fazemos diagnóstico antes de orçar — sistema sob medida não tem preço de prateleira.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="1100"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wsCollapseFour" aria-expanded="false" aria-controls="wsCollapseFour">Posso começar com um MVP?</button></h2><div id="wsCollapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionWebSystems"><div class="accordion-body"><p>Sim — e recomendamos. Entregar uma primeira versão enxuta, validar com a operação e evoluir por fases reduz risco, acelera retorno e evita projeto gigante que nunca sai do papel.</p></div></div></div>
+              <div class="space32"></div>
+              <div class="accordion-item" data-aos="fade-up" data-aos-duration="1200"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wsCollapseFive" aria-expanded="false" aria-controls="wsCollapseFive">Vocês cuidam de hospedagem e publicação?</button></h2><div id="wsCollapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionWebSystems"><div class="accordion-body"><p>Podemos orientar, configurar e operar a publicação conforme o contrato. Também atendemos cenários em que o cliente já possui infraestrutura ou preferência de provedor.</p></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== FAQ AREA ENDS =======-->
+
+  <!--===== CTA AREA STARTS =======-->
+  <div class="cta5-section-area scb-service-section-cta-bg">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-5">
+          <div class="cta-header heading7">
+            <h5 data-aos="fade-left" data-aos-duration="800"><span><img src="{% static 'institutional/eitech/img/icons/sub-logo1.svg' %}" alt=""></span>Próximo passo</h5>
+            <div class="space18"></div>
+            <h2 class="text-anime-style-3">Vamos transformar sua operação em sistema — com IA onde fizer sentido</h2>
+            <div class="space16"></div>
+            <p data-aos="fade-left" data-aos-duration="900">Conte o que você faz hoje em planilha, WhatsApp ou sistema antigo. A partir daí, indicamos o caminho mais rápido e seguro para colocar um sistema web profissional no ar.</p>
+            <div class="space32"></div>
+            <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
+              <a class="vl-btn6" href="{% url 'institutional:contact' %}">Solicitar diagnóstico <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+              <a class="vl-btn6 btn2" href="{% url 'institutional:supervisao_dados_industriais' %}">Ver o Smart360 <span class="arrow1"><i class="fa-solid fa-arrow-right"></i></span><span class="arrow2"><i class="fa-solid fa-arrow-right"></i></span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6">
+          <div class="images-area">
+            <div class="row">
+              <div class="col-lg-6 col-md-6" data-aos="fade-right" data-aos-duration="1000"><div class="img1"><img src="{% static 'institutional/eitech/img/all-images/hero/hero-img7.png' %}" alt=""></div><div class="space30 d-md-none d-block"></div></div>
+              <div class="col-lg-6 col-md-6" data-aos="fade-left" data-aos-duration="1000"><div class="img2"><img src="{% static 'institutional/eitech/img/all-images/about/about-img27.png' %}" alt=""></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== CTA AREA ENDS =======-->
+{% endblock %}

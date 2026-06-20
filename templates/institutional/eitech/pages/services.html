@@ -4,6 +4,10 @@
 {% block title %}Soluções | Smart Control Brasil em Automação, Robótica e Dados{% endblock %}
 {% block meta_description %}Conheça as soluções da Smart Control Brasil em automação industrial, robótica aplicada, IoT, dados, dashboards e integração técnica para empresas.{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-service.css' %}">
+{% endblock %}
+
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
@@ -32,6 +36,23 @@
   <div class="service1-section-area sp2">
     <div class="container">
       <div class="row">
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="750">
+          <div class="service1-boxarea scb-service-featured-card">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
+            </div>
+            <div class="arrow">
+              <a href="{% url 'institutional:service_sistemas_web_aplicativos' %}"><i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="space24"></div>
+            <a href="{% url 'institutional:service_sistemas_web_aplicativos' %}">Sistemas Web e Aplicativos com IA</a>
+            <div class="space16"></div>
+            <p>Painéis, portais, apps, dashboards, CRM e assistente com IA integrada — o que construímos no Smart360, Lívia e Atlas, adaptado para a sua operação.</p>
+            <div class="space24"></div>
+            <h5>★</h5>
+          </div>
+        </div>
+
         <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="800">
           <div class="service1-boxarea">
             <div class="icons">
@@ -89,12 +110,12 @@
               <img src="{% static 'institutional/eitech/img/icons/service-icon5.svg' %}" alt="">
             </div>
             <div class="arrow">
-              <a href="{% url 'institutional:parceiro_xyron_robotics' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:service_sistemas_web_aplicativos' %}"><i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="space24"></div>
-            <a href="{% url 'institutional:parceiro_xyron_robotics' %}">Softwares, IoT e Dados</a>
+            <a href="{% url 'institutional:service_sistemas_web_aplicativos' %}">Softwares, Sistemas e Dados</a>
             <div class="space16"></div>
-            <p>Sistemas web, dashboards, sensores, telemetria, monitoramento remoto, integração com dados, automação com Python e dispositivos inteligentes.</p>
+            <p>Sistemas web sob medida, dashboards, integrações, automações e IA aplicada à gestão — prioridade para gerar controle e receita.</p>
             <div class="space24"></div>
             <h5>04</h5>
           </div>

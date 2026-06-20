@@ -1,0 +1,119 @@
+{% extends "admin_shell/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content-grid tc-catalog-detail-grid">
+    <section class="widget-card">
+        <div class="widget-card-header">
+            <h2>Resumo</h2>
+            <p>Dados principais exibidos no catálogo público.</p>
+        </div>
+        <div class="widget-card-body">
+            <dl class="detail-list">
+                <div class="detail-list-row"><span>Marca</span><strong>{{ product.brand }}</strong></div>
+                <div class="detail-list-row"><span>Fornecedor</span><strong>{{ product.supplier_name }}</strong></div>
+                <div class="detail-list-row"><span>Categoria</span><strong>{{ product.category }}</strong></div>
+                <div class="detail-list-row"><span>Área de aplicação</span><strong>{{ product.application_area }}</strong></div>
+                <div class="detail-list-row"><span>Slug</span><strong><code>{{ product.slug }}</code></strong></div>
+                <div class="detail-list-row"><span>Ordem</span><strong>{{ product.display_order }}</strong></div>
+                <div class="detail-list-row">
+                    <span>Status</span>
+                    <strong>
+                        {% if product.is_active %}
+                        <span class="status-badge status-emerald">Ativo</span>
+                        {% else %}
+                        <span class="status-badge status-slate">Inativo</span>
+                        {% endif %}
+                        {% if product.is_featured %}
+                        <span class="status-badge status-amber">Destaque na home</span>
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="detail-list-row"><span>Atualizado em</span><strong>{{ product.updated_at|date:"d/m/Y H:i" }}</strong></div>
+            </dl>
+        </div>
+    </section>
+
+    <section class="widget-card">
+        <div class="widget-card-header">
+            <h2>Imagem destacada</h2>
+            <p>Fonte usada na vitrine quando disponível.</p>
+        </div>
+        <div class="widget-card-body tc-catalog-preview-body">
+            {% if catalog_entry.featured_image_url %}
+            <img src="{{ catalog_entry.featured_image_url }}" alt="{{ product.title }}" class="tc-catalog-preview-img" loading="lazy">
+            {% elif catalog_entry.image %}
+            <img src="{% static catalog_entry.image %}" alt="{{ product.title }}" class="tc-catalog-preview-img" loading="lazy">
+            {% else %}
+            <p class="shell-text-muted">Sem imagem configurada.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="widget-card tc-catalog-detail-wide">
+        <div class="widget-card-header">
+            <h2>Descrição</h2>
+            <p>Texto exibido na página do produto.</p>
+        </div>
+        <div class="widget-card-body">
+            <p class="tc-catalog-short-desc">{{ product.short_description }}</p>
+            {% if product.description %}
+            <div class="tc-catalog-long-desc">{{ product.description|linebreaksbr }}</div>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if catalog_entry.features or catalog_entry.applications or catalog_entry.tags %}
+    <section class="widget-card tc-catalog-detail-wide">
+        <div class="widget-card-header">
+            <h2>Metadados técnicos</h2>
+            <p>Recursos, aplicações e tags do cadastro.</p>
+        </div>
+        <div class="widget-card-body tc-catalog-meta-grid">
+            {% if catalog_entry.features %}
+            <div>
+                <h3 class="tc-subheading">Recursos</h3>
+                <ul class="tc-bullet-list">
+                    {% for item in catalog_entry.features %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if catalog_entry.applications %}
+            <div>
+                <h3 class="tc-subheading">Aplicações</h3>
+                <ul class="tc-bullet-list">
+                    {% for item in catalog_entry.applications %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if catalog_entry.tags %}
+            <div>
+                <h3 class="tc-subheading">Tags</h3>
+                <ul class="tc-bullet-list">
+                    {% for item in catalog_entry.tags %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<section class="widget-card">
+    <div class="widget-card-header">
+        <h2>Links úteis</h2>
+        <p>Validação rápida no catálogo público.</p>
+    </div>
+    <div class="widget-card-body tc-catalog-link-row">
+        <a class="quick-action-button primary" href="{{ public_product_url }}" target="_blank" rel="noopener noreferrer">Ver página pública</a>
+        <a class="quick-action-button" href="{{ public_catalog_url }}" target="_blank" rel="noopener noreferrer">Abrir /marketplace/</a>
+        <a class="quick-action-button" href="{% url 'admin-shell:technical-catalog-product-update' pk=product.pk %}">Editar cadastro</a>
+    </div>
+</section>
+{% endblock %}

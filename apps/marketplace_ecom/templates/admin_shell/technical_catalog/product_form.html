@@ -1,0 +1,65 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+<section class="form-page">
+    <div class="form-card">
+        <header class="form-header">
+            <h1>{{ page_title }}</h1>
+            <p class="muted-block">{{ page_description }}</p>
+        </header>
+
+        <div class="form-card-body">
+            <form method="post" class="form-grid" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="form-field full">
+                    {% for err in form.non_field_errors %}
+                    <p class="form-error">{{ err }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="form-field full">
+                    <h2 class="tc-form-section-title">Identidade</h2>
+                </div>
+                {% include "admin_shell/components/forms/field.html" with field=form.title %}
+                {% include "admin_shell/components/forms/field.html" with field=form.slug %}
+                {% include "admin_shell/components/forms/field.html" with field=form.brand %}
+                {% include "admin_shell/components/forms/field.html" with field=form.supplier_name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.category full=True %}
+
+                <div class="form-field full">
+                    <h2 class="tc-form-section-title">Conteúdo público</h2>
+                </div>
+                {% include "admin_shell/components/forms/field.html" with field=form.short_description full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.description full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.application_area full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.product_type full=True %}
+
+                <div class="form-field full">
+                    <h2 class="tc-form-section-title">Mídia e metadados</h2>
+                </div>
+                {% include "admin_shell/components/forms/field.html" with field=form.featured_image full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.catalog_image full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.applications full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.features full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.tags full=True %}
+                {% include "admin_shell/components/forms/field.html" with field=form.specs full=True %}
+
+                <div class="form-field full">
+                    <h2 class="tc-form-section-title">Publicação</h2>
+                </div>
+                {% include "admin_shell/components/forms/field.html" with field=form.display_order %}
+                {% include "admin_shell/components/forms/field.html" with field=form.is_active %}
+                {% include "admin_shell/components/forms/field.html" with field=form.is_featured %}
+
+                <div class="form-actions form-field full">
+                    <button type="submit" class="btn-primary">{{ submit_label }}</button>
+                    <a class="btn-secondary" href="{{ cancel_url }}">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

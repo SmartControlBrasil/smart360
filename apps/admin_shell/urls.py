@@ -21,6 +21,12 @@ from apps.media_library.dashboard_views import (
     MediaAssetRemoveBackgroundView,
     MediaAssetUpdateView,
 )
+from apps.marketplace_ecom.dashboard_views import (
+    TechnicalProductCreateView,
+    TechnicalProductDetailView,
+    TechnicalProductListView,
+    TechnicalProductUpdateView,
+)
 from apps.caneca_de_garagem.dashboard_views import (
     CanecaGaragemDashboardView,
     CanecaOrderCompleteView,
@@ -403,6 +409,26 @@ urlpatterns = [
         name="media-image-remove-background",
     ),
     path("dashboard/media/images/<int:pk>/", MediaAssetDetailView.as_view(), name="media-image-detail"),
+    path(
+        "dashboard/catalogo-tecnico/",
+        TechnicalProductListView.as_view(),
+        name="technical-catalog-product-list",
+    ),
+    path(
+        "dashboard/catalogo-tecnico/novo/",
+        TechnicalProductCreateView.as_view(),
+        name="technical-catalog-product-create",
+    ),
+    path(
+        "dashboard/catalogo-tecnico/<int:pk>/editar/",
+        TechnicalProductUpdateView.as_view(),
+        name="technical-catalog-product-update",
+    ),
+    path(
+        "dashboard/catalogo-tecnico/<int:pk>/",
+        TechnicalProductDetailView.as_view(),
+        name="technical-catalog-product-detail",
+    ),
     path("app/ai-agents/", AIAgentsDashboardView.as_view(), name="ai-agents-dashboard"),
     path("app/ai-agents/briefings/", AIBriefingListView.as_view(), name="ai-briefings"),
     path("app/ai-agents/briefings/generate/", AIBriefingGenerateView.as_view(), name="ai-briefing-generate"),

@@ -102,9 +102,9 @@ def get_technical_catalog_b2b_links():
     from django.urls import reverse
 
     return {
-        "manage_products": reverse("admin:marketplace_ecom_technicalproduct_changelist"),
-        "add_product": reverse("admin:marketplace_ecom_technicalproduct_add"),
-        "media_library": reverse("admin-shell:media-image-upload"),
+        "manage_products": reverse("admin-shell:technical-catalog-product-list"),
+        "add_product": reverse("admin-shell:technical-catalog-product-create"),
+        "media_library": reverse("admin-shell:media-image-list"),
     }
 
 
@@ -121,7 +121,7 @@ def get_technical_catalog_b2b_shortcuts():
             "label": "Adicionar produto",
             "href": links["add_product"],
             "permission_domain": "dashboard",
-            "permission_action": "view",
+            "permission_action": "create",
         },
         {
             "label": "Biblioteca de imagens",
@@ -475,22 +475,27 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                         {
                             "label": "Gerenciar produtos",
                             "icon": "list",
-                            "href": catalog_links["manage_products"],
+                            "url_name": "admin-shell:technical-catalog-product-list",
+                            "match_names": [
+                                "admin-shell:technical-catalog-product-list",
+                                "admin-shell:technical-catalog-product-detail",
+                                "admin-shell:technical-catalog-product-update",
+                            ],
                             "permission_domain": "dashboard",
                             "permission_action": "view",
                         },
                         {
                             "label": "Adicionar produto",
                             "icon": "check",
-                            "href": catalog_links["add_product"],
+                            "url_name": "admin-shell:technical-catalog-product-create",
+                            "match_names": ["admin-shell:technical-catalog-product-create"],
                             "permission_domain": "dashboard",
-                            "permission_action": "view",
+                            "permission_action": "create",
                         },
                         {
                             "label": "Biblioteca de imagens",
                             "icon": "layout",
-                            "href": catalog_links["media_library"],
-                            "url_name": "admin-shell:media-image-upload",
+                            "url_name": "admin-shell:media-image-list",
                             "match_names": [
                                 "admin-shell:media-image-upload",
                                 "admin-shell:media-image-list",

@@ -1,0 +1,128 @@
+{% extends "admin_shell/base.html" %}
+
+{% block content %}
+<section class="ml-media-toolbar tc-catalog-toolbar">
+    <form method="get" class="ml-toolbar-form" role="search" aria-label="Filtros do catálogo técnico">
+        <div class="smart-filter-bar ml-toolbar-row">
+            <div class="filter-pill ml-filter-grow">
+                <label class="filter-label" for="tc-q">Busca</label>
+                <input
+                    class="filter-select"
+                    type="search"
+                    id="tc-q"
+                    name="q"
+                    value="{{ search_q|default_if_none:'' }}"
+                    placeholder="Título, marca, categoria ou slug…"
+                    maxlength="200"
+                    aria-label="Buscar produtos"
+                >
+            </div>
+
+            <div class="filter-pill">
+                <label class="filter-label" for="tc-brand">Marca</label>
+                <select class="filter-select" id="tc-brand" name="brand" aria-label="Filtrar por marca">
+                    <option value="">Todas</option>
+                    {% for brand in available_brands %}
+                    <option value="{{ brand }}" {% if filter_brand == brand %}selected{% endif %}>{{ brand }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-pill">
+                <label class="filter-label" for="tc-category">Categoria</label>
+                <select class="filter-select" id="tc-category" name="category" aria-label="Filtrar por categoria">
+                    <option value="">Todas</option>
+                    {% for category in available_categories %}
+                    <option value="{{ category }}" {% if filter_category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-pill">
+                <label class="filter-label" for="tc-status">Situação</label>
+                <select class="filter-select" id="tc-status" name="status" aria-label="Situação no catálogo">
+                    <option value="active" {% if filter_status == "active" %}selected{% endif %}>Somente ativos</option>
+                    <option value="inactive" {% if filter_status == "inactive" %}selected{% endif %}>Somente inativos</option>
+                    <option value="all" {% if filter_status == "all" %}selected{% endif %}>Todos</option>
+                </select>
+            </div>
+
+            <div class="filter-pill ml-filter-actions">
+                <span class="filter-label">Execução</span>
+                <div class="ml-toolbar-buttons">
+                    <button class="quick-action-button primary" type="submit">Aplicar</button>
+                    <a class="quick-action-button" href="{% url 'admin-shell:technical-catalog-product-list' %}">Limpar filtros</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+<section class="table-card tc-catalog-table-wrap">
+    <div class="table-wrapper">
+        <table class="data-table tc-catalog-table">
+            <thead>
+                <tr>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Marca</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Ordem</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Atualização</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin-shell:technical-catalog-product-detail' pk=product.pk %}">{{ product.title }}</a>
+                        {% if product.is_featured %}
+                        <span class="status-badge status-amber">Destaque</span>
+                        {% endif %}
+                        <span class="shell-text-muted tc-catalog-slug">{{ product.slug }}</span>
+                    </th>
+                    <td>{{ product.brand }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.display_order }}</td>
+                    <td>
+                        {% if product.is_active %}
+                        <span class="status-badge status-emerald">Ativo</span>
+                        {% else %}
+                        <span class="status-badge status-slate">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ product.updated_at|date:"d/m/Y H:i" }}</td>
+                    <td class="tc-catalog-actions-cell">
+                        <a href="{% url 'admin-shell:technical-catalog-product-detail' pk=product.pk %}">Ver</a>
+                        · <a href="{% url 'admin-shell:technical-catalog-product-update' pk=product.pk %}">Editar</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="tc-catalog-empty">Nenhum produto encontrado. Ajuste os filtros ou cadastre o primeiro item.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if is_paginated %}
+<div class="ml-pagination">
+    <span class="shell-text-muted">{{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }}</span>
+
+    {% if page_obj.has_previous %}
+    <a class="quick-action-button" href="?page={{ page_obj.previous_page_number }}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}{% if filter_brand %}&brand={{ filter_brand|urlencode }}{% endif %}{% if filter_category %}&category={{ filter_category|urlencode }}{% endif %}&status={{ filter_status }}">
+        Anterior
+    </a>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+    <a class="quick-action-button" href="?page={{ page_obj.next_page_number }}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}{% if filter_brand %}&brand={{ filter_brand|urlencode }}{% endif %}{% if filter_category %}&category={{ filter_category|urlencode }}{% endif %}&status={{ filter_status }}">
+        Próxima
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

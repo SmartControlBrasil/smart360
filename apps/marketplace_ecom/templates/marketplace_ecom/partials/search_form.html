@@ -1,0 +1,18 @@
+<form class="marketplace-search-form{% if compact %} marketplace-search-form--compact{% endif %}" method="get" action="{% url 'marketplace_ecom:products' %}">
+  <div class="marketplace-search-form__field marketplace-search-form__field--select">
+    <label class="mp-sr-only" for="marketplace-brand-filter{{ id_suffix }}">Filtrar por linha técnica</label>
+    <select id="marketplace-brand-filter{{ id_suffix }}" class="marketplace-search-form__select" name="brand">
+      <option value="">Todas</option>
+      <option value="Xyron Robotics">Xyron</option>
+      <option value="Mitsubishi Electric">Mitsubishi</option>
+    </select>
+  </div>
+  <div class="marketplace-search-form__field marketplace-search-form__field--search">
+    <label class="mp-sr-only" for="marketplace-search-input{{ id_suffix }}">Buscar no catálogo</label>
+    <span class="marketplace-search-form__icon" aria-hidden="true">
+      <svg class="marketplace-icon" width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm8.9 2.1-4.2-4.2a1 1 0 0 0-1.4 1.4l4.2 4.2a1 1 0 0 0 1.4-1.4Z" fill="currentColor"/></svg>
+    </span>
+    <input id="marketplace-search-input{{ id_suffix }}" class="marketplace-search-form__input" type="search" name="q" placeholder="Buscar produtos…">
+  </div>
+  <button class="mp-btn mp-btn--secondary marketplace-search-form__submit" type="submit">Buscar</button>
+</form>

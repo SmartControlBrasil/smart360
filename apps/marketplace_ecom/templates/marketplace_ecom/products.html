@@ -16,17 +16,17 @@
           <div class="sidebar-head"><h6 class="color-gray-900">Filtros visuais</h6></div>
           <div class="sidebar-content">
             <h6 class="color-gray-900 mb-10">Categorias</h6>
-            <ul class="list-nav-arrow">
+            <ul class="list-nav-arrow marketplace-sidebar-submenu">
               {% for category in available_categories %}<li><a href="?category={{ category|urlencode }}">{{ category }}</a></li>{% endfor %}
             </ul>
             <div class="border-bottom pt-10 mb-20"></div>
             <h6 class="color-gray-900 mb-10">Fabricantes</h6>
-            <ul class="list-nav-arrow">
+            <ul class="list-nav-arrow marketplace-sidebar-submenu">
               {% for brand in available_brands %}<li><a href="?brand={{ brand|urlencode }}">{{ brand }}</a></li>{% endfor %}
             </ul>
             <div class="border-bottom pt-10 mb-20"></div>
             <h6 class="color-gray-900 mb-10">Representadas e parceiros técnicos</h6>
-            <ul class="list-nav-arrow">
+            <ul class="list-nav-arrow marketplace-sidebar-submenu">
               {% for supplier in available_suppliers %}<li><a href="?supplier={{ supplier|urlencode }}">{{ supplier }}</a></li>{% endfor %}
             </ul>
             <div class="border-bottom pt-10 mb-20"></div>

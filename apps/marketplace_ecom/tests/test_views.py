@@ -112,6 +112,13 @@ class MarketplaceEcomViewTests(MarketplaceCatalogTestCase):
         self.assertContains(response, "smart360-marketplace.js")
         self.assertContains(response, "marketplace-shell")
         self.assertContains(response, 'data-marketplace-theme')
+        self.assertContains(response, "bootstrap.min.css")
+        self.assertContains(response, "smart360-marketplace.css?v=6")
+        self.assertContains(response, "marketplace-sidebar-submenu")
+        self.assertContains(response, 'class="header marketplace-header"')
+        self.assertContains(response, "marketplace-header__search")
+        self.assertContains(response, "marketplace-search-form--compact")
+        self.assertContains(response, "Orçamento")
 
     def test_product_detail_includes_theme_and_back_link(self):
         response = self.client.get(

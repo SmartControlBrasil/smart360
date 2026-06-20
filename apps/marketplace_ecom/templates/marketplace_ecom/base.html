@@ -17,13 +17,14 @@
       } catch (error) {}
     })();
   </script>
+  <link href="{% static 'marketplace/ecom/css/vendors/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'marketplace/ecom/css/style.css' %}" rel="stylesheet">
-  <link href="{% static 'marketplace/ecom/css/smart360-marketplace.css' %}" rel="stylesheet">
+  <link href="{% static 'marketplace/ecom/css/smart360-marketplace.css' %}?v=6" rel="stylesheet">
   <title>{% block title %}Catálogo Técnico | Smart Control Brasil{% endblock %}</title>
 </head>
 <body class="marketplace-shell">
   <div class="marketplace-top-shell">
-    <header class="marketplace-header" role="banner">
+    <header class="header marketplace-header" role="banner">
       <div class="mp-container marketplace-header__inner">
         <a class="marketplace-header__logo" href="{% url 'marketplace_ecom:home' %}">
           <img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-03.png' %}" alt="Smart Control Brasil">
@@ -43,6 +44,10 @@
           </div>
         </nav>
 
+        <div class="marketplace-header__search d-none d-xl-flex" role="search" aria-label="Busca no catálogo">
+          {% include "marketplace_ecom/partials/search_form.html" with id_suffix="" compact=True %}
+        </div>
+
         <div class="marketplace-header__tools">
           <button
             type="button"
@@ -52,15 +57,15 @@
             title="Modo escuro"
             aria-pressed="false"
           >
-            <svg class="mp-theme-btn__icon mp-theme-btn__icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <svg class="mp-theme-btn__icon mp-theme-btn__icon--moon marketplace-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z" fill="currentColor"/>
             </svg>
-            <svg class="mp-theme-btn__icon mp-theme-btn__icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <svg class="mp-theme-btn__icon mp-theme-btn__icon--sun marketplace-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 4a1 1 0 0 1-1-1v-1.1a1 1 0 1 1 2 0V20a1 1 0 0 1-1 1Zm0-18a1 1 0 0 1-1-1V1a1 1 0 1 1 2 0v1a1 1 0 0 1-1 1Zm10 9h-1.1a1 1 0 1 1 0-2H22a1 1 0 1 1 0 2ZM3.1 12a1 1 0 1 1 0-2H2a1 1 0 1 1 0 2h1.1Zm15.6 6.4a1 1 0 0 1-1.4 0l-.8-.8a1 1 0 1 1 1.4-1.4l.8.8a1 1 0 0 1 0 1.4ZM6.5 7.7a1 1 0 0 1 0-1.4l.8-.8a1 1 0 1 1 1.4 1.4l-.8.8a1 1 0 0 1-1.4 0Zm11.4-1.4a1 1 0 0 1 1.4 0l.8.8a1 1 0 0 1-1.4 1.4l-.8-.8a1 1 0 0 1 0-1.4ZM7.3 16.1a1 1 0 0 1 1.4 0l.8.8a1 1 0 0 1-1.4 1.4l-.8-.8a1 1 0 0 1 0-1.4Z" fill="currentColor"/>
             </svg>
           </button>
           <a class="mp-link-quiet d-none d-lg-inline-flex" href="/login/">Entrar</a>
-          <a class="mp-btn mp-btn--primary d-none d-md-inline-flex" href="{% url 'marketplace_ecom:products' %}">Solicitar orçamento</a>
+          <a class="mp-btn mp-btn--primary d-none d-md-inline-flex" href="{% url 'marketplace_ecom:products' %}" title="Solicitar orçamento">Orçamento</a>
           <div class="burger-icon burger-icon-white marketplace-header__burger" role="button" tabindex="0" aria-label="Abrir menu">
             <span class="burger-icon-top"></span>
             <span class="burger-icon-mid"></span>
@@ -70,26 +75,9 @@
       </div>
     </header>
 
-    <div class="marketplace-toolbar" role="search">
+    <div class="marketplace-toolbar d-xl-none" role="search" aria-label="Busca no catálogo">
       <div class="mp-container">
-        <form class="marketplace-search-form" method="get" action="{% url 'marketplace_ecom:products' %}">
-          <div class="marketplace-search-form__field marketplace-search-form__field--select">
-            <label class="mp-sr-only" for="marketplace-brand-filter">Filtrar por linha técnica</label>
-            <select id="marketplace-brand-filter" class="marketplace-search-form__select" name="brand">
-              <option value="">Todas as linhas</option>
-              <option value="Xyron Robotics">Robótica Xyron</option>
-              <option value="Mitsubishi Electric">Automação Mitsubishi</option>
-            </select>
-          </div>
-          <div class="marketplace-search-form__field marketplace-search-form__field--search">
-            <label class="mp-sr-only" for="marketplace-search-input">Buscar no catálogo</label>
-            <span class="marketplace-search-form__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false"><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm8.9 2.1-4.2-4.2a1 1 0 0 0-1.4 1.4l4.2 4.2a1 1 0 0 0 1.4-1.4Z" fill="currentColor"/></svg>
-            </span>
-            <input id="marketplace-search-input" class="marketplace-search-form__input" type="search" name="q" placeholder="Buscar produtos, fabricantes ou aplicações">
-          </div>
-          <button class="mp-btn mp-btn--secondary marketplace-search-form__submit" type="submit">Buscar</button>
-        </form>
+        {% include "marketplace_ecom/partials/search_form.html" with id_suffix="-mobile" compact=False %}
       </div>
     </div>
   </div>
@@ -112,8 +100,8 @@
                 <li><a class="marketplace-back-link" href="/" data-fallback-href="/">Voltar ao site</a></li>
                 <li>
                   <button type="button" class="mp-theme-btn mp-theme-btn--menu" data-marketplace-theme-toggle aria-label="Ativar modo escuro">
-                    <svg class="mp-theme-btn__icon mp-theme-btn__icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z" fill="currentColor"/></svg>
-                    <svg class="mp-theme-btn__icon mp-theme-btn__icon--sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 4a1 1 0 0 1-1-1v-1.1a1 1 0 1 1 2 0V20a1 1 0 0 1-1 1Zm0-18a1 1 0 0 1-1-1V1a1 1 0 1 1 2 0v1a1 1 0 0 1-1 1Zm10 9h-1.1a1 1 0 1 1 0-2H22a1 1 0 1 1 0 2ZM3.1 12a1 1 0 1 1 0-2H2a1 1 0 1 1 0 2h1.1Z" fill="currentColor"/></svg>
+                    <svg class="mp-theme-btn__icon mp-theme-btn__icon--moon marketplace-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z" fill="currentColor"/></svg>
+                    <svg class="mp-theme-btn__icon mp-theme-btn__icon--sun marketplace-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 4a1 1 0 0 1-1-1v-1.1a1 1 0 1 1 2 0V20a1 1 0 0 1-1 1Zm0-18a1 1 0 0 1-1-1V1a1 1 0 1 1 2 0v1a1 1 0 0 1-1 1Zm10 9h-1.1a1 1 0 1 1 0-2H22a1 1 0 1 1 0 2ZM3.1 12a1 1 0 1 1 0-2H2a1 1 0 1 1 0 2h1.1Z" fill="currentColor"/></svg>
                     <span class="mp-theme-btn__menu-label">Alternar tema</span>
                   </button>
                 </li>

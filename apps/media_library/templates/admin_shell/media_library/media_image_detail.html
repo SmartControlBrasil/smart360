@@ -3,7 +3,7 @@
 <div class="content-grid media-library-detail-grid">
     <section class="widget-card ml-detail-preview-card">
         <div class="widget-card-header">
-            <h2>Pré-visualização</h2>
+            <h2>Imagem original</h2>
             <p>Arquivo enviado para a biblioteca.</p>
         </div>
         <div class="widget-card-body ml-detail-preview-body">
@@ -11,6 +11,19 @@
             <img src="{{ asset.original_file.url }}" alt="{{ asset.alt_text|default:asset.title }}" class="ml-detail-large-img" loading="lazy">
             {% else %}
             <p class="shell-text-muted">Sem arquivo de imagem.</p>
+            {% endif %}
+        </div>
+    </section>
+    <section class="widget-card ml-detail-preview-card">
+        <div class="widget-card-header">
+            <h2>Imagem tratada</h2>
+            <p>Resultado mais recente do processamento.</p>
+        </div>
+        <div class="widget-card-body ml-detail-preview-body">
+            {% if asset.processed_file %}
+            <img src="{{ asset.processed_file.url }}" alt="{{ asset.alt_text|default:asset.title }} — imagem tratada" class="ml-detail-large-img" loading="lazy">
+            {% else %}
+            <p class="shell-text-muted">Nenhuma versão tratada disponível.</p>
             {% endif %}
         </div>
     </section>
@@ -32,6 +45,9 @@
                 </div>
                 <div class="detail-list-row"><span>MIME</span><strong>{{ asset.mime_type|default:"—" }}</strong></div>
                 <div class="detail-list-row"><span>Tamanho</span><strong>{{ formatted_size }}</strong></div>
+                <div class="detail-list-row"><span>Status do processamento</span><strong>{{ asset.get_processing_status_display }}</strong></div>
+                <div class="detail-list-row"><span>Observações do processamento</span><strong>{{ asset.processing_notes|default:"—" }}</strong></div>
+                <div class="detail-list-row"><span>URL tratada</span><strong>{% if absolute_processed_url %}<a href="{{ absolute_processed_url }}" target="_blank" rel="noopener noreferrer">{{ absolute_processed_url }}</a>{% else %}—{% endif %}</strong></div>
                 <div class="detail-list-row"><span>Dimensões</span><strong>{{ asset.width|default:"?" }} × {{ asset.height|default:"?" }} px</strong></div>
                 <div class="detail-list-row"><span>Enviado por</span><strong>{% if asset.uploaded_by %}{{ asset.uploaded_by.display_name|default:asset.uploaded_by.full_name|default:asset.uploaded_by.email }}{% else %}—{% endif %}</strong></div>
                 <div class="detail-list-row"><span>Criado em</span><strong>{{ asset.created_at|date:"d/m/Y H:i" }}</strong></div>
@@ -47,6 +63,18 @@
         </div>
     </section>
 </div>
+
+{% if remove_background_action %}
+<section class="widget-card">
+    <div class="widget-card-header">
+        <h2>Tratamento da imagem</h2>
+        <p>Gera uma nova versão PNG com fundo transparente a partir do arquivo original.</p>
+    </div>
+    <div class="widget-card-body">
+        {% include "admin_shell/components/quick_action_button.html" with action=remove_background_action %}
+    </div>
+</section>
+{% endif %}
 
 {% if asset.is_active and deactivate_action %}
 <section class="widget-card ml-danger-zone">

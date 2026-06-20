@@ -18,6 +18,7 @@ from apps.media_library.dashboard_views import (
     MediaAssetDeactivateView,
     MediaAssetDetailView,
     MediaAssetListView,
+    MediaAssetRemoveBackgroundView,
     MediaAssetUpdateView,
 )
 from apps.caneca_de_garagem.dashboard_views import (
@@ -396,6 +397,11 @@ urlpatterns = [
         name="media-image-deactivate",
     ),
     path("dashboard/media/images/<int:pk>/edit/", MediaAssetUpdateView.as_view(), name="media-image-edit"),
+    path(
+        "dashboard/media/images/<int:pk>/remove-background/",
+        MediaAssetRemoveBackgroundView.as_view(),
+        name="media-image-remove-background",
+    ),
     path("dashboard/media/images/<int:pk>/", MediaAssetDetailView.as_view(), name="media-image-detail"),
     path("app/ai-agents/", AIAgentsDashboardView.as_view(), name="ai-agents-dashboard"),
     path("app/ai-agents/briefings/", AIBriefingListView.as_view(), name="ai-briefings"),

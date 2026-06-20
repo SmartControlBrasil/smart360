@@ -1,6 +1,8 @@
 from io import BytesIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
@@ -148,3 +150,21 @@ class MediaLibraryDashboardTests(TestCase):
 
         self.client.post(reverse("admin-shell:media-image-deactivate", kwargs={"pk": pk}))
         self.assertFalse(MediaAsset.objects.get(pk=pk).is_active)
+
+    @patch("apps.media_library.dashboard_views.remove_background")
+    def test_detail_exposes_remove_background_action(self, mocked_remove_background):
+        self._login_super()
+        asset = MediaAsset.objects.create(
+            title="Produto para recorte",
+            original_file=ContentFile(_make_jpeg_bytes(), name="produto.jpg"),
+        )
+
+        detail = self.client.get(reverse("admin-shell:media-image-detail", kwargs={"pk": asset.pk}))
+        self.assertContains(detail, "Remover fundo")
+
+        response = self.client.post(
+            reverse("admin-shell:media-image-remove-background", kwargs={"pk": asset.pk})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        mocked_remove_background.assert_called_once()

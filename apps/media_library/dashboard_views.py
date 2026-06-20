@@ -14,7 +14,7 @@ from django.views.generic.list import ListView
 from apps.admin_shell.views import ShellContextMixin
 from apps.media_library.forms import MediaAssetForm
 from apps.media_library.models import MediaAsset
-from apps.media_library.services.image_processing import optimize_image
+from apps.media_library.services.image_processing import optimize_image, remove_background
 
 
 class MediaLibraryBaseMixin(ShellContextMixin):
@@ -118,6 +118,8 @@ class MediaAssetDetailView(MediaLibraryBaseMixin, DetailView):
         ctx["breadcrumbs"].append({"label": obj.title, "url": None})
         if obj.original_file:
             ctx["absolute_image_url"] = self.request.build_absolute_uri(obj.original_file.url)
+        if obj.processed_file:
+            ctx["absolute_processed_url"] = self.request.build_absolute_uri(obj.processed_file.url)
         ctx["formatted_size"] = obj.human_file_size()
         if obj.metadata:
             ctx["metadata_json"] = json.dumps(obj.metadata, indent=2, ensure_ascii=False)
@@ -136,6 +138,13 @@ class MediaAssetDetailView(MediaLibraryBaseMixin, DetailView):
                 "permission_action": "view",
             },
         ]
+        ctx["remove_background_action"] = {
+            "label": "Remover fundo",
+            "method": "post",
+            "action_url": reverse("admin-shell:media-image-remove-background", kwargs={"pk": obj.pk}),
+            "permission_domain": "dashboard",
+            "permission_action": "update",
+        }
         ctx["deactivate_action"] = {
             "label": "Desativar imagem",
             "method": "post",
@@ -190,6 +199,21 @@ class MediaAssetUpdateView(MediaLibraryBaseMixin, FormView):
             except Exception:
                 messages.warning(self.request, "A imagem foi salva, mas o tratamento automático falhou.")
         messages.success(self.request, "Imagem atualizada com sucesso.")
+        return redirect(reverse("admin-shell:media-image-detail", kwargs={"pk": asset.pk}))
+
+
+class MediaAssetRemoveBackgroundView(MediaLibraryBaseMixin, View):
+    permission_domain = "dashboard"
+    permission_action = "update"
+
+    def post(self, request, pk):
+        asset = get_object_or_404(MediaAsset, pk=pk)
+        try:
+            remove_background(asset)
+        except Exception as exc:
+            messages.error(request, f"Não foi possível remover o fundo: {exc}")
+        else:
+            messages.success(request, "Fundo removido com sucesso.")
         return redirect(reverse("admin-shell:media-image-detail", kwargs={"pk": asset.pk}))
 
 

@@ -22,6 +22,12 @@ def _target_mode(image: Image.Image) -> str:
     return "RGBA" if has_alpha else "RGB"
 
 
+def _remove_background_bytes(image_bytes: bytes) -> bytes:
+    from rembg import remove
+
+    return remove(image_bytes)
+
+
 def optimize_image(asset: MediaAsset) -> MediaAsset:
     """Gera a versão WEBP otimizada do arquivo original de um asset."""
     if not asset.pk:
@@ -64,6 +70,60 @@ def optimize_image(asset: MediaAsset) -> MediaAsset:
         asset.width, asset.height = image.size
         asset.processing_status = MediaAsset.ProcessingStatus.DONE
         asset.processing_notes = ""
+        MediaAsset.objects.filter(pk=asset.pk).update(
+            processed_file=asset.processed_file.name,
+            width=asset.width,
+            height=asset.height,
+            processing_status=asset.processing_status,
+            processing_notes=asset.processing_notes,
+            updated_at=timezone.now(),
+        )
+        return asset
+    except Exception as exc:
+        asset.processing_status = MediaAsset.ProcessingStatus.FAILED
+        asset.processing_notes = str(exc)
+        MediaAsset.objects.filter(pk=asset.pk).update(
+            processing_status=asset.processing_status,
+            processing_notes=asset.processing_notes,
+            updated_at=timezone.now(),
+        )
+        raise
+
+
+def remove_background(asset: MediaAsset) -> MediaAsset:
+    """Remove o fundo do arquivo original e salva uma versão PNG transparente."""
+    if not asset.pk:
+        raise ValueError("O asset precisa estar salvo antes do processamento.")
+    if not asset.original_file or not asset.original_file.name:
+        raise ValueError("O asset não possui arquivo original.")
+
+    MediaAsset.objects.filter(pk=asset.pk).update(
+        processing_status=MediaAsset.ProcessingStatus.PROCESSING,
+        processing_notes="",
+        updated_at=timezone.now(),
+    )
+    asset.processing_status = MediaAsset.ProcessingStatus.PROCESSING
+    asset.processing_notes = ""
+
+    try:
+        with asset.original_file.open("rb") as source:
+            removed_bytes = _remove_background_bytes(source.read())
+
+        with Image.open(BytesIO(removed_bytes)) as removed:
+            removed.load()
+            image = removed.convert("RGBA")
+
+        output = BytesIO()
+        image.save(output, format="PNG")
+        output.seek(0)
+
+        source_stem = Path(asset.original_file.name).stem
+        filename = f"{source_stem}-sem-fundo.png"
+        asset.processed_file.save(filename, ContentFile(output.read()), save=False)
+
+        asset.width, asset.height = image.size
+        asset.processing_status = MediaAsset.ProcessingStatus.DONE
+        asset.processing_notes = "Fundo removido com sucesso."
         MediaAsset.objects.filter(pk=asset.pk).update(
             processed_file=asset.processed_file.name,
             width=asset.width,

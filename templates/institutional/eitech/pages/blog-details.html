@@ -4,10 +4,10 @@
 {% block content %}
 <!--===== HERO AREA STARTS =======-->
   <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
-    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" class="elements5">
-    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" class="elements4">
-    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" class="elements1 keyframe5">
-    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" class="elements16">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
 
     <div class="container">
       <div class="row">
@@ -30,12 +30,12 @@
         <div class="col-lg-8 m-auto">
           <div class="blog-others-sidebar" style="padding: 0 !important;">
             <div class="img1">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img25.png' %}" alt="">
+              <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img25.png' %}" alt="Blog Img25 | Smart Control Brasil">
             </div>
             <div class="space32"></div>
             <ul class="list-author">
-              <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Robótica Aplicada <span> | </span></a></li>
-              <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/comments1.svg' %}" alt=""> Smart Control Brasil</a></li>
+              <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt="" aria-hidden="true"> Robótica Aplicada <span> | </span></a></li>
+              <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/comments1.svg' %}" alt="" aria-hidden="true"> Smart Control Brasil</a></li>
               <li><a href="#">3 comentários</a></li>
             </ul>
             <div class="space24"></div>
@@ -49,13 +49,13 @@
               <div class="col-lg-6 col-md-6">
                 <div class="space30"></div>
                 <div class="img1 image-anime">
-                  <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img26.png' %}" alt="">
+                  <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img26.png' %}" alt="Blog Img26 | Smart Control Brasil">
                 </div>
               </div>
               <div class="col-lg-6 col-md-6">
                 <div class="space30"></div>
                 <div class="img1 image-anime">
-                  <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img27.png' %}" alt="">
+                  <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img27.png' %}" alt="Blog Img27 | Smart Control Brasil">
                 </div>
               </div>
             </div>
@@ -68,7 +68,7 @@
             <div class="space48"></div>
             <div class="images">
               <div class="img1 image-anime">
-                <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img28.png' %}" alt="">
+                <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img28.png' %}" alt="Blog Img28 | Smart Control Brasil">
               </div>
               <div class="play">
                 <!-- TODO: substituir pelo vídeo institucional da Smart Control Brasil -->
@@ -94,9 +94,9 @@
               <div class="social">
                 <ul>
                   <li>Social:</li>
-                  <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-                  <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-                  <li><a href="#" class="m-0"><i class="fa-brands fa-youtube"></i></a></li>
+                  <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a></li>
+                  <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></li>
+                  <li><a href="https://www.youtube.com/@SmartControlBrasil" class="m-0" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a></li>
                 </ul>
               </div>
             </div>
@@ -107,10 +107,10 @@
               <div class="comments-boxes">
                 <div class="comments-auhtor-box">
                   <div class="img3">
-                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
+                    <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="Testimonial Img5 | Smart Control Brasil">
                   </div>
                   <div class="content">
-                    <a href="#" class="date"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Conteúdo institucional</a>
+                    <a href="#" class="date"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt="" aria-hidden="true"> Conteúdo institucional</a>
                     <a href="{% url 'institutional:team' %}" class="name">Comentário institucional</a>
                   </div>
                 </div>
@@ -124,10 +124,10 @@
               <div class="comments-boxes">
                 <div class="comments-auhtor-box">
                   <div class="img3">
-                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="">
+                    <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img4.png' %}" alt="Testimonial Img4 | Smart Control Brasil">
                   </div>
                   <div class="content">
-                    <a href="#" class="date"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Observação técnica</a>
+                    <a href="#" class="date"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt="" aria-hidden="true"> Observação técnica</a>
                     <a href="{% url 'institutional:team' %}" class="name">Observação técnica</a>
                   </div>
                 </div>
@@ -141,10 +141,10 @@
               <div class="comments-boxes">
                 <div class="comments-auhtor-box">
                   <div class="img3">
-                    <img src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="">
+                    <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/testimonial/testimonial-img5.png' %}" alt="Testimonial Img5 | Smart Control Brasil">
                   </div>
                   <div class="content">
-                    <a href="#" class="date"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt=""> Insight Smart Control</a>
+                    <a href="#" class="date"><img src="{% static 'institutional/eitech/img/icons/calender1.svg' %}" alt="" aria-hidden="true"> Insight Smart Control</a>
                     <a href="{% url 'institutional:team' %}" class="name">Insight Smart Control</a>
                   </div>
                 </div>
@@ -190,12 +190,12 @@
         <div class="col-lg-4 col-md-6">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img8.png' %}" alt="">
+              <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img8.png' %}" alt="Blog Img8 | Smart Control Brasil">
             </div>
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Conteúdo institucional</a></li>
+                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt="" aria-hidden="true"> Conteúdo institucional</a></li>
                 </ul>
               </div>
               <div class="space16"></div>
@@ -208,12 +208,12 @@
         <div class="col-lg-4 col-md-6">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img9.png' %}" alt="">
+              <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img9.png' %}" alt="Blog Img9 | Smart Control Brasil">
             </div>
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Conteúdo institucional</a></li>
+                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt="" aria-hidden="true"> Conteúdo institucional</a></li>
                 </ul>
               </div>
               <div class="space16"></div>
@@ -227,12 +227,12 @@
         <div class="col-lg-4 col-md-6">
           <div class="vl-blog-1-item">
             <div class="vl-blog-1-thumb image-anime">
-              <img src="{% static 'institutional/eitech/img/all-images/blog/blog-img10.png' %}" alt="">
+              <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/blog-img10.png' %}" alt="Blog Img10 | Smart Control Brasil">
             </div>
             <div class="vl-blog-1-content">
               <div class="vl-blog-meta">
                 <ul>
-                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt=""> Conteúdo institucional</a></li>
+                  <li><a href="#"><img src="{% static 'institutional/eitech/img/icons/calender3.svg' %}" alt="" aria-hidden="true"> Conteúdo institucional</a></li>
                 </ul>
               </div>
               <div class="space16"></div>

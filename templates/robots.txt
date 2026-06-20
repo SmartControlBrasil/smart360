@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /health/
+Disallow: /portal/
+
+Sitemap: https://smartcontrolbrasil.com.br/sitemap.xml

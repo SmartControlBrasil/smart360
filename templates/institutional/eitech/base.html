@@ -7,6 +7,33 @@
   <title>{% block title %}Smart Control Brasil | Tecnologia, Automacao e IA{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}Tecnologia, automacao e inteligencia artificial para empresas com mais controle, seguranca e eficiencia.{% endblock %}">
 
+  <!-- SEO Core & OpenGraph -->
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <meta property="og:title" content="{% block og_title %}Smart Control Brasil | Tecnologia, Automacao e IA{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Tecnologia, automacao e inteligencia artificial para empresas com mais controle, seguranca e eficiencia.{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/brand/logo-cores-04.png' %}{% endblock %}">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Smart Control Brasil">
+
+  <!-- JSON-LD LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Smart Control Brasil",
+    "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/brand/logo-cores-04.png' %}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "telephone": "+551151968525",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "São Paulo",
+      "addressRegion": "SP",
+      "addressCountry": "BR"
+    }
+  }
+  </script>
   <link rel="shortcut icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
   <link rel="icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
   <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins/bootstrap.min.css' %}">

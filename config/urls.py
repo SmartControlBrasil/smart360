@@ -8,10 +8,20 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from django.contrib.sitemaps.views import sitemap
+from django.views.generic import TemplateView
+
 from apps.core.api.views import ApiRootView, HealthCheckDetailsView, HealthCheckView, HealthLiveView, HealthReadyView
 from apps.growth_engine.views import receive_n8n_lead
+from apps.institutional.sitemaps import StaticViewSitemap
+
+sitemaps = {
+    'institutional': StaticViewSitemap,
+}
 
 urlpatterns = [
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("admin/", admin.site.urls),
     path("health/live/", HealthLiveView.as_view(), name="healthcheck-live"),
     path("health/ready/", HealthReadyView.as_view(), name="healthcheck-ready"),

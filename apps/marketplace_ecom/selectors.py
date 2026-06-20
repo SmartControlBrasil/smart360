@@ -1,5 +1,6 @@
 import unicodedata
 
+from django.db.models import Q
 from django.http import Http404
 
 from apps.marketplace_ecom.catalog import (
@@ -196,3 +197,44 @@ def build_brand_partners(products: list[dict]) -> list[dict]:
         )
 
     return sorted(partners, key=lambda item: item["name"])
+
+
+def admin_technical_products_queryset():
+    return TechnicalProduct.objects.select_related("featured_image").order_by(
+        "display_order",
+        "-is_featured",
+        "-updated_at",
+    )
+
+
+def filter_admin_technical_products(queryset, *, q="", brand="", category="", status="active"):
+    filtered = queryset
+    if status == "inactive":
+        filtered = filtered.filter(is_active=False)
+    elif status == "active":
+        filtered = filtered.filter(is_active=True)
+    # "all" → sem filtro extra
+
+    if brand:
+        filtered = filtered.filter(brand=brand)
+    if category:
+        filtered = filtered.filter(category=category)
+
+    normalized_query = (q or "").strip()
+    if normalized_query:
+        filtered = filtered.filter(
+            Q(title__icontains=normalized_query)
+            | Q(slug__icontains=normalized_query)
+            | Q(brand__icontains=normalized_query)
+            | Q(supplier_name__icontains=normalized_query)
+            | Q(category__icontains=normalized_query)
+            | Q(short_description__icontains=normalized_query)
+        )
+    return filtered
+
+
+def get_admin_product_filter_options(queryset=None):
+    base = queryset if queryset is not None else admin_technical_products_queryset()
+    brands = sorted({value for value in base.values_list("brand", flat=True) if value})
+    categories = sorted({value for value in base.values_list("category", flat=True) if value})
+    return brands, categories

@@ -192,3 +192,28 @@ class TechnicalProductAdminForm(forms.ModelForm):
             instance.save()
             self.save_m2m()
         return instance
+
+
+class TechnicalProductShellForm(TechnicalProductAdminForm):
+    """Formulário do catálogo no Admin Shell com widgets estilizados."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from apps.media_library.models import MediaAsset
+
+        widget_classes = {
+            "class": "form-control",
+        }
+        for name, field in self.fields.items():
+            widget = field.widget
+            attrs = widget.attrs.copy()
+            attrs.update(widget_classes)
+            if isinstance(widget, forms.Textarea):
+                attrs.setdefault("rows", widget.attrs.get("rows", 4))
+            elif isinstance(widget, forms.CheckboxInput):
+                attrs.pop("class", None)
+                attrs["class"] = "form-checkbox"
+            field.widget.attrs = attrs
+
+        self.fields["featured_image"].queryset = MediaAsset.objects.filter(is_active=True).order_by("-created_at")
+        self.fields["featured_image"].empty_label = "Selecione uma imagem da biblioteca"

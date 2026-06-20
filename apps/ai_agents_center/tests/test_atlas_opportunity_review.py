@@ -14,9 +14,9 @@ from apps.growth_engine.models import Lead
 from tests.factories.core import CompanyFactory, UserFactory
 
 
-class EduardoOpportunityReviewApiTests(APITestCase):
+class AtlasOpportunityReviewApiTests(APITestCase):
     def setUp(self):
-        self.user = UserFactory(email="edu-review@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
+        self.user = UserFactory(email="atlas-review@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
         self.company = CompanyFactory(name="Review Company", slug="review-company")
         Membership.objects.create(user=self.user, company=self.company, is_primary=True)
         self.client.force_authenticate(self.user)
@@ -24,7 +24,7 @@ class EduardoOpportunityReviewApiTests(APITestCase):
     def _opportunity(self, **overrides):
         defaults = {
             "company": self.company,
-            "title": "Oportunidade EDU: Hospital Review",
+            "title": "Oportunidade Atlas: Hospital Review",
             "company_name": "Hospital Review",
             "segment": "Hospital",
             "city": "Sao Paulo",
@@ -108,9 +108,9 @@ class EduardoOpportunityReviewApiTests(APITestCase):
         self.assertEqual(Lead.objects.first(), lead)
 
 
-class EduardoOpportunityReviewAdminTests(APITestCase):
+class AtlasOpportunityReviewAdminTests(APITestCase):
     def setUp(self):
-        self.user = UserFactory(email="edu-review-admin@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
+        self.user = UserFactory(email="atlas-review-admin@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
         self.company = CompanyFactory(name="Review Admin Company", slug="review-admin-company")
         Membership.objects.create(user=self.user, company=self.company, is_primary=True)
         self.admin = CommercialOpportunityAdmin(CommercialOpportunity, AdminSite())
@@ -126,7 +126,7 @@ class EduardoOpportunityReviewAdminTests(APITestCase):
     def _opportunity(self, **overrides):
         defaults = {
             "company": self.company,
-            "title": "Oportunidade EDU: Admin",
+            "title": "Oportunidade Atlas: Admin",
             "company_name": "Admin Hospital",
             "segment": "Hospital",
             "city": "Sao Paulo",

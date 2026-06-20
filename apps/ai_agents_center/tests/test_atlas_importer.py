@@ -6,19 +6,19 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from apps.access_control_center.services.smart_system_access import bootstrap_smart_system_access
-from apps.ai_agents_center.models import CommercialOpportunity, EduardoProspectImportBatch
-from apps.ai_agents_center.services.eduardo_importer import EduardoImporterService
+from apps.ai_agents_center.models import CommercialOpportunity, AtlasProspectImportBatch
+from apps.ai_agents_center.services.atlas_importer import AtlasImporterService
 from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 from apps.companies.models import Membership
 from apps.growth_engine.models import Lead
 from tests.factories.core import CompanyFactory, MembershipFactory, UserFactory
 
 
-class EduardoImporterServiceTests(TestCase):
+class AtlasImporterServiceTests(TestCase):
     def setUp(self):
         bootstrap_smart_system_access()
-        self.user = UserFactory(email="edu-importer@smart360.local", password="StrongPass123")
-        self.company = CompanyFactory(name="EDU Import Company", slug="edu-import-company")
+        self.user = UserFactory(email="atlas-importer@smart360.local", password="StrongPass123")
+        self.company = CompanyFactory(name="Atlas Import Company", slug="atlas-import-company")
         MembershipFactory(user=self.user, company=self.company, is_primary=True)
 
     def _valid_rows(self):
@@ -46,14 +46,14 @@ class EduardoImporterServiceTests(TestCase):
         ]
 
     def test_imports_valid_list_and_creates_opportunities(self):
-        batch = EduardoImporterService.import_rows(
+        batch = AtlasImporterService.import_rows(
             rows=self._valid_rows(),
             company=self.company,
             source="manual",
             created_by=self.user,
         )
 
-        self.assertEqual(batch.status, EduardoProspectImportBatch.Status.COMPLETED)
+        self.assertEqual(batch.status, AtlasProspectImportBatch.Status.COMPLETED)
         self.assertEqual(batch.total_rows, 2)
         self.assertEqual(batch.processed_rows, 2)
         self.assertEqual(batch.created_opportunities, 2)
@@ -63,7 +63,7 @@ class EduardoImporterServiceTests(TestCase):
     def test_ignores_rows_without_company_name(self):
         rows = self._valid_rows() + [{"segment": "Sem empresa", "city": "Campinas"}]
 
-        batch = EduardoImporterService.import_rows(rows=rows, company=self.company, source="manual")
+        batch = AtlasImporterService.import_rows(rows=rows, company=self.company, source="manual")
 
         self.assertEqual(batch.total_rows, 3)
         self.assertEqual(batch.processed_rows, 2)
@@ -73,8 +73,8 @@ class EduardoImporterServiceTests(TestCase):
     def test_prevents_duplicates(self):
         rows = self._valid_rows()[:1]
 
-        first_batch = EduardoImporterService.import_rows(rows=rows, company=self.company, source="manual")
-        second_batch = EduardoImporterService.import_rows(rows=rows, company=self.company, source="manual")
+        first_batch = AtlasImporterService.import_rows(rows=rows, company=self.company, source="manual")
+        second_batch = AtlasImporterService.import_rows(rows=rows, company=self.company, source="manual")
 
         self.assertEqual(first_batch.created_opportunities, 1)
         self.assertEqual(second_batch.created_opportunities, 0)
@@ -88,22 +88,22 @@ class EduardoImporterServiceTests(TestCase):
 
         def build_side_effect(*, analysis, company, source, **kwargs):
             if analysis.opportunity.get("company_name") == "Empresa Com Erro":
-                raise ValueError("Linha invalida para processamento EDU.")
+                raise ValueError("Linha invalida para processamento Atlas.")
             return original_build(analysis=analysis, company=company, source=source, **kwargs)
 
         with patch.object(OpportunityBuilderService, "build_from_analysis", side_effect=build_side_effect):
-            batch = EduardoImporterService.import_rows(rows=rows, company=self.company, source="manual")
+            batch = AtlasImporterService.import_rows(rows=rows, company=self.company, source="manual")
 
         self.assertEqual(batch.processed_rows, 3)
         self.assertEqual(batch.created_opportunities, 2)
         self.assertEqual(len(batch.errors), 1)
         self.assertEqual(batch.errors[0]["company_name"], "Empresa Com Erro")
-        self.assertEqual(batch.status, EduardoProspectImportBatch.Status.COMPLETED)
+        self.assertEqual(batch.status, AtlasProspectImportBatch.Status.COMPLETED)
 
     def test_batch_counters_are_correct(self):
         rows = self._valid_rows() + [{"company_name": ""}, {"segment": "vazio"}]
 
-        batch = EduardoImporterService.import_rows(
+        batch = AtlasImporterService.import_rows(
             rows=rows,
             company=self.company,
             source="manual",
@@ -121,20 +121,20 @@ class EduardoImporterServiceTests(TestCase):
     def test_does_not_create_lead_automatically(self):
         leads_before = Lead.objects.count()
 
-        EduardoImporterService.import_rows(rows=self._valid_rows(), company=self.company, source="manual")
+        AtlasImporterService.import_rows(rows=self._valid_rows(), company=self.company, source="manual")
 
         self.assertEqual(Lead.objects.count(), leads_before)
         self.assertFalse(CommercialOpportunity.objects.filter(lead__isnull=False).exists())
 
     def test_does_not_send_email(self):
         with patch("django.core.mail.send_mail") as send_mail_mock:
-            EduardoImporterService.import_rows(rows=self._valid_rows(), company=self.company, source="manual")
+            AtlasImporterService.import_rows(rows=self._valid_rows(), company=self.company, source="manual")
 
         self.assertEqual(send_mail_mock.call_count, 0)
         self.assertEqual(len(mail.outbox), 0)
 
     def test_preserves_institutional_contact_fields(self):
-        EduardoImporterService.import_rows(rows=self._valid_rows()[:1], company=self.company, source="manual")
+        AtlasImporterService.import_rows(rows=self._valid_rows()[:1], company=self.company, source="manual")
 
         opportunity = CommercialOpportunity.objects.get(company_name="Hospital Norte")
         contacts = opportunity.metadata.get("institutional_contacts") or []
@@ -155,14 +155,14 @@ class EduardoImporterServiceTests(TestCase):
             }
         ]
 
-        EduardoImporterService.import_rows(rows=rows, company=self.company, source="manual")
+        AtlasImporterService.import_rows(rows=rows, company=self.company, source="manual")
         opportunity = CommercialOpportunity.objects.get(company_name="Fabrica Sul")
 
         self.assertEqual(opportunity.city, "Porto Alegre")
         self.assertEqual(opportunity.state, "RS")
 
     def test_keeps_outreach_status_as_not_started(self):
-        EduardoImporterService.import_rows(rows=self._valid_rows()[:1], company=self.company, source="manual")
+        AtlasImporterService.import_rows(rows=self._valid_rows()[:1], company=self.company, source="manual")
 
         opportunity = CommercialOpportunity.objects.get(company_name="Hospital Norte")
 
@@ -170,12 +170,12 @@ class EduardoImporterServiceTests(TestCase):
         self.assertEqual(opportunity.outreach_channel, CommercialOpportunity.OutreachChannel.NONE)
 
     def test_stores_future_commercial_sender_without_sending_message(self):
-        EduardoImporterService.import_rows(rows=self._valid_rows()[:1], company=self.company, source="manual")
+        AtlasImporterService.import_rows(rows=self._valid_rows()[:1], company=self.company, source="manual")
 
         opportunity = CommercialOpportunity.objects.get(company_name="Hospital Norte")
 
-        self.assertEqual(opportunity.outreach_sender_email, EduardoImporterService.OUTREACH_SENDER_EMAIL)
-        self.assertEqual(opportunity.outreach_domain, EduardoImporterService.OUTREACH_DOMAIN)
+        self.assertEqual(opportunity.outreach_sender_email, AtlasImporterService.OUTREACH_SENDER_EMAIL)
+        self.assertEqual(opportunity.outreach_domain, AtlasImporterService.OUTREACH_DOMAIN)
         self.assertNotIn("smartcontrolbrasil.com.br", opportunity.outreach_sender_email)
         self.assertTrue(opportunity.metadata.get("outreach_prepared"))
 
@@ -185,7 +185,7 @@ class EduardoImporterServiceTests(TestCase):
             "Clinica Oeste,Clinica,Curitiba,PR,contato@clinica-oeste.test,limpeza hospitalar\n"
         )
 
-        batch = EduardoImporterService.import_csv(
+        batch = AtlasImporterService.import_csv(
             file_content=csv_content,
             company=self.company,
             filename="clinicas.csv",
@@ -198,10 +198,10 @@ class EduardoImporterServiceTests(TestCase):
         self.assertEqual(opportunity.source, CommercialOpportunity.Source.CSV)
 
 
-class EduardoImporterApiTests(APITestCase):
+class AtlasImporterApiTests(APITestCase):
     def setUp(self):
-        self.user = UserFactory(email="edu-import-api@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
-        self.company = CompanyFactory(name="EDU API Import", slug="edu-api-import")
+        self.user = UserFactory(email="atlas-import-api@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
+        self.company = CompanyFactory(name="Atlas API Import", slug="atlas-api-import")
         Membership.objects.create(user=self.user, company=self.company, is_primary=True)
         self.client.force_authenticate(self.user)
 
@@ -222,9 +222,9 @@ class EduardoImporterApiTests(APITestCase):
             ],
         }
 
-        response = self.client.post(reverse("ai-agent-edu-import-prospects"), payload, format="json")
+        response = self.client.post(reverse("ai-agent-atlas-import-prospects"), payload, format="json")
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["created_opportunities"], 1)
-        self.assertEqual(response.data["status"], EduardoProspectImportBatch.Status.COMPLETED)
+        self.assertEqual(response.data["status"], AtlasProspectImportBatch.Status.COMPLETED)
         self.assertTrue(CommercialOpportunity.objects.filter(company_name="Escola Modelo").exists())

@@ -885,7 +885,7 @@ class CommercialOpportunity(models.Model):
         return f"{self.company_name}: {self.title}"
 
 
-class EduardoProspectImportBatch(models.Model):
+class AtlasProspectImportBatch(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         PROCESSING = "processing", "Processing"
@@ -897,14 +897,14 @@ class EduardoProspectImportBatch(models.Model):
     company = models.ForeignKey(
         "companies.Company",
         on_delete=models.CASCADE,
-        related_name="edu_prospect_import_batches",
+        related_name="atlas_prospect_import_batches",
         null=True,
         blank=True,
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
-        related_name="edu_prospect_import_batches",
+        related_name="atlas_prospect_import_batches",
         null=True,
         blank=True,
     )
@@ -926,16 +926,16 @@ class EduardoProspectImportBatch(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = "ai_agents_edu_prospect_import_batches"
+        db_table = "ai_agents_atlas_prospect_import_batches"
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=["status", "created_at"], name="ai_edu_imp_status_created_idx"),
-            models.Index(fields=["source", "created_at"], name="ai_edu_imp_source_created_idx"),
+            models.Index(fields=["status", "created_at"], name="ai_atl_imp_stat_crt_idx"),
+            models.Index(fields=["source", "created_at"], name="ai_atl_imp_src_crt_idx"),
         ]
 
     def __str__(self):
         label = self.filename or self.source
-        return f"EDU import {label} ({self.status})"
+        return f"Atlas import {label} ({self.status})"
 
 
 class ManagerCopilotConfiguration(models.Model):

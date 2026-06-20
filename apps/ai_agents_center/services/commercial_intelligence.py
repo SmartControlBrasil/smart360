@@ -50,8 +50,8 @@ class CommercialIntelligenceService:
     @classmethod
     def build_context(cls, *, company=None, site=None, trigger_reference="", triggered_by=None, definition=None):
         return {
-            "agent_identity": "EDUARDO",
-            "agent_alias": "EDU",
+            "agent_identity": "ATLAS",
+            "agent_alias": "ATLAS",
             "company": {
                 "id": getattr(company, "id", None),
                 "name": getattr(company, "name", ""),
@@ -66,7 +66,7 @@ class CommercialIntelligenceService:
             else None,
             "trigger_reference": trigger_reference,
             "public_opportunity": cls.parse_trigger_reference(trigger_reference),
-            "prompt_reference": "knowledge/comercial/agente_eduardo.md",
+            "prompt_reference": "knowledge/comercial/agente_atlas.md",
             "portfolio": definition.config.get("portfolio", {}) if definition else {},
             "compliance": {
                 "lgpd": True,
@@ -153,7 +153,7 @@ class CommercialIntelligenceService:
         notes = [
             f"Problema identificado: {'; '.join(opportunity['problems']) if opportunity['problems'] else UNCONFIRMED}",
             f"Solucao sugerida: {'; '.join(analysis.recommended_services or analysis.recommended_products) if analysis.recommended_services or analysis.recommended_products else UNCONFIRMED}",
-            f"Score EDU: {analysis.score_label} ({analysis.score_value}/100)",
+            f"Score Atlas: {analysis.score_label} ({analysis.score_value}/100)",
             f"Observacoes: fatos={analysis.facts or [UNCONFIRMED]}; hipoteses={analysis.hypotheses or [UNCONFIRMED]}",
         ]
         return {
@@ -168,8 +168,8 @@ class CommercialIntelligenceService:
             "status": "new",
             "notes": "\n".join(notes),
             "metadata": {
-                "origin_agent": "eduardo-commercial-intelligence-agent",
-                "agent_alias": "EDU",
+                "origin_agent": "atlas-commercial-intelligence-agent",
+                "agent_alias": "ATLAS",
                 "segment": opportunity["segment"],
                 "institutional_contacts": opportunity["institutional_contacts"],
                 "problem_identified": opportunity["problems"],

@@ -5,7 +5,7 @@ from apps.ai_agents_center.models import AgentDefinition, AgentExecutionPolicy
 
 def get_agent_class_map():
     from apps.ai_agents_center.agents.anomaly import AnomalyDetectionAgent
-    from apps.ai_agents_center.agents.eduardo import EduardoCommercialIntelligenceAgent
+    from apps.ai_agents_center.agents.atlas import AtlasCommercialIntelligenceAgent
     from apps.ai_agents_center.agents.maintenance import MaintenanceIntelligenceAgent
     from apps.ai_agents_center.agents.marketplace import MarketplaceAllocationAgent
     from apps.ai_agents_center.agents.profitability import ProfitabilityAgent
@@ -17,7 +17,7 @@ def get_agent_class_map():
         ProfitabilityAgent.slug: ProfitabilityAgent,
         MarketplaceAllocationAgent.slug: MarketplaceAllocationAgent,
         AnomalyDetectionAgent.slug: AnomalyDetectionAgent,
-        EduardoCommercialIntelligenceAgent.slug: EduardoCommercialIntelligenceAgent,
+        AtlasCommercialIntelligenceAgent.slug: AtlasCommercialIntelligenceAgent,
     }
 
 
@@ -153,13 +153,13 @@ class AgentRegistryService:
             },
         },
         {
-            "slug": "eduardo-commercial-intelligence-agent",
-            "name": "Eduardo Commercial Intelligence Agent",
+            "slug": "atlas-commercial-intelligence-agent",
+            "name": "Atlas Commercial Intelligence Agent",
             "description": "Identifica oportunidades comerciais publicas, qualifica problemas e propoe leads para o Growth Engine.",
             "domain": AgentDefinition.Domain.MARKETPLACE,
             "autonomy_level": AgentDefinition.AutonomyLevel.PROPOSE,
             "config": {
-                "prompt_reference": "knowledge/comercial/agente_eduardo.md",
+                "prompt_reference": "knowledge/comercial/agente_atlas.md",
                 "tools": [
                     "query_public_company_profile",
                     "query_public_digital_presence",

@@ -17,7 +17,7 @@ from apps.ai_agents_center.models import (
     AIBriefingConfiguration,
     AIBriefingDelivery,
     CommercialOpportunity,
-    EduardoProspectImportBatch,
+    AtlasProspectImportBatch,
     ClientPortalCopilotConfiguration,
     ClientPortalCopilotMessage,
     ClientPortalCopilotSession,
@@ -184,8 +184,8 @@ class CommercialOpportunityAdmin(admin.ModelAdmin):
             self.message_user(request, f"{blocked} opportunity/opportunities were not approved or already converted.", messages.WARNING)
 
 
-@admin.register(EduardoProspectImportBatch)
-class EduardoProspectImportBatchAdmin(admin.ModelAdmin):
+@admin.register(AtlasProspectImportBatch)
+class AtlasProspectImportBatchAdmin(admin.ModelAdmin):
     list_display = (
         "public_id",
         "source",

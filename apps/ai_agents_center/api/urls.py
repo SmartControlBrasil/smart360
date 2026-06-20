@@ -17,7 +17,7 @@ from apps.ai_agents_center.api.views import (
     AgentRunViewSet,
     AgentScheduleHealthFlagViewSet,
     CommercialOpportunityViewSet,
-    EduardoProspectImportView,
+    AtlasProspectImportView,
     AnomalyAnalysisRunView,
     MaintenanceAnalysisRunView,
     ManagerCopilotContextView,
@@ -48,7 +48,7 @@ router.register("briefings", AIBriefingViewSet, basename="ai-agent-briefings")
 router.register("commercial-opportunities", CommercialOpportunityViewSet, basename="ai-agent-commercial-opportunities")
 
 urlpatterns = [
-    path("edu/import-prospects/", EduardoProspectImportView.as_view(), name="ai-agent-edu-import-prospects"),
+    path("atlas/import-prospects/", AtlasProspectImportView.as_view(), name="ai-agent-atlas-import-prospects"),
     path("manual-run/", AgentManualRunView.as_view(), name="ai-agent-manual-run"),
     path("maintenance/run/", MaintenanceAnalysisRunView.as_view(), name="ai-agent-maintenance-run"),
     path("scheduling/run/", SchedulingAnalysisRunView.as_view(), name="ai-agent-scheduling-run"),

@@ -10,8 +10,8 @@ from apps.ai_agents_center.services.commercial_intelligence import CommercialInt
 from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 
 
-class EduardoCommercialIntelligenceAgent(BaseSpecializedAgent):
-    slug = "eduardo-commercial-intelligence-agent"
+class AtlasCommercialIntelligenceAgent(BaseSpecializedAgent):
+    slug = "atlas-commercial-intelligence-agent"
     trigger_domains = ("growth", "lead", "commercial", "market_intelligence", "public_opportunity")
 
     def build_context(self, *, company=None, site=None, trigger_reference="", triggered_by=None):
@@ -40,7 +40,7 @@ class EduardoCommercialIntelligenceAgent(BaseSpecializedAgent):
 
         recommendation = AgentRecommendationPayload(
             recommendation_type="marketplace",
-            title=f"EDU: revisar oportunidade {company_name}",
+            title=f"Atlas: revisar oportunidade {company_name}",
             summary=(
                 f"Oportunidade comercial criada com score {commercial_opportunity.commercial_score} "
                 f"e confianca {commercial_opportunity.confidence_score}. "
@@ -48,7 +48,7 @@ class EduardoCommercialIntelligenceAgent(BaseSpecializedAgent):
             ),
             explanation=(
                 "A analise separa fatos de hipoteses e criou uma CommercialOpportunity auditavel. "
-                "O EDU nao converte oportunidades em leads automaticamente."
+                "O Atlas nao converte oportunidades em leads automaticamente."
             ),
             evidence_summary="; ".join(analysis.facts or [UNCONFIRMED]),
             suggested_action=(
@@ -90,7 +90,7 @@ class EduardoCommercialIntelligenceAgent(BaseSpecializedAgent):
                 action_type="review_commercial_opportunity",
                 target_entity="commercial_opportunity",
                 target_entity_id=str(commercial_opportunity.public_id),
-                title=f"Revisar oportunidade EDU: {company_name}",
+                title=f"Revisar oportunidade Atlas: {company_name}",
                 summary="Oportunidade pronta para revisao humana antes de virar lead.",
                 proposed_payload={
                     "commercial_opportunity_public_id": str(commercial_opportunity.public_id),
@@ -106,7 +106,7 @@ class EduardoCommercialIntelligenceAgent(BaseSpecializedAgent):
                 action_type="enrich_commercial_opportunity",
                 target_entity="commercial_opportunity",
                 target_entity_id=str(commercial_opportunity.public_id),
-                title="Enriquecer oportunidade EDU",
+                title="Enriquecer oportunidade Atlas",
                 summary="A oportunidade ainda nao tem confianca suficiente para revisao comercial.",
                 proposed_payload={
                     "commercial_opportunity_public_id": str(commercial_opportunity.public_id),
@@ -119,7 +119,7 @@ class EduardoCommercialIntelligenceAgent(BaseSpecializedAgent):
             )
 
         output_summary = (
-            f"EDU criou CommercialOpportunity {commercial_opportunity.public_id} para {company_name}: "
+            f"Atlas criou CommercialOpportunity {commercial_opportunity.public_id} para {company_name}: "
             f"score {commercial_opportunity.commercial_score}, confianca {commercial_opportunity.confidence_score}, "
             f"status {commercial_opportunity.status}."
         )

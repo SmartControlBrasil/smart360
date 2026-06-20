@@ -4,12 +4,12 @@ import csv
 import io
 from typing import Any
 
-from apps.ai_agents_center.models import CommercialOpportunity, EduardoProspectImportBatch
+from apps.ai_agents_center.models import AtlasProspectImportBatch, CommercialOpportunity
 from apps.ai_agents_center.services.commercial_intelligence import UNCONFIRMED, CommercialIntelligenceService
 from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 
 
-class EduardoImporterService:
+class AtlasImporterService:
     OUTREACH_SENDER_EMAIL = "comercial@mcautomation.com.br"
     OUTREACH_DOMAIN = "mcautomation.com.br"
     VALID_SOURCES = {choice[0] for choice in CommercialOpportunity.Source.choices}
@@ -23,15 +23,15 @@ class EduardoImporterService:
         source: str = "manual",
         filename: str = "",
         created_by=None,
-    ) -> EduardoProspectImportBatch:
+    ) -> AtlasProspectImportBatch:
         batch_source = source if source in cls.VALID_SOURCES else CommercialOpportunity.Source.MANUAL
-        batch = EduardoProspectImportBatch.objects.create(
+        batch = AtlasProspectImportBatch.objects.create(
             company=company,
             created_by=created_by,
             source=batch_source,
             filename=filename or "",
             total_rows=len(rows),
-            status=EduardoProspectImportBatch.Status.PROCESSING,
+            status=AtlasProspectImportBatch.Status.PROCESSING,
         )
         errors: list[dict[str, Any]] = []
         created_opportunities = 0
@@ -74,9 +74,9 @@ class EduardoImporterService:
         batch.skipped_empty_rows = skipped_empty_rows
         batch.errors = errors
         if processed_rows > 0 and created_opportunities == 0 and skipped_duplicates == 0 and errors:
-            batch.status = EduardoProspectImportBatch.Status.FAILED
+            batch.status = AtlasProspectImportBatch.Status.FAILED
         else:
-            batch.status = EduardoProspectImportBatch.Status.COMPLETED
+            batch.status = AtlasProspectImportBatch.Status.COMPLETED
         batch.save()
         return batch
 
@@ -88,7 +88,7 @@ class EduardoImporterService:
         company,
         filename: str = "",
         created_by=None,
-    ) -> EduardoProspectImportBatch:
+    ) -> AtlasProspectImportBatch:
         if isinstance(file_content, bytes):
             file_content = file_content.decode("utf-8-sig")
         reader = csv.DictReader(io.StringIO(file_content))
@@ -137,7 +137,7 @@ class EduardoImporterService:
             contacts.append(f"Contato: {contact_name}")
 
         problems = [notes] if notes else [UNCONFIRMED]
-        evidence = [f"Notas da importacao EDU: {notes}"] if notes else []
+        evidence = [f"Notas da importacao Atlas: {notes}"] if notes else []
 
         return {
             "company_name": company_name,

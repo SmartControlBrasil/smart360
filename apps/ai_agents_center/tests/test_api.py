@@ -115,7 +115,7 @@ class AIAgentsCenterApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(any(item["slug"] == "maintenance-agent" for item in response.data["results"]))
-        self.assertTrue(any(item["slug"] == "eduardo-commercial-intelligence-agent" for item in response.data["results"]))
+        self.assertTrue(any(item["slug"] == "atlas-commercial-intelligence-agent" for item in response.data["results"]))
 
     def test_briefing_generation_personalizes_by_audience(self):
         technician_briefing = AIBriefingComposer.generate_briefing(
@@ -216,7 +216,7 @@ class AIAgentsCenterApiTests(APITestCase):
         self.assertTrue(recommendation.evidence_summary)
         self.assertTrue(recommendation.suggested_action)
 
-    def test_eduardo_agent_qualifies_public_opportunity_for_growth_engine(self):
+    def test_atlas_agent_qualifies_public_opportunity_for_growth_engine(self):
         trigger_reference = json.dumps(
             {
                 "empresa": "Hospital Exemplo",
@@ -232,15 +232,15 @@ class AIAgentsCenterApiTests(APITestCase):
         )
 
         run = AgentCoordinatorService.run_agent(
-            agent_slug="eduardo-commercial-intelligence-agent",
+            agent_slug="atlas-commercial-intelligence-agent",
             company=self.company,
             triggered_by=self.user,
             trigger_reference=trigger_reference,
         )
 
         self.assertEqual(run.status, AgentRun.Status.COMPLETED)
-        recommendation = AgentRecommendation.objects.filter(agent_run__agent__slug="eduardo-commercial-intelligence-agent").latest("created_at")
-        proposal = AgentActionProposal.objects.filter(agent_run__agent__slug="eduardo-commercial-intelligence-agent").latest("created_at")
+        recommendation = AgentRecommendation.objects.filter(agent_run__agent__slug="atlas-commercial-intelligence-agent").latest("created_at")
+        proposal = AgentActionProposal.objects.filter(agent_run__agent__slug="atlas-commercial-intelligence-agent").latest("created_at")
         opportunity = CommercialOpportunity.objects.get(company_name="Hospital Exemplo")
         self.assertEqual(recommendation.payload["score"]["label"], "Estrategico")
         self.assertEqual(proposal.action_type, "review_commercial_opportunity")

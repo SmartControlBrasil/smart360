@@ -13,12 +13,12 @@ from apps.growth_engine.models import Lead
 from tests.factories.core import CompanyFactory, MembershipFactory, UserFactory
 
 
-class EduardoCommercialOpportunityTests(TestCase):
+class AtlasCommercialOpportunityTests(TestCase):
     def setUp(self):
         bootstrap_smart_system_access()
         AgentRegistryService.bootstrap_registry()
-        self.user = UserFactory(email="edu-opportunities@smart360.local", password="StrongPass123")
-        self.company = CompanyFactory(name="EDU Company", slug="edu-company")
+        self.user = UserFactory(email="atlas-opportunities@smart360.local", password="StrongPass123")
+        self.company = CompanyFactory(name="Atlas Company", slug="atlas-company")
         MembershipFactory(user=self.user, company=self.company, is_primary=True)
         assign_smart_system_role(self.user, "maintenance-manager", company=self.company)
 
@@ -82,7 +82,7 @@ class EduardoCommercialOpportunityTests(TestCase):
         with self.assertRaises(ValueError):
             OpportunityBuilderService.mark_ready_for_review(opportunity=opportunity, user=self.user)
 
-    def test_eduardo_run_creates_opportunity_but_does_not_create_lead(self):
+    def test_atlas_run_creates_opportunity_but_does_not_create_lead(self):
         trigger_reference = json.dumps(
             {
                 "empresa": "Hospital Exemplo",
@@ -98,7 +98,7 @@ class EduardoCommercialOpportunityTests(TestCase):
         )
 
         run = AgentCoordinatorService.run_agent(
-            agent_slug="eduardo-commercial-intelligence-agent",
+            agent_slug="atlas-commercial-intelligence-agent",
             company=self.company,
             triggered_by=self.user,
             trigger_reference=trigger_reference,

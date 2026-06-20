@@ -45,7 +45,7 @@ class OpportunityBuilderService:
         relation_fields = cls._relation_fields(company=company, company_id=company_id, agent_run=agent_run, agent_run_id=agent_run_id)
         raw = opportunity.get("raw") or {}
         metadata = {
-            "origin_agent": "eduardo-commercial-intelligence-agent",
+            "origin_agent": "atlas-commercial-intelligence-agent",
             "facts": analysis.facts,
             "hypotheses": analysis.hypotheses,
             "missing_information": analysis.missing_information,
@@ -66,7 +66,7 @@ class OpportunityBuilderService:
             "segment": opportunity.get("segment") or "",
             "city": opportunity.get("city") or "",
             "state": opportunity.get("state") or "",
-            "title": f"Oportunidade EDU: {opportunity.get('company_name') or 'empresa nao confirmada'}",
+            "title": f"Oportunidade Atlas: {opportunity.get('company_name') or 'empresa nao confirmada'}",
             "opportunity_description": opportunity_description,
             "recommended_solution": recommended_solution,
             "recommended_product": recommended_product,
@@ -183,7 +183,7 @@ class OpportunityBuilderService:
                 "notes": cls._lead_notes(opportunity=opportunity),
                 "metadata": {
                     "origin_opportunity_public_id": str(opportunity.public_id),
-                    "origin_agent": metadata.get("origin_agent", "eduardo-commercial-intelligence-agent"),
+                    "origin_agent": metadata.get("origin_agent", "atlas-commercial-intelligence-agent"),
                     "source": opportunity.source,
                     "problem_detected": opportunity.problem_detected,
                     "opportunity_description": opportunity.opportunity_description,
@@ -222,7 +222,7 @@ class OpportunityBuilderService:
         ]
         if recommended_product:
             parts.append(f"Produto recomendado: {recommended_product}")
-        parts.append(f"Score EDU: {analysis.score_label} ({analysis.score_value}/100)")
+        parts.append(f"Score Atlas: {analysis.score_label} ({analysis.score_value}/100)")
         if opportunity.get("evidence"):
             parts.append(f"Evidencias: {'; '.join(opportunity.get('evidence') or [])}")
         return "\n".join(parts)
@@ -257,7 +257,7 @@ class OpportunityBuilderService:
                 f"Descricao da oportunidade: {opportunity.opportunity_description}",
                 f"Solucao recomendada: {opportunity.recommended_solution}",
                 f"Produto recomendado: {opportunity.recommended_product or UNCONFIRMED}",
-                f"Score EDU: {opportunity.commercial_score}",
-                f"Confianca EDU: {opportunity.confidence_score}",
+                f"Score Atlas: {opportunity.commercial_score}",
+                f"Confianca Atlas: {opportunity.confidence_score}",
             ]
         )

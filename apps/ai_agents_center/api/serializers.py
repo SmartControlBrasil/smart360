@@ -15,7 +15,7 @@ from apps.ai_agents_center.models import (
     AgentRun,
     AgentScheduleHealthFlag,
     CommercialOpportunity,
-    EduardoProspectImportBatch,
+    AtlasProspectImportBatch,
     ManagerCopilotConfiguration,
     ManagerCopilotMessage,
     ManagerCopilotSession,
@@ -226,7 +226,7 @@ class CommercialOpportunitySerializer(serializers.ModelSerializer):
         )
 
 
-class EduardoProspectRowSerializer(serializers.Serializer):
+class AtlasProspectRowSerializer(serializers.Serializer):
     company_name = serializers.CharField(required=False, allow_blank=True)
     segment = serializers.CharField(required=False, allow_blank=True)
     city = serializers.CharField(required=False, allow_blank=True)
@@ -239,7 +239,7 @@ class EduardoProspectRowSerializer(serializers.Serializer):
     source = serializers.CharField(required=False, allow_blank=True)
 
 
-class EduardoProspectImportSerializer(serializers.Serializer):
+class AtlasProspectImportSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from apps.companies.models import Company
@@ -252,12 +252,12 @@ class EduardoProspectImportSerializer(serializers.Serializer):
         required=False,
     )
     filename = serializers.CharField(required=False, allow_blank=True, default="")
-    rows = EduardoProspectRowSerializer(many=True)
+    rows = AtlasProspectRowSerializer(many=True)
 
 
-class EduardoProspectImportBatchSerializer(serializers.ModelSerializer):
+class AtlasProspectImportBatchSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EduardoProspectImportBatch
+        model = AtlasProspectImportBatch
         fields = (
             "public_id",
             "source",

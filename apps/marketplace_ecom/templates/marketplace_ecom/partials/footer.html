@@ -1,0 +1,32 @@
+{% load static %}
+<footer class="footer marketplace-footer" role="contentinfo">
+  <div class="footer-1 marketplace-footer__shell">
+    <div class="mp-container">
+      <div class="row marketplace-footer__grid">
+        <div class="col-lg-4 col-md-6 mb-30">
+          <a class="marketplace-footer__logo-link" href="{% url 'marketplace_ecom:home' %}">
+            <img class="marketplace-scb-brand-logo" src="{% static 'institutional/brand/logo-cores-03.png' %}" alt="Smart Control Brasil">
+          </a>
+          <p class="marketplace-footer__text marketplace-footer__tagline">Revenda, representação e soluções técnicas B2B. Consulte produtos sob orçamento com a Smart Control Brasil.</p>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-30">
+          <h4 class="marketplace-footer__title">Navegação</h4>
+          <ul class="menu-footer marketplace-footer__menu">
+            <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
+            <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
+            <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
+            <li><a href="/" data-fallback-href="/" class="marketplace-back-link">Voltar ao site</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-30">
+          <h4 class="marketplace-footer__title">Operação B2B</h4>
+          <p class="marketplace-footer__text">Catálogo dedicado à avaliação técnica e solicitação de orçamento com a equipe comercial.</p>
+          <a class="mp-btn mp-btn--primary mp-btn--sm marketplace-footer__cta" href="{% url 'marketplace_ecom:products' %}">Solicitar orçamento</a>
+        </div>
+      </div>
+      <div class="marketplace-footer__bottom">
+        <p class="marketplace-footer__copyright">© {% now "Y" %} Smart Control Brasil · Catálogo Técnico B2B · Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </div>
+</footer>

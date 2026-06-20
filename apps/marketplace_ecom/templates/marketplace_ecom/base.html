@@ -19,7 +19,7 @@
   </script>
   <link href="{% static 'marketplace/ecom/css/vendors/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'marketplace/ecom/css/style.css' %}" rel="stylesheet">
-  <link href="{% static 'marketplace/ecom/css/smart360-marketplace.css' %}?v=6" rel="stylesheet">
+  <link href="{% static 'marketplace/ecom/css/smart360-marketplace.css' %}?v=8" rel="stylesheet">
   <title>{% block title %}Catálogo Técnico | Smart Control Brasil{% endblock %}</title>
 </head>
 <body class="marketplace-shell">
@@ -119,31 +119,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer marketplace-footer">
-    <div class="footer-1">
-      <div class="mp-container">
-        <div class="row">
-          <div class="col-lg-4 width-25 mb-30">
-            <h4 class="mb-30 marketplace-footer__title">Catálogo Técnico B2B</h4>
-            <div class="font-md marketplace-footer__text">Revenda, representação e soluções técnicas de fabricantes representados e parceiros. Consulte produtos sob orçamento com a Smart Control Brasil.</div>
-          </div>
-          <div class="col-lg-2 width-20 mb-30">
-            <h4 class="mb-30 marketplace-footer__title">Navegação</h4>
-            <ul class="menu-footer">
-              <li><a href="{% url 'marketplace_ecom:home' %}">Catálogo</a></li>
-              <li><a href="{% url 'marketplace_ecom:products' %}">Produtos</a></li>
-              <li><a href="{% url 'marketplace_ecom:home' %}#representadas-parceiros">Parceiros</a></li>
-              <li><a href="/" data-fallback-href="/" class="marketplace-back-link">Voltar ao site</a></li>
-            </ul>
-          </div>
-          <div class="col-lg-3 width-25 mb-30">
-            <h4 class="mb-30 marketplace-footer__title">Status</h4>
-            <p class="font-md marketplace-footer__text">Catálogo técnico B2B dedicado à avaliação de soluções e solicitação de orçamento.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+  {% include "marketplace_ecom/partials/footer.html" %}
 
   <script src="{% static 'marketplace/ecom/js/vendors/modernizr-3.6.0.min.js' %}"></script>
   <script src="{% static 'marketplace/ecom/js/vendors/jquery-3.6.0.min.js' %}"></script>

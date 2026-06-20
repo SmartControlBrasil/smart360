@@ -768,18 +768,97 @@ body.marketplace-shell .btn.btn-buy {
 
 /* ----- Footer / mobile ----- */
 body.marketplace-shell .marketplace-footer {
-  background: var(--mp-footer-bg) !important;
-  border-top: 1px solid var(--mp-border);
-  margin-top: 20px;
+  background: linear-gradient(180deg, #26385f 0%, var(--mp-footer-bg) 72%) !important;
+  border-top: 2px solid var(--mp-accent);
+  margin-top: 28px;
+  position: relative;
+}
+
+html[data-marketplace-theme="dark"] body.marketplace-shell .marketplace-footer {
+  background: linear-gradient(180deg, #111c31 0%, var(--mp-footer-bg) 72%) !important;
+  border-top-color: var(--mp-brand);
+}
+
+body.marketplace-shell .marketplace-footer .footer-1,
+body.marketplace-shell .marketplace-footer__shell {
+  background: transparent !important;
+  margin-bottom: 0 !important;
+  padding: 48px 0 0 !important;
+}
+
+body.marketplace-shell .marketplace-footer__logo-link {
+  display: inline-block;
+  margin-bottom: 18px;
+}
+
+body.marketplace-shell .marketplace-footer__logo-link .marketplace-scb-brand-logo {
+  max-height: 36px;
+  max-width: 118px;
 }
 
 body.marketplace-shell .marketplace-footer__title {
   color: #f8fafc !important;
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 16px;
 }
 
 body.marketplace-shell .marketplace-footer__text,
-body.marketplace-shell .marketplace-footer .menu-footer a {
+body.marketplace-shell .marketplace-footer__tagline {
   color: var(--mp-footer-text) !important;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 22rem;
+}
+
+body.marketplace-shell .marketplace-footer__menu {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+body.marketplace-shell .marketplace-footer .menu-footer li {
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+body.marketplace-shell .marketplace-footer .menu-footer li a {
+  background: none !important;
+  color: var(--mp-footer-text) !important;
+  display: inline-block;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  padding: 0 !important;
+  text-decoration: none;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+body.marketplace-shell .marketplace-footer .menu-footer li a:hover,
+body.marketplace-shell .marketplace-footer .menu-footer li a:focus-visible {
+  color: var(--mp-accent) !important;
+  outline: none;
+  padding-left: 0 !important;
+  transform: translateX(3px);
+}
+
+body.marketplace-shell .marketplace-footer__cta {
+  margin-top: 16px;
+}
+
+body.marketplace-shell .marketplace-footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 12px;
+  padding: 20px 0 28px;
+}
+
+body.marketplace-shell .marketplace-footer__copyright {
+  color: var(--mp-footer-text) !important;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.92;
+  text-align: center;
 }
 
 body.marketplace-shell .mobile-header-wrapper-style {

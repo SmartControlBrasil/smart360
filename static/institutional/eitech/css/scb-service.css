@@ -30,6 +30,32 @@
   margin: 0;
 }
 
+/* Hero 4: mantém CTAs irmãos alinhados sem margens herdadas do tema. */
+.hero4-section-area .hero4-heading .btn-area1 {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hero4-section-area .hero4-heading .btn-area1 .vl-btn5 + .vl-btn5 {
+  margin-left: 0;
+}
+
+.scb-maintenance-scope-note {
+  background: rgba(253, 150, 54, 0.08);
+  border: 1px solid rgba(253, 150, 54, 0.35);
+  border-radius: 14px;
+  color: #35558f;
+  line-height: 1.55;
+  margin-top: 1.5rem;
+  padding: 1.1rem 1.25rem;
+}
+
+.scb-maintenance-scope-note strong {
+  color: #1e3a5f;
+}
+
 .scb-service-hero-marketing-bg {
   background-image: url(../img/all-images/bg/hero-bg3.png);
   background-position: center;
@@ -170,4 +196,12 @@ body.service-web-systems-page .scb-web-systems-ecosystem .work-boxarea a:hover {
 .scb-service-featured-card h5 {
   color: #0f766e;
   font-weight: 700;
+}
+
+@media (max-width: 767.98px) {
+  .hero4-section-area .hero4-heading .btn-area1 .vl-btn5 {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+  }
 }

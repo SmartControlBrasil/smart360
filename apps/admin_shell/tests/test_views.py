@@ -2317,9 +2317,9 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "Gerenciar produtos")
         self.assertContains(response, "Adicionar produto")
         self.assertContains(response, "Biblioteca de imagens")
-        self.assertContains(response, reverse("admin:marketplace_ecom_technicalproduct_changelist"))
-        self.assertContains(response, reverse("admin:marketplace_ecom_technicalproduct_add"))
-        self.assertContains(response, reverse("admin-shell:media-image-upload"))
+        self.assertContains(response, reverse("admin-shell:technical-catalog-product-list"))
+        self.assertContains(response, reverse("admin-shell:technical-catalog-product-create"))
+        self.assertContains(response, reverse("admin-shell:media-image-list"))
 
     def test_requires_authentication(self):
         self.client.logout()

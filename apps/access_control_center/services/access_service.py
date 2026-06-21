@@ -235,6 +235,20 @@ class AccessControlService:
                 )
             return True, "Superuser bypass."
 
+        if getattr(user, "is_staff", False) and domain_slug == "dashboard":
+            if log_decision:
+                AccessAuditService.log(
+                    user=user,
+                    action=action_slug,
+                    domain=domain_slug,
+                    decision=AccessAuditLog.Decision.ALLOW,
+                    reason="Staff dashboard bypass.",
+                    resource_type=resource_type,
+                    resource_id=resource_id,
+                    metadata={"module_name": module_name},
+                )
+            return True, "Staff dashboard bypass."
+
         resource_reference = f"{resource_type}:{resource_id}" if resource_type and resource_id else ""
         assignments = RoleAssignmentService.get_current_assignments(
             user,

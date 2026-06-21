@@ -27,6 +27,18 @@ ACTION_LIST_KEYS = {
     "technical_catalog_shortcuts",
 }
 
+STAFF_INTERNAL_ADMIN_DOMAINS = frozenset(
+    {
+        "dashboard",
+        "billing_admin",
+        "analytics_admin",
+        "observability_admin",
+        "ai_agents_admin",
+        "users",
+        "smart_system_settings",
+    }
+)
+
 
 def filter_context_actions(payload, permission_map):
     if isinstance(payload, list):
@@ -95,6 +107,11 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
         return ""
 
     def has_required_permission(self):
+        user = self.request.user
+        if getattr(user, "is_superuser", False):
+            return True
+        if getattr(user, "is_staff", False) and self.permission_domain in STAFF_INTERNAL_ADMIN_DOMAINS:
+            return True
         if not self.permission_domain:
             return True
         return has_smart_system_permission(

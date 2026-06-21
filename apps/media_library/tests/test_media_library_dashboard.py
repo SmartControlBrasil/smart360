@@ -7,6 +7,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 
+from apps.access_control_center.services.smart_system_access import bootstrap_smart_system_access
 from apps.media_library.models import MediaAsset
 
 
@@ -24,6 +25,7 @@ def _make_jpeg_bytes(name_hint="blob", size_px=(120, 80)):
 )
 class MediaLibraryDashboardTests(TestCase):
     def setUp(self):
+        bootstrap_smart_system_access()
         self.client = Client()
         user_model = get_user_model()
         self.super_user = user_model.objects.create_superuser(
@@ -32,9 +34,38 @@ class MediaLibraryDashboardTests(TestCase):
             first_name="Super",
             last_name="User",
         )
+        self.regular_user = user_model.objects.create_user(
+            email="regular@media.example.com",
+            password="pwd123secure",
+            first_name="Regular",
+            last_name="User",
+        )
 
     def _login_super(self):
         self.client.force_login(self.super_user)
+
+    def test_superuser_accesses_media_library_list(self):
+        self._login_super()
+
+        response = self.client.get(reverse("admin-shell:media-image-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Biblioteca de imagens")
+
+    def test_superuser_accesses_image_upload_page(self):
+        self._login_super()
+
+        response = self.client.get(reverse("admin-shell:media-image-upload"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Enviar imagem")
+
+    def test_regular_user_without_permission_is_denied_on_upload(self):
+        self.client.force_login(self.regular_user)
+
+        response = self.client.get(reverse("admin-shell:media-image-upload"))
+
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_upload_valid_creates_asset(self):
         self._login_super()

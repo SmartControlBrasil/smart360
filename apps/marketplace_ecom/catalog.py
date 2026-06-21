@@ -11,7 +11,7 @@ _IMG = "institutional/eitech/img"
 def resolve_catalog_image(*, featured_image=None, catalog_image=""):
     """Prioridade: featured_image do banco > imagem static do catálogo > placeholder."""
     if featured_image is not None:
-        file_field = getattr(featured_image, "image", None)
+        file_field = getattr(featured_image, "original_file", None) or getattr(featured_image, "image", None)
         if file_field and getattr(file_field, "name", ""):
             return DEFAULT_IMAGE, file_field.url
     if catalog_image and catalog_image != DEFAULT_IMAGE:

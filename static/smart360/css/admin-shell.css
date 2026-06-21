@@ -4679,6 +4679,85 @@ html:not([data-theme="dark"]) body.admin-shell .form-help {
     }
 }
 
+/* === Catálogo Técnico B2B (Admin Shell) === */
+.tc-catalog-toolbar {
+    margin-bottom: var(--space-4);
+}
+.tc-catalog-table-wrap .table-wrapper {
+    overflow-x: auto;
+}
+.tc-catalog-table th[scope="row"] {
+    min-width: 220px;
+}
+.tc-catalog-slug {
+    display: block;
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+}
+.tc-catalog-actions-cell {
+    white-space: nowrap;
+}
+.tc-catalog-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--shell-text-muted);
+}
+.tc-catalog-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+.tc-catalog-detail-wide {
+    grid-column: 1 / -1;
+}
+.tc-catalog-preview-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+}
+.tc-catalog-preview-img {
+    max-width: 100%;
+    max-height: 280px;
+    border-radius: 12px;
+    object-fit: contain;
+}
+.tc-catalog-short-desc {
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+}
+.tc-catalog-long-desc {
+    color: var(--shell-text-muted);
+    line-height: 1.6;
+}
+.tc-catalog-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+.tc-subheading,
+.tc-form-section-title {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--shell-heading);
+}
+.tc-bullet-list {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+.tc-catalog-link-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+@media (max-width: 980px) {
+    .tc-catalog-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 /* === SMART360 Attex-like sidebar accordion === */
 .shell-nav-attex {

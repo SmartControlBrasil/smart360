@@ -18,7 +18,7 @@ SMART_SYSTEM_DOMAINS = {
         "name": "Dashboard",
         "description": "Visao executiva e operacional do Smart System.",
         "module_name": "smart_system",
-        "actions": ["view"],
+        "actions": ["view", "create", "update", "delete"],
     },
     "assets": {
         "name": "Ativos",

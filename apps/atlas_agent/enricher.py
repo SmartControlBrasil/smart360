@@ -10,6 +10,20 @@ class EnrichmentService:
     def __init__(self, api_key: Optional[str] = None, provider: str = "apollo"):
         self.api_key = api_key
         self.provider = provider
+
+    @staticmethod
+    def calculate_lead_score(lead: Lead) -> int:
+        """Pontua completude e acionabilidade do prospect em uma escala de 0 a 10."""
+        score = 0
+        score += 1 if lead.institution_name.strip() else 0
+        score += 1 if lead.city.strip() and lead.region.strip() else 0
+        score += 2 if lead.website_domain else 0
+        score += 1 if lead.phone else 0
+        score += 2 if lead.contact_email else 0
+        score += 1 if lead.decider_name else 0
+        score += 1 if lead.decider_role else 0
+        score += 1 if lead.notes.strip() else 0
+        return min(score, 10)
         
     def enrich_mock(self, lead: Lead) -> Lead:
         """
@@ -23,8 +37,6 @@ class EnrichmentService:
         else:
             lead.contact_email = "contato@escola.com.br"
         
-        # Filtro de Scoring: Escola rica em dados, damos score 5.
-        lead.lead_score = 5
         return lead
 
     def enrich_apollo(self, lead: Lead) -> Lead:
@@ -63,7 +75,6 @@ class EnrichmentService:
                 lead.decider_name = f"{person.get('first_name', '')} {person.get('last_name', '')}".strip()
                 lead.decider_role = person.get('title', '')
                 lead.contact_email = person.get('email', '')
-                lead.lead_score = 5 if lead.contact_email else 3
             else:
                 print(f"[Atlas Enricher] No people found for {lead.website_domain}")
                 
@@ -77,6 +88,8 @@ class EnrichmentService:
         Função principal do microsserviço de enriquecimento.
         """
         if self.provider == "apollo":
-            return self.enrich_apollo(lead)
+            enriched = self.enrich_apollo(lead)
         else:
-            return self.enrich_mock(lead)
+            enriched = self.enrich_mock(lead)
+        enriched.lead_score = self.calculate_lead_score(enriched)
+        return enriched

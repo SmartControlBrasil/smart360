@@ -1,0 +1,74 @@
+/* Smart Control Brasil — Manutenção Industrial de Campo */
+/* Origem: templates/institutional/eitech/pages/service-manutencao-tpm-confiabilidade.html */
+
+.scb-maintenance-hero-bg {
+  background-image: url(../img/all-images/bg/hero-bg3.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-maintenance-h5-uppercase {
+  text-transform: uppercase;
+}
+
+.scb-maintenance-section-service-bg {
+  background-image: url(../img/all-images/bg/service-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-maintenance-section-cta-bg {
+  background-image: url(../img/all-images/bg/hero-bg6.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.scb-maintenance-about-bg {
+  background-image: url(../img/all-images/bg/about-bg3.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.scb-maintenance-progress-bar-last {
+  margin: 0;
+}
+
+.scb-maintenance-scope-note {
+  margin-top: 1.5rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid rgba(253, 150, 54, 0.35);
+  background: rgba(253, 150, 54, 0.08);
+  color: #35558f;
+  line-height: 1.55;
+}
+
+.scb-maintenance-scope-note strong {
+  color: #1e3a5f;
+}
+
+body.homepage5-body.service-maintenance-page .hero5-section-area .hero6-header .btn-area1 {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body.homepage5-body.service-maintenance-page .hero5-section-area .hero6-header .btn-area1 .vl-btn6.btn2 {
+  margin-left: 0;
+}
+
+body.service-maintenance-page .scb-maintenance-counter .counter-box h2 {
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+body.service-maintenance-page .service-single-boxarea {
+  height: 100%;
+}

@@ -29,3 +29,29 @@
 .scb-mitsubishi-progress-bar-last {
   margin: 0;
 }
+
+/* CTAs — alinhar espaçamento com home (flex + gap) */
+.hero4-section-area .hero4-heading .btn-area1,
+.cta5-section-area.scb-mitsubishi-section-cta-bg .cta-header .btn-area1 {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hero4-section-area .hero4-heading .btn-area1 .vl-btn5 + .vl-btn5,
+.cta5-section-area.scb-mitsubishi-section-cta-bg .cta-header .btn-area1 .vl-btn6.btn2 {
+  margin-left: 0;
+}
+
+@media (max-width: 767.98px) {
+  .cta5-section-area.scb-mitsubishi-section-cta-bg .cta-header .btn-area1 .vl-btn6.btn2 {
+    margin-top: 0;
+  }
+
+  .hero4-section-area .hero4-heading .btn-area1 .vl-btn5 {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+  }
+}

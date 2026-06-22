@@ -3,7 +3,6 @@ from django.core import mail
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
-
 TEST_MIDDLEWARE = [
     mw
     for mw in settings.MIDDLEWARE
@@ -90,6 +89,37 @@ class InstitutionalRoutesTests(SimpleTestCase):
             status_code=301,
             fetch_redirect_response=False,
         )
+
+    def test_home_uses_shared_action_layout_classes(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        self.assertContains(response, "scb-home-hero-actions")
+        self.assertContains(response, "scb-home-final-actions")
+
+    def test_web_systems_page_has_expected_visual_contract(self):
+        response = self.client.get(
+            reverse("institutional:service_sistemas_web_aplicativos")
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response,
+            "institutional/eitech/pages/service-sistemas-web-aplicativos.html",
+        )
+        self.assertContains(response, "service-web-systems-page")
+        self.assertContains(response, "institutional/eitech/css/scb-service.css")
+        self.assertContains(response, "Solicitar diagnóstico")
+        self.assertContains(response, "Falar com a Lívia")
+
+    def test_maintenance_uses_shared_service_styles_only(self):
+        response = self.client.get(
+            reverse("institutional:service_manutencao_tpm_confiabilidade")
+        )
+
+        self.assertContains(response, "institutional/eitech/css/scb-service.css")
+        self.assertNotContains(response, "scb-maintenance.css")
+        self.assertContains(response, "scb-maintenance-scope-note")
+
 
 
 @override_settings(

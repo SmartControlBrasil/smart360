@@ -14,6 +14,7 @@ class Lead:
     institution_type: str = "Privada"
     approach_status: str = "Pendente"
     lead_score: int = 0
+    segment: str = "Outros"
     notes: str = ""
 
     def to_csv_row(self) -> List[str]:

@@ -1376,3 +1376,59 @@ class AIBriefingDelivery(models.Model):
 
     def __str__(self):
         return f"{self.briefing_id}:{self.channel}"
+
+
+class AtlasLead(models.Model):
+    """
+    Modelo bruto para ingestão de leads gerados e enriquecidos pelo pipeline do Atlas (PoC).
+    Estes leads são ingeridos via API e aguardam revisão humana.
+    """
+    class Segment(models.TextChoices):
+        ESCOLA = "Escola / Educação", "Escola / Educação"
+        LIMPEZA = "Limpeza / Facilities", "Limpeza / Facilities"
+        SHOPPING = "Shopping / Clínica / Hotel", "Shopping / Clínica / Hotel"
+        SEGURANCA = "Segurança / Indústria", "Segurança / Indústria"
+        OUTROS = "Outros", "Outros"
+
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    
+    # Dados da Empresa
+    razao_social = models.CharField(max_length=255)
+    segmento = models.CharField(max_length=50, choices=Segment.choices, default=Segment.OUTROS)
+    cidade = models.CharField(max_length=150, blank=True)
+    regiao = models.CharField(max_length=150, blank=True)
+    
+    # Inteligência Comercial
+    fit_comercial = models.CharField(max_length=50, blank=True)
+    score = models.PositiveSmallIntegerField(default=0)
+    
+    # Decisor
+    nome_decisor = models.CharField(max_length=255, blank=True, null=True)
+    cargo_decisor = models.CharField(max_length=255, blank=True, null=True)
+    email_contato = models.EmailField(blank=True, null=True)
+    telefone = models.CharField(max_length=50, blank=True, null=True)
+    
+    # Status e Observações
+    status = models.CharField(max_length=50, default="ready_for_review")
+    notas = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "ai_agents_atlas_leads"
+        ordering = ["-score", "-created_at"]
+
+    def __str__(self):
+        return f"{self.razao_social} [{self.score}]"
+
+
+class PendingAtlasLead(AtlasLead):
+    """
+    Proxy model para criar uma view dedicada no Django Admin apenas para leads pendentes.
+    """
+    class Meta:
+        proxy = True
+        verbose_name = "Lead Pendente do Atlas"
+        verbose_name_plural = "Leads Pendentes do Atlas"

@@ -797,6 +797,69 @@ class AnomalyAnalysisRunView(APIView):
         return Response(AgentRunSerializer(run).data, status=status.HTTP_201_CREATED)
 
 
+import os
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.conf import settings
+
+class AtlasLeadIngestionView(APIView):
+    """
+    Endpoint (M2M) para ingestão de leads processados pelo robô Atlas.
+    Valida token estático (ATLAS_API_TOKEN) e aplica regras de anti-duplicação.
+    """
+    permission_classes = [] # Custom authentication implemented in post
+    
+    def post(self, request, *args, **kwargs):
+        # 1. Validação de Token Machine-to-Machine
+        auth_header = request.headers.get("Authorization")
+        expected_token = os.getenv("ATLAS_API_TOKEN", "mock-token")
+        
+        if not auth_header or auth_header != f"Bearer {expected_token}":
+            return Response({"error": "Unauthorized or invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        # 2. Desserialização do array de leads
+        leads_data = request.data if isinstance(request.data, list) else [request.data]
+        
+        from apps.ai_agents_center.api.serializers import AtlasLeadSerializer
+        from apps.ai_agents_center.models import AtlasLead
+        
+        created_count = 0
+        skipped_count = 0
+        errors = []
+        
+        for idx, lead_payload in enumerate(leads_data):
+            serializer = AtlasLeadSerializer(data=lead_payload)
+            if serializer.is_valid():
+                email = serializer.validated_data.get("email_contato")
+                razao_social = serializer.validated_data.get("razao_social")
+                cidade = serializer.validated_data.get("cidade")
+                
+                # Regra de Anti-duplicidade
+                is_duplicate = False
+                if email and AtlasLead.objects.filter(email_contato=email).exists():
+                    is_duplicate = True
+                elif razao_social and cidade and AtlasLead.objects.filter(razao_social=razao_social, cidade=cidade).exists():
+                    is_duplicate = True
+                elif razao_social and not cidade and AtlasLead.objects.filter(razao_social=razao_social).exists():
+                    is_duplicate = True
+                    
+                if is_duplicate:
+                    skipped_count += 1
+                else:
+                    serializer.save()
+                    created_count += 1
+            else:
+                errors.append({"index": idx, "errors": serializer.errors})
+                
+        return Response({
+            "message": "Ingestão concluída",
+            "created": created_count,
+            "skipped_duplicates": skipped_count,
+            "errors": errors
+        }, status=status.HTTP_201_CREATED if created_count > 0 else status.HTTP_200_OK)
+
+
 class AIBriefingGenerateView(APIView):
     permission_classes = [AIAgentsPermission]
     permission_action = "manage"

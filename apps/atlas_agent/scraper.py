@@ -1,5 +1,6 @@
 import requests
 import urllib.parse
+import os
 from typing import List, Optional
 from .models import Lead
 
@@ -8,7 +9,7 @@ class SchoolScraper:
     Motor base para varredura em lote por quadrantes estruturados.
     """
     def __init__(self, google_api_key: Optional[str] = None):
-        self.google_api_key = google_api_key
+        self.google_api_key = google_api_key or os.getenv("GOOGLE_PLACES_API_KEY")
 
     def search_schools_mock(self, query: str, region: str) -> List[Lead]:
         """

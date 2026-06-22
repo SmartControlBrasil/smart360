@@ -1,4 +1,5 @@
 import requests
+import os
 from typing import Optional
 from .models import Lead
 
@@ -8,7 +9,7 @@ class EnrichmentService:
     usando APIs de B2B Data (ex: Apollo.io, Hunter.io, Lusha).
     """
     def __init__(self, api_key: Optional[str] = None, provider: str = "apollo"):
-        self.api_key = api_key
+        self.api_key = api_key or os.getenv("APOLLO_API_KEY")
         self.provider = provider
 
     @staticmethod

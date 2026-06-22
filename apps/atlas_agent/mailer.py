@@ -1,7 +1,8 @@
 import smtplib
 from email.mime.text import MIMEText
+import os
 from email.mime.multipart import MIMEMultipart
-from typing import List
+from typing import List, Optional
 import time
 from .models import Lead
 
@@ -10,12 +11,15 @@ class ColdMailer:
     Controlador de envio de E-mails Frios para a plataforma Google Workspace.
     Integra sistema de Opt-Out (LGPD) e templates dinâmicos.
     """
-    def __init__(self, smtp_user: str = "", smtp_pass: str = "", dry_run: bool = True):
+    def __init__(self, smtp_user: Optional[str] = None, smtp_pass: Optional[str] = None, dry_run: Optional[bool] = None):
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
-        self.smtp_user = smtp_user
-        self.smtp_pass = smtp_pass
-        self.dry_run = dry_run
+        self.smtp_user = smtp_user or os.getenv("SMTP_USER", "")
+        self.smtp_pass = smtp_pass or os.getenv("SMTP_PASSWORD", "")
+        if dry_run is None:
+            self.dry_run = os.getenv("ATLAS_ENV", "development") != "production"
+        else:
+            self.dry_run = dry_run
 
     def generate_email_body(self, lead: Lead) -> str:
         """

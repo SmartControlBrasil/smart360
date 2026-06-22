@@ -578,3 +578,27 @@ class ManagerCopilotQuerySerializer(serializers.Serializer):
 
 class ManagerCopilotSessionResetSerializer(serializers.Serializer):
     session_public_id = serializers.UUIDField()
+
+
+class AtlasLeadSerializer(serializers.ModelSerializer):
+    class Meta:
+        from apps.ai_agents_center.models import AtlasLead
+        model = AtlasLead
+        fields = (
+            "public_id",
+            "razao_social",
+            "segmento",
+            "cidade",
+            "regiao",
+            "fit_comercial",
+            "score",
+            "nome_decisor",
+            "cargo_decisor",
+            "email_contato",
+            "telefone",
+            "status",
+            "notas",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("public_id", "created_at", "updated_at", "status")

@@ -18,6 +18,7 @@ from apps.ai_agents_center.api.views import (
     AgentScheduleHealthFlagViewSet,
     CommercialOpportunityViewSet,
     AtlasProspectImportView,
+    AtlasLeadIngestionView,
     AnomalyAnalysisRunView,
     MaintenanceAnalysisRunView,
     ManagerCopilotContextView,
@@ -49,6 +50,7 @@ router.register("commercial-opportunities", CommercialOpportunityViewSet, basena
 
 urlpatterns = [
     path("atlas/import-prospects/", AtlasProspectImportView.as_view(), name="ai-agent-atlas-import-prospects"),
+    path("atlas-leads/ingest/", AtlasLeadIngestionView.as_view(), name="ai-agent-atlas-leads-ingest"),
     path("manual-run/", AgentManualRunView.as_view(), name="ai-agent-manual-run"),
     path("maintenance/run/", MaintenanceAnalysisRunView.as_view(), name="ai-agent-maintenance-run"),
     path("scheduling/run/", SchedulingAnalysisRunView.as_view(), name="ai-agent-scheduling-run"),

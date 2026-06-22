@@ -227,4 +227,6 @@ class AtlasImporterApiTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["created_opportunities"], 1)
         self.assertEqual(response.data["status"], AtlasProspectImportBatch.Status.COMPLETED)
-        self.assertTrue(CommercialOpportunity.objects.filter(company_name="Escola Modelo").exists())
+        opportunity = CommercialOpportunity.objects.get(company_name="Escola Modelo")
+        self.assertEqual(opportunity.status, CommercialOpportunity.Status.READY_FOR_REVIEW)
+        self.assertIsNone(opportunity.lead)

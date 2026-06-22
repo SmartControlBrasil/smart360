@@ -27,6 +27,8 @@ from apps.ai_agents_center.models import (
     TechnicianCopilotConfiguration,
     TechnicianCopilotMessage,
     TechnicianCopilotSession,
+    AtlasLead,
+    PendingAtlasLead,
 )
 
 
@@ -308,3 +310,62 @@ class AIBriefingDeliveryAdmin(admin.ModelAdmin):
     list_display = ("briefing", "channel", "recipient_user", "status", "delivered_at", "viewed_at")
     list_filter = ("channel", "status")
     search_fields = ("briefing__title", "recipient_user__email")
+
+
+import logging
+logger = logging.getLogger(__name__)
+
+def trigger_n8n_webhook(lead):
+    """
+    Mock Webhook trigger for n8n integration.
+    Fires when a lead is approved by human moderation.
+    """
+    logger.info(f"[N8N WEBHOOK MOCK] Lead Aprovado e enviado para n8n: {lead.razao_social} - Email: {lead.email_contato}")
+    # Aqui entraria a chamada real requests.post(url, json=payload)
+
+
+@admin.register(AtlasLead)
+class AtlasLeadAdmin(admin.ModelAdmin):
+    list_display = ("razao_social", "cidade", "score", "segmento", "status", "created_at")
+    list_filter = ("status", "segmento", "cidade")
+    search_fields = ("razao_social", "email_contato", "cidade")
+    ordering = ("-score", "-created_at")
+    readonly_fields = ("public_id", "created_at", "updated_at")
+
+
+@admin.register(PendingAtlasLead)
+class PendingAtlasLeadAdmin(admin.ModelAdmin):
+    """
+    Painel de Moderação Humana (Interface de Revisão do Marcelo).
+    Focado especificamente em 'Leads Pendentes do Atlas'.
+    """
+    list_display = ("razao_social", "cidade", "score", "segmento", "notas_resumo", "status")
+    search_fields = ("razao_social", "cidade", "email_contato")
+    ordering = ("-score",)
+    
+    actions = ["approve_selected_leads", "reject_selected_leads"]
+
+    def get_queryset(self, request):
+        # Filtro padrão obrigatório
+        qs = super().get_queryset(request)
+        return qs.filter(status='ready_for_review')
+        
+    def notas_resumo(self, obj):
+        return (obj.notas[:100] + '...') if len(obj.notas) > 100 else obj.notas
+    notas_resumo.short_description = "Notas (Fit Comercial / Produtos)"
+
+    @admin.action(description="Aprovar Leads Selecionados")
+    def approve_selected_leads(self, request, queryset):
+        approved = 0
+        for lead in queryset:
+            lead.status = 'approved'
+            lead.save()
+            trigger_n8n_webhook(lead)
+            approved += 1
+        self.message_user(request, f"{approved} leads aprovados com sucesso. Webhooks disparados.", messages.SUCCESS)
+
+    @admin.action(description="Rejeitar/Arquivar Leads Selecionados")
+    def reject_selected_leads(self, request, queryset):
+        rejected = queryset.update(status='rejected')
+        self.message_user(request, f"{rejected} leads foram rejeitados/arquivados.", messages.WARNING)
+

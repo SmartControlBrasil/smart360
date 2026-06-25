@@ -31,6 +31,7 @@ from apps.billing.services.billing_service import ContractService, PaymentServic
 from apps.companies.services.company_shell_access import user_can_create_saas_company
 from apps.companies.services.tenant_scope import TenantScopeService
 from apps.integration_bus.services.realtime_bus import RealtimeEventBus
+from apps.users.access import is_client_portal_only_user
 
 from .forms import (
     ClientPortalRequestForm,
@@ -2762,12 +2763,8 @@ class DashboardView(ShellContextMixin, TemplateView):
     template_name = "admin_shell/dashboard.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if (
-            getattr(request.user, "user_type", "") == "client"
-            and not getattr(request.user, "is_staff", False)
-            and not getattr(request.user, "is_superuser", False)
-        ):
-            return self.handle_access_denied()
+        if is_client_portal_only_user(request.user):
+            return redirect("/portal/")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

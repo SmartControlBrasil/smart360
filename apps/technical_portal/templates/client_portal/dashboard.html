@@ -17,6 +17,15 @@
   <div class="portal-card"><div class="portal-muted">Concluídos</div><div class="portal-kpi">{{ completed_count }}</div></div>
   <div class="portal-card"><div class="portal-muted">Equipamentos</div><div class="portal-kpi">{{ asset_count }}</div></div>
   <div class="portal-card"><div class="portal-muted">Equipamentos parados</div><div class="portal-kpi">{{ stopped_asset_count }}</div></div>
+  <div class="portal-card">
+    <div class="portal-muted">Próxima visita técnica</div>
+    {% if next_visit_order %}
+      <div class="portal-kpi">{{ next_visit_order.scheduled_start|date:"d/m/Y H:i" }}</div>
+      <div class="portal-muted">{{ next_visit_order.order_number }}{% if next_visit_order.asset %} · {{ next_visit_order.asset }}{% endif %}</div>
+    {% else %}
+      <p>Nenhuma visita agendada no momento.</p>
+    {% endif %}
+  </div>
 </div>
 <div class="portal-grid two" style="margin-top:16px;">
   <div class="portal-card"><h3>Chamados por status</h3><div id="status-chart"></div></div>

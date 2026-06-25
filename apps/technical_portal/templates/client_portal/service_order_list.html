@@ -3,12 +3,12 @@
 {% block content %}
 <div class="portal-topbar"><div><h1>Meus chamados</h1><p class="portal-muted">Chamados vinculados ao seu cliente/unidade.</p></div>{% if can_create_service_order %}<a class="portal-btn" href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>{% endif %}</div>
 <table class="portal-table">
-  <thead><tr><th>Número</th><th>Equipamento</th><th>Status</th><th>Prioridade</th><th>Criado em</th><th></th></tr></thead>
+  <thead><tr><th>Número</th><th>Equipamento</th><th>Status</th><th>Prioridade</th><th>Próxima visita</th><th>Criado em</th><th></th></tr></thead>
   <tbody>
     {% for order in orders %}
-      <tr><td>{{ order.order_number }}</td><td>{{ order.asset|default:"-" }}</td><td>{{ order.get_status_display }}</td><td>{{ order.get_priority_display }}</td><td>{{ order.opened_at|date:"d/m/Y H:i" }}</td><td><a href="{% url 'technical_portal:service-order-detail' order.pk %}">Detalhe</a></td></tr>
+      <tr><td>{{ order.order_number }}</td><td>{{ order.asset|default:"-" }}</td><td>{{ order.get_status_display }}</td><td>{{ order.get_priority_display }}</td><td>{% if order.scheduled_start %}{{ order.scheduled_start|date:"d/m/Y H:i" }}{% else %}Nenhuma visita agendada no momento.{% endif %}</td><td>{{ order.opened_at|date:"d/m/Y H:i" }}</td><td><a href="{% url 'technical_portal:service-order-detail' order.pk %}">Detalhe</a></td></tr>
     {% empty %}
-      <tr><td colspan="6">Nenhum chamado encontrado.</td></tr>
+      <tr><td colspan="7">Nenhum chamado encontrado.</td></tr>
     {% endfor %}
   </tbody>
 </table>

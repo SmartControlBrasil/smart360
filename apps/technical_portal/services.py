@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from apps.access_control_center.models import UserRoleAssignment
 from apps.smart_system.models import Asset, OperationalSite, ServiceOrder
@@ -67,3 +68,15 @@ def user_can_create_service_order(request) -> bool:
         role__slug__in=SERVICE_ORDER_CREATE_ROLE_SLUGS,
         company_id__in=allowed_company_ids,
     ).exists()
+
+
+def upcoming_service_orders(request) -> QuerySet:
+    return (
+        allowed_service_orders(request)
+        .filter(scheduled_start__gte=timezone.now())
+        .order_by("scheduled_start", "opened_at")
+    )
+
+
+def next_service_order_visit(request) -> ServiceOrder | None:
+    return upcoming_service_orders(request).first()

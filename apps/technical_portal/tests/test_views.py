@@ -3,6 +3,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.urls import resolve, reverse
 from django.utils import timezone
+from datetime import timedelta
 
 from apps.access_control_center.services.smart_system_access import assign_smart_system_role, bootstrap_smart_system_access
 from apps.companies.models import Company, Membership, SiteMembership
@@ -50,7 +51,7 @@ class TechnicalPortalViewTests(TestCase):
         SiteMembership.objects.create(user=self.user, company=company, site=site, status=SiteMembership.Status.ACTIVE, is_primary=True)
         return company, maintenance_client, site, asset
 
-    def create_order(self, maintenance_client, site, asset=None, *, order_number="SS-TESTE-0001"):
+    def create_order(self, maintenance_client, site, asset=None, *, order_number="SS-TESTE-0001", scheduled_start=None):
         return ServiceOrder.objects.create(
             order_number=order_number,
             client=maintenance_client,
@@ -62,6 +63,7 @@ class TechnicalPortalViewTests(TestCase):
             source=ServiceOrder.Source.MANUAL,
             title="Chamado em aberto",
             description="Equipamento com falha intermitente.",
+            scheduled_start=scheduled_start,
         )
 
     def test_can_create_categories(self):
@@ -215,13 +217,103 @@ class TechnicalPortalViewTests(TestCase):
         self.assertNotContains(response, "Nota interna")
         self.assertNotContains(response, "trocar fornecedor")
 
-    def test_client_membership_alone_does_not_access_admin_dashboard(self):
+    def test_client_portal_only_user_redirects_from_admin_dashboard_to_portal(self):
         self.create_scope()
         self.login()
 
         response = self.client.get(reverse("admin-shell:dashboard-entry"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertRedirects(response, "/portal/", fetch_redirect_response=False)
+
+    def test_staff_user_can_access_admin_dashboard(self):
+        staff = get_user_model().objects.create_user(
+            email="staff.portal@smart360.local",
+            password="StrongPass123",
+            first_name="Staff",
+            is_staff=True,
+        )
+        self.client.force_login(staff)
+
+        response = self.client.get(reverse("admin-shell:dashboard-entry"))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_superuser_can_access_admin_dashboard(self):
+        superuser = get_user_model().objects.create_superuser(
+            email="super.portal@smart360.local",
+            password="StrongPass123",
+            first_name="Super",
+        )
+        self.client.force_login(superuser)
+
+        response = self.client.get(reverse("admin-shell:dashboard-entry"))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_shows_next_visit_when_future_service_order_exists(self):
+        _, maintenance_client, site, asset = self.create_scope()
+        next_visit = timezone.now() + timedelta(days=2)
+        self.create_order(maintenance_client, site, asset=asset, order_number="SS-VISITA-0001", scheduled_start=next_visit)
+        self.login()
+
+        response = self.client.get(reverse("technical_portal:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Próxima visita técnica")
+        self.assertContains(response, "SS-VISITA-0001")
+        self.assertContains(response, timezone.localtime(next_visit).strftime("%d/%m/%Y %H:%M"))
+
+    def test_dashboard_shows_empty_next_visit_message(self):
+        self.create_scope()
+        self.login()
+
+        response = self.client.get(reverse("technical_portal:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nenhuma visita agendada no momento.")
+
+    def test_dashboard_does_not_show_next_visit_from_other_company(self):
+        self.create_scope()
+        other_company = Company.objects.create(name="Outro Cliente", slug="outro-cliente-visita")
+        other_client = MaintenanceClient.objects.create(company=other_company, display_name="Outro Cliente")
+        other_site = OperationalSite.objects.create(maintenance_client=other_client, name="Unidade Externa")
+        self.create_order(
+            other_client,
+            other_site,
+            order_number="SS-VISITA-FORA",
+            scheduled_start=timezone.now() + timedelta(days=1),
+        )
+        self.login()
+
+        response = self.client.get(reverse("technical_portal:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nenhuma visita agendada no momento.")
+        self.assertNotContains(response, "SS-VISITA-FORA")
+
+    def test_service_order_detail_shows_next_visit(self):
+        _, maintenance_client, site, asset = self.create_scope()
+        next_visit = timezone.now() + timedelta(days=3)
+        order = self.create_order(maintenance_client, site, asset=asset, scheduled_start=next_visit)
+        self.login()
+
+        response = self.client.get(reverse("technical_portal:service-order-detail", args=[order.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Próxima visita técnica")
+        self.assertContains(response, timezone.localtime(next_visit).strftime("%d/%m/%Y %H:%M"))
+
+    def test_service_order_list_shows_next_visit(self):
+        _, maintenance_client, site, asset = self.create_scope()
+        next_visit = timezone.now() + timedelta(days=4)
+        self.create_order(maintenance_client, site, asset=asset, order_number="SS-LISTA-0001", scheduled_start=next_visit)
+        self.login()
+
+        response = self.client.get(reverse("technical_portal:service-orders"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Próxima visita")
+        self.assertContains(response, timezone.localtime(next_visit).strftime("%d/%m/%Y %H:%M"))
 
     def test_main_routes_return_200(self):
         _, maintenance_client, site, asset = self.create_scope()

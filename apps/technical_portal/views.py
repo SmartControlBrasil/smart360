@@ -12,7 +12,7 @@ from apps.smart_system.services.maintenance_service import ServiceOrderService
 
 from .forms import ClientServiceOrderForm
 from .models import ErrorCode, TechnicalArticle, TechnicalCategory
-from .services import allowed_assets, allowed_service_orders, user_can_access_service_order, user_can_create_service_order
+from .services import allowed_assets, allowed_service_orders, next_service_order_visit, user_can_access_service_order, user_can_create_service_order
 
 
 IN_PROGRESS_STATUSES = (
@@ -49,6 +49,7 @@ class ClientPortalDashboardView(LoginRequiredMixin, TemplateView):
                 "asset_count": assets.count(),
                 "stopped_asset_count": assets.filter(status=Asset.Status.STOPPED).count(),
                 "latest_orders": orders[:6],
+                "next_visit_order": next_service_order_visit(self.request),
                 "can_create_service_order": user_can_create_service_order(self.request),
                 "status_chart": {
                     "labels": [ServiceOrder.Status(row["status"]).label for row in status_rows],

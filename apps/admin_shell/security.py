@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from apps.access_control_center.services.smart_system_access import (
     filter_permissioned_items,
@@ -10,6 +10,7 @@ from apps.access_control_center.services.smart_system_access import (
 from apps.billing.services.billing_service import BillingAccessService
 from apps.companies.services.tenant_scope import TenantScopeService
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
+from apps.users.access import is_client_portal_only_user
 
 from .services.shell import get_dashboard_context, get_navigation
 from .services.tenant_scope import build_shell_tenant_context
@@ -112,8 +113,6 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
             return True
         if getattr(user, "is_staff", False) and self.permission_domain in STAFF_INTERNAL_ADMIN_DOMAINS:
             return True
-        if getattr(user, "user_type", "") == "client" and self.permission_domain in STAFF_INTERNAL_ADMIN_DOMAINS:
-            return False
         if not self.permission_domain:
             return True
         return has_smart_system_permission(
@@ -154,6 +153,8 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
+        if is_client_portal_only_user(request.user):
+            return redirect("/portal/")
         denial = self._maybe_deny_without_smart_system_company_membership(request)
         if denial is not None:
             return denial

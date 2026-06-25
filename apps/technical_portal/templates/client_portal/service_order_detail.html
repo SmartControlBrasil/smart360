@@ -11,7 +11,7 @@
     <p><strong>Status:</strong> {{ order.get_status_display }}</p>
     <p><strong>Prioridade:</strong> {{ order.get_priority_display }}</p>
     <p><strong>Tipo:</strong> {{ order.get_maintenance_type_display }}</p>
-    <p><strong>Próxima visita técnica:</strong> {% if order.scheduled_start %}{{ order.scheduled_start|date:"d/m/Y H:i" }}{% else %}Nenhuma visita agendada no momento.{% endif %}</p>
+    <p><strong>Próxima visita técnica:</strong> {% if next_portal_visit %}{{ next_portal_visit.display_at }}{% else %}Nenhuma visita agendada no momento.{% endif %}</p>
   </div>
   <div class="portal-card">
     <h3>Descrição</h3>

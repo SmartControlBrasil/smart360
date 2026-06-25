@@ -12,7 +12,15 @@ from apps.smart_system.services.maintenance_service import ServiceOrderService
 
 from .forms import ClientServiceOrderForm
 from .models import ErrorCode, TechnicalArticle, TechnicalCategory
-from .services import allowed_assets, allowed_service_orders, next_service_order_visit, user_can_access_service_order, user_can_create_service_order
+from .services import (
+    allowed_assets,
+    allowed_service_orders,
+    attach_portal_visits_to_orders,
+    get_next_portal_visit,
+    get_service_order_portal_visit,
+    user_can_access_service_order,
+    user_can_create_service_order,
+)
 
 
 IN_PROGRESS_STATUSES = (
@@ -49,7 +57,7 @@ class ClientPortalDashboardView(LoginRequiredMixin, TemplateView):
                 "asset_count": assets.count(),
                 "stopped_asset_count": assets.filter(status=Asset.Status.STOPPED).count(),
                 "latest_orders": orders[:6],
-                "next_visit_order": next_service_order_visit(self.request),
+                "next_portal_visit": get_next_portal_visit(self.request),
                 "can_create_service_order": user_can_create_service_order(self.request),
                 "status_chart": {
                     "labels": [ServiceOrder.Status(row["status"]).label for row in status_rows],
@@ -119,6 +127,7 @@ class ClientServiceOrderListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        attach_portal_visits_to_orders(self.request, context["orders"])
         context["can_create_service_order"] = user_can_create_service_order(self.request)
         return context
 
@@ -144,6 +153,7 @@ class ClientServiceOrderDetailView(LoginRequiredMixin, DetailView):
             {"occurred_at": log.started_at or log.created_at, "label": "Atendimento tecnico registrado"}
             for log in work_logs
         ]
+        context["next_portal_visit"] = get_service_order_portal_visit(self.request, self.object)
         context["can_create_service_order"] = user_can_create_service_order(self.request)
         return context
 

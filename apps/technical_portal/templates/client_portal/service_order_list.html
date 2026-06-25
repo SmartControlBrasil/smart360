@@ -6,7 +6,7 @@
   <thead><tr><th>Número</th><th>Equipamento</th><th>Status</th><th>Prioridade</th><th>Próxima visita</th><th>Criado em</th><th></th></tr></thead>
   <tbody>
     {% for order in orders %}
-      <tr><td>{{ order.order_number }}</td><td>{{ order.asset|default:"-" }}</td><td>{{ order.get_status_display }}</td><td>{{ order.get_priority_display }}</td><td>{% if order.scheduled_start %}{{ order.scheduled_start|date:"d/m/Y H:i" }}{% else %}Nenhuma visita agendada no momento.{% endif %}</td><td>{{ order.opened_at|date:"d/m/Y H:i" }}</td><td><a href="{% url 'technical_portal:service-order-detail' order.pk %}">Detalhe</a></td></tr>
+      <tr><td>{{ order.order_number }}</td><td>{{ order.asset|default:"-" }}</td><td>{{ order.get_status_display }}</td><td>{{ order.get_priority_display }}</td><td>{% if order.portal_next_visit %}{{ order.portal_next_visit.display_at }}{% else %}Nenhuma visita agendada no momento.{% endif %}</td><td>{{ order.opened_at|date:"d/m/Y H:i" }}</td><td><a href="{% url 'technical_portal:service-order-detail' order.pk %}">Detalhe</a></td></tr>
     {% empty %}
       <tr><td colspan="7">Nenhum chamado encontrado.</td></tr>
     {% endfor %}

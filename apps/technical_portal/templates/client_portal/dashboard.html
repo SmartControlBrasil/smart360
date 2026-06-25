@@ -19,9 +19,9 @@
   <div class="portal-card"><div class="portal-muted">Equipamentos parados</div><div class="portal-kpi">{{ stopped_asset_count }}</div></div>
   <div class="portal-card">
     <div class="portal-muted">Próxima visita técnica</div>
-    {% if next_visit_order %}
-      <div class="portal-kpi">{{ next_visit_order.scheduled_start|date:"d/m/Y H:i" }}</div>
-      <div class="portal-muted">{{ next_visit_order.order_number }}{% if next_visit_order.asset %} · {{ next_visit_order.asset }}{% endif %}</div>
+    {% if next_portal_visit %}
+      <div class="portal-kpi">{{ next_portal_visit.display_at }}</div>
+      <div class="portal-muted">{{ next_portal_visit.order_number }}{% if next_portal_visit.asset_label %} · {{ next_portal_visit.asset_label }}{% endif %}</div>
     {% else %}
       <p>Nenhuma visita agendada no momento.</p>
     {% endif %}

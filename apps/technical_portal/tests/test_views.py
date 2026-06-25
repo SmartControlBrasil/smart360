@@ -144,9 +144,9 @@ class TechnicalPortalViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Automação")
 
-    def test_authorized_client_creates_real_service_order(self):
+    def test_client_manager_creates_real_service_order(self):
         company, maintenance_client, site, asset = self.create_scope()
-        assign_smart_system_role(self.user, "requester", company=company)
+        assign_smart_system_role(self.user, "client-manager", company=company)
         self.login()
 
         response = self.client.post(
@@ -222,6 +222,14 @@ class TechnicalPortalViewTests(TestCase):
         self.login()
 
         response = self.client.get(reverse("admin-shell:dashboard-entry"))
+
+        self.assertRedirects(response, "/portal/", fetch_redirect_response=False)
+
+    def test_client_portal_only_user_redirects_from_internal_app_route_to_portal(self):
+        self.create_scope()
+        self.login()
+
+        response = self.client.get(reverse("admin-shell:smart-system-scheduling-calendar"))
 
         self.assertRedirects(response, "/portal/", fetch_redirect_response=False)
 

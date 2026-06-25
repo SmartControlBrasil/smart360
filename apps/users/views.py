@@ -8,6 +8,7 @@ from django.contrib.auth.views import (
 )
 from django.urls import reverse_lazy
 
+from .access import get_post_login_redirect_url
 from .forms import Smart360AuthenticationForm
 
 
@@ -15,6 +16,14 @@ class Smart360LoginView(LoginView):
     template_name = "accounts/login.html"
     authentication_form = Smart360AuthenticationForm
     redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return get_post_login_redirect_url(
+            self.request.user,
+            self.get_redirect_url(),
+            allowed_hosts=self.get_success_url_allowed_hosts(),
+            require_https=self.request.is_secure(),
+        )
 
     def form_valid(self, form):
         remember_me = form.cleaned_data.get("remember_me")

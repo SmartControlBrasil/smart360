@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
 
@@ -46,6 +47,60 @@ class Smart360AuthViewTests(TestCase):
 
         self.assertRedirects(response, "/ecossistema/", fetch_redirect_response=False)
         self.assertEqual(str(self.client.session["_auth_user_id"]), str(self.user.pk))
+
+    def test_client_user_login_redirects_to_portal(self):
+        client_user = get_user_model().objects.create_user(
+            email="cliente@smart360.local",
+            password=self.password,
+            first_name="Cliente",
+            user_type="client",
+        )
+
+        response = self.client.post(
+            reverse("users:login"),
+            {"username": client_user.email, "password": self.password},
+        )
+
+        self.assertRedirects(response, "/portal/", fetch_redirect_response=False)
+
+    def test_client_portal_only_group_login_redirects_to_portal(self):
+        group_user = get_user_model().objects.create_user(
+            email="grupo.portal@smart360.local",
+            password=self.password,
+            first_name="Grupo",
+        )
+        group = Group.objects.create(name="client-portal-only")
+        group_user.groups.add(group)
+
+        response = self.client.post(
+            reverse("users:login"),
+            {"username": group_user.email, "password": self.password},
+        )
+
+        self.assertRedirects(response, "/portal/", fetch_redirect_response=False)
+
+    def test_client_portal_only_login_ignores_internal_next(self):
+        client_user = get_user_model().objects.create_user(
+            email="cliente.next@smart360.local",
+            password=self.password,
+            first_name="Cliente",
+            user_type="client",
+        )
+
+        response = self.client.post(
+            f"{reverse('users:login')}?next=/ecossistema/",
+            {"username": client_user.email, "password": self.password},
+        )
+
+        self.assertRedirects(response, "/portal/", fetch_redirect_response=False)
+
+    def test_internal_login_preserves_safe_next(self):
+        response = self.client.post(
+            f"{reverse('users:login')}?next=/ecossistema/",
+            {"username": self.user.email, "password": self.password},
+        )
+
+        self.assertRedirects(response, "/ecossistema/", fetch_redirect_response=False)
 
     def test_password_reset_get_returns_200(self):
         response = self.client.get(reverse("users:password-reset"))

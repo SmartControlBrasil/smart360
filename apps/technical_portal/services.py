@@ -2,8 +2,19 @@ from __future__ import annotations
 
 from django.db.models import QuerySet
 
+from apps.access_control_center.models import UserRoleAssignment
 from apps.smart_system.models import Asset, OperationalSite, ServiceOrder
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
+
+
+SERVICE_ORDER_CREATE_ROLE_SLUGS = {
+    "client-admin",
+    "client-manager",
+    "company-admin",
+    "maintenance-manager",
+    "manager",
+    "requester",
+}
 
 
 def portal_queryset(queryset: QuerySet, request) -> QuerySet:
@@ -36,3 +47,23 @@ def allowed_service_orders(request) -> QuerySet:
 
 def user_can_access_service_order(request, service_order: ServiceOrder) -> bool:
     return allowed_service_orders(request).filter(pk=service_order.pk).exists()
+
+
+def user_can_create_service_order(request) -> bool:
+    user = request.user
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "is_superuser", False) or getattr(user, "is_staff", False):
+        return True
+
+    allowed_company_ids = SmartSystemScopeService.get_allowed_company_ids(user)
+    if not allowed_company_ids:
+        return False
+
+    return UserRoleAssignment.objects.filter(
+        user=user,
+        is_active=True,
+        role__is_active=True,
+        role__slug__in=SERVICE_ORDER_CREATE_ROLE_SLUGS,
+        company_id__in=allowed_company_ids,
+    ).exists()

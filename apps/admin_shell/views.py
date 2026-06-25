@@ -1212,7 +1212,7 @@ class ClientPortalReportPreviewView(ClientPortalScopedResourceTemplateView):
         ]
         context["current_portal_section"] = "reports"
         context["page_actions"] = [
-            {"label": "Baixar PDF", "href": f"/portal/reports/{self.kwargs['report_type']}/{self.kwargs['reference_code']}/download/", "permission_domain": "client_portal_reports", "permission_action": "export"},
+            {"label": "Baixar PDF", "href": f"/app/client-portal/reports/{self.kwargs['report_type']}/{self.kwargs['reference_code']}/download/", "permission_domain": "client_portal_reports", "permission_action": "export"},
             {"label": "Voltar para relatorios", "route_name": "admin-shell:client-portal-reports", "permission_domain": "client_portal_reports", "permission_action": "view"},
         ]
         return context
@@ -2760,6 +2760,15 @@ class ObservabilityDashboardView(ShellContextMixin, TemplateView):
 
 class DashboardView(ShellContextMixin, TemplateView):
     template_name = "admin_shell/dashboard.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if (
+            getattr(request.user, "user_type", "") == "client"
+            and not getattr(request.user, "is_staff", False)
+            and not getattr(request.user, "is_superuser", False)
+        ):
+            return self.handle_access_denied()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

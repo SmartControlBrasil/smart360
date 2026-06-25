@@ -112,6 +112,8 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
             return True
         if getattr(user, "is_staff", False) and self.permission_domain in STAFF_INTERNAL_ADMIN_DOMAINS:
             return True
+        if getattr(user, "user_type", "") == "client" and self.permission_domain in STAFF_INTERNAL_ADMIN_DOMAINS:
+            return False
         if not self.permission_domain:
             return True
         return has_smart_system_permission(

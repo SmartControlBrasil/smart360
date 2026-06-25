@@ -403,7 +403,7 @@ def get_client_asset_listing_context(request, filters, tenant_context):
                 "criticality": asset.get_criticality_display(),
                 "last_maintenance": timezone.localdate(latest_order.completed_at).strftime("%d/%m/%Y") if latest_order and latest_order.completed_at else "-",
                 "next_preventive": next_plan.next_due_date.strftime("%d/%m/%Y") if next_plan and next_plan.next_due_date else "-",
-                "detail_url": f"/portal/assets/{asset.asset_tag}/",
+                "detail_url": f"/app/client-portal/assets/{asset.asset_tag}/",
             }
         )
 
@@ -515,7 +515,7 @@ def get_client_work_order_detail_context(request, order_code):
     if quote is not None:
         page_actions.insert(
             1,
-            {"label": "Orcamento", "href": f"/portal/quotes/{quote.quote_number}/", "permission_domain": "client_portal_quotes", "permission_action": "view"},
+            {"label": "Orcamento", "href": f"/app/client-portal/quotes/{quote.quote_number}/", "permission_domain": "client_portal_quotes", "permission_action": "view"},
         )
     return {
         "work_order": order,
@@ -568,7 +568,7 @@ def get_client_preventive_detail_context(request, public_id):
     ]
     if plan.asset:
         page_actions.append(
-            {"label": "Ativo", "href": f"/portal/assets/{plan.asset.asset_tag}/", "permission_domain": "client_portal_assets", "permission_action": "view"}
+            {"label": "Ativo", "href": f"/app/client-portal/assets/{plan.asset.asset_tag}/", "permission_domain": "client_portal_assets", "permission_action": "view"}
         )
     return {
         "plan": plan,
@@ -615,8 +615,8 @@ def get_client_quote_detail_context(request, quote_number):
         "quote": quote,
         "quote_items": list(quote.items.all()),
         "page_actions": [
-            {"label": "Aprovar", "href": f"/portal/quotes/{quote.quote_number}/approve/", "permission_domain": "client_portal_quotes", "permission_action": "approve"},
-            {"label": "Rejeitar", "href": f"/portal/quotes/{quote.quote_number}/reject/", "permission_domain": "client_portal_quotes", "permission_action": "reject"},
+            {"label": "Aprovar", "href": f"/app/client-portal/quotes/{quote.quote_number}/approve/", "permission_domain": "client_portal_quotes", "permission_action": "approve"},
+            {"label": "Rejeitar", "href": f"/app/client-portal/quotes/{quote.quote_number}/reject/", "permission_domain": "client_portal_quotes", "permission_action": "reject"},
             {"label": "Abrir OS", "route_name": "admin-shell:client-portal-work-order-detail", "route_kwargs": {"order_code": quote.work_order.order_number}, "permission_domain": "client_portal_work_orders", "permission_action": "view"},
         ],
     }
@@ -773,8 +773,8 @@ def _map_portal_report_entries(entries):
         report_type = _resolve_report_type_slug(entry["report_code"], entry["reference_code"])
         mapped = dict(entry)
         mapped["report_type_slug"] = report_type
-        mapped["portal_preview_url"] = f"/portal/reports/{report_type}/{entry['reference_code']}/"
-        mapped["portal_download_url"] = f"/portal/reports/{report_type}/{entry['reference_code']}/download/"
+        mapped["portal_preview_url"] = f"/app/client-portal/reports/{report_type}/{entry['reference_code']}/"
+        mapped["portal_download_url"] = f"/app/client-portal/reports/{report_type}/{entry['reference_code']}/download/"
         mapped_entries.append(mapped)
     return mapped_entries
 

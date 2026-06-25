@@ -43,7 +43,7 @@
       <div class="portal-brand">Smart Control<span>Portal do Cliente</span></div>
       <nav class="portal-nav">
         <a href="{% url 'technical_portal:home' %}">Dashboard</a>
-        <a href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>
+        {% if can_create_service_order %}<a href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>{% endif %}
         <a href="{% url 'technical_portal:service-orders' %}">Meus chamados</a>
         <a href="{% url 'technical_portal:assets' %}">Equipamentos</a>
         <a href="{% url 'users:logout' %}">Sair</a>

@@ -1,7 +1,7 @@
 {% extends "client_portal/base.html" %}
 {% block title %}Meus chamados{% endblock %}
 {% block content %}
-<div class="portal-topbar"><div><h1>Meus chamados</h1><p class="portal-muted">Chamados vinculados ao seu cliente/unidade.</p></div><a class="portal-btn" href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a></div>
+<div class="portal-topbar"><div><h1>Meus chamados</h1><p class="portal-muted">Chamados vinculados ao seu cliente/unidade.</p></div>{% if can_create_service_order %}<a class="portal-btn" href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>{% endif %}</div>
 <table class="portal-table">
   <thead><tr><th>Número</th><th>Equipamento</th><th>Status</th><th>Prioridade</th><th>Criado em</th><th></th></tr></thead>
   <tbody>

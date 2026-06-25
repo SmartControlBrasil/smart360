@@ -6,7 +6,7 @@
     <h1>Dashboard</h1>
     <p class="portal-muted">Visão simples dos chamados e equipamentos vinculados ao seu acesso.</p>
   </div>
-  <a class="portal-btn" href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>
+  {% if can_create_service_order %}<a class="portal-btn" href="{% url 'technical_portal:service-order-create' %}">Abrir chamado</a>{% endif %}
 </div>
 {% if not has_scope_data %}
   <div class="portal-empty">Nenhum dado disponível para o seu usuário neste portal. Se você esperava ver equipamentos ou chamados, solicite a vinculação da sua conta a uma empresa ou unidade.</div>

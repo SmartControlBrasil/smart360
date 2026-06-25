@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.db.models.functions import TruncMonth
 from django.http import Http404
@@ -11,7 +12,7 @@ from apps.smart_system.services.maintenance_service import ServiceOrderService
 
 from .forms import ClientServiceOrderForm
 from .models import ErrorCode, TechnicalArticle, TechnicalCategory
-from .services import allowed_assets, allowed_service_orders, user_can_access_service_order
+from .services import allowed_assets, allowed_service_orders, user_can_access_service_order, user_can_create_service_order
 
 
 IN_PROGRESS_STATUSES = (
@@ -48,6 +49,7 @@ class ClientPortalDashboardView(LoginRequiredMixin, TemplateView):
                 "asset_count": assets.count(),
                 "stopped_asset_count": assets.filter(status=Asset.Status.STOPPED).count(),
                 "latest_orders": orders[:6],
+                "can_create_service_order": user_can_create_service_order(self.request),
                 "status_chart": {
                     "labels": [ServiceOrder.Status(row["status"]).label for row in status_rows],
                     "series": [row["total"] for row in status_rows],
@@ -70,6 +72,11 @@ class ClientServiceOrderCreateView(LoginRequiredMixin, FormView):
     template_name = "client_portal/service_order_form.html"
     form_class = ClientServiceOrderForm
     success_url = reverse_lazy("technical_portal:service-orders")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not user_can_create_service_order(request):
+            raise PermissionDenied("Seu perfil permite acompanhar chamados, mas nao abrir novos chamados.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -109,6 +116,11 @@ class ClientServiceOrderListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return allowed_service_orders(self.request)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_create_service_order"] = user_can_create_service_order(self.request)
+        return context
+
 
 class ClientServiceOrderDetailView(LoginRequiredMixin, DetailView):
     template_name = "client_portal/service_order_detail.html"
@@ -126,7 +138,12 @@ class ClientServiceOrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["work_logs"] = WorkLog.objects.filter(service_order=self.object).select_related("user").order_by("-started_at", "-created_at")
+        work_logs = WorkLog.objects.filter(service_order=self.object).order_by("-started_at", "-created_at")
+        context["client_history"] = [
+            {"occurred_at": log.started_at or log.created_at, "label": "Atendimento tecnico registrado"}
+            for log in work_logs
+        ]
+        context["can_create_service_order"] = user_can_create_service_order(self.request)
         return context
 
 
@@ -142,6 +159,11 @@ class ClientAssetListView(LoginRequiredMixin, ListView):
                 filter=Q(service_orders__status__in=(ServiceOrder.Status.OPEN, *IN_PROGRESS_STATUSES)),
             )
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_create_service_order"] = user_can_create_service_order(self.request)
+        return context
 
 
 class TechnicalPortalHomeView(ClientPortalDashboardView):
@@ -179,6 +201,7 @@ class TechnicalPortalSearchView(LoginRequiredMixin, TemplateView):
         context["articles"] = articles
         context["error_codes"] = error_codes
         context["result_count"] = articles.count() + error_codes.count()
+        context["can_create_service_order"] = user_can_create_service_order(self.request)
         return context
 
 
@@ -196,4 +219,5 @@ class TechnicalCategoryDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["articles"] = self.object.articles.filter(is_active=True)
         context["error_codes"] = self.object.error_codes.filter(is_active=True)
+        context["can_create_service_order"] = user_can_create_service_order(self.request)
         return context

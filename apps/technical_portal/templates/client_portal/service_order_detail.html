@@ -19,8 +19,8 @@
 </div>
 <div class="portal-card" style="margin-top:16px;">
   <h3>Histórico básico</h3>
-  {% for log in work_logs %}
-    <p><strong>{{ log.started_at|default:log.created_at|date:"d/m/Y H:i" }}</strong> - {{ log.notes|default:"Registro técnico" }}</p>
+  {% for item in client_history %}
+    <p><strong>{{ item.occurred_at|date:"d/m/Y H:i" }}</strong> - {{ item.label }}</p>
   {% empty %}
     <p class="portal-muted">Nenhum histórico técnico registrado ainda.</p>
   {% endfor %}

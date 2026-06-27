@@ -36,7 +36,7 @@ class AutonomousPolicyService:
         if decision.normalized_action_type in ELIGIBLE_ACTIONS:
             base = Decimal(str(ELIGIBLE_ACTIONS[decision.normalized_action_type].default_threshold))
         if decision.risk_level == "low":
-            base += Decimal("0.08")
+            base += Decimal("0.10")
         if simulation_run and hasattr(simulation_run, "result"):
             base = max(base, cls.CONFIDENCE_MAP.get(simulation_run.result.confidence_level, Decimal("0.75")))
         return min(base, Decimal("0.99"))

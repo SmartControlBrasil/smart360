@@ -48,7 +48,7 @@ def seed_autonomous_defaults(apps, schema_editor):
     PolicyScope.objects.get_or_create(policy=policy, company=None, site=None, module_slug="ai_autonomous_ops", defaults={"priority": 20})
     rules = [
         ("evaluate_candidate", "low", "allow", False, True, []),
-        ("execute_autonomy", "medium", "allow", False, True, []),
+        ("execute_autonomy", "any", "allow", False, True, []),
         ("rollback_autonomy", "medium", "allow", False, True, ["maintenance-manager", "company-admin", "super-admin"]),
         ("kill_switch", "high", "require_approval", True, True, ["company-admin", "super-admin"]),
     ]

@@ -14,9 +14,11 @@ from django.views.generic import TemplateView
 from django.views import View
 from django.views.generic.edit import FormView
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.utils import timezone
+from django.db.models import Q
 
 from apps.access_control_center.services.access_service import AccessAuditService
 from apps.ai_agents_center.models import AIBriefing, AgentActionProposal
@@ -28,12 +30,16 @@ from apps.analytics_platform.models import OperationalMetrics
 from apps.analytics_platform.services.analytics_service import ExecutiveAnalyticsService
 from apps.billing.models import Contract, Invoice
 from apps.billing.services.billing_service import ContractService, PaymentService
+from apps.companies.models import Membership, SiteMembership
 from apps.companies.services.company_shell_access import user_can_create_saas_company
 from apps.companies.services.tenant_scope import TenantScopeService
 from apps.integration_bus.services.realtime_bus import RealtimeEventBus
 
 from .forms import (
+    CLIENT_PORTAL_GROUP_DESCRIPTIONS,
+    CLIENT_PORTAL_GROUP_LABELS,
     ClientPortalRequestForm,
+    ClientPortalUserForm,
     ClientQuoteDecisionForm,
     ClientServiceSignatureForm,
     CorrectiveServiceOrderForm,
@@ -105,6 +111,7 @@ from .services.ai_agents_center import (
     get_ai_agents_runs_context,
     get_ai_briefings_context,
     get_ai_agents_scheduling_health_context,
+    get_operations_health_context,
 )
 from .services.observability import get_observability_dashboard_context
 from .services.marketplace_technicians import (
@@ -230,6 +237,160 @@ class ShellContextMixin(SmartSystemShellAccessMixin):
         context = self.get_context_data(form=form)
         # When using FormView, render the template with status 400
         return render(self.request, self.get_template_names(), context=context, status=400)
+
+
+class ClientPortalUserAdminMixin(ShellContextMixin):
+    permission_domain = "users"
+    permission_action = "manage"
+    enforce_billing_access = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "current_module_slug": "core-platform",
+                "breadcrumbs": [
+                    {"label": "Dashboard", "url": "admin-shell:dashboard"},
+                    {"label": "Usuários do Portal", "url": "admin-shell:client-portal-users"},
+                ],
+            }
+        )
+        return context
+
+
+class ClientPortalUserListView(ClientPortalUserAdminMixin, TemplateView):
+    template_name = "admin_shell/client_portal_users/list.html"
+
+    @staticmethod
+    def _client_portal_users_queryset():
+        return (
+            get_user_model()
+            .objects.filter(Q(user_type="client") | Q(groups__name="client-portal-only"))
+            .prefetch_related("groups")
+            .distinct()
+            .order_by("email")
+        )
+
+    @staticmethod
+    def _access_label(user):
+        names = set(user.groups.values_list("name", flat=True))
+        for group_name, label in CLIENT_PORTAL_GROUP_LABELS.items():
+            if group_name in names:
+                return label
+        return CLIENT_PORTAL_GROUP_LABELS["client-portal-only"]
+
+    @staticmethod
+    def _last_login(user):
+        return getattr(user, "last_login_at", None) or getattr(user, "last_login", None)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        users = list(self._client_portal_users_queryset())
+        memberships = {}
+        for membership in (
+            Membership.objects.filter(
+                user_id__in=[user.id for user in users],
+                status=Membership.Status.ACTIVE,
+            )
+            .select_related("company")
+            .order_by("user_id", "-is_primary", "company__name")
+        ):
+            memberships.setdefault(membership.user_id, membership)
+        site_memberships = {}
+        for site_membership in (
+            SiteMembership.objects.filter(
+                user_id__in=[user.id for user in users],
+                status=SiteMembership.Status.ACTIVE,
+            )
+            .select_related("site", "company")
+            .order_by("user_id", "-is_primary", "site__name")
+        ):
+            site_memberships.setdefault(site_membership.user_id, site_membership)
+        rows = []
+        for user in users:
+            membership = memberships.get(user.id)
+            site_membership = site_memberships.get(user.id)
+            rows.append(
+                {
+                    "user": user,
+                    "company": membership.company if membership else None,
+                    "site": site_membership.site if site_membership else None,
+                    "access_level": self._access_label(user),
+                    "last_login": self._last_login(user),
+                }
+            )
+        context.update(
+            {
+                "page_title": "Usuários do Portal",
+                "page_description": (
+                    "Usuários do Portal acessam somente o painel básico em /portal/ para abrir e acompanhar chamados. "
+                    "Eles não acessam o painel interno do Smart360."
+                ),
+                "portal_user_rows": rows,
+                "create_url": reverse("admin-shell:client-portal-user-create"),
+            }
+        )
+        return context
+
+
+class ClientPortalUserCreateView(ClientPortalUserAdminMixin, FormView):
+    template_name = "admin_shell/client_portal_users/form.html"
+    form_class = ClientPortalUserForm
+
+    def get_success_url(self):
+        return reverse("admin-shell:client-portal-users")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "form_mode": "create",
+                "page_title": "Novo usuário do Portal",
+                "page_description": "Cadastre um login externo para acessar somente /portal/.",
+                "access_descriptions": CLIENT_PORTAL_GROUP_DESCRIPTIONS,
+                "cancel_href": reverse("admin-shell:client-portal-users"),
+            }
+        )
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Usuário do Portal criado com sucesso.")
+        return super().form_valid(form)
+
+
+class ClientPortalUserUpdateView(ClientPortalUserCreateView):
+    form_mode = "update"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = get_object_or_404(
+            get_user_model().objects.prefetch_related("groups"),
+            pk=kwargs["user_id"],
+        )
+        if self.object.is_staff or self.object.is_superuser:
+            raise Http404("Usuário interno não pode ser editado por esta tela.")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = self.object
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "form_mode": "update",
+                "page_title": "Editar usuário do Portal",
+                "page_description": "Atualize empresa, unidade, status e nível de acesso do login externo.",
+            }
+        )
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Usuário do Portal atualizado com sucesso.")
+        return FormView.form_valid(self, form)
 
 
 class CMMSOperationalShellMixin(SmartSystemOperationalRouteMixin, ShellContextMixin):
@@ -1971,6 +2132,31 @@ class AnalyticsExecutiveRefreshView(ShellContextMixin, View):
                 user=request.user,
             )
         return redirect(reverse("admin-shell:analytics-executive-dashboard"))
+
+
+class OperationsHealthView(ShellContextMixin, TemplateView):
+    template_name = "admin_shell/operations_health.html"
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(get_operations_health_context(tenant_context=self.get_tenant_context()))
+        context["page_title"] = "Operação Técnica Inteligente"
+        context["page_description"] = "Resumo prático dos agentes de manutenção e agenda para gestão operacional."
+        context["breadcrumbs"] = [
+            {"label": "Dashboard", "url": "admin-shell:dashboard"},
+            {"label": "Operações", "url": None},
+            {"label": "Operação Técnica Inteligente", "url": None},
+        ]
+        context["current_module_slug"] = "ai-agents-center"
+        context["page_actions"] = [
+            {"label": "Recomendações", "route_name": "admin-shell:ai-agents-recommendations", "permission_domain": "ai_agents_admin", "permission_action": "view"},
+            {"label": "Propostas", "route_name": "admin-shell:ai-agents-proposals", "permission_domain": "ai_agents_admin", "permission_action": "view"},
+            {"label": "Runs", "route_name": "admin-shell:ai-agents-runs", "permission_domain": "ai_agents_admin", "permission_action": "view"},
+        ]
+        return context
 
 
 class AIAgentsDashboardView(ShellContextMixin, TemplateView):

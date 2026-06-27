@@ -31,6 +31,101 @@ def get_ai_agents_dashboard_context(*, tenant_context):
     return payload
 
 
+def get_operations_health_context(*, tenant_context):
+    company = tenant_context.get("active_company") or tenant_context.get("company")
+    operational_agent_slugs = ["maintenance-agent", "scheduling-agent"]
+
+    recommendations = AgentRecommendation.objects.select_related(
+        "agent_run",
+        "agent_run__agent",
+        "company",
+        "site",
+    ).filter(agent_run__agent__slug__in=operational_agent_slugs)
+    proposals = AgentActionProposal.objects.select_related(
+        "agent_run",
+        "agent_run__agent",
+        "agent_run__company",
+        "agent_run__site",
+    ).filter(agent_run__agent__slug__in=operational_agent_slugs)
+    asset_flags = AgentAssetAttentionFlag.objects.select_related(
+        "agent",
+        "company",
+        "site",
+        "asset",
+        "latest_recommendation",
+    ).filter(agent__slug="maintenance-agent")
+    schedule_flags = AgentScheduleHealthFlag.objects.select_related(
+        "agent",
+        "company",
+        "site",
+        "technician",
+        "latest_recommendation",
+    ).filter(agent__slug="scheduling-agent")
+    runs = AgentRun.objects.select_related("agent", "company", "site", "triggered_by").filter(
+        agent__slug__in=operational_agent_slugs
+    )
+
+    if company is not None:
+        recommendations = recommendations.filter(company=company)
+        proposals = proposals.filter(agent_run__company=company)
+        asset_flags = asset_flags.filter(company=company)
+        schedule_flags = schedule_flags.filter(company=company)
+        runs = runs.filter(company=company)
+
+    open_recommendations = recommendations.filter(status=AgentRecommendation.Status.OPEN)
+    pending_proposals = proposals.filter(status=AgentActionProposal.Status.PENDING_APPROVAL)
+    open_asset_flags = asset_flags.filter(status__in=[AgentAssetAttentionFlag.Status.ACTIVE, AgentAssetAttentionFlag.Status.WATCHING])
+    open_schedule_flags = schedule_flags.filter(status__in=[AgentScheduleHealthFlag.Status.ACTIVE, AgentScheduleHealthFlag.Status.WATCHING])
+
+    detected_risks = []
+    for recommendation in open_recommendations.order_by("-attention_score", "-created_at")[:6]:
+        detected_risks.append(
+            {
+                "kind": "Recomendação",
+                "title": recommendation.title,
+                "summary": recommendation.summary,
+                "agent": recommendation.agent_run.agent.name,
+                "risk": recommendation.severity,
+                "created_at": recommendation.created_at,
+                "href": "admin-shell:ai-agents-recommendations",
+            }
+        )
+    for proposal in pending_proposals.order_by("-created_at")[:6]:
+        detected_risks.append(
+            {
+                "kind": "Proposta",
+                "title": proposal.title or proposal.action_type,
+                "summary": proposal.summary,
+                "agent": proposal.agent_run.agent.name,
+                "risk": proposal.priority,
+                "created_at": proposal.created_at,
+                "href": "admin-shell:ai-agents-proposals",
+            }
+        )
+    detected_risks.sort(key=lambda item: item["created_at"], reverse=True)
+
+    return {
+        "company": company,
+        "summary_cards": [
+            {"label": "Recomendações pendentes", "value": open_recommendations.count(), "href": "admin-shell:ai-agents-recommendations"},
+            {"label": "Propostas aguardando aprovação", "value": pending_proposals.count(), "href": "admin-shell:ai-agents-proposals"},
+            {"label": "Flags de atenção abertas", "value": open_asset_flags.count() + open_schedule_flags.count(), "href": "admin-shell:ai-agents-maintenance-health"},
+            {"label": "Runs recentes", "value": runs.count(), "href": "admin-shell:ai-agents-runs"},
+        ],
+        "detected_risks": detected_risks[:10],
+        "open_asset_flags": list(open_asset_flags.order_by("-attention_score", "-updated_at")[:8]),
+        "open_schedule_flags": list(open_schedule_flags.order_by("-attention_score", "-updated_at")[:8]),
+        "recent_runs": list(runs.order_by("-created_at")[:8]),
+        "quick_links": [
+            {"label": "Recomendações", "href": "admin-shell:ai-agents-recommendations"},
+            {"label": "Propostas", "href": "admin-shell:ai-agents-proposals"},
+            {"label": "Runs", "href": "admin-shell:ai-agents-runs"},
+            {"label": "Maintenance Health", "href": "admin-shell:ai-agents-maintenance-health"},
+            {"label": "Scheduling Health", "href": "admin-shell:ai-agents-scheduling-health"},
+        ],
+    }
+
+
 def get_ai_agents_recommendations_context(*, tenant_context):
     company = tenant_context.get("active_company")
     queryset = AgentRecommendation.objects.select_related("agent_run", "agent_run__agent", "company", "site").order_by("-created_at")

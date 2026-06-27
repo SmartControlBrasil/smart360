@@ -585,6 +585,14 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                     "permission_action": "view",
                 },
                 {
+                    "label": "Operação Técnica Inteligente",
+                    "icon": "spark",
+                    "url_name": "admin-shell:operations-health",
+                    "match_names": ["admin-shell:operations-health"],
+                    "permission_domain": "ai_agents_admin",
+                    "permission_action": "view",
+                },
+                {
                     "label": "AI Agents Center",
                     "icon": "spark",
                     "url_name": "admin-shell:ai-agents-dashboard",
@@ -701,6 +709,18 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
         {
             "label": "Governanca",
             "items": [
+                {
+                    "label": "Usuários do Portal",
+                    "icon": "users",
+                    "url_name": "admin-shell:client-portal-users",
+                    "match_names": [
+                        "admin-shell:client-portal-users",
+                        "admin-shell:client-portal-user-create",
+                        "admin-shell:client-portal-user-update",
+                    ],
+                    "permission_domain": "users",
+                    "permission_action": "manage",
+                },
                 {
                     "label": "Access Control Center",
                     "icon": "shield",

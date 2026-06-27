@@ -120,7 +120,43 @@ class SimulationEngineApiTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
+        self.assertTrue(all(item["simulation_type"] == "maintenance_action_plan_simulation" for item in response.data))
+
+    def test_by_entity_endpoint_does_not_leak_other_company_history(self):
+        other_membership = MembershipFactory()
+        other_company = other_membership.company
+        other_user = other_membership.user
+        other_site = OperationalSiteFactory(maintenance_client__company=other_company)
+        other_asset = AssetFactory(operational_site=other_site)
+        other_run = AgentRun.objects.create(
+            agent=self.agent,
+            company=other_company,
+            site=other_site,
+            triggered_by=other_user,
+            trigger_type=AgentRun.TriggerType.MANUAL,
+            status=AgentRun.Status.COMPLETED,
+        )
+        other_proposal = AgentActionProposal.objects.create(
+            agent_run=other_run,
+            action_type="open_inspection_work_order",
+            target_entity="asset",
+            target_entity_id=str(other_asset.public_id),
+            title="Open inspection work order",
+            summary="Inspection required",
+            proposed_payload={"asset_public_id": str(other_asset.public_id)},
+            priority="high",
+            approval_required=True,
+        )
+        DecisionOrchestrator.receive_action_proposal(proposal=other_proposal)
+
+        response = self.client.get(
+            reverse("ai-simulation-run-by-entity"),
+            {"company": self.company.id, "entity": "asset", "entity_id": str(other_asset.public_id)},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
 
     def test_attach_to_decision_endpoint_links_existing_run(self):
         response = self.client.post(

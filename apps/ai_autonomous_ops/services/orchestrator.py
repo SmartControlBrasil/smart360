@@ -6,7 +6,9 @@ from django.utils import timezone
 from apps.ai_autonomous_ops.models import AutonomousExecution
 from apps.ai_shared.interfaces.decision_engine import get_decision_execution_service
 from apps.ai_decision_engine.models import AgentDecision, DecisionExecution
+from apps.ai_simulation_engine.models import SimulationType
 from apps.ai_simulation_engine.services.orchestrator import SimulationOrchestrator
+from apps.ai_simulation_engine.services.policies import SimulationPolicyService
 from apps.ai_policy_studio.models import PolicyRule
 from apps.ai_policy_studio.services.engine import PolicyStudioEngine
 
@@ -22,6 +24,41 @@ class AutonomousOperationsService:
     def evaluate_and_execute(cls, *, decision: AgentDecision):
         simulation_run = None
         envelope = AutonomousPolicyService.evaluate_safety_envelope(decision=decision, simulation_run=None)
+        required_simulation = SimulationPolicyService.get_requirement_for_decision(decision)
+        if envelope.requires_simulation and required_simulation is not None:
+            simulation_type = SimulationType.objects.filter(slug=required_simulation["simulation_type"], enabled=True).first()
+            if simulation_type is None:
+                execution = AutonomousExecution.objects.create(
+                    company=decision.company,
+                    site=decision.site,
+                    action_type=decision.normalized_action_type,
+                    source_agent=decision.agent_action_proposal.agent_run.agent.slug,
+                    source_decision=decision,
+                    risk_level=decision.risk_level,
+                    execution_status=AutonomousExecution.ExecutionStatus.BLOCKED,
+                    execution_summary="Simulacao obrigatoria ausente.",
+                    policy_snapshot={
+                        **envelope.policy_payload,
+                        "policy_studio_result": "",
+                        "policy_studio_reason": "",
+                        "required_simulation_type": required_simulation["simulation_type"],
+                    },
+                )
+                AutonomousAuditService.log_event(
+                    execution=execution,
+                    event_type="autonomy.simulation.failed",
+                    message="Simulacao obrigatoria ausente.",
+                )
+                decision.explainability_payload = {
+                    **(decision.explainability_payload or {}),
+                    "autonomy": {
+                        "candidate": True,
+                        "autonomous_execution_public_id": str(execution.public_id),
+                        "safety_envelope": execution.policy_snapshot,
+                    },
+                }
+                decision.save(update_fields=["explainability_payload", "updated_at"])
+                return execution
         studio_result = PolicyStudioEngine.evaluate(
             module_slug="ai_autonomous_ops",
             action_type="evaluate_candidate",
@@ -63,7 +100,7 @@ class AutonomousOperationsService:
             },
         }
         decision.save(update_fields=["explainability_payload", "updated_at"])
-        if not studio_result.allowed or studio_result.result == PolicyRule.EvaluationResult.DENY:
+        if studio_result.policy is not None and studio_result.result == PolicyRule.EvaluationResult.DENY:
             execution.execution_status = AutonomousExecution.ExecutionStatus.BLOCKED
             execution.execution_summary = studio_result.reason
             execution.save(update_fields=["execution_status", "execution_summary", "updated_at"])

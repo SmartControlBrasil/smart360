@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from apps.companies.models import Company
+from apps.smart_system.models import OperationalSite
 from apps.ai_simulation_engine.models import SimulationResult, SimulationRun, SimulationScenario, SimulationType
 
 
@@ -84,21 +86,13 @@ class SimulationScenarioSerializer(serializers.ModelSerializer):
 class SimulationRequestSerializer(serializers.Serializer):
     simulation_type = serializers.SlugField(required=False)
     decision_public_id = serializers.UUIDField(required=False)
-    company = serializers.PrimaryKeyRelatedField(read_only=True)
-    site = serializers.PrimaryKeyRelatedField(read_only=True)
+    company = serializers.PrimaryKeyRelatedField(required=False, queryset=Company.objects.all())
+    site = serializers.PrimaryKeyRelatedField(required=False, queryset=OperationalSite.objects.all())
     title = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     target_entity = serializers.CharField(required=False, allow_blank=True)
     target_entity_id = serializers.CharField(required=False, allow_blank=True)
     input_payload = serializers.JSONField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        from apps.companies.models import Company
-        from apps.smart_system.models import OperationalSite
-
-        self.fields["company"].queryset = Company.objects.all()
-        self.fields["site"].queryset = OperationalSite.objects.all()
 
     def validate(self, attrs):
         if not attrs.get("decision_public_id") and not attrs.get("simulation_type"):

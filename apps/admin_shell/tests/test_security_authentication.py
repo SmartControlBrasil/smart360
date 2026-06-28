@@ -15,6 +15,9 @@ class CriticalInternalAuthenticationTests(TestCase):
     def test_operations_health_requires_authentication(self):
         self.assert_redirects_to_admin_login(reverse("admin-shell:operations-health"))
 
+    def test_operations_review_requires_authentication(self):
+        self.assert_redirects_to_admin_login(reverse("admin-shell:operations-review"))
+
     def test_client_user_management_requires_authentication(self):
         self.assert_redirects_to_admin_login(reverse("admin-shell:client-portal-users"))
 

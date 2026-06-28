@@ -105,14 +105,34 @@ Para validar o agendamento no código:
 .venv/bin/python manage.py test apps.ai_agents_center.tests.test_operational_runner
 ```
 
-## Tela para abrir depois da execução
+## Rotina diária de revisão
 
-Abrir `/app/operations/health/` e conferir:
+1. O Celery Beat roda a task `ai_agents_center.run_daily_operational_agents` às 06:30.
+2. O operador abre `/app/operations/review/`.
+3. Revisa recomendações abertas e propostas pendentes dos agentes `maintenance-agent` e `scheduling-agent`.
+4. Aprova ou rejeita propostas pelo fluxo interno de decisão humana.
+5. Marca recomendações como revisadas quando a triagem operacional estiver concluída.
+6. Acompanha `/app/operations/health/` para visão de saúde, flags e runs recentes.
+
+A Operational Review Queue não executa manutenção real, não envia e-mail e não altera agenda externa. Ela apenas organiza a revisão humana e reaproveita o status interno de recomendações/propostas.
+
+## Telas para abrir depois da execução
+
+Abrir `/app/operations/review/` para responder: o que preciso revisar hoje no piloto operacional? Conferir:
+
+- propostas pendentes com ações de aprovar/rejeitar;
+- recomendações abertas com ação de marcar como revisada;
+- flags relevantes de manutenção e agenda;
+- runs de hoje e ontem.
+
+Abrir `/app/operations/health/` para acompanhar saúde operacional agregada:
 
 - recomendações abertas por agente;
 - propostas pendentes de aprovação humana;
 - flags abertas de manutenção e agenda;
 - últimos `AgentRun` dos agentes operacionais.
+
+Diferença prática: a Review Queue é a fila diária de trabalho humano; o Operations Health é o painel de acompanhamento e diagnóstico.
 
 As telas detalhadas permanecem as existentes:
 
@@ -152,8 +172,9 @@ Um painel vazio não significa falha obrigatória. Conferir nesta ordem:
 3. Verificar se existem sites ativos para a empresa do usuário logado.
 4. Rodar a rotina real sem `--dry-run` para a janela desejada.
 5. Confirmar se há dados operacionais suficientes para gerar recomendações, propostas ou flags.
-6. Se a rotina automática já deveria ter rodado, conferir se Beat/worker Celery estão ativos e procurar logs da task `ai_agents_center.run_daily_operational_agents`.
-7. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
+6. Abrir `/app/operations/review/` para revisar a fila do dia.
+7. Se a rotina automática já deveria ter rodado, conferir se Beat/worker Celery estão ativos e procurar logs da task `ai_agents_center.run_daily_operational_agents`.
+8. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
 
 ## Dependências para piloto real
 

@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from apps.access_control_center.services.access_service import AccessAuditService
-from apps.ai_agents_center.models import AIBriefing, AgentActionProposal
+from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentRecommendation
 from apps.ai_agents_center.services.briefing_composer import AIBriefingComposer
 from apps.ai_agents_center.services.client_portal_copilot import ClientPortalCopilotService
 from apps.ai_decision_engine.models import AgentDecision
@@ -112,6 +112,7 @@ from .services.ai_agents_center import (
     get_ai_briefings_context,
     get_ai_agents_scheduling_health_context,
     get_operations_health_context,
+    get_operational_review_queue_context,
 )
 from .services.observability import get_observability_dashboard_context
 from .services.marketplace_technicians import (
@@ -2153,11 +2154,112 @@ class OperationsHealthView(ShellContextMixin, TemplateView):
         ]
         context["current_module_slug"] = "ai-agents-center"
         context["page_actions"] = [
+            {"label": "Fila de revisão", "route_name": "admin-shell:operations-review", "permission_domain": "ai_agents_admin", "permission_action": "view"},
             {"label": "Recomendações", "route_name": "admin-shell:ai-agents-recommendations", "permission_domain": "ai_agents_admin", "permission_action": "view"},
             {"label": "Propostas", "route_name": "admin-shell:ai-agents-proposals", "permission_domain": "ai_agents_admin", "permission_action": "view"},
             {"label": "Runs", "route_name": "admin-shell:ai-agents-runs", "permission_domain": "ai_agents_admin", "permission_action": "view"},
         ]
         return context
+
+
+class OperationalReviewQueueView(ShellContextMixin, TemplateView):
+    template_name = "admin_shell/operations_review_queue.html"
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filters = {key: value for key, value in self.request.GET.items() if value}
+        context.update(get_operational_review_queue_context(tenant_context=self.get_tenant_context(), filters=filters))
+        context["page_title"] = "Operational Review Queue"
+        context["page_description"] = "Fila diária para revisar recomendações, propostas, flags e runs dos agentes operacionais."
+        context["breadcrumbs"] = [
+            {"label": "Dashboard", "url": "admin-shell:dashboard"},
+            {"label": "Operações", "url": None},
+            {"label": "Operational Review Queue", "url": None},
+        ]
+        context["current_module_slug"] = "ai-agents-center"
+        context["page_actions"] = [
+            {"label": "Operations Health", "route_name": "admin-shell:operations-health", "permission_domain": "ai_agents_admin", "permission_action": "view"},
+            {"label": "Runs", "route_name": "admin-shell:ai-agents-runs", "permission_domain": "ai_agents_admin", "permission_action": "view"},
+        ]
+        return context
+
+
+class OperationalReviewRecommendationReviewedView(ShellContextMixin, View):
+    permission_domain = "ai_agents_admin"
+    permission_action = "approve"
+    enforce_billing_access = False
+
+    def post(self, request, recommendation_id, *args, **kwargs):
+        tenant_context = self.get_tenant_context()
+        company = tenant_context.get("active_company") or tenant_context.get("company")
+        queryset = AgentRecommendation.objects.select_related("agent_run", "agent_run__agent").filter(
+            agent_run__agent__slug__in=["maintenance-agent", "scheduling-agent"],
+        )
+        if company is not None:
+            queryset = queryset.filter(company=company)
+        recommendation = get_object_or_404(queryset, public_id=recommendation_id)
+        recommendation.status = AgentRecommendation.Status.REVIEWED
+        recommendation.save(update_fields=["status", "updated_at"])
+        messages.success(request, "Recomendação marcada como revisada.")
+        return redirect(reverse("admin-shell:operations-review"))
+
+
+class OperationalReviewProposalApproveView(ShellContextMixin, View):
+    permission_domain = "ai_agents_admin"
+    permission_action = "approve"
+    enforce_billing_access = False
+
+    def post(self, request, proposal_id, *args, **kwargs):
+        from apps.ai_agents_center.services.orchestrator import get_decision_orchestrator
+        from apps.ai_decision_engine.services.approvals import DecisionApprovalService
+
+        tenant_context = self.get_tenant_context()
+        company = tenant_context.get("active_company") or tenant_context.get("company")
+        queryset = AgentActionProposal.objects.select_related("agent_run", "agent_run__company", "agent_run__agent").filter(
+            agent_run__agent__slug__in=["maintenance-agent", "scheduling-agent"],
+        )
+        if company is not None:
+            queryset = queryset.filter(agent_run__company=company)
+        proposal = get_object_or_404(queryset, public_id=proposal_id)
+        decision = getattr(proposal, "decision", None)
+        if decision is None:
+            decision = get_decision_orchestrator().receive_action_proposal(proposal=proposal)
+        DecisionApprovalService.approve(decision=decision, approved_by=request.user, comment="Aprovada na fila operacional.", execute=False)
+        proposal.status = AgentActionProposal.Status.APPROVED
+        proposal.approved_by = request.user
+        proposal.approved_at = timezone.now()
+        proposal.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
+        messages.success(request, "Proposta aprovada no fluxo interno de decisão, sem execução operacional automática.")
+        return redirect(reverse("admin-shell:operations-review"))
+
+
+class OperationalReviewProposalRejectView(ShellContextMixin, View):
+    permission_domain = "ai_agents_admin"
+    permission_action = "approve"
+    enforce_billing_access = False
+
+    def post(self, request, proposal_id, *args, **kwargs):
+        from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
+
+        tenant_context = self.get_tenant_context()
+        company = tenant_context.get("active_company") or tenant_context.get("company")
+        queryset = AgentActionProposal.objects.select_related("agent_run", "agent_run__company", "agent_run__agent").filter(
+            agent_run__agent__slug__in=["maintenance-agent", "scheduling-agent"],
+        )
+        if company is not None:
+            queryset = queryset.filter(agent_run__company=company)
+        proposal = get_object_or_404(queryset, public_id=proposal_id)
+        AgentCoordinatorService.reject_proposal(
+            proposal=proposal,
+            rejected_by=request.user,
+            company=proposal.agent_run.company,
+            reason=request.POST.get("reason", "Rejeitada na fila operacional."),
+        )
+        messages.success(request, "Proposta rejeitada no fluxo interno de decisão.")
+        return redirect(reverse("admin-shell:operations-review"))
 
 
 class AIAgentsDashboardView(ShellContextMixin, TemplateView):

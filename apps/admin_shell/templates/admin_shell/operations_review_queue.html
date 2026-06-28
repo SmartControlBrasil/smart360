@@ -1,0 +1,253 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-secondary" href="{% url 'admin-shell:operations-health' %}">Operations Health</a>
+            <a class="btn-secondary" href="{% url 'admin-shell:ai-agents-runs' %}">Runs</a>
+        </div>
+    </div>
+
+    <form method="get" class="table-card">
+        <div class="section-header">
+            <h2>Filtros</h2>
+            <p class="muted-block">Refine a fila por agente, status, data e site operacional.</p>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>Agente</span>
+                <select name="agent">
+                    <option value="">Todos</option>
+                    {% for option in agent_options %}
+                        <option value="{{ option.value }}" {% if filters.agent == option.value %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Status</span>
+                <select name="status">
+                    <option value="">Abertos / pendentes</option>
+                    {% for option in status_options %}
+                        <option value="{{ option.value }}" {% if filters.status == option.value %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Data</span>
+                <input type="date" name="date" value="{% if filters.date != 'today' and filters.date != 'yesterday' %}{{ filters.date }}{% endif %}">
+            </label>
+            <label>
+                <span>Site</span>
+                <select name="site">
+                    <option value="">Todos</option>
+                    {% for site in site_options %}
+                        <option value="{{ site.id }}" {% if filters.site|stringformat:'s' == site.id|stringformat:'s' %}selected{% endif %}>{{ site.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="page-actions">
+            <button class="quick-action-button" type="submit">Aplicar filtros</button>
+            <a class="btn-secondary" href="{% url 'admin-shell:operations-review' %}">Limpar</a>
+        </div>
+    </form>
+
+    <div class="kpi-grid">
+        {% for card in summary_cards %}
+        <article class="stat-card">
+            <span class="stat-label">{{ card.label }}</span>
+            <strong class="stat-value">{{ card.value }}</strong>
+        </article>
+        {% endfor %}
+    </div>
+
+    {% if not has_review_items %}
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Fila vazia</h2>
+            <p class="muted-block">Nenhum item operacional encontrado para revisão. Para validar o piloto, gere massa mínima e rode os agentes.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <tbody>
+                    <tr><td>.venv/bin/python manage.py seed_operational_pilot_data</td></tr>
+                    <tr><td>.venv/bin/python manage.py run_operational_agents</td></tr>
+                    <tr><td>Depois abra novamente /app/operations/review/ e acompanhe /app/operations/health/.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Propostas pendentes</h2>
+            <p class="muted-block">Aprovar ou rejeitar aqui apenas muda o fluxo interno de decisão. Nenhuma manutenção real ou agenda externa é executada.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Proposta</th>
+                        <th>Prioridade</th>
+                        <th>Alvo</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for proposal in proposals %}
+                    <tr>
+                        <td>{{ proposal.agent_run.agent.slug }}</td>
+                        <td><strong>{{ proposal.title|default:proposal.action_type }}</strong><br><span class="muted-block">{{ proposal.summary|default:"Sem resumo informado." }}</span></td>
+                        <td>{{ proposal.priority }}</td>
+                        <td>{{ proposal.target_entity|default:"-" }} {{ proposal.target_entity_id|default:"" }}</td>
+                        <td>{{ proposal.get_status_display }}</td>
+                        <td>
+                            {% if proposal.status == "pending_approval" %}
+                                <form method="post" action="{% url 'admin-shell:operations-review-proposal-approve' proposal_id=proposal.public_id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button" type="submit">Aprovar</button>
+                                </form>
+                                <form method="post" action="{% url 'admin-shell:operations-review-proposal-reject' proposal_id=proposal.public_id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button quick-action-button--ghost" type="submit">Rejeitar</button>
+                                </form>
+                            {% else %}
+                                {{ proposal.get_status_display }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">Nenhuma proposta pendente para os agentes operacionais.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Recomendações abertas</h2>
+            <p class="muted-block">Recomendações são itens de triagem. Marcar como revisada não executa ação operacional.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Recomendação</th>
+                        <th>Severidade</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recommendation in recommendations %}
+                    <tr>
+                        <td>{{ recommendation.agent_run.agent.slug }}</td>
+                        <td><strong>{{ recommendation.title }}</strong><br><span class="muted-block">{{ recommendation.summary }}</span></td>
+                        <td>{{ recommendation.get_severity_display }}</td>
+                        <td>{{ recommendation.get_priority_display }}</td>
+                        <td>{{ recommendation.get_status_display }}</td>
+                        <td>
+                            {% if recommendation.status == "open" %}
+                                <form method="post" action="{% url 'admin-shell:operations-review-recommendation-reviewed' recommendation_id=recommendation.public_id %}">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button" type="submit">Marcar revisada</button>
+                                </form>
+                            {% else %}
+                                {{ recommendation.get_status_display }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">Nenhuma recomendação aberta para os agentes operacionais.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Flags relevantes</h2>
+            <p class="muted-block">Sinais ativos ou em observação vindos de manutenção e agenda.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Origem</th>
+                        <th>Resumo</th>
+                        <th>Risco</th>
+                        <th>Score</th>
+                        <th>Site</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for flag in asset_flags %}
+                    <tr>
+                        <td>maintenance-agent</td>
+                        <td>{{ flag.summary }}</td>
+                        <td>{{ flag.risk_level }}</td>
+                        <td>{{ flag.attention_score }}</td>
+                        <td>{{ flag.site|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% for flag in schedule_flags %}
+                    <tr>
+                        <td>scheduling-agent</td>
+                        <td>{{ flag.summary }}</td>
+                        <td>{{ flag.risk_level }}</td>
+                        <td>{{ flag.attention_score }}</td>
+                        <td>{{ flag.site|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not asset_flags and not schedule_flags %}
+                    <tr><td colspan="5">Nenhuma flag aberta para os agentes operacionais.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Runs hoje e ontem</h2>
+            <p class="muted-block">Últimas execuções para confirmar se a rotina operacional rodou.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Status</th>
+                        <th>Trigger</th>
+                        <th>Site</th>
+                        <th>Finalizado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for run in recent_runs %}
+                    <tr>
+                        <td>{{ run.agent.slug }}</td>
+                        <td>{{ run.get_status_display }}</td>
+                        <td>{{ run.trigger_reference|default:run.get_trigger_type_display }}</td>
+                        <td>{{ run.site|default:"-" }}</td>
+                        <td>{% if run.finished_at %}{{ run.finished_at|date:"d/m/Y H:i" }}{% else %}{{ run.created_at|date:"d/m/Y H:i" }}{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">Nenhum run de hoje ou ontem para maintenance-agent ou scheduling-agent.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

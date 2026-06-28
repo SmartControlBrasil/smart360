@@ -1,4 +1,7 @@
 from django.db.models import Avg, Count, Q
+from django.utils import timezone
+
+from apps.smart_system.models import OperationalSite
 
 from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentAnomalyAttentionFlag, AgentAssetAttentionFlag, AgentMarketplaceRequestFlag, AgentProfitabilityAttentionFlag, AgentRecommendation, AgentRun, AgentScheduleHealthFlag, ManagerCopilotSession
 from apps.ai_agents_center.services.dashboard import AgentDashboardService
@@ -31,9 +34,28 @@ def get_ai_agents_dashboard_context(*, tenant_context):
     return payload
 
 
+OPERATIONAL_AGENT_SLUGS = ["maintenance-agent", "scheduling-agent"]
+
+
+def _parse_review_date(value):
+    if not value or value == "today":
+        return timezone.localdate()
+    if value == "yesterday":
+        return timezone.localdate() - timezone.timedelta(days=1)
+    try:
+        return timezone.datetime.strptime(value, "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return timezone.localdate()
+
+
+def _day_bounds(day):
+    start = timezone.make_aware(timezone.datetime.combine(day, timezone.datetime.min.time()))
+    return start, start + timezone.timedelta(days=1)
+
+
 def get_operations_health_context(*, tenant_context):
     company = tenant_context.get("active_company") or tenant_context.get("company")
-    operational_agent_slugs = ["maintenance-agent", "scheduling-agent"]
+    operational_agent_slugs = OPERATIONAL_AGENT_SLUGS
 
     recommendations = AgentRecommendation.objects.select_related(
         "agent_run",
@@ -162,6 +184,136 @@ def get_operations_health_context(*, tenant_context):
         ],
     }
 
+
+
+def get_operational_review_queue_context(*, tenant_context, filters=None):
+    filters = filters or {}
+    company = tenant_context.get("active_company") or tenant_context.get("company")
+    selected_agent = filters.get("agent", "")
+    selected_status = filters.get("status", "")
+    selected_date = filters.get("date", "today")
+    selected_site_id = filters.get("site", "")
+    review_date = _parse_review_date(selected_date)
+    review_start, review_end = _day_bounds(review_date)
+    yesterday_start, _ = _day_bounds(timezone.localdate() - timezone.timedelta(days=1))
+    tomorrow_start, _ = _day_bounds(timezone.localdate() + timezone.timedelta(days=1))
+
+    recommendations = AgentRecommendation.objects.select_related(
+        "agent_run",
+        "agent_run__agent",
+        "company",
+        "site",
+    ).filter(
+        agent_run__agent__slug__in=OPERATIONAL_AGENT_SLUGS,
+        created_at__gte=review_start,
+        created_at__lt=review_end,
+    )
+    proposals = AgentActionProposal.objects.select_related(
+        "agent_run",
+        "agent_run__agent",
+        "agent_run__company",
+        "agent_run__site",
+    ).filter(
+        agent_run__agent__slug__in=OPERATIONAL_AGENT_SLUGS,
+        created_at__gte=review_start,
+        created_at__lt=review_end,
+    )
+    asset_flags = AgentAssetAttentionFlag.objects.select_related(
+        "agent",
+        "company",
+        "site",
+        "asset",
+        "latest_recommendation",
+    ).filter(agent__slug="maintenance-agent")
+    schedule_flags = AgentScheduleHealthFlag.objects.select_related(
+        "agent",
+        "company",
+        "site",
+        "technician",
+        "latest_recommendation",
+    ).filter(agent__slug="scheduling-agent")
+    runs = AgentRun.objects.select_related("agent", "company", "site", "triggered_by").filter(
+        agent__slug__in=OPERATIONAL_AGENT_SLUGS,
+        created_at__gte=yesterday_start,
+        created_at__lt=tomorrow_start,
+    )
+    sites = OperationalSite.objects.select_related("maintenance_client", "maintenance_client__company").order_by("name")
+
+    if company is not None:
+        recommendations = recommendations.filter(company=company)
+        proposals = proposals.filter(agent_run__company=company)
+        asset_flags = asset_flags.filter(company=company)
+        schedule_flags = schedule_flags.filter(company=company)
+        runs = runs.filter(company=company)
+        sites = sites.filter(maintenance_client__company=company)
+
+    if selected_agent in OPERATIONAL_AGENT_SLUGS:
+        recommendations = recommendations.filter(agent_run__agent__slug=selected_agent)
+        proposals = proposals.filter(agent_run__agent__slug=selected_agent)
+        asset_flags = asset_flags.filter(agent__slug=selected_agent)
+        schedule_flags = schedule_flags.filter(agent__slug=selected_agent)
+        runs = runs.filter(agent__slug=selected_agent)
+
+    if selected_status:
+        recommendations = recommendations.filter(status=selected_status)
+        proposals = proposals.filter(status=selected_status)
+        asset_flags = asset_flags.filter(status=selected_status)
+        schedule_flags = schedule_flags.filter(status=selected_status)
+        runs = runs.filter(status=selected_status)
+    else:
+        recommendations = recommendations.filter(status=AgentRecommendation.Status.OPEN)
+        proposals = proposals.filter(status=AgentActionProposal.Status.PENDING_APPROVAL)
+        asset_flags = asset_flags.filter(status__in=[AgentAssetAttentionFlag.Status.ACTIVE, AgentAssetAttentionFlag.Status.WATCHING])
+        schedule_flags = schedule_flags.filter(status__in=[AgentScheduleHealthFlag.Status.ACTIVE, AgentScheduleHealthFlag.Status.WATCHING])
+
+    if selected_site_id:
+        recommendations = recommendations.filter(site_id=selected_site_id)
+        proposals = proposals.filter(agent_run__site_id=selected_site_id)
+        asset_flags = asset_flags.filter(site_id=selected_site_id)
+        schedule_flags = schedule_flags.filter(site_id=selected_site_id)
+        runs = runs.filter(site_id=selected_site_id)
+
+    recommendation_list = list(recommendations.order_by("-attention_score", "-created_at")[:50])
+    proposal_list = list(proposals.order_by("-created_at")[:50])
+    asset_flag_list = list(asset_flags.order_by("-attention_score", "-updated_at")[:25])
+    schedule_flag_list = list(schedule_flags.order_by("-attention_score", "-updated_at")[:25])
+    run_list = list(runs.order_by("-created_at")[:30])
+
+    return {
+        "company": company,
+        "review_date": review_date,
+        "filters": {
+            "agent": selected_agent,
+            "status": selected_status,
+            "date": selected_date,
+            "site": selected_site_id,
+        },
+        "agent_options": [
+            {"value": "maintenance-agent", "label": "maintenance-agent"},
+            {"value": "scheduling-agent", "label": "scheduling-agent"},
+        ],
+        "status_options": [
+            {"value": AgentRecommendation.Status.OPEN, "label": "Open / Active / Pending"},
+            {"value": AgentRecommendation.Status.REVIEWED, "label": "Reviewed"},
+            {"value": AgentActionProposal.Status.APPROVED, "label": "Approved"},
+            {"value": AgentActionProposal.Status.REJECTED, "label": "Rejected"},
+            {"value": AgentRun.Status.COMPLETED, "label": "Completed"},
+            {"value": AgentRun.Status.FAILED, "label": "Failed"},
+        ],
+        "site_options": list(sites[:100]),
+        "summary_cards": [
+            {"label": "Propostas pendentes", "value": len(proposal_list)},
+            {"label": "Recomendações abertas", "value": len(recommendation_list)},
+            {"label": "Flags relevantes", "value": len(asset_flag_list) + len(schedule_flag_list)},
+            {"label": "Runs hoje/ontem", "value": len(run_list)},
+        ],
+        "recommendations": recommendation_list,
+        "proposals": proposal_list,
+        "asset_flags": asset_flag_list,
+        "schedule_flags": schedule_flag_list,
+        "recent_runs": run_list,
+        "has_review_items": any([recommendation_list, proposal_list, asset_flag_list, schedule_flag_list, run_list]),
+    }
 
 def get_ai_agents_recommendations_context(*, tenant_context):
     company = tenant_context.get("active_company")

@@ -128,7 +128,12 @@ class OperationsHealthViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin_shell/operations_health.html")
         self.assertContains(response, "Operação Técnica Inteligente")
+        self.assertContains(response, "Rotina operacional dos agentes")
+        self.assertContains(response, "maintenance-agent")
+        self.assertContains(response, "scheduling-agent")
         self.assertContains(response, "Riscos detectados")
+        self.assertContains(response, "Rode a rotina run_operational_agents")
+        self.assertContains(response, "Nenhuma execução recente encontrada para maintenance-agent ou scheduling-agent.")
 
     def test_operations_health_shows_real_agent_data(self):
         self.create_agent_data()
@@ -144,3 +149,5 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "scheduling-agent")
         self.assertContains(response, reverse("admin-shell:ai-agents-recommendations"))
         self.assertContains(response, reverse("admin-shell:ai-agents-proposals"))
+        self.assertContains(response, "Maintenance Intelligence Agent")
+        self.assertContains(response, "Scheduling Optimization Agent")

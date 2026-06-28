@@ -1,4 +1,4 @@
-from django.db.models import Avg, Q
+from django.db.models import Avg, Count, Q
 
 from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentAnomalyAttentionFlag, AgentAssetAttentionFlag, AgentMarketplaceRequestFlag, AgentProfitabilityAttentionFlag, AgentRecommendation, AgentRun, AgentScheduleHealthFlag, ManagerCopilotSession
 from apps.ai_agents_center.services.dashboard import AgentDashboardService
@@ -76,6 +76,42 @@ def get_operations_health_context(*, tenant_context):
     pending_proposals = proposals.filter(status=AgentActionProposal.Status.PENDING_APPROVAL)
     open_asset_flags = asset_flags.filter(status__in=[AgentAssetAttentionFlag.Status.ACTIVE, AgentAssetAttentionFlag.Status.WATCHING])
     open_schedule_flags = schedule_flags.filter(status__in=[AgentScheduleHealthFlag.Status.ACTIVE, AgentScheduleHealthFlag.Status.WATCHING])
+    recommendation_counts = {
+        item["agent_run__agent__slug"]: item["total"]
+        for item in open_recommendations.values("agent_run__agent__slug").annotate(total=Count("id"))
+    }
+    proposal_counts = {
+        item["agent_run__agent__slug"]: item["total"]
+        for item in pending_proposals.values("agent_run__agent__slug").annotate(total=Count("id"))
+    }
+    flag_counts = {
+        "maintenance-agent": open_asset_flags.count(),
+        "scheduling-agent": open_schedule_flags.count(),
+    }
+    run_counts = {
+        item["agent__slug"]: item["total"]
+        for item in runs.values("agent__slug").annotate(total=Count("id"))
+    }
+    operational_agent_status = [
+        {
+            "agent_slug": "maintenance-agent",
+            "agent_name": "Maintenance Intelligence Agent",
+            "open_recommendations": recommendation_counts.get("maintenance-agent", 0),
+            "pending_proposals": proposal_counts.get("maintenance-agent", 0),
+            "open_flags": flag_counts["maintenance-agent"],
+            "recent_runs": run_counts.get("maintenance-agent", 0),
+            "health_href": "admin-shell:ai-agents-maintenance-health",
+        },
+        {
+            "agent_slug": "scheduling-agent",
+            "agent_name": "Scheduling Optimization Agent",
+            "open_recommendations": recommendation_counts.get("scheduling-agent", 0),
+            "pending_proposals": proposal_counts.get("scheduling-agent", 0),
+            "open_flags": flag_counts["scheduling-agent"],
+            "recent_runs": run_counts.get("scheduling-agent", 0),
+            "health_href": "admin-shell:ai-agents-scheduling-health",
+        },
+    ]
 
     detected_risks = []
     for recommendation in open_recommendations.order_by("-attention_score", "-created_at")[:6]:
@@ -112,6 +148,7 @@ def get_operations_health_context(*, tenant_context):
             {"label": "Flags de atenção abertas", "value": open_asset_flags.count() + open_schedule_flags.count(), "href": "admin-shell:ai-agents-maintenance-health"},
             {"label": "Runs recentes", "value": runs.count(), "href": "admin-shell:ai-agents-runs"},
         ],
+        "operational_agent_status": operational_agent_status,
         "detected_risks": detected_risks[:10],
         "open_asset_flags": list(open_asset_flags.order_by("-attention_score", "-updated_at")[:8]),
         "open_schedule_flags": list(open_schedule_flags.order_by("-attention_score", "-updated_at")[:8]),

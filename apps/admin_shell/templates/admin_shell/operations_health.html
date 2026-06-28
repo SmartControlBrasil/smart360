@@ -23,6 +23,41 @@
 
     <div class="table-card">
         <div class="section-header">
+            <h2>Rotina operacional dos agentes</h2>
+            <p class="muted-block">Leitura por agente para a rotina diária de manutenção e agenda.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Recomendações abertas</th>
+                        <th>Propostas pendentes</th>
+                        <th>Flags abertas</th>
+                        <th>Runs</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agent in operational_agent_status %}
+                    <tr>
+                        <td><strong>{{ agent.agent_name }}</strong><br><span class="muted-block">{{ agent.agent_slug }}</span></td>
+                        <td>{{ agent.open_recommendations }}</td>
+                        <td>{{ agent.pending_proposals }}</td>
+                        <td>{{ agent.open_flags }}</td>
+                        <td>{{ agent.recent_runs }}</td>
+                        <td><a href="{% url agent.health_href %}">Health</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">Nenhum agente operacional configurado para esta rotina.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
             <h2>Riscos detectados</h2>
             <p class="muted-block">Recomendações abertas e propostas aguardando decisão dos agentes de manutenção e agenda.</p>
         </div>
@@ -49,7 +84,7 @@
                         <td><a href="{% url risk.href %}">Abrir</a></td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="6">Nenhum risco operacional aberto no momento.</td></tr>
+                    <tr><td colspan="6">Nenhum risco operacional aberto no momento. Rode a rotina run_operational_agents para alimentar este painel com dados recentes do piloto.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -125,7 +160,7 @@
                         <td>{% if run.finished_at %}{{ run.finished_at|date:"d/m/Y H:i" }}{% else %}{{ run.created_at|date:"d/m/Y H:i" }}{% endif %}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5">Nenhuma execução recente encontrada.</td></tr>
+                    <tr><td colspan="5">Nenhuma execução recente encontrada para maintenance-agent ou scheduling-agent.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

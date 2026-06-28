@@ -60,8 +60,8 @@
             <div class="img1">
               <img src="{% static 'institutional/eitech/img/all-images/hero/image214.webp' %}" alt="Painel de Automação, Robótica Xyron e Softwares Smart Control Brasil" width="600" height="auto">
             </div>
-            <div class="image-bg1">
-              <img src="{% static 'institutional/eitech/img/all-images/bg/anel-xyron.png' %}" alt="Hostbot Smart Control Brasil" aria-hidden="true">
+            <div class="image-bg1" style="aspect-ratio: 520 / 460; content-visibility: auto; contain-intrinsic-size: 520px 460px;">
+              <img src="{% static 'institutional/eitech/img/all-images/bg/anel-xyron.png' %}" alt="Hostbot Smart Control Brasil" aria-hidden="true" width="520" height="460">
             </div>
             <div class="elements">
               {% comment %} <img src="{% static 'institutional/eitech/img/elements/chatgpt-ia.png' %}"  class="chatgpt-ia" alt="liro-robo-educacional" class="elements3 aniamtion-key-1"> {% endcomment %}
@@ -1010,7 +1010,7 @@
               </p>
 
               <div class="vl-blog-1-icon">
-                <a href="{% url 'institutional:blog_details' %}">
+                <a href="{% url 'institutional:blog_details' %}" aria-label="Leia o artigo completo no blog técnico da Smart Control Brasil">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
@@ -1057,7 +1057,7 @@
               </p>
 
               <div class="vl-blog-1-icon">
-                <a href="{% url 'institutional:blog_details' %}">
+                <a href="{% url 'institutional:blog_details' %}" aria-label="Leia o artigo completo no blog técnico da Smart Control Brasil">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>

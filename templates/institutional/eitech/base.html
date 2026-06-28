@@ -74,9 +74,17 @@
   {% include 'institutional/eitech/partials/scripts.html' %}
   {% block extra_js %}{% endblock %}
   <script type="module">
-    import BubbleChat from "https://agent-factory-chat.hostgator.io/scripts/start-chat.js";
-    const hashId = "13d80814-dbe6-4c84-9764-4d57b34fea14";
-    const bubbleChat = new BubbleChat(hashId, "prod");
+    // Injeta o chat apenas 2 segundos após a tela inteira estar desenhada e carregada
+    window.addEventListener("load", function() {
+      setTimeout(async function() {
+        try {
+          const module = await import("https://agent-factory-chat.hostgator.io/scripts/start-chat.js");
+          const BubbleChat = module.default;
+          const hashId = "13d80814-dbe6-4c84-9764-4d57b34fea14";
+          const bubbleChat = new BubbleChat(hashId, "prod");
+        } catch(e) { console.warn("Chat delay error:", e); }
+      }, 2000);
+    });
   </script>
 </body>
 </html>

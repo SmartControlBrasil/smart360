@@ -9,7 +9,8 @@
 {% block body_extra %} class="home-page"{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-home.css' %}">
+<link rel="preload" href="{% static 'institutional/eitech/css/scb-home.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-home.css' %}"></noscript>
 {% endblock %}
 
 {% block content %}
@@ -220,7 +221,7 @@
             </div>
 
             <div class="arrow">
-              <a href="{% url 'institutional:service_automacao_industrial_clps' %}">
+              <a href="{% url 'institutional:service_automacao_industrial_clps' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                 <i class="fa-solid fa-arrow-right"></i>
               </a>
             </div>
@@ -269,7 +270,7 @@
             </div>
 
             <div class="arrow">
-              <a href="{% url 'institutional:contact' %}">
+              <a href="{% url 'institutional:contact' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                 <i class="fa-solid fa-arrow-right"></i>
               </a>
             </div>
@@ -318,7 +319,7 @@
             </div>
 
             <div class="arrow">
-              <a href="{% url 'institutional:contact' %}">
+              <a href="{% url 'institutional:contact' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                 <i class="fa-solid fa-arrow-right"></i>
               </a>
             </div>
@@ -367,7 +368,7 @@
             </div>
 
             <div class="arrow">
-              <a href="{% url 'institutional:representada_mitsubishi_automacao' %}">
+              <a href="{% url 'institutional:representada_mitsubishi_automacao' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                 <i class="fa-solid fa-arrow-right"></i>
               </a>
             </div>
@@ -441,21 +442,21 @@
               <div class="progress-bar">
                 <label>Automação Industrial Mitsubishi <span>96%</span></label>
                 <div class="progress">
-                  <div class="progress-inner" data-progress="96" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-inner" data-progress="96" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Porcentagem de conclusão do projeto"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
                 <label>Inovação e Tecnologia Xyron <span>97%</span></label>
                 <div class="progress">
-                  <div class="progress-inner" data-progress="97" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-inner" data-progress="97" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Porcentagem de conclusão do projeto"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
                 <label>Conectividade e Telemetria IoT <span>99%</span></label>
                 <div class="progress">
-                  <div class="progress-inner" data-progress="99" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-inner" data-progress="99" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Porcentagem de conclusão do projeto"></div>
                 </div>
               </div>
             </div>
@@ -617,7 +618,7 @@
                 Sistemas integrados com CLPs de alta velocidade, sincronismo de eixos e supervisórios Mitsubishi.
               </a>
               <div class="arrow">
-                <a href="{% url 'institutional:project_automacao_industrial_clps' %}">
+                <a href="{% url 'institutional:project_automacao_industrial_clps' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
@@ -635,7 +636,7 @@
                 Frotas de robôs móveis Xyron para recepção corporativa, suporte logístico interno e inteligência de marca.
               </a>
               <div class="arrow">
-                <a href="{% url 'institutional:contact' %}">
+                <a href="{% url 'institutional:contact' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
@@ -653,7 +654,7 @@
                 Coleta automatizada de sensores remotos, telemetria em Python e exibição de analytics em tempo real.
               </a>
               <div class="arrow">
-                <a href="{% url 'institutional:contact' %}">
+                <a href="{% url 'institutional:contact' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
@@ -671,7 +672,7 @@
                 Modernização de sistemas obsoletos por painéis novos de alta confiabilidade para estender a vida útil do ativo.
               </a>
               <div class="arrow">
-                <a href="{% url 'institutional:representada_mitsubishi_automacao' %}">
+                <a href="{% url 'institutional:representada_mitsubishi_automacao' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação">
                   <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>

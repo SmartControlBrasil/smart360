@@ -44,8 +44,16 @@
   </script>
   <link rel="shortcut icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
   <link rel="icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins.bundle.min.css' %}">
-  <link rel="stylesheet" href="{% static 'institutional/eitech/css/main.bundle.min.css' %}">
+  <!-- Preconnect para Google Fonts (Redução drástica do DNS/TLS overhead) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+  <!-- CSS Bundles Otimizados (Preload) -->
+  <link rel="preload" href="{% static 'institutional/eitech/css/plugins.bundle.min.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins.bundle.min.css' %}"></noscript>
+  <link rel="preload" href="{% static 'institutional/eitech/css/main.bundle.min.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="{% static 'institutional/eitech/css/main.bundle.min.css' %}"></noscript>
   {% block extra_css %}{% endblock %}
 </head>
 <body{% block body_extra %}{% endblock %}>

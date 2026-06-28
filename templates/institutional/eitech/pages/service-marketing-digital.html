@@ -795,7 +795,8 @@
               <img src="{% static 'institutional/eitech/img/icons/service-icon1.svg' %}" alt="" aria-hidden="true">
             </div>
             <div class="arrow">
-              <a href="{% url 'institutional:service_details' %}"><i class="fa-solid fa-arrow-right"></i></a>
+              <a href="{% url 'institutional:service_details' %}" aria-label="Saiba mais sobre o serviço">
+                <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="space24"></div>
             <a href="{% url 'institutional:service_details' %}">Produtos tecnológicos e operação digital</a>

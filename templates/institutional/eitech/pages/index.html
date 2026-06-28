@@ -17,7 +17,7 @@
   <div class="hero1-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
     <img src="{% static 'institutional/eitech/img/elements/elements6.png' %}" alt="" aria-hidden="true" class="elements6">
     <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
-    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4" fetchpriority="high">
 
     <div class="container">
       <div class="row align-items-center">
@@ -441,21 +441,21 @@
               <div class="progress-bar">
                 <label>Automação Industrial Mitsubishi <span>96%</span></label>
                 <div class="progress">
-                  <div class="progress-inner" data-progress="96" style="width: 0%;"></div>
+                  <div class="progress-inner" data-progress="96" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
                 <label>Inovação e Tecnologia Xyron <span>97%</span></label>
                 <div class="progress">
-                  <div class="progress-inner" data-progress="97" style="width: 0%;"></div>
+                  <div class="progress-inner" data-progress="97" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </div>
 
               <div class="progress-bar">
                 <label>Conectividade e Telemetria IoT <span>99%</span></label>
                 <div class="progress">
-                  <div class="progress-inner" data-progress="99" style="width: 0%;"></div>
+                  <div class="progress-inner" data-progress="99" style="width: 0%;" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </div>
             </div>
@@ -881,16 +881,16 @@
                 <p>O Neo é ideal para empresas, eventos, lojas, clínicas, escolas e ambientes corporativos que desejam impressionar, orientar visitantes e criar experiências interativas com tecnologia de ponta</p>
               </div>
               <div class="icons">
-                <a href="{% url 'institutional:contact' %}">
+                <a href="{% url 'institutional:contact' %}" aria-label="Compartilhar ou Entrar em contato">
                   <img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt="" aria-hidden="true" loading="lazy">
                 </a>
               </div>
             </div>
             <ul>
-              <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a></li>
-              <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></li>
-              <li><a href="https://www.youtube.com/@SmartControlBrasil" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a></li>
-              <li><a href="https://www.linkedin.com/in/smart-control-brasil-ba85983a9/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener" aria-label="Acessar Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener" aria-label="Acessar Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="https://www.youtube.com/@SmartControlBrasil" target="_blank" rel="noopener" aria-label="Acessar YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="https://www.linkedin.com/in/smart-control-brasil-ba85983a9/" target="_blank" rel="noopener" aria-label="Acessar LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a></li>
             </ul>
           </div>
         </div>
@@ -908,16 +908,16 @@
                 <p>O Buddy é um robô quadrúpede versável, robusto e visualmente impactante, indicado para demonstrações tecnológicas, inspeções, ações promocionais, educação avançada e projetos de inovação.</p>
               </div>
               <div class="icons">
-                <a href="{% url 'institutional:contact' %}">
+                <a href="{% url 'institutional:contact' %}" aria-label="Compartilhar ou Entrar em contato">
                   <img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt="" aria-hidden="true" loading="lazy">
                 </a>
               </div>
             </div>
             <ul>
-              <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a></li>
-              <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></li>
-              <li><a href="https://www.youtube.com/@SmartControlBrasil" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a></li>
-              <li><a href="https://www.linkedin.com/in/smart-control-brasil-ba85983a9/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener" aria-label="Acessar Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener" aria-label="Acessar Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="https://www.youtube.com/@SmartControlBrasil" target="_blank" rel="noopener" aria-label="Acessar YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="https://www.linkedin.com/in/smart-control-brasil-ba85983a9/" target="_blank" rel="noopener" aria-label="Acessar LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a></li>
             </ul>
           </div>
         </div>
@@ -935,16 +935,16 @@
                 <p>O Little aproxima crianças, jovens e instituições do universo da robótica, programação e inteligência artificial, tornando o aprendizado mais prático, divertido e conectado ao futuro.</p>
               </div>
               <div class="icons">
-                <a href="{% url 'institutional:contact' %}">
+                <a href="{% url 'institutional:contact' %}" aria-label="Compartilhar ou Entrar em contato">
                   <img src="{% static 'institutional/eitech/img/icons/share1.svg' %}" alt="" aria-hidden="true" loading="lazy">
                 </a>
               </div>
             </div>
             <ul>
-              <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a></li>
-              <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></li>
-              <li><a href="https://www.youtube.com/@SmartControlBrasil" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a></li>
-              <li><a href="https://www.linkedin.com/in/smart-control-brasil-ba85983a9/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li><a href="https://www.facebook.com/profile.php?id=61579259162806" target="_blank" rel="noopener" aria-label="Acessar Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+              <li><a href="https://www.instagram.com/smartcontrolbrasil/" target="_blank" rel="noopener" aria-label="Acessar Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+              <li><a href="https://www.youtube.com/@SmartControlBrasil" target="_blank" rel="noopener" aria-label="Acessar YouTube"><i class="fa-brands fa-youtube"></i></a></li>
+              <li><a href="https://www.linkedin.com/in/smart-control-brasil-ba85983a9/" target="_blank" rel="noopener" aria-label="Acessar LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a></li>
             </ul>
           </div>
         </div>

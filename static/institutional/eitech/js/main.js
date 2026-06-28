@@ -132,6 +132,15 @@ $('select').niceSelect();
 
 //========== CASE IMAGE ============= //
 
+//========== ACCESSIBILITY FIXES ============= //
+setTimeout(function() {
+    var $owlPrev = $('.owl-prev');
+    var $owlNext = $('.owl-next');
+    
+    $owlPrev.removeAttr('role').attr('aria-label', 'Depoimento anterior');
+    $owlNext.removeAttr('role').attr('aria-label', 'Próximo depoimento');
+}, 500);
+
 });
 //========== COUNTER UP============= //
 const ucounter = $('.counter');

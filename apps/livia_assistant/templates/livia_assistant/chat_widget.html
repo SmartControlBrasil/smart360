@@ -7,8 +7,13 @@
       <div class="livia-chat-header-content">
         <img
           src="{% static 'livia_assistant/img/livia.webp' %}"
-          alt="Lívia"
+          alt="Lívia, assistente virtual da Smart Control Brasil"
+          width="42"
+          height="42"
+          decoding="async"
+          loading="eager"
           class="livia-chat-avatar"
+          style="width: 42px; height: 42px; min-width: 42px; min-height: 42px; max-width: 42px; max-height: 42px; object-fit: cover; border-radius: 999px;"
         />
         <div>
           <strong>{{ livia_chat_branding.assistant_name }}</strong>
@@ -40,11 +45,16 @@
       <button type="submit" data-livia-submit>{% trans "Enviar" %}</button>
     </form>
   </section>
-  <button class="livia-chat-toggle" type="button" aria-expanded="false" aria-controls="livia-chat-panel" data-livia-toggle>
+  <button class="livia-chat-toggle" type="button" aria-expanded="false" aria-controls="livia-chat-panel" data-livia-toggle style="height: 34px; min-height: 34px; min-width: 162px; overflow: visible; box-sizing: border-box; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center;">
     <img
       src="{% static 'livia_assistant/img/livia.webp' %}"
-      alt="Lívia"
-      class="livia-chat-avatar"
+      alt="Lívia, assistente virtual da Smart Control Brasil"
+      width="54"
+      height="54"
+      decoding="async"
+      loading="eager"
+      class="livia-chat-avatar livia-widget-avatar"
+      style="width: 54px !important; height: 54px !important; min-width: 54px !important; min-height: 54px !important; max-width: 54px !important; max-height: 54px !important; object-fit: cover; border-radius: 999px !important; display: block;"
     />
     <span class="livia-chat-toggle-label">{{ livia_chat_branding.toggle_label }}</span>
   </button>

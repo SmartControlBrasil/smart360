@@ -14,7 +14,7 @@ from apps.ai_agents_center.services.registry import AgentRegistryService
 from apps.ai_agents_center.tasks import run_daily_operational_agents
 from apps.admin_shell.services.ai_agents_center import get_operations_health_context
 from apps.companies.models import Company
-from apps.smart_system.models import MaintenanceClient, OperationalSite
+from apps.smart_system.models import Asset, FailureEvent, MaintenanceClient, OperationalSite, ScheduledVisit, ServiceOrder
 
 
 class OperationalAgentsRunnerCommandTests(TestCase):
@@ -149,3 +149,68 @@ class OperationalAgentsCeleryTaskTests(TestCase):
         self.assertEqual(beat_entry["task"], "ai_agents_center.run_daily_operational_agents")
         self.assertEqual(str(beat_entry["schedule"]._orig_hour), "6")
         self.assertEqual(str(beat_entry["schedule"]._orig_minute), "30")
+
+
+class OperationalPilotSeedCommandTests(TestCase):
+    def test_seed_operational_pilot_data_creates_minimum_dataset(self):
+        output = StringIO()
+
+        call_command("seed_operational_pilot_data", stdout=output)
+
+        company = Company.objects.get(slug="empresa-piloto-smart360")
+        site = OperationalSite.objects.get(maintenance_client__company=company, name="Unidade Piloto Operacional")
+        self.assertEqual(Asset.objects.filter(operational_site=site).count(), 5)
+        self.assertGreaterEqual(Asset.objects.filter(operational_site=site, criticality=Asset.Criticality.CRITICAL).count(), 1)
+        self.assertEqual(ServiceOrder.objects.filter(operational_site=site, order_number__startswith="OPS-PILOT-OS-").count(), 8)
+        self.assertEqual(FailureEvent.objects.filter(asset__operational_site=site).count(), 4)
+        self.assertEqual(ScheduledVisit.objects.filter(company=company, operational_site=site).count(), 5)
+        self.assertIn("Seed operacional do piloto concluído", output.getvalue())
+        self.assertIn("assets=5", output.getvalue())
+        self.assertIn("visits=5", output.getvalue())
+
+    def test_seed_operational_pilot_data_is_idempotent(self):
+        call_command("seed_operational_pilot_data", stdout=StringIO())
+        first_counts = {
+            "companies": Company.objects.filter(slug="empresa-piloto-smart360").count(),
+            "sites": OperationalSite.objects.filter(code="OPS-PILOT-001").count(),
+            "assets": Asset.objects.filter(asset_tag__startswith="OPS-PILOT-").count(),
+            "orders": ServiceOrder.objects.filter(order_number__startswith="OPS-PILOT-OS-").count(),
+            "failures": FailureEvent.objects.filter(asset__asset_tag__startswith="OPS-PILOT-").count(),
+            "visits": ScheduledVisit.objects.filter(metadata__seed_key="operational_pilot").count(),
+        }
+
+        call_command("seed_operational_pilot_data", stdout=StringIO())
+        second_counts = {
+            "companies": Company.objects.filter(slug="empresa-piloto-smart360").count(),
+            "sites": OperationalSite.objects.filter(code="OPS-PILOT-001").count(),
+            "assets": Asset.objects.filter(asset_tag__startswith="OPS-PILOT-").count(),
+            "orders": ServiceOrder.objects.filter(order_number__startswith="OPS-PILOT-OS-").count(),
+            "failures": FailureEvent.objects.filter(asset__asset_tag__startswith="OPS-PILOT-").count(),
+            "visits": ScheduledVisit.objects.filter(metadata__seed_key="operational_pilot").count(),
+        }
+
+        self.assertEqual(second_counts, first_counts)
+
+    @patch("apps.ai_agents_center.services.operational_runner.SchedulingAgentTriggerService.run_day_analysis")
+    @patch("apps.ai_agents_center.services.operational_runner.MaintenanceAgentTriggerService.run_site_analysis")
+    def test_run_operational_agents_dry_run_after_seed(self, maintenance_mock, scheduling_mock):
+        call_command("seed_operational_pilot_data", stdout=StringIO())
+        output = StringIO()
+
+        call_command("run_operational_agents", dry_run=True, stdout=output)
+
+        self.assertEqual(maintenance_mock.call_count, 0)
+        self.assertEqual(scheduling_mock.call_count, 0)
+        self.assertIn("PLANNED maintenance-agent", output.getvalue())
+        self.assertIn("PLANNED scheduling-agent", output.getvalue())
+
+    def test_seed_operational_pilot_data_reset_removes_only_seed_records(self):
+        other_company = Company.objects.create(name="Cliente Real", slug="cliente-real")
+        call_command("seed_operational_pilot_data", stdout=StringIO())
+
+        call_command("seed_operational_pilot_data", reset=True, stdout=StringIO())
+
+        self.assertTrue(Company.objects.filter(pk=other_company.pk).exists())
+        self.assertFalse(Company.objects.filter(slug="empresa-piloto-smart360").exists())
+        self.assertFalse(Asset.objects.filter(asset_tag__startswith="OPS-PILOT-").exists())
+        self.assertFalse(ServiceOrder.objects.filter(order_number__startswith="OPS-PILOT-OS-").exists())

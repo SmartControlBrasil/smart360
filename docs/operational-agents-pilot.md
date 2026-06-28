@@ -31,7 +31,24 @@ Esse teste valida que:
 - o contexto de `/app/operations/health/` é montado sem erro;
 - a task `ai_agents_center.run_daily_operational_agents` está registrada no Beat às 06:30.
 
-3. Fazer um dry-run manual da rotina:
+3. Criar ou atualizar dados mínimos do piloto operacional, quando não houver dados reais seguros para demonstração:
+
+```bash
+.venv/bin/python manage.py seed_operational_pilot_data
+```
+
+Por padrão, o seed cria a empresa `Empresa Piloto Smart360`, o site `Unidade Piloto Operacional`, ativos `OPS-PILOT-*`, técnicos locais `@smart360.local`, ordens `OPS-PILOT-OS-*`, falhas recentes e visitas para o próximo dia. O command é idempotente: rodar duas vezes no mesmo dia atualiza os mesmos registros principais, sem duplicar empresa, site, ativos, OS ou visitas.
+
+Opções úteis:
+
+```bash
+.venv/bin/python manage.py seed_operational_pilot_data --company-name "Empresa Piloto Cliente A" --site-name "Unidade Piloto Cliente A"
+.venv/bin/python manage.py seed_operational_pilot_data --reset
+```
+
+Use `--reset` somente para remover dados identificáveis do próprio seed. Ele não recria dados na mesma execução e não deve ser usado sobre dados reais.
+
+4. Fazer um dry-run manual da rotina:
 
 ```bash
 .venv/bin/python manage.py run_operational_agents --dry-run
@@ -41,9 +58,11 @@ A saída esperada deve conter linhas `PLANNED maintenance-agent` e `PLANNED sche
 
 ## Rotina manual
 
-Para executar manualmente a rotina real:
+Para preparar dados mínimos e executar manualmente a rotina real:
 
 ```bash
+.venv/bin/python manage.py seed_operational_pilot_data
+.venv/bin/python manage.py run_operational_agents --dry-run
 .venv/bin/python manage.py run_operational_agents
 ```
 
@@ -113,6 +132,8 @@ A rotina não exige dados reais para o smoke test, mas uma demo com cliente fica
 - ordens de serviço e visitas futuras;
 - técnicos e agenda com disponibilidade ou risco de SLA.
 
+Quando usar o seed, trate os registros como massa de demonstração. Eles são marcados por nomes/prefixos estáveis como `Empresa Piloto Smart360`, `Unidade Piloto Operacional`, `OPS-PILOT-*`, `OPS-PILOT-OS-*`, e-mails `@smart360.local` e `metadata.seed_key=operational_pilot` nos models que suportam metadata. Não misture esses registros com dados de cliente real em validações comerciais.
+
 ## Como interpretar o painel
 
 - Recomendações abertas indicam pontos para triagem operacional. Elas não executam ação sozinhas.
@@ -126,12 +147,13 @@ A rotina não exige dados reais para o smoke test, mas uma demo com cliente fica
 
 Um painel vazio não significa falha obrigatória. Conferir nesta ordem:
 
-1. Rodar `.venv/bin/python manage.py run_operational_agents --dry-run` e confirmar os dois agentes planejados.
-2. Verificar se existem sites ativos para a empresa do usuário logado.
-3. Rodar a rotina real sem `--dry-run` para a janela desejada.
-4. Confirmar se há dados operacionais suficientes para gerar recomendações, propostas ou flags.
-5. Se a rotina automática já deveria ter rodado, conferir se Beat/worker Celery estão ativos e procurar logs da task `ai_agents_center.run_daily_operational_agents`.
-6. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
+1. Rodar `.venv/bin/python manage.py seed_operational_pilot_data` se não houver massa real segura para demo.
+2. Rodar `.venv/bin/python manage.py run_operational_agents --dry-run` e confirmar os dois agentes planejados.
+3. Verificar se existem sites ativos para a empresa do usuário logado.
+4. Rodar a rotina real sem `--dry-run` para a janela desejada.
+5. Confirmar se há dados operacionais suficientes para gerar recomendações, propostas ou flags.
+6. Se a rotina automática já deveria ter rodado, conferir se Beat/worker Celery estão ativos e procurar logs da task `ai_agents_center.run_daily_operational_agents`.
+7. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
 
 ## Dependências para piloto real
 

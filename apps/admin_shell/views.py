@@ -1561,6 +1561,7 @@ class ClientPortalRequestCreateView(ClientPortalContextMixin, FormView):
     form_class = ClientPortalRequestForm
     permission_domain = "client_portal_requests"
     permission_action = "create"
+    allow_client_portal_only_user = True
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -3122,6 +3123,7 @@ class SmartSystemOperationsView(CMMSOperationalShellMixin, TemplateView):
         ]
         context["operations_chart_data"] = build_operations_chart_data(self.request)
         context["current_module_slug"] = "smart-system"
+        context["execution"] = None
         return context
 
 
@@ -3146,6 +3148,7 @@ class SmartSystemReliabilityView(CMMSOperationalShellMixin, TemplateView):
             {"label": "Engenharia & TPM", "url": None},
         ]
         context["current_module_slug"] = "smart-system"
+        context["execution"] = None
         return context
 
 

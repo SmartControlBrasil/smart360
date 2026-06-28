@@ -168,7 +168,11 @@ class SchedulingOptimizationService:
             "thresholds": thresholds,
             "technicians": technician_contexts,
             "unassigned_visits": [cls.serialize_visit(visit) for visit in unassigned_visits],
-            "day_summary": cls.build_day_summary(technician_contexts=technician_contexts, unassigned_visits=unassigned_visits, target_date=target_date),
+            "day_summary": cls.build_day_summary(
+                technician_contexts=technician_contexts,
+                unassigned_visits=unassigned_visits,
+                target_date=target_date,
+            ),
             "analytics": cls.query_analytics(company=company),
         }
 
@@ -187,6 +191,7 @@ class SchedulingOptimizationService:
         conflicts = cls.detect_conflicts(visits)
         urgent_after_low = cls.detect_priority_inversion(visits)
         sla_risk_visits = cls.detect_sla_risk_visits(visits, thresholds=thresholds)
+
         return {
             "technician_id": getattr(technician, "id", None),
             "technician_public_id": "",
@@ -198,6 +203,7 @@ class SchedulingOptimizationService:
             "route_travel_minutes": route_travel,
             "optimized_travel_minutes": optimized_route["total_travel_minutes"],
             "optimized_travel_gain": max(route_travel - optimized_route["total_travel_minutes"], 0),
+            "has_location_backtrack": optimized_route.get("has_location_backtrack", False),
             "total_minutes": total_minutes,
             "capacity_minutes": capacity_minutes,
             "free_capacity_minutes": free_capacity,
@@ -248,7 +254,14 @@ class SchedulingOptimizationService:
         proposals.extend(day_proposals)
         health_flags.extend(day_flags)
 
-        recommendations.sort(key=lambda item: (item.attention_score, cls._severity_rank(item.severity), cls._priority_rank(item.priority)), reverse=True)
+        recommendations.sort(
+            key=lambda item: (
+                item.attention_score,
+                cls._severity_rank(item.severity),
+                cls._priority_rank(item.priority),
+            ),
+            reverse=True,
+        )
         proposals.sort(key=lambda item: (cls._priority_rank(item.priority), item.action_type), reverse=True)
         summary = (
             f"Scheduling optimization completed for {context['target_date']}: "
@@ -273,7 +286,10 @@ class SchedulingOptimizationService:
             cls.log_signal(
                 event_type="agent.scheduling.overload.detected",
                 technician_context=technician_context,
-                payload={"total_minutes": technician_context["total_minutes"], "capacity_minutes": technician_context["capacity_minutes"]},
+                payload={
+                    "total_minutes": technician_context["total_minutes"],
+                    "capacity_minutes": technician_context["capacity_minutes"],
+                },
             )
             summary = (
                 f"Tecnico {tech_name} possui {technician_context['visit_count']} visitas com carga estimada de "
@@ -296,16 +312,21 @@ class SchedulingOptimizationService:
                 )
             )
             reassignment_candidates = cls.find_reassignment_candidates(source_context=technician_context, capacity_by_tech=capacity_by_tech)
-            if reassignment_candidates:
+            if reassignment_candidates and technician_context["visits"]:
                 candidate = reassignment_candidates[0]
+                visit_to_reassign = max(
+                    technician_context["visits"],
+                    key=lambda item: item["estimated_duration_minutes"] + item["estimated_travel_minutes"],
+                )
                 proposals.append(
                     SchedulingActionProposalDraft(
                         action_type="reassign_visits_between_technicians",
-                        target_entity="technician_schedule",
-                        target_entity_id=technician_context["schedule_public_id"] or tech_entity_id,
+                        target_entity="scheduled_visit",
+                        target_entity_id=visit_to_reassign["public_id"],
                         title=f"Redistribuir agenda de {tech_name}",
                         summary=f"Sugerida redistribuicao para {candidate['technician_name']} com capacidade ociosa.",
                         proposed_payload={
+                            "visit_public_id": visit_to_reassign["public_id"],
                             "from_technician_id": tech_id,
                             "to_technician_id": candidate["technician_id"],
                             "date": technician_context["date"],
@@ -344,27 +365,46 @@ class SchedulingOptimizationService:
                     target_entity_id=technician_context["schedule_public_id"] or tech_entity_id,
                     title=f"Bloquear agenda de {tech_name} para revisao",
                     summary="Agenda com conflito precisa de revisao operacional antes da execucao.",
-                    proposed_payload={"technician_id": tech_id, "date": technician_context["date"], "conflicts": technician_context["conflicts"]},
+                    proposed_payload={
+                        "technician_id": tech_id,
+                        "date": technician_context["date"],
+                        "conflicts": technician_context["conflicts"],
+                    },
                     priority="high",
                 )
             )
             flags.append(cls.build_health_flag(technician_context=technician_context, flag_type="conflict", summary=f"Conflitos na agenda de {tech_name}", attention_score=84))
 
-        if technician_context["optimized_travel_gain"] >= thresholds["reorder_gain_minutes"]:
+        should_reorder_route = (
+            technician_context["optimized_travel_gain"] >= thresholds["reorder_gain_minutes"]
+            or technician_context.get("has_location_backtrack", False)
+        )
+
+        if should_reorder_route:
+            reorder_summary = (
+                f"A rota atual de {tech_name} pode reduzir {technician_context['optimized_travel_gain']} min com reordenacao."
+                if technician_context["optimized_travel_gain"] >= thresholds["reorder_gain_minutes"]
+                else f"A rota atual de {tech_name} alterna localidades ja visitadas e deve ser reordenada."
+            )
+
             recommendations.append(
                 SchedulingRecommendationDraft(
                     recommendation_type="route_reorder",
                     severity="medium",
                     priority="high",
                     title=f"Rota subotima para {tech_name}",
-                    summary=f"A rota atual de {tech_name} pode reduzir {technician_context['optimized_travel_gain']} min com reordenacao.",
-                    explanation="A sequencia atual nao aproveita a proximidade geográfica das visitas.",
+                    summary=reorder_summary,
+                    explanation="A sequencia atual nao aproveita a proximidade geografica das visitas.",
                     evidence_summary=evidence,
                     suggested_action="Aplicar reordenacao proposta para reduzir deslocamento e folga operacional.",
                     attention_score=73,
                     entity_type="route_plan",
                     entity_id=technician_context["route_plan_public_id"] or tech_entity_id,
-                    payload={"technician": technician_context, "signals": ["route_efficiency"], "optimized_order": technician_context["optimized_order"]},
+                    payload={
+                        "technician": technician_context,
+                        "signals": ["route_efficiency"],
+                        "optimized_order": technician_context["optimized_order"],
+                    },
                 )
             )
             proposals.append(
@@ -373,12 +413,23 @@ class SchedulingOptimizationService:
                     target_entity="route_plan",
                     target_entity_id=technician_context["route_plan_public_id"] or tech_entity_id,
                     title=f"Reordenar rota de {tech_name}",
-                    summary="Sequencia alternativa reduz deslocamento estimado.",
-                    proposed_payload={"technician_id": tech_id, "date": technician_context["date"], "ordered_public_ids": technician_context["optimized_order"]},
+                    summary="Sequencia alternativa reduz deslocamento estimado ou elimina retorno desnecessario a localidades ja visitadas.",
+                    proposed_payload={
+                        "technician_id": tech_id,
+                        "date": technician_context["date"],
+                        "ordered_public_ids": technician_context["optimized_order"],
+                    },
                     priority="high",
                 )
             )
-            flags.append(cls.build_health_flag(technician_context=technician_context, flag_type="route_efficiency", summary=f"Rota ineficiente de {tech_name}", attention_score=73))
+            flags.append(
+                cls.build_health_flag(
+                    technician_context=technician_context,
+                    flag_type="route_efficiency",
+                    summary=f"Rota ineficiente de {tech_name}",
+                    attention_score=73,
+                )
+            )
 
         if technician_context["sla_risk_visits"]:
             visit = technician_context["sla_risk_visits"][0]
@@ -405,7 +456,11 @@ class SchedulingOptimizationService:
                     target_entity_id=visit["public_id"],
                     title=f"Antecipar visita critica {visit['title']}",
                     summary="Visita em risco de SLA deve ganhar prioridade operacional imediata.",
-                    proposed_payload={"visit_public_id": visit["public_id"], "technician_id": tech_id, "date": technician_context["date"]},
+                    proposed_payload={
+                        "visit_public_id": visit["public_id"],
+                        "technician_id": tech_id,
+                        "date": technician_context["date"],
+                    },
                     priority="immediate",
                 )
             )
@@ -436,7 +491,11 @@ class SchedulingOptimizationService:
                     target_entity_id=technician_context["schedule_public_id"] or tech_entity_id,
                     title=f"Encaixar visita em agenda de {tech_name}",
                     summary=f"Sugerido encaixe da visita {visit['title']} na capacidade livre do tecnico.",
-                    proposed_payload={"technician_id": tech_id, "visit_public_id": visit["public_id"], "date": technician_context["date"]},
+                    proposed_payload={
+                        "technician_id": tech_id,
+                        "visit_public_id": visit["public_id"],
+                        "date": technician_context["date"],
+                    },
                     priority="medium",
                 )
             )
@@ -468,7 +527,12 @@ class SchedulingOptimizationService:
                     attention_score=89 if target_visit["priority"] == "urgent" else 78,
                     entity_type="scheduled_visit",
                     entity_id=target_visit["public_id"],
-                    payload={"signals": ["unassigned_visit"], "visit": target_visit, "suggested_technician": candidate, "marketplace_candidates": marketplace_candidates},
+                    payload={
+                        "signals": ["unassigned_visit"],
+                        "visit": target_visit,
+                        "suggested_technician": candidate,
+                        "marketplace_candidates": marketplace_candidates,
+                    },
                 )
             )
             proposals.append(
@@ -478,7 +542,12 @@ class SchedulingOptimizationService:
                     target_entity_id=target_visit["public_id"],
                     title=f"Sugerir tecnico alternativo para {target_visit['title']}",
                     summary="Visita nao alocada requer encaixe ou remanejamento imediato.",
-                    proposed_payload={"visit_public_id": target_visit["public_id"], "candidate": candidate, "marketplace_candidates": marketplace_candidates, "date": context["target_date"]},
+                    proposed_payload={
+                        "visit_public_id": target_visit["public_id"],
+                        "candidate": candidate,
+                        "marketplace_candidates": marketplace_candidates,
+                        "date": context["target_date"],
+                    },
                     priority="immediate" if target_visit["priority"] == "urgent" else "high",
                 )
             )
@@ -565,7 +634,13 @@ class SchedulingOptimizationService:
 
     @classmethod
     def estimate_route_travel(cls, visits):
-        ordered = sorted(visits, key=lambda item: (item.route_order, item.scheduled_start or timezone.now()))
+        ordered = sorted(
+            visits,
+            key=lambda item: (
+                item.route_order,
+                item.scheduled_start or timezone.now(),
+            ),
+        )
         total = 0
         previous = None
         for visit in ordered:
@@ -576,29 +651,75 @@ class SchedulingOptimizationService:
     @classmethod
     def simulate_route_reorder(cls, *, visits, target_date):
         if not visits:
-            return {"ordered_public_ids": [], "total_travel_minutes": 0}
+            return {
+                "ordered_public_ids": [],
+                "total_travel_minutes": 0,
+                "has_location_backtrack": False,
+            }
+
+        current_order = sorted(
+            visits,
+            key=lambda visit: (
+                visit.route_order or 999,
+                visit.scheduled_start or timezone.now(),
+            ),
+        )
+
+        seen_locations = set()
+        previous_location = None
+        has_location_backtrack = False
+
+        for visit in current_order:
+            city = (visit.city or "").strip().lower()
+            state = (visit.state or "").strip().lower()
+            location_key = f"{city}:{state}" if city or state else ""
+
+            if not location_key:
+                continue
+
+            if previous_location and location_key != previous_location:
+                seen_locations.add(previous_location)
+
+            if location_key in seen_locations and location_key != previous_location:
+                has_location_backtrack = True
+                break
+
+            previous_location = location_key
+
         ordered = sorted(
             visits,
             key=lambda visit: (
                 {"urgent": 0, "high": 1, "medium": 2, "low": 3}.get(visit.priority, 4),
                 visit.window_start or TechnicianRoutingService.DEFAULT_START_TIME,
-                visit.city or "",
+                (visit.city or "").strip().lower(),
+                (visit.state or "").strip().lower(),
                 visit.location_label or "",
             ),
         )
+
         previous = None
         total = 0
         for visit in ordered:
             total += TechnicianRoutingService._estimate_travel_minutes(previous, visit)
             previous = visit
-        return {"ordered_public_ids": [str(visit.public_id) for visit in ordered], "total_travel_minutes": total}
+
+        return {
+            "ordered_public_ids": [str(visit.public_id) for visit in ordered],
+            "total_travel_minutes": total,
+            "has_location_backtrack": has_location_backtrack,
+        }
 
     @classmethod
     def simulate_visit_reassignment(cls, *, visit_payload, technician_context):
         return {
             "visit_public_id": visit_payload["public_id"],
             "technician_id": technician_context["technician_id"],
-            "remaining_capacity_minutes": max(technician_context["free_capacity_minutes"] - visit_payload["estimated_duration_minutes"] - visit_payload["estimated_travel_minutes"], 0),
+            "remaining_capacity_minutes": max(
+                technician_context["free_capacity_minutes"]
+                - visit_payload["estimated_duration_minutes"]
+                - visit_payload["estimated_travel_minutes"],
+                0,
+            ),
         }
 
     @classmethod
@@ -608,7 +729,7 @@ class SchedulingOptimizationService:
         for index, visit in enumerate(ordered):
             if visit.conflict_flags:
                 conflicts.append({"visit_public_id": str(visit.public_id), "flags": list(visit.conflict_flags)})
-            for other in ordered[index + 1 :]:
+            for other in ordered[index + 1:]:
                 if not visit.scheduled_start or not visit.scheduled_end or not other.scheduled_start or not other.scheduled_end:
                     continue
                 if visit.scheduled_start < other.scheduled_end and visit.scheduled_end > other.scheduled_start:
@@ -700,7 +821,9 @@ class SchedulingOptimizationService:
             technician_service_request__requester_company_id=company_id
         )
         if visit_payload.get("work_order_public_id"):
-            queryset = queryset.filter(technician_service_request__related_service_order__public_id=visit_payload["work_order_public_id"])
+            queryset = queryset.filter(
+                technician_service_request__related_service_order__public_id=visit_payload["work_order_public_id"]
+            )
         else:
             queryset = queryset.filter(
                 Q(technician_service_request__city__iexact=visit_payload.get("city", ""))

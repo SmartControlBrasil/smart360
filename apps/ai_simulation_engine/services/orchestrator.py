@@ -9,6 +9,7 @@ from apps.ai_optimization_loop.services.orchestrator import LearningOrchestrator
 from apps.ai_policy_studio.models import PolicyRule
 from apps.ai_policy_studio.services.engine import PolicyStudioEngine
 from apps.observability_center.services.observability_service import SystemEventService
+from apps.smart_system.models import Asset
 from shared_kernel.observability.context import get_request_id
 
 from ..models import SimulationResult, SimulationRun, SimulationScenario, SimulationType
@@ -32,20 +33,54 @@ class SimulationOrchestrator:
         if simulation_type == "route_reorder_simulation":
             payload.setdefault("technician_id", payload.get("technician_id"))
         if simulation_type == "technician_reassignment_simulation":
-            payload.setdefault("visit_public_id", payload.get("visit_public_id") or decision.target_entity_id)
+            if decision.target_entity == "scheduled_visit":
+                payload.setdefault("visit_public_id", payload.get("visit_public_id") or decision.target_entity_id)
             payload.setdefault("to_technician_id", payload.get("to_technician_id") or payload.get("technician_id"))
         if simulation_type == "preventive_frequency_change_simulation":
-            payload.setdefault("asset_public_id", payload.get("asset_public_id") or decision.target_entity_id)
+            asset_public_id = payload.get("asset_public_id")
+            if not asset_public_id and decision.target_entity == "asset":
+                asset_public_id = decision.target_entity_id
+            if not asset_public_id and decision.site is not None:
+                asset_public_id = (
+                    Asset.objects.filter(operational_site=decision.site)
+                    .order_by("id")
+                    .values_list("public_id", flat=True)
+                    .first()
+                )
+            if not asset_public_id:
+                run_context = getattr(decision.agent_action_proposal.agent_run, "input_context", {}) or {}
+                candidate_assets = payload.get("asset_analysis") or run_context.get("asset_analysis") or []
+                asset_public_id = next((row.get("asset_public_id") for row in candidate_assets if row.get("asset_public_id")), None)
+            if asset_public_id:
+                payload["asset_public_id"] = asset_public_id
             payload.setdefault("proposed_frequency_days", 15)
         if simulation_type == "contract_repricing_simulation":
-            payload.setdefault("contract_public_id", payload.get("contract_public_id") or decision.target_entity_id)
-            payload.setdefault("proposed_value", payload.get("proposed_value"))
+            contract_public_id = payload.get("contract_public_id")
+            if not contract_public_id and decision.target_entity == "maintenance_contract":
+                contract_public_id = decision.target_entity_id
+            if not contract_public_id and decision.target_entity == "maintenance_client":
+                run_context = getattr(decision.agent_action_proposal.agent_run, "input_context", {}) or {}
+                candidate_rows = payload.get("contract_rows") or run_context.get("contract_rows") or []
+                contract_public_id = next((row.get("contract_public_id") for row in candidate_rows if row.get("contract_public_id")), None)
+            if contract_public_id:
+                payload["contract_public_id"] = contract_public_id
         if simulation_type == "marketplace_candidate_swap_simulation":
             payload.setdefault("service_request_public_id", payload.get("service_request_public_id") or decision.target_entity_id)
             if payload.get("marketplace_candidates") and not payload.get("proposed_candidate_public_id"):
                 payload["proposed_candidate_public_id"] = payload["marketplace_candidates"][0].get("technician_profile_public_id")
         if simulation_type == "maintenance_action_plan_simulation":
-            payload.setdefault("asset_public_id", payload.get("asset_public_id") or decision.target_entity_id)
+            asset_public_id = payload.get("asset_public_id")
+            if not asset_public_id and decision.target_entity == "asset":
+                asset_public_id = decision.target_entity_id
+            if not asset_public_id and decision.site is not None:
+                asset_public_id = (
+                    Asset.objects.filter(operational_site=decision.site)
+                    .order_by("id")
+                    .values_list("public_id", flat=True)
+                    .first()
+                )
+            if asset_public_id:
+                payload.setdefault("asset_public_id", str(asset_public_id))
         return payload
 
     @classmethod
@@ -70,6 +105,11 @@ class SimulationOrchestrator:
             latest = decision.simulation_runs.select_related("result", "scenario", "scenario__simulation_type").order_by("-created_at").first()
             if latest and latest.status == SimulationRun.RunStatus.COMPLETED:
                 return latest
+        input_payload = cls.build_input_for_decision(decision, simulation_type.slug)
+        if simulation_type.slug == "technician_reassignment_simulation" and (
+            not input_payload.get("visit_public_id") or not input_payload.get("to_technician_id")
+        ):
+            return None
         scenario, _ = SimulationScenario.objects.get_or_create(
             simulation_type=simulation_type,
             company=decision.company,
@@ -89,7 +129,7 @@ class SimulationOrchestrator:
             trigger_type=SimulationRun.TriggerType.DECISION,
             source_type=SimulationRun.SourceType.DECISION,
             source_reference=str(decision.public_id),
-            input_payload=cls.build_input_for_decision(decision, simulation_type.slug),
+            input_payload=input_payload,
             status=SimulationRun.RunStatus.PENDING,
             request_id=get_request_id(),
             created_by_user=requested_by or decision.agent_action_proposal.agent_run.triggered_by,

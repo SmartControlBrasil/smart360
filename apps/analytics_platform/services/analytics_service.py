@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from uuid import UUID
 
 from django.db import transaction
 from django.db.models import Avg, Count, Q, Sum
@@ -63,6 +64,24 @@ def _minutes_between(start, end) -> int:
     if not start or not end:
         return 0
     return max(int((end - start).total_seconds() // 60), 0)
+
+
+def _json_ready(value):
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, Decimal):
+        return str(value)
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if isinstance(value, UUID):
+        return str(value)
+    if isinstance(value, dict):
+        return {key: _json_ready(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_ready(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_ready(item) for item in value]
+    return value
 
 
 @dataclass(frozen=True)
@@ -370,7 +389,7 @@ class ExecutiveAnalyticsService:
                     "billing_mrr_total": str(cls._billing_mrr(company)),
                     "contract_revenue": str(contract_revenue),
                     "quote_revenue": str(quote_revenue),
-                    "top_problematic_assets": cls._top_problematic_assets(company, period),
+                    "top_problematic_assets": [_json_ready(asset) for asset in cls._top_problematic_assets(company, period)],
                 },
                 "calculated_at": timezone.now(),
             },
@@ -591,6 +610,14 @@ class ExecutiveAnalyticsService:
                 {"label": "SLA medio", "value": metrics.sla_compliance_rate, "tone": "cyan", "helper": "Percentual de atendimentos no prazo", "format": "percentage"},
                 {"label": "Tempo medio de resposta", "value": metrics.avg_response_time, "tone": "rose", "helper": "Minutos ate inicio do atendimento", "format": "duration"},
             ],
+            "summary_cards": [
+                {"label": "Receita operacional", "value": _json_ready(metrics.total_revenue), "tone": "emerald", "helper": "Contratos recorrentes + orcamentos aprovados", "format": "currency"},
+                {"label": "Lucro operacional", "value": _json_ready(metrics.total_profit), "tone": "sky", "helper": "Receita menos mao de obra, pecas e deslocamento", "format": "currency"},
+                {"label": "Contratos ativos", "value": contracts_active, "tone": "violet", "helper": "Cobertura recorrente vigente", "format": "count"},
+                {"label": "MRR total", "value": _json_ready(cls._billing_mrr(company)), "tone": "amber", "helper": "Receita mensal recorrente de billing SaaS", "format": "currency"},
+                {"label": "SLA medio", "value": _json_ready(metrics.sla_compliance_rate), "tone": "cyan", "helper": "Percentual de atendimentos no prazo", "format": "percentage"},
+                {"label": "Tempo medio de resposta", "value": _json_ready(metrics.avg_response_time), "tone": "rose", "helper": "Minutos ate inicio do atendimento", "format": "duration"},
+            ],
             "revenue_series": cls.get_revenue_series(company=company, period_type=period_type, reference_date=reference_date),
             "profit_series": cls.get_profit_series(company=company, period_type=period_type, reference_date=reference_date),
             "top_clients": [
@@ -674,7 +701,7 @@ class ExecutiveAnalyticsService:
     def get_profitability_payload(cls, *, company, reference_date: date | None = None, period_type: str = OperationalMetrics.PeriodType.MONTHLY):
         dashboard = cls.build_executive_dashboard(company=company, reference_date=reference_date, period_type=period_type)
         return {
-            "company": {"id": company.public_id, "name": company.name, "slug": company.slug},
+            "company": {"id": str(company.public_id), "name": company.name, "slug": company.slug},
             "period": dashboard["period"],
             "clients": dashboard["top_clients"],
             "contracts": dashboard["top_contracts"],
@@ -685,7 +712,7 @@ class ExecutiveAnalyticsService:
     def get_technician_payload(cls, *, company, reference_date: date | None = None, period_type: str = OperationalMetrics.PeriodType.MONTHLY):
         dashboard = cls.build_executive_dashboard(company=company, reference_date=reference_date, period_type=period_type)
         return {
-            "company": {"id": company.public_id, "name": company.name, "slug": company.slug},
+            "company": {"id": str(company.public_id), "name": company.name, "slug": company.slug},
             "period": dashboard["period"],
             "technicians": dashboard["technician_leaderboard"],
         }
@@ -694,7 +721,7 @@ class ExecutiveAnalyticsService:
     def get_asset_payload(cls, *, company, reference_date: date | None = None, period_type: str = OperationalMetrics.PeriodType.MONTHLY):
         dashboard = cls.build_executive_dashboard(company=company, reference_date=reference_date, period_type=period_type)
         return {
-            "company": {"id": company.public_id, "name": company.name, "slug": company.slug},
+            "company": {"id": str(company.public_id), "name": company.name, "slug": company.slug},
             "period": dashboard["period"],
             "assets": dashboard["asset_analysis"],
         }

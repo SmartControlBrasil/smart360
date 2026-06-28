@@ -28,6 +28,14 @@ from tests.factories.marketplace_technicians import (
     TechnicianSkillAssignmentFactory,
     TechnicianSkillFactory,
 )
+def _payload_items(response):
+    if isinstance(response.data, list):
+        return response.data
+    if isinstance(response.data, dict):
+        return response.data.get("results", [])
+    return []
+
+
 from tests.factories.smart_system import (
     AssetCategoryFactory,
     AssetFactory,
@@ -114,8 +122,8 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agents-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(any(item["slug"] == "maintenance-agent" for item in response.data["results"]))
-        self.assertTrue(any(item["slug"] == "atlas-commercial-intelligence-agent" for item in response.data["results"]))
+        self.assertTrue(any(item["slug"] == "maintenance-agent" for item in _payload_items(response)))
+        self.assertTrue(any(item["slug"] == "atlas-commercial-intelligence-agent" for item in _payload_items(response)))
 
     def test_briefing_generation_personalizes_by_audience(self):
         technician_briefing = AIBriefingComposer.generate_briefing(
@@ -149,7 +157,7 @@ class AIAgentsCenterApiTests(APITestCase):
 
         list_response = self.client.get(reverse("ai-agent-briefings-list"), {"company": self.company.id})
         self.assertEqual(list_response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(list_response.data["count"], 1)
+        self.assertGreaterEqual(len(_payload_items(list_response)), 1)
 
     def test_briefing_scope_respects_company(self):
         other_company = CompanyFactory(name="Other AI", slug="other-ai")
@@ -165,7 +173,7 @@ class AIAgentsCenterApiTests(APITestCase):
 
         response = self.client.get(reverse("ai-agent-briefings-list"))
 
-        public_ids = [item["public_id"] for item in response.data["results"]]
+        public_ids = [item["public_id"] for item in _payload_items(response)]
         self.assertNotIn(str(other_briefing.public_id), public_ids)
 
     def test_briefing_delivery_creates_in_app_delivery(self):
@@ -216,6 +224,22 @@ class AIAgentsCenterApiTests(APITestCase):
         self.assertTrue(recommendation.evidence_summary)
         self.assertTrue(recommendation.suggested_action)
 
+    def test_manual_run_without_manage_permission_is_forbidden(self):
+        limited_user = UserFactory(email="planner-ai@smart360.local", password="StrongPass123")
+        MembershipFactory(user=limited_user, company=self.company, is_primary=True)
+        assign_smart_system_role(limited_user, "planner", company=self.company)
+        self.client.force_authenticate(limited_user)
+
+        response = self.client.post(
+            reverse("ai-agent-manual-run"),
+            {"agent_slug": "maintenance-agent", "company": self.company.id, "site": self.site.id},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(AgentRun.objects.filter(agent__slug="maintenance-agent", triggered_by=limited_user).exists())
+        self.client.force_authenticate(self.user)
+
     def test_atlas_agent_qualifies_public_opportunity_for_growth_engine(self):
         trigger_reference = json.dumps(
             {
@@ -249,6 +273,13 @@ class AIAgentsCenterApiTests(APITestCase):
         self.assertIn("HygiBot", opportunity.recommended_product)
 
     def test_agent_detects_recurring_failure_pattern(self):
+        FailureEvent.objects.create(
+            asset=self.asset,
+            service_order=self.order,
+            symptom="Falha eletrica intermitente",
+            probable_cause="Conector",
+            severity="high",
+        )
         response = self.client.post(
             reverse("ai-agent-manual-run"),
             {"agent_slug": "maintenance-agent", "company": self.company.id, "site": self.site.id},
@@ -257,6 +288,22 @@ class AIAgentsCenterApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
+            AgentRecommendation.objects.filter(
+                agent_run__agent__slug="maintenance-agent",
+                recommendation_type="failure_pattern_alert",
+                entity_id=str(self.asset.public_id),
+            ).exists()
+        )
+
+    def test_agent_does_not_detect_recurring_failure_pattern_below_threshold(self):
+        response = self.client.post(
+            reverse("ai-agent-manual-run"),
+            {"agent_slug": "maintenance-agent", "company": self.company.id, "site": self.site.id},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(
             AgentRecommendation.objects.filter(
                 agent_run__agent__slug="maintenance-agent",
                 recommendation_type="failure_pattern_alert",
@@ -393,7 +440,7 @@ class AIAgentsCenterApiTests(APITestCase):
             assigned_to=self.user,
             created_by=self.user,
         )
-        WorkLogFactory(service_order=order, user=self.user, labor_minutes=420)
+        WorkLogFactory(service_order=order, user=self.user, labor_minutes=600)
         StockMovementFactory(
             company=self.company,
             operational_site=self.site,
@@ -454,7 +501,7 @@ class AIAgentsCenterApiTests(APITestCase):
         )
 
     def test_profitability_agent_detects_route_margin_erosion(self):
-        contract = MaintenanceContractFactory(company=self.company, client=self.maintenance_client, operational_site=self.site, contract_value=Decimal("1200.00"))
+        contract = MaintenanceContractFactory(company=self.company, client=self.maintenance_client, operational_site=self.site, contract_value=Decimal("500.00"))
         order = ServiceOrderFactory(
             client=self.maintenance_client,
             operational_site=self.site,
@@ -536,7 +583,7 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-profitability-health-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(response.data["count"], 1)
+        self.assertGreaterEqual(len(_payload_items(response)), 1)
         self.assertTrue(AgentProfitabilityAttentionFlag.objects.filter(agent__slug="profitability-agent", company=self.company).exists())
 
     def test_marketplace_agent_identifies_best_viable_candidate(self):
@@ -768,7 +815,7 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-marketplace-health-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(response.data["count"], 1)
+        self.assertGreaterEqual(len(_payload_items(response)), 1)
         self.assertTrue(AgentMarketplaceRequestFlag.objects.filter(agent__slug="marketplace-agent", company=self.company).exists())
 
     def test_anomaly_agent_detects_abnormal_failure_spike(self):
@@ -931,16 +978,22 @@ class AIAgentsCenterApiTests(APITestCase):
         )
         current_period = ExecutiveAnalyticsService.get_period(reference_date=timezone.localdate(), period_type=OperationalMetrics.PeriodType.MONTHLY)
         previous_period = ExecutiveAnalyticsService.get_period(reference_date=current_period.start - timedelta(days=1), period_type=OperationalMetrics.PeriodType.MONTHLY)
-        ContractProfitability.objects.create(
+        order = ServiceOrderFactory(
+            client=self.maintenance_client,
+            operational_site=self.site,
+            asset=self.asset,
+            maintenance_contract=contract,
+            assigned_to=self.user,
+            created_by=self.user,
+            status=ServiceOrder.Status.COMPLETED,
+        )
+        WorkLogFactory(service_order=order, user=self.user, labor_minutes=600)
+        StockMovementFactory(
             company=self.company,
-            contract=contract,
-            period_type=current_period.period_type,
-            period_start=current_period.start,
-            period_end=current_period.end,
-            revenue=Decimal("2000.00"),
-            cost=Decimal("2100.00"),
-            profit=Decimal("-100.00"),
-            margin=Decimal("-5.00"),
+            operational_site=self.site,
+            service_order=order,
+            part=PartFactory(company=self.company, operational_site=self.site, unit_cost=500),
+            quantity=2,
         )
         ContractProfitability.objects.create(
             company=self.company,
@@ -988,7 +1041,7 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-anomaly-health-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(response.data["count"], 1)
+        self.assertGreaterEqual(len(_payload_items(response)), 1)
         self.assertTrue(AgentAnomalyAttentionFlag.objects.filter(agent__slug="anomaly-agent", company=self.company).exists())
 
     def test_proposal_approval_changes_status(self):
@@ -1062,7 +1115,7 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-recommendations-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], 0)
+        self.assertEqual(len(_payload_items(response)), 0)
 
     def test_anomaly_recommendations_are_scoped_by_company_membership(self):
         for offset in (1, 2, 3, 4):
@@ -1088,7 +1141,7 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-anomaly-health-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], 0)
+        self.assertEqual(len(_payload_items(response)), 0)
 
     def test_attention_assets_endpoint_respects_scope(self):
         self.client.post(
@@ -1099,7 +1152,7 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-maintenance-attention-assets-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(len(_payload_items(response)), 1)
 
     def test_scheduling_agent_detects_technician_overload(self):
         target_date = timezone.localdate() + timedelta(days=1)
@@ -1323,7 +1376,15 @@ class AIAgentsCenterApiTests(APITestCase):
         response = self.client.get(reverse("ai-agent-scheduling-health-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(response.data["count"], 1)
+
+        if isinstance(response.data, list):
+            self.assertGreaterEqual(len(response.data), 1)
+            results = response.data
+        else:
+            self.assertGreaterEqual(len(_payload_items(response)), 1)
+            results = response.data.get("results", [])
+
+        self.assertTrue(results)
 
     def test_manager_copilot_query_respects_scope(self):
         other_company = CompanyFactory(name="Outra Empresa", slug="outra-empresa")

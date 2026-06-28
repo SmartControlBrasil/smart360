@@ -1,0 +1,46 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ page_title }}</h1>
+            <p class="muted-block">{{ page_description }}</p>
+            <p class="muted-block">Usuários do Portal acessam somente o painel básico em /portal/ para abrir e acompanhar chamados. Eles não acessam o painel interno do Smart360.</p>
+        </div>
+
+        <form method="post" class="form-card-body" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for err in form.non_field_errors %}
+                    <div class="form-error">{{ err }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-grid">
+                {% include "admin_shell/components/forms/field.html" with field=form.full_name %}
+                {% include "admin_shell/components/forms/field.html" with field=form.email %}
+                {% include "admin_shell/components/forms/field.html" with field=form.company %}
+                {% include "admin_shell/components/forms/field.html" with field=form.site %}
+                {% include "admin_shell/components/forms/field.html" with field=form.access_level full=True %}
+                <div class="form-field full">
+                    <label class="form-label">Descrições dos níveis</label>
+                    <small class="form-help">
+                        {% for _group, description in access_descriptions.items %}
+                            {{ description }}{% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </small>
+                </div>
+                {% include "admin_shell/components/forms/field.html" with field=form.is_active %}
+                {% include "admin_shell/components/forms/field.html" with field=form.password %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a class="btn-secondary" href="{{ cancel_href }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+import uuid
 from decimal import Decimal
 
 from django.db.models import Count, Q
@@ -147,8 +148,15 @@ class AnomalyDetectionIntelligenceService:
             ).select_related("operational_site", "category").first()
         elif trigger_reference.startswith("site:"):
             site_token = trigger_reference.split(":", 1)[1]
+            site_filter = Q(code=site_token)
+            try:
+                site_uuid = uuid.UUID(str(site_token))
+            except (TypeError, ValueError, AttributeError):
+                site_uuid = None
+            if site_uuid is not None:
+                site_filter |= Q(public_id=site_uuid)
             scope["site"] = OperationalSite.objects.filter(
-                Q(code=site_token) | Q(public_id=site_token),
+                site_filter,
                 maintenance_client__company=company,
             ).select_related("maintenance_client").first() or site
         elif trigger_reference.startswith("client:"):
@@ -260,7 +268,7 @@ class AnomalyDetectionIntelligenceService:
                 baseline_end=baseline_end,
             ),
         }
-        return _json_ready(context)
+        return context
 
     @classmethod
     def build_asset_contexts(cls, *, company, site=None, asset=None, client=None, contract=None, recent_start, recent_end, baseline_start, baseline_end):

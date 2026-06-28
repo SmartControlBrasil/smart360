@@ -11,6 +11,16 @@ from tests.factories.core import MembershipFactory
 from tests.factories.smart_system import AssetFactory, OperationalSiteFactory, ScheduledVisitFactory
 
 
+def _payload_items(response):
+    if isinstance(response.data, list):
+        return response.data
+    if isinstance(response.data, dict):
+        return response.data.get("results", [])
+    return []
+
+
+
+
 class SimulationEngineApiTests(APITestCase):
     def setUp(self):
         self.membership = MembershipFactory()
@@ -197,4 +207,4 @@ class SimulationEngineApiTests(APITestCase):
         response = self.client.get(reverse("ai-simulation-run-copilot-summary"), {"company": self.company.id})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data["results"])
+        self.assertTrue(_payload_items(response))

@@ -246,7 +246,7 @@ from .views import (
 app_name = "admin-shell"
 
 urlpatterns = [
-    path("", DashboardView.as_view(), name="dashboard"),
+    path("ecossistema/", DashboardView.as_view(), name="dashboard"),
     path("dashboard/site-factory/", include("apps.smart_site_factory.urls")),
     path("ecossistema/", DashboardView.as_view(), name="dashboard-entry"),
     path("field/login/", TechnicianLoginView.as_view(), name="technician-app-login"),

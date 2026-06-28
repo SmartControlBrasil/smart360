@@ -88,10 +88,13 @@ class ServiceOrderFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ServiceOrder
 
+    class Params:
+        company = factory.SubFactory(CompanyFactory)
+
     order_number = factory.Sequence(lambda n: f"SO-{n:05d}")
-    client = factory.SubFactory(MaintenanceClientFactory)
-    operational_site = factory.SubFactory(OperationalSiteFactory)
-    asset = factory.SubFactory(AssetFactory)
+    client = factory.SubFactory(MaintenanceClientFactory, company=factory.SelfAttribute("..company"))
+    operational_site = factory.SubFactory(OperationalSiteFactory, maintenance_client=factory.SelfAttribute("..client"))
+    asset = factory.SubFactory(AssetFactory, operational_site=factory.SelfAttribute("..operational_site"))
     maintenance_type = ServiceOrder.MaintenanceType.CORRECTIVE
     priority = ServiceOrder.Priority.MEDIUM
     status = ServiceOrder.Status.OPEN
@@ -231,7 +234,6 @@ class StockMovementFactory(factory.django.DjangoModelFactory):
     movement_type = StockMovement.MovementType.OUTBOUND
     quantity = 1
     performed_by = factory.SubFactory(UserFactory)
-    metadata = factory.LazyFunction(dict)
 
 
 class ServiceQuoteFactory(factory.django.DjangoModelFactory):

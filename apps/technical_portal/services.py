@@ -95,6 +95,9 @@ def user_can_create_service_order(request) -> bool:
     if not allowed_company_ids:
         return False
 
+    if user.groups.filter(name__in=SERVICE_ORDER_CREATE_ROLE_SLUGS).exists():
+        return True
+
     return UserRoleAssignment.objects.filter(
         user=user,
         is_active=True,

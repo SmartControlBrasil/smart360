@@ -50,7 +50,7 @@ from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilde
 from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
 from apps.companies.models import Membership
 from apps.observability_center.services.observability_service import SystemEventService
-from apps.smart_system.models import OperationalSite
+from apps.smart_system.models import Asset, MaintenanceContract, OperationalSite, Part
 
 
 class AIAgentsPermission(permissions.BasePermission):
@@ -62,6 +62,13 @@ class AIAgentsPermission(permissions.BasePermission):
         if company_id:
             company = Membership.objects.filter(user=request.user, company_id=company_id).select_related("company").first()
             company = company.company if company else None
+        if company is None:
+            primary_membership = (
+                Membership.objects.filter(user=request.user, is_primary=True)
+                .select_related("company")
+                .first()
+            )
+            company = primary_membership.company if primary_membership else None
         allowed, _ = AccessControlService.check_permission(
             user=request.user,
             domain_slug="ai_agents_admin",
@@ -583,16 +590,19 @@ class AgentManualRunView(APIView):
     permission_action = "manage"
 
     def post(self, request, *args, **kwargs):
-        serializer = AgentManualRunSerializer(data=request.data)
+        serializer = AgentManualRunSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        run = AgentCoordinatorService.run_agent(
-            agent_slug=serializer.validated_data["agent_slug"],
-            company=serializer.validated_data.get("company"),
-            site=serializer.validated_data.get("site"),
-            triggered_by=request.user,
-            trigger_type=AgentRun.TriggerType.MANUAL,
-            trigger_reference=serializer.validated_data.get("trigger_reference", ""),
-        )
+        try:
+            run = AgentCoordinatorService.run_agent(
+                agent_slug=serializer.validated_data["agent_slug"],
+                company=serializer.validated_data.get("company"),
+                site=serializer.validated_data.get("site"),
+                triggered_by=request.user,
+                trigger_type=AgentRun.TriggerType.MANUAL,
+                trigger_reference=serializer.validated_data.get("trigger_reference", ""),
+            )
+        except PermissionError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_403_FORBIDDEN)
         return Response(AgentRunSerializer(run).data, status=status.HTTP_201_CREATED)
 
 
@@ -774,6 +784,15 @@ class AnomalyAnalysisRunView(APIView):
         contract_public_id = request.data.get("contract_public_id")
         technician_id = request.data.get("technician_id")
         part_public_id = request.data.get("part_public_id")
+        if site is None and asset_public_id:
+            asset = Asset.objects.filter(public_id=asset_public_id, operational_site__maintenance_client__company=company).select_related("operational_site").first()
+            site = asset.operational_site if asset else site
+        if site is None and contract_public_id:
+            contract = MaintenanceContract.objects.filter(public_id=contract_public_id, company=company).select_related("operational_site").first()
+            site = contract.operational_site if contract else site
+        if site is None and part_public_id:
+            part = Part.objects.filter(public_id=part_public_id, company=company).select_related("operational_site").first()
+            site = part.operational_site if part else site
         if asset_public_id:
             trigger_reference = f"asset:{asset_public_id}"
         elif client_public_id:

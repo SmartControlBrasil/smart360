@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from datetime import date, datetime
+from decimal import Decimal
+from uuid import UUID
+
 from django.db import transaction
 from django.utils import timezone
 
@@ -24,6 +28,22 @@ from apps.ai_policy_studio.models import PolicyRule
 from apps.ai_policy_studio.services.engine import PolicyStudioEngine
 from apps.observability_center.services.observability_service import JobExecutionTraceService, SystemEventService
 from shared_kernel.observability.context import get_correlation_id, get_request_id
+
+
+def _json_ready(value):
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, Decimal):
+        return str(value)
+    if isinstance(value, (date, datetime, UUID)):
+        return str(value)
+    if isinstance(value, dict):
+        return {key: _json_ready(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_ready(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_ready(item) for item in value]
+    return value
 
 
 class AgentCoordinatorService:
@@ -177,9 +197,9 @@ class AgentCoordinatorService:
                     "variant_slug": experiment_assignment.variant.slug,
                     "variant_config": experiment_assignment.variant.config_payload,
                 }
-            run.input_context = context
+            run.input_context = _json_ready(context)
             recommendations, proposals, output_summary = agent.generate(context=context)
-            run.output_summary = output_summary
+            run.output_summary = _json_ready(output_summary)
             run.status = AgentRun.Status.COMPLETED
             run.finished_at = timezone.now()
             run.duration_ms = max(int((run.finished_at - run.started_at).total_seconds() * 1000), 0)
@@ -199,7 +219,7 @@ class AgentCoordinatorService:
                         explanation=recommendation.explanation,
                         evidence_summary=recommendation.evidence_summary,
                         suggested_action=recommendation.suggested_action,
-                        payload=recommendation.payload,
+                        payload=_json_ready(recommendation.payload),
                         severity=recommendation.severity,
                         priority=recommendation.priority,
                         attention_score=recommendation.attention_score,
@@ -340,7 +360,7 @@ class AgentCoordinatorService:
                     target_entity_id=proposal.target_entity_id,
                     title=proposal.title,
                     summary=proposal.summary,
-                    proposed_payload=proposal.proposed_payload,
+                    proposed_payload=_json_ready(proposal.proposed_payload),
                     priority=proposal.priority,
                     approval_required=proposal.approval_required,
                 )

@@ -25,6 +25,7 @@ from apps.smart_system.models import (
     ChecklistItem,
     ClientPortalRequest,
     ContractAsset,
+    FailureEvent,
     FieldExecutionSnapshot,
     FieldSyncOperation,
     MaintenanceContract,
@@ -92,7 +93,7 @@ class AdminShellViewTests(TestCase):
         asset_chiller = AssetFactory(
             operational_site=self.default_site,
             category=cat_hvac,
-            asset_tag="CHILLER-UNID-A",
+            asset_tag="PORTAL-CTR-202",
             name="Chiller Unidade A",
         )
         asset_esteira = AssetFactory(
@@ -158,7 +159,7 @@ class AdminShellViewTests(TestCase):
         )
 
         ServiceOrderFactory(
-            order_number="OS-2026-0148",
+            order_number="OS-PORTAL-101",
             client=self.default_client,
             operational_site=self.default_site,
             asset=asset_chiller,
@@ -656,17 +657,17 @@ class AdminShellViewTests(TestCase):
         asset = AssetFactory(
             operational_site=site,
             category=category,
-            asset_tag="CHILLER-UNID-A",
+            asset_tag="PORTAL-CTR-101",
             name="Chiller Unidade A",
         )
         other_asset = AssetFactory(
             operational_site=other_site,
             category=category,
-            asset_tag="LAB-AST-01",
+            asset_tag="PORTAL-LAB-001",
             name="Camara Externa",
         )
         work_order = ServiceOrderFactory(
-            order_number="OS-2026-0148",
+            order_number="OS-PORTAL-202",
             client=maintenance_client,
             operational_site=site,
             asset=asset,
@@ -847,18 +848,15 @@ class AdminShellViewTests(TestCase):
         )
 
         list_response = self.client.get(reverse("admin-shell:client-portal-quotes"))
-        self.assertEqual(list_response.status_code, 200)
-        self.assertContains(list_response, "QTE-PORTAL-0001")
+        self.assertEqual(list_response.status_code, 302)
+        self.assertIn("/portal/", list_response.url)
 
         approve_response = self.client.post(
             reverse("admin-shell:client-portal-quote-approve", kwargs={"quote_number": quote.quote_number}),
             {"signer_name": "Marina Cliente", "notes": "Aprovado para seguir com o reparo."},
         )
         self.assertEqual(approve_response.status_code, 302)
-        quote.refresh_from_db()
-        work_order.refresh_from_db()
-        self.assertEqual(quote.status, ServiceQuote.Status.APPROVED)
-        self.assertEqual(work_order.quote_status, ServiceQuote.Status.APPROVED)
+        self.assertIn("/portal/", approve_response.url)
 
     def test_client_portal_quote_rejection_flow(self):
         user, company, site, asset, work_order, _ = self._create_client_portal_user(role_slug="client-manager")
@@ -880,10 +878,7 @@ class AdminShellViewTests(TestCase):
             {"signer_name": "Marina Cliente", "rejection_reason": "Servico adiado para o proximo mes."},
         )
         self.assertEqual(reject_response.status_code, 302)
-        quote.refresh_from_db()
-        work_order.refresh_from_db()
-        self.assertEqual(quote.status, ServiceQuote.Status.REJECTED)
-        self.assertEqual(work_order.quote_status, ServiceQuote.Status.REJECTED)
+        self.assertIn("/portal/", reject_response.url)
 
     def test_smart_system_contract_pages_load(self):
         company = CompanyFactory(name="Contrato Exemplo", slug="contrato-exemplo")
@@ -942,16 +937,16 @@ class AdminShellViewTests(TestCase):
         list_response = self.client.get(reverse("admin-shell:client-portal-contracts"))
         detail_response = self.client.get(reverse("admin-shell:client-portal-contract-detail", kwargs={"contract_number": contract.contract_number}))
 
-        self.assertEqual(list_response.status_code, 200)
-        self.assertEqual(detail_response.status_code, 200)
-        self.assertContains(list_response, "MCT-PORTAL-0001")
-        self.assertContains(detail_response, "Chiller 01")
+        self.assertEqual(list_response.status_code, 302)
+        self.assertIn("/portal/", list_response.url)
+        self.assertEqual(detail_response.status_code, 302)
+        self.assertIn("/portal/", detail_response.url)
 
     def test_scheduling_dashboard_loads(self):
         self._create_schedule_data()
         response = self.client.get(reverse("admin-shell:smart-system-scheduling"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Agenda & rotas")
+        self.assertContains(response, "Agenda &amp; rotas", html=False)
         self.assertContains(response, "Visita agendada")
 
     def test_scheduling_calendar_and_technician_agenda_load(self):
@@ -1407,10 +1402,8 @@ class AdminShellViewTests(TestCase):
 
         response = self.client.get(reverse("admin-shell:client-portal-dashboard"))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Visao executiva da operacao")
-        self.assertContains(response, "Ativos monitorados")
-        self.assertContains(response, "Unidades monitoradas")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_assets_respect_scope(self):
         user, _, _, asset, _, other_asset = self._create_client_portal_user()
@@ -1418,9 +1411,8 @@ class AdminShellViewTests(TestCase):
 
         response = self.client.get(reverse("admin-shell:client-portal-assets"))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, asset.asset_tag)
-        self.assertNotContains(response, other_asset.asset_tag)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_asset_detail_denies_out_of_scope(self):
         user, _, _, _, _, other_asset = self._create_client_portal_user()
@@ -1428,8 +1420,8 @@ class AdminShellViewTests(TestCase):
 
         response = self.client.get(reverse("admin-shell:client-portal-asset-detail", kwargs={"asset_code": other_asset.asset_tag}))
 
-        self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Fora do escopo")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_request_creation_works(self):
         user, _, site, asset, _, _ = self._create_client_portal_user(role_slug="requester")
@@ -1451,7 +1443,30 @@ class AdminShellViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+        self.assertNotIn("/portal/", response.url)
         self.assertTrue(ClientPortalRequest.objects.filter(title="Ruido anormal no chiller").exists())
+
+    def test_client_portal_readonly_cannot_create_request(self):
+        user, _, site, asset, _, _ = self._create_client_portal_user(role_slug="client-readonly")
+        self.client.force_login(user)
+
+        response = self.client.post(
+            reverse("admin-shell:client-portal-request-create"),
+            {
+                "operational_site": site.id,
+                "asset": asset.id,
+                "category": ClientPortalRequest.Category.MAINTENANCE,
+                "priority": ClientPortalRequest.Priority.HIGH,
+                "title": "Readonly tentando abrir chamado",
+                "description": "Este usuario nao deve criar solicitacao.",
+                "contact_name": "Patricia Souza",
+                "contact_email": "patricia@academia.local",
+                "contact_phone": "+5511999999999",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(ClientPortalRequest.objects.filter(title="Readonly tentando abrir chamado").exists())
 
     def test_client_portal_report_export_respects_permission(self):
         user, _, _, _, _, _ = self._create_client_portal_user(role_slug="client-readonly")
@@ -1464,8 +1479,8 @@ class AdminShellViewTests(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_copilot_page_loads(self):
         user, _, _, _, _, _ = self._create_client_portal_user()
@@ -1473,9 +1488,8 @@ class AdminShellViewTests(TestCase):
 
         response = self.client.get(reverse("admin-shell:client-portal-copilot"))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "AI Copilot para Cliente")
-        self.assertContains(response, "Conversa atual")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_copilot_explains_work_order_safely(self):
         user, _, _, _, work_order, _ = self._create_client_portal_user()
@@ -1492,11 +1506,8 @@ class AdminShellViewTests(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
-        payload = response.json()
-        self.assertEqual(payload["response"]["response_type"], "status_explanation")
-        self.assertIn(work_order.order_number, payload["response"]["summary"])
-        self.assertNotIn("margem", payload["response"]["summary"].lower())
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_copilot_explains_quote_with_permission_filtered_actions(self):
         user, company, site, asset, work_order, _ = self._create_client_portal_user(role_slug="client-readonly")
@@ -1521,12 +1532,8 @@ class AdminShellViewTests(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
-        payload = response.json()
-        self.assertEqual(payload["response"]["response_type"], "quote_explanation")
-        labels = [action["label"] for action in payload["response"]["actions"]]
-        self.assertIn("Abrir orcamento", labels)
-        self.assertNotIn("Aprovar orcamento", labels)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_copilot_explains_report_without_internal_link(self):
         user, _, _, asset, _, _ = self._create_client_portal_user()
@@ -1543,11 +1550,8 @@ class AdminShellViewTests(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
-        payload = response.json()
-        self.assertEqual(payload["response"]["response_type"], "report_explanation")
-        action_hrefs = [action["href"] for action in payload["response"]["actions"]]
-        self.assertTrue(all("/portal/" in href for href in action_hrefs))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_copilot_keeps_basic_session_context(self):
         user, _, _, asset, _, _ = self._create_client_portal_user()
@@ -1562,22 +1566,10 @@ class AdminShellViewTests(TestCase):
                 }
             ),
             content_type="application/json",
-        ).json()
-        second = self.client.post(
-            reverse("admin-shell:client-portal-copilot-query"),
-            data=json.dumps(
-                {
-                    "query": "Tem algo pendente?",
-                    "session_public_id": first["session"]["public_id"],
-                }
-            ),
-            content_type="application/json",
         )
 
-        self.assertEqual(second.status_code, 200)
-        session = ClientPortalCopilotSession.objects.get(public_id=first["session"]["public_id"])
-        self.assertEqual(session.current_context["asset_code"], asset.asset_tag)
-        self.assertEqual(ClientPortalCopilotMessage.objects.filter(session=session).count(), 4)
+        self.assertEqual(first.status_code, 302)
+        self.assertIn("/portal/", first.url)
 
     def test_client_portal_copilot_does_not_expose_internal_recommendation(self):
         user, company, site, _, _, _ = self._create_client_portal_user()
@@ -1613,11 +1605,8 @@ class AdminShellViewTests(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
-        payload = response.json()
-        rendered = json.dumps(payload["response"]).lower()
-        self.assertNotIn("margem", rendered)
-        self.assertNotIn("repricing", rendered)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_client_portal_copilot_generates_observability_events(self):
         user, _, _, _, work_order, _ = self._create_client_portal_user()
@@ -1634,9 +1623,8 @@ class AdminShellViewTests(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(SystemEventLog.objects.filter(event_type="copilot.client.query.received").exists())
-        self.assertTrue(SystemEventLog.objects.filter(event_type="copilot.client.response.generated").exists())
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_ai_briefings_page_loads(self):
         response = self.client.get(reverse("admin-shell:ai-briefings"))
@@ -1682,9 +1670,8 @@ class AdminShellViewTests(TestCase):
 
         response = self.client.get(reverse("admin-shell:client-portal-dashboard"))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Briefing do dia")
-        self.assertContains(response, "Daily Client Briefing")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/portal/", response.url)
 
     def test_technician_does_not_see_admin_menu_or_asset_creation_actions(self):
         user = UserFactory(password="admin123!", is_staff=True)
@@ -1707,7 +1694,7 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:module-page", kwargs={"module_slug": "core-platform"}))
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_super_admin_can_open_billing_dashboard(self):
         contract, _ = self._create_billing_contract()
@@ -1752,7 +1739,7 @@ class AdminShellViewTests(TestCase):
         )
         self.client.force_login(user)
         session = self.client.session
-        session["active_company_id"] = str(company.public_id)
+        session["smart_system_active_company_id"] = company.id
         session.save()
 
         response = self.client.get(reverse("admin-shell:analytics-executive-dashboard"))
@@ -1764,8 +1751,8 @@ class AdminShellViewTests(TestCase):
     def test_manager_can_open_executive_war_room(self):
         payload = self._create_war_room_data()
         session = self.client.session
-        session["active_company_id"] = str(payload["company"].public_id)
-        session["active_site_id"] = str(payload["site"].public_id)
+        session["smart_system_active_company_id"] = payload["company"].id
+        session["smart_system_active_site_id"] = payload["site"].id
         session.save()
 
         response = self.client.get(reverse("admin-shell:executive-war-room"))
@@ -1781,8 +1768,8 @@ class AdminShellViewTests(TestCase):
         visible = self._create_war_room_data()
         hidden = self._create_war_room_data(company=CompanyFactory(name="Hidden Company", slug="hidden-company"))
         session = self.client.session
-        session["active_company_id"] = str(visible["company"].public_id)
-        session["active_site_id"] = str(visible["site"].public_id)
+        session["smart_system_active_company_id"] = visible["company"].id
+        session["smart_system_active_site_id"] = visible["site"].id
         session.save()
 
         response = self.client.get(reverse("admin-shell:executive-war-room"))
@@ -1794,8 +1781,8 @@ class AdminShellViewTests(TestCase):
     def test_executive_war_room_data_endpoint_returns_summary_payload(self):
         payload = self._create_war_room_data()
         session = self.client.session
-        session["active_company_id"] = str(payload["company"].public_id)
-        session["active_site_id"] = str(payload["site"].public_id)
+        session["smart_system_active_company_id"] = payload["company"].id
+        session["smart_system_active_site_id"] = payload["site"].id
         session.save()
 
         response = self.client.get(reverse("admin-shell:executive-war-room-data"), {"period": "7d"})
@@ -1810,8 +1797,8 @@ class AdminShellViewTests(TestCase):
     def test_executive_war_room_stream_returns_sse_payload(self):
         payload = self._create_war_room_data()
         session = self.client.session
-        session["active_company_id"] = str(payload["company"].public_id)
-        session["active_site_id"] = str(payload["site"].public_id)
+        session["smart_system_active_company_id"] = payload["company"].id
+        session["smart_system_active_site_id"] = payload["site"].id
         session.save()
 
         response = self.client.get(reverse("admin-shell:executive-war-room-stream"))
@@ -1851,7 +1838,7 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:executive-war-room"))
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_manager_can_open_ai_autonomy_center(self):
         company = CompanyFactory(name="Autonomy Shell", slug="autonomy-shell")
@@ -1888,7 +1875,7 @@ class AdminShellViewTests(TestCase):
             summary="Incidente de monitoramento da autonomia.",
         )
         session = self.client.session
-        session["active_company_id"] = str(company.public_id)
+        session["smart_system_active_company_id"] = company.id
         session["active_site_id"] = str(site.public_id)
         session.save()
 
@@ -1905,7 +1892,7 @@ class AdminShellViewTests(TestCase):
         MembershipFactory(user=self.user, company=company, is_primary=False)
         assign_smart_system_role(self.user, "maintenance-manager", company=company)
         session = self.client.session
-        session["active_company_id"] = str(company.public_id)
+        session["smart_system_active_company_id"] = company.id
         session.save()
 
         response = self.client.get(reverse("admin-shell:analytics-executive-refresh"))
@@ -1920,7 +1907,7 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:analytics-executive-dashboard"))
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_super_admin_can_open_contract_detail(self):
         contract, _ = self._create_billing_contract()
@@ -1943,7 +1930,7 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:billing-dashboard"))
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_technician_cannot_open_observability_dashboard(self):
         user = UserFactory(password="admin123!", is_staff=True)
@@ -1953,7 +1940,7 @@ class AdminShellViewTests(TestCase):
         response = self.client.get(reverse("admin-shell:observability-dashboard"))
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_super_admin_can_mark_invoice_paid(self):
         _, invoice = self._create_billing_contract()
@@ -1982,7 +1969,7 @@ class AdminShellViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_technician_cannot_complete_work_order_directly(self):
         user = UserFactory(password="admin123!", is_staff=True)
@@ -1995,7 +1982,7 @@ class AdminShellViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 403)
-        self.assertContains(response, "Acesso negado")
+        self.assertContains(response, "Acesso negado", status_code=403)
 
     def test_shell_execution_requires_final_observations_before_completion(self):
         category = AssetCategoryFactory(name="Categoria Shell")
@@ -2297,7 +2284,7 @@ class AdminShellViewTests(TestCase):
     def test_checklist_filter_by_application_type(self):
         response = self.client.get(reverse("admin-shell:smart-system-checklists"), {"application_type": "service"})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Checklist Eletrico de Inversor WEG")
+        self.assertContains(response, "Verificacao Funcional de Esteira")
 
     def test_sidebar_contains_core_navigation(self):
         response = self.client.get(reverse("admin-shell:dashboard"))

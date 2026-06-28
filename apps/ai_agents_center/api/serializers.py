@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from apps.companies.models import Company
+from apps.smart_system.models import OperationalSite
 from apps.ai_agents_center.models import (
     AIBriefing,
     AIBriefingDelivery,
@@ -87,14 +89,6 @@ class AIBriefingGenerateSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(required=False)
     start = serializers.DateField(required=False)
     end = serializers.DateField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        from apps.companies.models import Company
-        from apps.smart_system.models import OperationalSite
-
-        self.fields["company"].queryset = Company.objects.all()
-        self.fields["site"].queryset = OperationalSite.objects.all()
 
 
 class AgentDefinitionSerializer(serializers.ModelSerializer):
@@ -291,17 +285,30 @@ class AgentMemoryEntrySerializer(serializers.ModelSerializer):
 
 class AgentManualRunSerializer(serializers.Serializer):
     agent_slug = serializers.SlugField()
-    company = serializers.PrimaryKeyRelatedField(read_only=True)
-    site = serializers.PrimaryKeyRelatedField(read_only=True)
+    company = serializers.PrimaryKeyRelatedField(required=False, allow_null=True, queryset=Company.objects.all())
+    site = serializers.PrimaryKeyRelatedField(required=False, allow_null=True, queryset=OperationalSite.objects.all())
     trigger_reference = serializers.CharField(required=False, allow_blank=True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        from apps.companies.models import Company
-        from apps.smart_system.models import OperationalSite
+    def validate(self, attrs):
+        from apps.companies.models import Membership
 
-        self.fields["company"].queryset = Company.objects.all()
-        self.fields["site"].queryset = OperationalSite.objects.all()
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        company = attrs.get("company")
+        site = attrs.get("site")
+
+        if user is not None and not getattr(user, "is_superuser", False):
+            memberships = Membership.objects.filter(user=user, status=Membership.Status.ACTIVE)
+            if company is None:
+                primary_membership = memberships.filter(is_primary=True).select_related("company").first()
+                company = primary_membership.company if primary_membership else None
+                attrs["company"] = company
+            elif not memberships.filter(company=company).exists():
+                raise serializers.ValidationError({"company": "Usuario sem acesso a esta empresa."})
+
+        if site is not None and company is not None and site.maintenance_client.company_id != company.id:
+            raise serializers.ValidationError({"site": "Unidade fora do escopo da empresa informada."})
+        return attrs
 
 
 class AgentAssetAttentionFlagSerializer(serializers.ModelSerializer):

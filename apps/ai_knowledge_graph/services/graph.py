@@ -91,7 +91,10 @@ class GraphProjectionService:
             "quotes": ServiceQuote.objects.filter(company=company, **({"operational_site": site} if site else {})).select_related("asset", "work_order"),
             "parts": Part.objects.filter(company=company, **({"operational_site": site} if site else {})).select_related("operational_site"),
             "stock_movements": StockMovement.objects.filter(company=company, **({"operational_site": site} if site else {})).select_related("part", "service_order", "service_order__asset"),
-            "recommendations": AgentRecommendation.objects.filter(company=company, **({"site": site} if site else {})).select_related("asset", "site", "agent_run", "agent_run__agent"),
+            "recommendations": AgentRecommendation.objects.filter(
+            company=company,
+            **({"site": site} if site else {}),
+            ).select_related("company", "site", "agent_run", "agent_run__agent"),
             "decisions": AgentDecision.objects.filter(company=company, **({"site": site} if site else {})).select_related("agent_action_proposal", "policy_applied"),
             "anomalies": AgentAnomalyAttentionFlag.objects.filter(company=company, **({"site": site} if site else {})).select_related("asset", "site", "contract", "part", "technician"),
             "requests": TechnicianServiceRequest.objects.filter(requester_company=company, **({"related_site": site} if site else {})).select_related("related_site", "related_asset", "related_service_order"),

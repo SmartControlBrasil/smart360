@@ -1,0 +1,48 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-primary" href="{{ create_url }}">Novo usuário do Portal</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Empresa</th>
+                        <th>Unidade/Site</th>
+                        <th>Nível de acesso</th>
+                        <th>Status</th>
+                        <th>Último login</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in portal_user_rows %}
+                    <tr>
+                        <td><strong>{{ row.user.full_name|default:row.user.display_name|default:row.user.email }}</strong></td>
+                        <td>{{ row.user.email }}</td>
+                        <td>{{ row.company.name|default:"-" }}</td>
+                        <td>{{ row.site.name|default:"-" }}</td>
+                        <td>{{ row.access_level }}</td>
+                        <td>{% if row.user.is_active %}Ativo{% else %}Inativo{% endif %}</td>
+                        <td>{% if row.last_login %}{{ row.last_login|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
+                        <td><a href="{% url "admin-shell:client-portal-user-update" user_id=row.user.pk %}">Editar</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8">Nenhum usuário do Portal cadastrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

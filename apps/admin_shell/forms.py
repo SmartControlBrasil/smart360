@@ -1,9 +1,10 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.db import transaction
 from django.utils import timezone
 
-from apps.companies.models import Company
+from apps.companies.models import Company, Membership, SiteMembership
 from apps.companies.services.company_shell_access import user_can_create_saas_company
 from apps.companies.services.tenant_scope import TenantScopeService
 from apps.smart_system.models import (
@@ -22,6 +23,164 @@ from apps.smart_system.services.default_operational_site import ensure_default_o
 from apps.smart_system.services.tenant_scope import SmartSystemScopeService
 
 from .services.smart_system_work_order_create import maintenance_plan_client_and_site
+
+
+CLIENT_PORTAL_GROUP_CHOICES = [
+    ("client-admin", "Administrador do cliente"),
+    ("client-manager", "Gestor da unidade"),
+    ("requester", "Solicitante"),
+    ("client-readonly", "Somente leitura"),
+    ("client-portal-only", "Acesso basico ao portal"),
+]
+
+CLIENT_PORTAL_GROUP_LABELS = dict(CLIENT_PORTAL_GROUP_CHOICES)
+CLIENT_PORTAL_GROUP_NAMES = set(CLIENT_PORTAL_GROUP_LABELS)
+CLIENT_PORTAL_GROUP_DESCRIPTIONS = {
+    "client-admin": "Administrador do cliente: acesso amplo ao portal do cliente.",
+    "client-manager": "Gestor da unidade: pode abrir e acompanhar chamados.",
+    "requester": "Solicitante: pode abrir e acompanhar chamados.",
+    "client-readonly": "Somente leitura: apenas acompanha chamados e visitas.",
+    "client-portal-only": "Acesso basico ao portal: acessa somente o painel basico em /portal/.",
+}
+
+
+class ClientPortalUserForm(forms.Form):
+    full_name = forms.CharField(max_length=150, label="Nome completo")
+    email = forms.EmailField(label="E-mail")
+    company = forms.ModelChoiceField(queryset=Company.objects.none(), label="Empresa")
+    site = forms.ModelChoiceField(queryset=OperationalSite.objects.none(), label="Unidade/Site")
+    access_level = forms.ChoiceField(
+        choices=CLIENT_PORTAL_GROUP_CHOICES,
+        label="Nivel de acesso",
+        help_text="Gestor da unidade e Solicitante podem abrir chamados. Somente leitura apenas acompanha chamados e visitas.",
+    )
+    is_active = forms.BooleanField(required=False, initial=True, label="Ativo")
+    password = forms.CharField(
+        required=False,
+        label="Senha inicial ou senha temporaria",
+        widget=forms.PasswordInput(render_value=True),
+        help_text="Obrigatoria ao criar. Na edicao, deixe em branco para manter a senha atual.",
+    )
+
+    def __init__(self, *args, instance=None, **kwargs):
+        self.instance = instance
+        super().__init__(*args, **kwargs)
+        self.fields["company"].queryset = Company.objects.order_by("name")
+        self.fields["site"].queryset = OperationalSite.objects.select_related(
+            "maintenance_client",
+            "maintenance_client__company",
+        ).order_by("maintenance_client__display_name", "name")
+        if instance is not None and not self.is_bound:
+            membership = self._primary_membership(instance)
+            site_membership = self._primary_site_membership(instance)
+            self.initial.update(
+                {
+                    "full_name": instance.full_name or instance.display_name or instance.email,
+                    "email": instance.email,
+                    "company": membership.company if membership else None,
+                    "site": site_membership.site if site_membership else None,
+                    "access_level": self._access_level_for_user(instance),
+                    "is_active": instance.is_active,
+                }
+            )
+
+    @staticmethod
+    def _primary_membership(user):
+        return (
+            Membership.objects.filter(user=user, status=Membership.Status.ACTIVE)
+            .select_related("company")
+            .order_by("-is_primary", "company__name")
+            .first()
+        )
+
+    @staticmethod
+    def _primary_site_membership(user):
+        return (
+            SiteMembership.objects.filter(user=user, status=SiteMembership.Status.ACTIVE)
+            .select_related("site", "site__maintenance_client", "company")
+            .order_by("-is_primary", "site__name")
+            .first()
+        )
+
+    @staticmethod
+    def _access_level_for_user(user):
+        names = set(user.groups.values_list("name", flat=True))
+        for group_name, _label in CLIENT_PORTAL_GROUP_CHOICES:
+            if group_name in names:
+                return group_name
+        return "client-portal-only"
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower()
+        queryset = get_user_model().objects.filter(email=email)
+        if self.instance is not None:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise forms.ValidationError("Ja existe um usuario com este e-mail.")
+        return email
+
+    def clean_password(self):
+        password = self.cleaned_data.get("password", "")
+        if self.instance is None and not password:
+            raise forms.ValidationError("Informe uma senha inicial para o usuario.")
+        return password
+
+    def clean(self):
+        cleaned = super().clean()
+        company = cleaned.get("company")
+        site = cleaned.get("site")
+        if company and site and site.maintenance_client.company_id != company.id:
+            self.add_error("site", "A unidade selecionada nao pertence a empresa escolhida.")
+        return cleaned
+
+    @transaction.atomic
+    def save(self):
+        data = self.cleaned_data
+        full_name = data["full_name"].strip()
+        first_name, _, last_name = full_name.partition(" ")
+        user = self.instance or get_user_model()()
+        if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+            raise forms.ValidationError("Usuarios internos nao podem ser alterados por esta tela.")
+
+        user.email = data["email"]
+        user.first_name = first_name
+        user.last_name = last_name
+        user.display_name = full_name
+        user.user_type = "client"
+        user.is_active = data["is_active"]
+        user.is_staff = False
+        user.is_superuser = False
+        if data.get("password"):
+            user.set_password(data["password"])
+        elif self.instance is None:
+            user.set_unusable_password()
+        user.save()
+
+        user.groups.remove(*Group.objects.filter(name__in=CLIENT_PORTAL_GROUP_NAMES))
+        selected_group, _created = Group.objects.get_or_create(name=data["access_level"])
+        user.groups.add(selected_group)
+
+        company = data["company"]
+        site = data["site"]
+        Membership.objects.filter(user=user).exclude(company=company).update(
+            status=Membership.Status.INACTIVE,
+            is_primary=False,
+        )
+        Membership.objects.update_or_create(
+            user=user,
+            company=company,
+            defaults={"status": Membership.Status.ACTIVE, "is_primary": True},
+        )
+        SiteMembership.objects.filter(user=user).exclude(site=site).update(
+            status=SiteMembership.Status.INACTIVE,
+            is_primary=False,
+        )
+        SiteMembership.objects.update_or_create(
+            user=user,
+            site=site,
+            defaults={"company": company, "status": SiteMembership.Status.ACTIVE, "is_primary": True},
+        )
+        return user
 
 
 class ClientPortalRequestForm(forms.ModelForm):

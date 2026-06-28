@@ -73,6 +73,7 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
     enforce_billing_access = True
 
     enforce_active_company_membership = False
+    allow_client_portal_only_user = False
 
     def get_current_company(self):
         return TenantScopeService.resolve_context(self.request).company or get_default_company_for_user(self.request.user)
@@ -153,7 +154,7 @@ class SmartSystemAccessMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        if is_client_portal_only_user(request.user):
+        if is_client_portal_only_user(request.user) and not self.allow_client_portal_only_user:
             return redirect("/portal/")
         denial = self._maybe_deny_without_smart_system_company_membership(request)
         if denial is not None:

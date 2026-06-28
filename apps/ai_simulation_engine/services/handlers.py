@@ -134,11 +134,14 @@ class PreventiveFrequencySimulationHandler(BaseSimulationHandler):
     simulation_type = "preventive_frequency_change_simulation"
 
     def run(self, *, company, site, input_payload):
-        asset_queryset = Asset.objects.filter(public_id=input_payload["asset_public_id"])
+        asset_queryset = Asset.objects.all()
         if company is not None:
             asset_queryset = asset_queryset.filter(operational_site__maintenance_client__company=company)
         if site is not None:
             asset_queryset = asset_queryset.filter(operational_site=site)
+        asset_public_id = input_payload.get("asset_public_id")
+        if asset_public_id:
+            asset_queryset = asset_queryset.filter(public_id=asset_public_id)
         asset = asset_queryset.get()
         plan = MaintenancePlan.objects.filter(asset=asset, is_active=True).order_by("created_at").first()
         failures = asset.failure_events.count()
@@ -268,28 +271,152 @@ class MarketplaceCandidateSwapSimulationHandler(BaseSimulationHandler):
     simulation_type = "marketplace_candidate_swap_simulation"
 
     def run(self, *, company, site, input_payload):
-        service_request = TechnicianServiceRequest.objects.get(public_id=input_payload["service_request_public_id"], requester_company=company)
+        service_request_public_id = input_payload.get("service_request_public_id")
         current_candidate = input_payload.get("current_candidate_public_id")
         proposed_candidate = input_payload.get("proposed_candidate_public_id")
+
+        if not service_request_public_id:
+            return SimulationComputation(
+                baseline_snapshot={
+                    "status": "skipped",
+                    "reason": "missing_service_request_public_id",
+                },
+                summary="Simulacao ignorada: service_request_public_id ausente.",
+                impact_score=ZERO,
+                confidence_level="low",
+                risk_delta=ZERO,
+                cost_delta=ZERO,
+                sla_delta=ZERO,
+                profit_delta=ZERO,
+                travel_delta=ZERO,
+                workload_delta=ZERO,
+                recommendation="Manter fluxo atual: nao ha solicitacao de marketplace vinculada para simular troca de candidato.",
+                result_payload={
+                    "status": "skipped",
+                    "reason": "missing_service_request_public_id",
+                },
+            )
+
+        service_request = TechnicianServiceRequest.objects.filter(
+            public_id=service_request_public_id,
+            requester_company=company,
+        ).first()
+
+        if service_request is None:
+            return SimulationComputation(
+                baseline_snapshot={
+                    "status": "skipped",
+                    "reason": "service_request_not_found",
+                    "service_request_public_id": str(service_request_public_id),
+                },
+                summary="Simulacao ignorada: TechnicianServiceRequest nao encontrada para o public_id informado.",
+                impact_score=ZERO,
+                confidence_level="low",
+                risk_delta=ZERO,
+                cost_delta=ZERO,
+                sla_delta=ZERO,
+                profit_delta=ZERO,
+                travel_delta=ZERO,
+                workload_delta=ZERO,
+                recommendation="Manter fluxo atual: nao foi possivel localizar a solicitacao de marketplace para comparar candidatos.",
+                result_payload={
+                    "status": "skipped",
+                    "reason": "service_request_not_found",
+                    "service_request_public_id": str(service_request_public_id),
+                },
+            )
+
+        if not proposed_candidate:
+            return SimulationComputation(
+                baseline_snapshot={
+                    "status": "skipped",
+                    "reason": "missing_proposed_candidate_public_id",
+                    "request_priority": service_request.priority,
+                },
+                summary="Simulacao ignorada: proposed_candidate_public_id ausente.",
+                impact_score=ZERO,
+                confidence_level="low",
+                risk_delta=ZERO,
+                cost_delta=ZERO,
+                sla_delta=ZERO,
+                profit_delta=ZERO,
+                travel_delta=ZERO,
+                workload_delta=ZERO,
+                recommendation="Manter candidato atual: nao ha candidato proposto para comparar.",
+                result_payload={
+                    "status": "skipped",
+                    "reason": "missing_proposed_candidate_public_id",
+                },
+            )
+
+        proposed_profile = TechnicianProfile.objects.filter(
+            public_id=proposed_candidate,
+        ).first()
+
+        if proposed_profile is None:
+            return SimulationComputation(
+                baseline_snapshot={
+                    "status": "skipped",
+                    "reason": "proposed_candidate_not_found",
+                    "request_priority": service_request.priority,
+                },
+                summary="Simulacao ignorada: TechnicianProfile proposto nao encontrado.",
+                impact_score=ZERO,
+                confidence_level="low",
+                risk_delta=ZERO,
+                cost_delta=ZERO,
+                sla_delta=ZERO,
+                profit_delta=ZERO,
+                travel_delta=ZERO,
+                workload_delta=ZERO,
+                recommendation="Manter candidato atual: candidato proposto nao foi localizado.",
+                result_payload={
+                    "status": "skipped",
+                    "reason": "proposed_candidate_not_found",
+                    "proposed_candidate_public_id": str(proposed_candidate),
+                },
+            )
+
         current_score = Decimal("70.00")
+
         if current_candidate:
             current_match = TechnicianMatchingRecord.objects.filter(
                 technician_service_request=service_request,
                 technician_profile__public_id=current_candidate,
             ).first()
+
             if current_match and current_match.match_score is not None:
                 current_score = Decimal(current_match.match_score)
-        proposed_profile = TechnicianProfile.objects.get(public_id=proposed_candidate)
+
         proposed_match = TechnicianMatchingRecord.objects.filter(
             technician_service_request=service_request,
             technician_profile=proposed_profile,
         ).first()
-        proposed_score = Decimal(proposed_match.match_score) if proposed_match and proposed_match.match_score is not None else Decimal("82.00")
+
+        proposed_score = (
+            Decimal(proposed_match.match_score)
+            if proposed_match and proposed_match.match_score is not None
+            else Decimal("82.00")
+        )
+
         risk_delta = Decimal("-0.70") if proposed_score > current_score else Decimal("0.25")
-        sla_delta = Decimal("0.55") if proposed_profile.marketplace_status == TechnicianProfile.MarketplaceStatus.AVAILABLE else Decimal("-0.20")
+
+        sla_delta = (
+            Decimal("0.55")
+            if proposed_profile.marketplace_status == TechnicianProfile.MarketplaceStatus.AVAILABLE
+            else Decimal("-0.20")
+        )
+
         return SimulationComputation(
-            baseline_snapshot={"current_match_score": str(current_score), "request_priority": service_request.priority},
-            summary="Troca de candidato melhora aderencia tecnica e disponibilidade estimada." if proposed_score > current_score else "Troca de candidato nao melhora o matching atual.",
+            baseline_snapshot={
+                "current_match_score": str(current_score),
+                "request_priority": service_request.priority,
+            },
+            summary=(
+                "Troca de candidato melhora aderencia tecnica e disponibilidade estimada."
+                if proposed_score > current_score
+                else "Troca de candidato nao melhora o matching atual."
+            ),
             impact_score=(proposed_score - current_score).quantize(Decimal("0.01")),
             confidence_level="medium",
             risk_delta=risk_delta,
@@ -300,8 +427,13 @@ class MarketplaceCandidateSwapSimulationHandler(BaseSimulationHandler):
             workload_delta=ZERO,
             recommendation="Trocar candidato." if proposed_score > current_score else "Manter candidato atual.",
             result_payload={
-                "current": {"match_score": str(current_score)},
-                "proposed": {"match_score": str(proposed_score), "candidate": proposed_profile.display_name},
+                "current": {
+                    "match_score": str(current_score),
+                },
+                "proposed": {
+                    "match_score": str(proposed_score),
+                    "candidate": proposed_profile.display_name,
+                },
             },
         )
 

@@ -178,6 +178,11 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "Riscos detectados")
         self.assertContains(response, "Rode a rotina run_operational_agents")
         self.assertContains(response, "Nenhuma execução recente encontrada para maintenance-agent ou scheduling-agent.")
+        self.assertContains(response, "Alertas internos do piloto")
+        self.assertContains(response, "Task diária sem execução registrada hoje")
+        self.assertContains(response, "maintenance-agent sem run hoje")
+        self.assertContains(response, "scheduling-agent sem run hoje")
+        self.assertEqual(response.context["operational_alert_count"], 3)
 
     def test_operations_health_shows_real_agent_data(self):
         self.create_agent_data()
@@ -196,8 +201,41 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "Maintenance Intelligence Agent")
         self.assertContains(response, "Scheduling Optimization Agent")
         self.assertContains(response, "Resumo da revisão operacional")
+        self.assertContains(response, "Nenhum alerta operacional crítico no momento.")
         self.assertEqual(response.context["review_metrics"]["pending_proposals"], 1)
         self.assertEqual(response.context["review_metrics"]["runs_today"], 2)
+        self.assertEqual(response.context["operational_alert_count"], 0)
+
+    def test_operations_health_alerts_when_latest_operational_run_failed(self):
+        data = self.create_agent_data()
+        AgentRun.objects.create(
+            agent=data["maintenance_agent"],
+            company=self.company,
+            site=self.site,
+            trigger_type=AgentRun.TriggerType.SCHEDULED,
+            status=AgentRun.Status.FAILED,
+            error_message="Falha no coletor de manutenção.",
+            finished_at=timezone.now(),
+        )
+
+        response = self.client.get(reverse("admin-shell:operations-health"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Último run de maintenance-agent falhou")
+        self.assertContains(response, "Falha no coletor de manutenção")
+        self.assertTrue(any(alert["severity"] == "critical" for alert in response.context["operational_alerts"]))
+
+    def test_operations_health_alerts_for_old_pending_proposal(self):
+        data = self.create_agent_data()
+        old_created_at = timezone.now() - timezone.timedelta(hours=49)
+        AgentActionProposal.objects.filter(pk=data["proposal"].pk).update(created_at=old_created_at)
+
+        response = self.client.get(reverse("admin-shell:operations-health"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Proposta pendente antiga")
+        self.assertContains(response, "Revisar propostas pendentes")
+        self.assertTrue(any(alert["title"] == "Proposta pendente antiga" for alert in response.context["operational_alerts"]))
 
     def test_operations_review_url_resolves_to_view(self):
         resolved = resolve("/app/operations/review/")
@@ -214,12 +252,15 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "Decisões pendentes")
         self.assertContains(response, "Runs com falha")
         self.assertContains(response, "Sem execução")
+        self.assertContains(response, "Alertas internos do piloto")
+        self.assertContains(response, "Task diária sem execução registrada hoje")
         self.assertContains(response, "Fila vazia")
         self.assertContains(response, ".venv/bin/python manage.py seed_operational_pilot_data")
         self.assertContains(response, ".venv/bin/python manage.py run_operational_agents")
         self.assertContains(response, "Nenhuma proposta pendente")
         self.assertEqual(response.context["review_metrics"]["pending_proposals"], 0)
         self.assertEqual(response.context["review_metrics"]["runs_today"], 0)
+        self.assertEqual(response.context["operational_alert_count"], 3)
 
     def test_operations_review_shows_operational_agent_data(self):
         self.create_agent_data()
@@ -236,6 +277,8 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "Marcar revisada")
         self.assertContains(response, "Aprovar")
         self.assertContains(response, "Rejeitar")
+        self.assertContains(response, "Nenhum alerta operacional crítico no momento.")
+        self.assertEqual(response.context["operational_alert_count"], 0)
 
     def test_operations_review_metrics_count_decisions_and_runs(self):
         data = self.create_agent_data()

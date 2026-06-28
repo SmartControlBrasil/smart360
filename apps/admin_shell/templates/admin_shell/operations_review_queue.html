@@ -92,6 +92,35 @@
         </div>
     </div>
 
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Alertas internos do piloto</h2>
+            <p class="muted-block">Resumo informativo para detectar falha de execução ou revisão humana parada.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Severidade</th>
+                        <th>Alerta</th>
+                        <th>Ação sugerida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alert in operational_alerts %}
+                    <tr>
+                        <td>{{ alert.severity }}</td>
+                        <td><strong>{{ alert.title }}</strong><br><span class="muted-block">{{ alert.message }}</span></td>
+                        <td>{{ alert.action }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3">Nenhum alerta operacional crítico no momento.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     {% if not has_review_items %}
     <div class="table-card">
         <div class="section-header">

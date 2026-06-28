@@ -116,6 +116,29 @@ Para validar o agendamento no código:
 
 A Operational Review Queue não executa manutenção real, não envia e-mail e não altera agenda externa. Ela apenas organiza a revisão humana e reaproveita o status interno de recomendações/propostas.
 
+## Alertas internos do piloto
+
+O painel `/app/operations/health/` exibe alertas internos simples do piloto operacional. A fila `/app/operations/review/` também mostra um resumo desses alertas para apoiar a rotina diária.
+
+Esses alertas são apenas informativos e internos. Eles não enviam e-mail, não enviam WhatsApp, não executam manutenção, não alteram agenda externa e não acionam LLM.
+
+Alertas atuais:
+
+- Task diária sem execução registrada hoje: nenhum `AgentRun` operacional foi encontrado na data; pode indicar Beat/worker parado ou ausência de execução manual.
+- `maintenance-agent` sem run hoje: o agente de manutenção ainda não registrou execução no dia.
+- `scheduling-agent` sem run hoje: o agente de agenda ainda não registrou execução no dia.
+- Último run de agente falhou: o run mais recente do agente terminou com status `failed` e deve ter seus logs revisados.
+- Proposta pendente antiga: existe proposta aguardando decisão humana há mais de 24h; acima de 48h o alerta fica crítico.
+- Recomendação aberta antiga: existe recomendação aberta há mais de 48h, sinal de triagem parada.
+
+Diagnóstico recomendado:
+
+1. Abrir `/app/operations/health/` e conferir a seção de alertas internos.
+2. Abrir `/app/operations/review/` e revisar propostas/recomendações pendentes.
+3. Rodar `.venv/bin/python manage.py run_operational_agents --dry-run` para validar registry, sites e planejamento.
+4. Checar logs do Celery worker e do Celery Beat, especialmente a task `ai_agents_center.run_daily_operational_agents`.
+5. Se o dry-run estiver correto e a janela operacional já deveria ter rodado, executar manualmente `.venv/bin/python manage.py run_operational_agents`.
+
 ## Métricas do piloto operacional
 
 A fila `/app/operations/review/` mostra métricas simples para medir se o piloto está virando decisão humana rastreável:

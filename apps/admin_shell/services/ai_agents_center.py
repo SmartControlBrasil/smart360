@@ -128,6 +128,102 @@ def _build_operational_review_metrics(*, proposals, recommendations, runs, lates
     }
 
 
+def get_operational_agent_alerts(*, company=None, agent_slug=None, site_id=None, reference_date=None):
+    reference_date = reference_date or timezone.localdate()
+    today_start, today_end = _day_bounds(reference_date)
+    now = timezone.now()
+    alerts = []
+
+    runs = AgentRun.objects.select_related("agent", "company", "site").filter(agent__slug__in=OPERATIONAL_AGENT_SLUGS)
+    proposals = AgentActionProposal.objects.select_related("agent_run", "agent_run__agent", "agent_run__company", "agent_run__site").filter(
+        agent_run__agent__slug__in=OPERATIONAL_AGENT_SLUGS,
+        status=AgentActionProposal.Status.PENDING_APPROVAL,
+    )
+    recommendations = AgentRecommendation.objects.select_related("agent_run", "agent_run__agent", "company", "site").filter(
+        agent_run__agent__slug__in=OPERATIONAL_AGENT_SLUGS,
+        status=AgentRecommendation.Status.OPEN,
+    )
+
+    if company is not None:
+        runs = runs.filter(company=company)
+        proposals = proposals.filter(agent_run__company=company)
+        recommendations = recommendations.filter(company=company)
+    if agent_slug in OPERATIONAL_AGENT_SLUGS:
+        runs = runs.filter(agent__slug=agent_slug)
+        proposals = proposals.filter(agent_run__agent__slug=agent_slug)
+        recommendations = recommendations.filter(agent_run__agent__slug=agent_slug)
+    if site_id:
+        runs = runs.filter(site_id=site_id)
+        proposals = proposals.filter(agent_run__site_id=site_id)
+        recommendations = recommendations.filter(site_id=site_id)
+
+    runs_today = runs.filter(created_at__gte=today_start, created_at__lt=today_end)
+    checked_agents = [agent_slug] if agent_slug in OPERATIONAL_AGENT_SLUGS else OPERATIONAL_AGENT_SLUGS
+
+    if not runs_today.exists():
+        alerts.append(
+            {
+                "severity": "warning",
+                "title": "Task diária sem execução registrada hoje",
+                "message": "Nenhum AgentRun operacional foi encontrado para a data de hoje.",
+                "action": "Verificar logs do Celery Beat/worker e rodar run_operational_agents --dry-run.",
+            }
+        )
+
+    for slug in checked_agents:
+        agent_runs_today = runs_today.filter(agent__slug=slug)
+        if not agent_runs_today.exists():
+            alerts.append(
+                {
+                    "severity": "warning",
+                    "title": f"{slug} sem run hoje",
+                    "message": f"O agente {slug} ainda não possui AgentRun registrado hoje.",
+                    "action": "Rodar run_operational_agents manualmente se a janela operacional já deveria ter executado.",
+                }
+            )
+        latest_run = runs.filter(agent__slug=slug).order_by("-created_at").first()
+        if latest_run and latest_run.status == AgentRun.Status.FAILED:
+            alerts.append(
+                {
+                    "severity": "critical",
+                    "title": f"Último run de {slug} falhou",
+                    "message": latest_run.error_message or "O último AgentRun terminou com status failed.",
+                    "action": "Abrir Runs, revisar erro e executar dry-run antes de uma nova execução real.",
+                }
+            )
+
+    old_proposal_threshold = now - timezone.timedelta(hours=24)
+    oldest_old_proposal = proposals.filter(created_at__lt=old_proposal_threshold).order_by("created_at").first()
+    if oldest_old_proposal:
+        age = _format_age(now - oldest_old_proposal.created_at)
+        severity = "critical" if oldest_old_proposal.created_at < now - timezone.timedelta(hours=48) else "warning"
+        alerts.append(
+            {
+                "severity": severity,
+                "title": "Proposta pendente antiga",
+                "message": f"Existe proposta pendente há {age}: {oldest_old_proposal.title or oldest_old_proposal.action_type}.",
+                "action": "Revisar propostas pendentes na Review Queue e aprovar ou rejeitar.",
+            }
+        )
+
+    old_recommendation_threshold = now - timezone.timedelta(hours=48)
+    oldest_old_recommendation = recommendations.filter(created_at__lt=old_recommendation_threshold).order_by("created_at").first()
+    if oldest_old_recommendation:
+        age = _format_age(now - oldest_old_recommendation.created_at)
+        alerts.append(
+            {
+                "severity": "warning",
+                "title": "Recomendação aberta antiga",
+                "message": f"Existe recomendação aberta há {age}: {oldest_old_recommendation.title}.",
+                "action": "Revisar a recomendação e marcar como revisada quando a triagem terminar.",
+            }
+        )
+
+    severity_order = {"critical": 0, "warning": 1, "info": 2}
+    alerts.sort(key=lambda item: severity_order.get(item["severity"], 99))
+    return alerts
+
+
 def get_operations_health_context(*, tenant_context):
     company = tenant_context.get("active_company") or tenant_context.get("company")
     operational_agent_slugs = OPERATIONAL_AGENT_SLUGS
@@ -197,6 +293,7 @@ def get_operations_health_context(*, tenant_context):
         runs=runs.filter(created_at__gte=today_start, created_at__lt=today_end),
         latest_runs_queryset=runs,
     )
+    operational_alerts = get_operational_agent_alerts(company=company, reference_date=today)
     operational_agent_status = [
         {
             "agent_slug": "maintenance-agent",
@@ -259,6 +356,8 @@ def get_operations_health_context(*, tenant_context):
         "open_schedule_flags": list(open_schedule_flags.order_by("-attention_score", "-updated_at")[:8]),
         "recent_runs": list(runs.order_by("-created_at")[:8]),
         "review_metrics": review_metrics,
+        "operational_alerts": operational_alerts,
+        "operational_alert_count": len(operational_alerts),
         "quick_links": [
             {"label": "Recomendações", "href": "admin-shell:ai-agents-recommendations"},
             {"label": "Propostas", "href": "admin-shell:ai-agents-proposals"},
@@ -381,6 +480,12 @@ def get_operational_review_queue_context(*, tenant_context, filters=None):
         runs=metric_runs,
         latest_runs_queryset=latest_runs_queryset,
     )
+    operational_alerts = get_operational_agent_alerts(
+        company=company,
+        agent_slug=selected_agent,
+        site_id=selected_site_id,
+        reference_date=review_date,
+    )
 
     recommendation_list = list(recommendations.order_by("-attention_score", "-created_at")[:50])
     proposal_list = list(proposals.order_by("-created_at")[:50])
@@ -421,6 +526,8 @@ def get_operational_review_queue_context(*, tenant_context, filters=None):
             {"label": "Runs com falha", "value": review_metrics["failed_runs"]},
         ],
         "review_metrics": review_metrics,
+        "operational_alerts": operational_alerts,
+        "operational_alert_count": len(operational_alerts),
         "recommendations": recommendation_list,
         "proposals": proposal_list,
         "asset_flags": asset_flag_list,

@@ -6,6 +6,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from apps.ai_agents_center.models import AgentDefinition, AgentRun
+from apps.ai_agents_center.services.registry import AgentRegistryService
+from apps.admin_shell.services.ai_agents_center import get_operations_health_context
 from apps.companies.models import Company
 from apps.smart_system.models import MaintenanceClient, OperationalSite
 
@@ -71,3 +73,27 @@ class OperationalAgentsRunnerCommandTests(TestCase):
         self.assertEqual(AgentRun.objects.count(), 0)
         self.assertIn("PLANNED maintenance-agent", output.getvalue())
         self.assertIn("PLANNED scheduling-agent", output.getvalue())
+
+    @patch("apps.ai_agents_center.services.operational_runner.SchedulingAgentTriggerService.run_day_analysis")
+    @patch("apps.ai_agents_center.services.operational_runner.MaintenanceAgentTriggerService.run_site_analysis")
+    def test_operational_pilot_smoke_validates_registry_dry_run_and_health_context(self, maintenance_mock, scheduling_mock):
+        output = StringIO()
+
+        call_command("run_operational_agents", dry_run=True, stdout=output)
+
+        maintenance_agent = AgentRegistryService.get_agent_definition("maintenance-agent")
+        scheduling_agent = AgentRegistryService.get_agent_definition("scheduling-agent")
+        health_context = get_operations_health_context(tenant_context={"active_company": self.company})
+        status_slugs = {item["agent_slug"] for item in health_context["operational_agent_status"]}
+
+        self.assertEqual(maintenance_mock.call_count, 0)
+        self.assertEqual(scheduling_mock.call_count, 0)
+        self.assertEqual(AgentRun.objects.count(), 0)
+        self.assertTrue(maintenance_agent.enabled)
+        self.assertTrue(scheduling_agent.enabled)
+        self.assertIn("PLANNED maintenance-agent", output.getvalue())
+        self.assertIn("PLANNED scheduling-agent", output.getvalue())
+        self.assertEqual(status_slugs, {"maintenance-agent", "scheduling-agent"})
+        self.assertEqual(len(health_context["summary_cards"]), 4)
+        self.assertIn("detected_risks", health_context)
+        self.assertIn("recent_runs", health_context)

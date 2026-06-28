@@ -583,7 +583,7 @@ Location:
 /*============= OTHERS CSS AREA ===============*/
 /*============= FOOTER CSS AREA ===============*/
 /*============= COMMON CSS AREA ===============*/
-.heading1 h5 {
+.heading1 h5, .heading1 .h5 {
   display: inline-block;
   align-items: center;
   border-radius: 8px;
@@ -601,11 +601,11 @@ Location:
   text-transform: uppercase;
 }
 @media (max-width: 767px) {
-  .heading1 h5 {
+  .heading1 h5, .heading1 .h5 {
     font-size: var(--ztc-font-size-font-s14);
   }
 }
-.heading1 h5 span {
+.heading1 h5 span, .heading1 .h5 span {
   height: 32px;
   width: 32px;
   text-align: center;
@@ -659,7 +659,7 @@ Location:
   letter-spacing: -0.18px;
 }
 
-.heading2 h5 {
+.heading2 h5, .heading2 .h5 {
   background: var(--Main-Color, linear-gradient(90deg, #2E0797 0%, #726EFC 100%));
   background-clip: text;
   -webkit-background-clip: text;
@@ -675,7 +675,7 @@ Location:
   display: inline-block;
   padding: 8px;
 }
-.heading2 h5::after {
+.heading2 h5::after, .heading2 .h5::after {
   position: absolute;
   content: "";
   left: 0;
@@ -687,7 +687,7 @@ Location:
   transition: all 0.4s;
   z-index: -1;
 }
-.heading2 h5 span {
+.heading2 h5 span, .heading2 .h5 span {
   height: 28px;
   width: 28px;
   text-align: center;
@@ -698,7 +698,7 @@ Location:
   border-radius: 50%;
   margin: 0 6px 0 0;
 }
-.heading2 h5 span img {
+.heading2 h5 span img, .heading2 .h5 span img {
   filter: brightness(0) invert(1);
 }
 .heading2 h2 {
@@ -726,7 +726,7 @@ Location:
   letter-spacing: -0.18px;
 }
 
-.heading3 h5 {
+.heading3 h5, .heading3 .h5 {
   display: inline-block;
   align-items: center;
   border-radius: 8px;
@@ -741,11 +741,11 @@ Location:
   line-height: 18px;
 }
 @media (max-width: 767px) {
-  .heading3 h5 {
+  .heading3 h5, .heading3 .h5 {
     font-size: var(--ztc-font-size-font-s14);
   }
 }
-.heading3 h5 img {
+.heading3 h5 img, .heading3 .h5 img {
   height: 24px;
   width: 24px;
   -o-object-fit: cover;
@@ -793,7 +793,7 @@ Location:
   transition: all 0.4s;
 }
 
-.heading4 h5 {
+.heading4 h5, .heading4 .h5 {
   display: inline-block;
   align-items: center;
   border-radius: 8px;
@@ -808,11 +808,11 @@ Location:
   line-height: 18px;
 }
 @media (max-width: 767px) {
-  .heading4 h5 {
+  .heading4 h5, .heading4 .h5 {
     font-size: var(--ztc-font-size-font-s14);
   }
 }
-.heading4 h5 img {
+.heading4 h5 img, .heading4 .h5 img {
   height: 24px;
   width: 24px;
   -o-object-fit: cover;
@@ -845,7 +845,7 @@ Location:
   transition: all 0.4s;
 }
 
-.heading5 h5 {
+.heading5 h5, .heading5 .h5 {
   display: inline-block;
   align-items: center;
   border-radius: 4px;
@@ -863,11 +863,11 @@ Location:
   text-transform: uppercase;
 }
 @media (max-width: 767px) {
-  .heading5 h5 {
+  .heading5 h5, .heading5 .h5 {
     font-size: var(--ztc-font-size-font-s14);
   }
 }
-.heading5 h5 img {
+.heading5 h5 img, .heading5 .h5 img {
   height: 24px;
   width: 24px;
   -o-object-fit: cover;
@@ -900,7 +900,7 @@ Location:
   transition: all 0.4s;
 }
 
-.heading6 h5 {
+.heading6 h5, .heading6 .h5 {
   background: linear-gradient(90deg, #202CD3 1.1%, #0778F9 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -916,10 +916,10 @@ Location:
   display: inline-block;
   padding: 6px 12px;
 }
-.heading6 h5 img {
+.heading6 h5 img, .heading6 .h5 img {
   margin: 0 4px 0 0;
 }
-.heading6 h5::after {
+.heading6 h5::after, .heading6 .h5::after {
   position: absolute;
   content: "";
   left: 0;
@@ -959,7 +959,7 @@ Location:
   opacity: 80%;
 }
 
-.heading7 h5 {
+.heading7 h5, .heading7 .h5 {
   display: inline-block;
   align-items: center;
   border-radius: 4px;
@@ -977,11 +977,11 @@ Location:
   text-transform: uppercase;
 }
 @media (max-width: 767px) {
-  .heading7 h5 {
+  .heading7 h5, .heading7 .h5 {
     font-size: var(--ztc-font-size-font-s14);
   }
 }
-.heading7 h5 span {
+.heading7 h5 span, .heading7 .h5 span {
   height: 32px;
   width: 32px;
   text-align: center;
@@ -1035,7 +1035,7 @@ Location:
   letter-spacing: -0.18px;
 }
 
-.heading8 h5 {
+.heading8 h5, .heading8 .h5 {
   display: inline-block;
   align-items: center;
   border-radius: 4px;
@@ -1051,11 +1051,11 @@ Location:
   text-transform: uppercase;
 }
 @media (max-width: 767px) {
-  .heading8 h5 {
+  .heading8 h5, .heading8 .h5 {
     font-size: var(--ztc-font-size-font-s14);
   }
 }
-.heading8 h5 img {
+.heading8 h5 img, .heading8 .h5 img {
   height: 24px;
   width: 24px;
   -o-object-fit: cover;
@@ -1470,7 +1470,7 @@ Location:
   background: var(--ztc-bg-bg-1) !important;
 }
 
-.bg-heading h5::after {
+.bg-heading h5::after, .bg-heading .h5::after {
   border-radius: 8px !important;
   background: linear-gradient(0deg, rgba(114, 110, 252, 0.1) 0%, rgba(114, 110, 252, 0.1) 100%) !important;
   -webkit-backdrop-filter: blur(5px) !important;
@@ -2375,7 +2375,7 @@ Location:
     margin-top: 30px;
   }
 }
-.about1-section-area-widget .about-header-area h5::after {
+.about1-section-area-widget .about-header-area h5::after, .about1-section-area-widget .about-header-area .h5::after {
   border-radius: 8px;
   background: linear-gradient(0deg, rgba(114, 110, 252, 0.1) 0%, rgba(114, 110, 252, 0.1) 100%);
   -webkit-backdrop-filter: blur(5px);
@@ -2538,7 +2538,7 @@ Location:
   position: relative;
   z-index: 1;
 }
-.service1-section-area .service-header h5::after {
+.service1-section-area .service-header h5::after, .service1-section-area .service-header .h5::after {
   border-radius: 8px;
   background: linear-gradient(0deg, rgba(114, 110, 252, 0.1) 0%, rgba(114, 110, 252, 0.1) 100%);
   -webkit-backdrop-filter: blur(5px);
@@ -2573,12 +2573,12 @@ Location:
   transition: all 0.4s;
   opacity: 80%;
 }
-.service1-section-area .service1-boxarea:hover h5 {
+.service1-section-area .service1-boxarea:hover h5, .service1-section-area .service1-boxarea:hover .h5 {
   color: var(--ztc-text-text-1);
   transition: all 0.4s;
   padding-left: 0;
 }
-.service1-section-area .service1-boxarea:hover h5::after {
+.service1-section-area .service1-boxarea:hover h5::after, .service1-section-area .service1-boxarea:hover .h5::after {
   background: var(--ztc-bg-bg-1);
   transition: all 0.4s;
   left: 26px;
@@ -2654,7 +2654,7 @@ Location:
   line-height: 26px;
   transition: all 0.4s;
 }
-.service1-section-area .service1-boxarea h5 {
+.service1-section-area .service1-boxarea h5, .service1-section-area .service1-boxarea .h5 {
   color: #2E0797;
   font-family: var(--ztc-family-font1);
   font-size: var(--ztc-font-size-font-s16);
@@ -2666,7 +2666,7 @@ Location:
   z-index: 1;
   transition: all 0.4s;
 }
-.service1-section-area .service1-boxarea h5::after {
+.service1-section-area .service1-boxarea h5::after, .service1-section-area .service1-boxarea .h5::after {
   position: absolute;
   z-index: 1;
   content: "";
@@ -3916,7 +3916,7 @@ Location:
     display: none;
   }
 }
-.hero3-section-area .hero3-header h5 {
+.hero3-section-area .hero3-header h5, .hero3-section-area .hero3-header .h5 {
   text-transform: uppercase;
 }
 .hero3-section-area .hero3-header h4 {
@@ -4368,7 +4368,7 @@ Location:
   }
 }
 @media (max-width: 767px) {
-  .hero5-section-area .hero6-header h5 {
+  .hero5-section-area .hero6-header h5, .hero5-section-area .hero6-header .h5 {
     font-size: var(--ztc-font-size-font-s12);
   }
 }
@@ -9945,7 +9945,7 @@ Location:
     display: none;
   }
 }
-.work5-section-area .work-widget-boxes .work-boxarea:hover h5 {
+.work5-section-area .work-widget-boxes .work-boxarea:hover h5, .work5-section-area .work-widget-boxes .work-boxarea:hover .h5 {
   background: var(--ztc-bg-bg-12);
   color: var(--ztc-text-text-1);
   transition: all 0.4s;
@@ -9959,7 +9959,7 @@ Location:
   transition: all 0.4s;
   filter: brightness(0) invert(1);
 }
-.work5-section-area .work-widget-boxes .work-boxarea h5 {
+.work5-section-area .work-widget-boxes .work-boxarea h5, .work5-section-area .work-widget-boxes .work-boxarea .h5 {
   color: var(--ztc-text-text-13);
   font-family: var(--ztc-family-font1);
   font-size: var(--ztc-font-size-font-s16);
@@ -10158,7 +10158,7 @@ Location:
   bottom: 0;
   right: 0;
 }
-.others3-section-area .others-heading h5 img {
+.others3-section-area .others-heading h5 img, .others3-section-area .others-heading .h5 img {
   filter: brightness(0) invert(1);
 }
 .others3-section-area .others-heading .btn-area1 a {
@@ -10446,7 +10446,7 @@ Location:
   background-repeat: no-repeat;
   background-size: cover;
 }
-.team1-section-area .team-header h5::after {
+.team1-section-area .team-header h5::after, .team1-section-area .team-header .h5::after {
   background: linear-gradient(0deg, rgba(114, 110, 252, 0.1) 0%, rgba(114, 110, 252, 0.1) 100%);
 }
 .team1-section-area .team-author-boxarea {
@@ -10681,7 +10681,7 @@ Location:
   position: relative;
   z-index: 1;
 }
-.teaminner-section-area .team-header h5::after {
+.teaminner-section-area .team-header h5::after, .teaminner-section-area .team-header .h5::after {
   background: linear-gradient(0deg, rgba(114, 110, 252, 0.1) 0%, rgba(114, 110, 252, 0.1) 100%);
 }
 .teaminner-section-area .team-author-boxarea {
@@ -12888,7 +12888,7 @@ Location:
     text-align: center;
   }
 }
-.case1-section-area .case-header h5::after {
+.case1-section-area .case-header h5::after, .case1-section-area .case-header .h5::after {
   border-radius: 8px;
   background: linear-gradient(0deg, rgba(114, 110, 252, 0.1) 0%, rgba(114, 110, 252, 0.1) 100%);
   -webkit-backdrop-filter: blur(5px);

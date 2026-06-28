@@ -1,3 +1,4 @@
+from datetime import timedelta
 from io import StringIO
 from unittest.mock import patch
 
@@ -5,8 +6,12 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 
+from config.celery import app as celery_app
+
 from apps.ai_agents_center.models import AgentDefinition, AgentRun
+from apps.ai_agents_center.services.operational_runner import OperationalAgentRunItem
 from apps.ai_agents_center.services.registry import AgentRegistryService
+from apps.ai_agents_center.tasks import run_daily_operational_agents
 from apps.admin_shell.services.ai_agents_center import get_operations_health_context
 from apps.companies.models import Company
 from apps.smart_system.models import MaintenanceClient, OperationalSite
@@ -97,3 +102,50 @@ class OperationalAgentsRunnerCommandTests(TestCase):
         self.assertEqual(len(health_context["summary_cards"]), 4)
         self.assertIn("detected_risks", health_context)
         self.assertIn("recent_runs", health_context)
+
+
+class OperationalAgentsCeleryTaskTests(TestCase):
+    def test_run_daily_operational_agents_task_calls_runner(self):
+        summary = {
+            "run_date": timezone.localdate(),
+            "target_date": timezone.localdate() + timedelta(days=1),
+            "site_count": 1,
+            "results": [
+                OperationalAgentRunItem(
+                    agent_slug="maintenance-agent",
+                    site_id=10,
+                    site_name="Unidade Piloto",
+                    trigger_reference="operational:maintenance:daily_critical_assets:2026-06-28",
+                    status="executed",
+                    run_id=123,
+                ),
+                OperationalAgentRunItem(
+                    agent_slug="scheduling-agent",
+                    site_id=10,
+                    site_name="Unidade Piloto",
+                    trigger_reference="date:2026-06-29",
+                    status="skipped",
+                ),
+            ],
+            "executed": 1,
+            "skipped": 1,
+            "planned": 0,
+            "failed": 0,
+        }
+
+        with patch("apps.ai_agents_center.tasks.OperationalAgentsRunner.run_daily", return_value=summary) as runner_mock:
+            payload = run_daily_operational_agents()
+
+        runner_mock.assert_called_once_with(dry_run=False, force=False)
+        self.assertEqual(payload["status"], "completed")
+        self.assertEqual(payload["run_date"], summary["run_date"].isoformat())
+        self.assertEqual(payload["target_date"], summary["target_date"].isoformat())
+        self.assertEqual(payload["results"][0]["agent_slug"], "maintenance-agent")
+        self.assertEqual(payload["results"][1]["agent_slug"], "scheduling-agent")
+
+    def test_operational_agents_beat_schedule_is_registered(self):
+        beat_entry = celery_app.conf.beat_schedule["ai-agents-operational-daily-0630"]
+
+        self.assertEqual(beat_entry["task"], "ai_agents_center.run_daily_operational_agents")
+        self.assertEqual(str(beat_entry["schedule"]._orig_hour), "6")
+        self.assertEqual(str(beat_entry["schedule"]._orig_minute), "30")

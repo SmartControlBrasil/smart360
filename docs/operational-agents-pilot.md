@@ -17,7 +17,7 @@ Os agentes continuam em nível `PROPOSE`, com aprovação humana obrigatória pa
 .venv/bin/python manage.py check
 ```
 
-2. Rodar o smoke test operacional sem depender de dados reais:
+2. Rodar o smoke test operacional sem depender de dados reais e validar o schedule do Celery Beat:
 
 ```bash
 .venv/bin/python manage.py test apps.ai_agents_center.tests.test_operational_runner
@@ -28,7 +28,8 @@ Esse teste valida que:
 - o registry contém `maintenance-agent` e `scheduling-agent`;
 - `run_operational_agents --dry-run` planeja os dois agentes sem executar análise real;
 - nenhum `AgentRun` é criado no dry-run;
-- o contexto de `/app/operations/health/` é montado sem erro.
+- o contexto de `/app/operations/health/` é montado sem erro;
+- a task `ai_agents_center.run_daily_operational_agents` está registrada no Beat às 06:30.
 
 3. Fazer um dry-run manual da rotina:
 
@@ -38,7 +39,9 @@ Esse teste valida que:
 
 A saída esperada deve conter linhas `PLANNED maintenance-agent` e `PLANNED scheduling-agent` para cada site ativo encontrado.
 
-## Como rodar a rotina real
+## Rotina manual
+
+Para executar manualmente a rotina real:
 
 ```bash
 .venv/bin/python manage.py run_operational_agents
@@ -62,6 +65,26 @@ Por padrão, a rotina:
 - falha explicitamente se algum agente não executar.
 
 Use `--force` apenas quando a intenção for reprocessar conscientemente a mesma janela operacional.
+
+
+## Rotina automática via Celery Beat
+
+O piloto operacional também fica agendado no Celery Beat pela entrada `ai-agents-operational-daily-0630`.
+
+- Task: `ai_agents_center.run_daily_operational_agents`
+- Horário: todos os dias às 06:30
+- Runner usado: `OperationalAgentsRunner.run_daily`
+- Agentes executados: `maintenance-agent` e `scheduling-agent`
+
+A task registra logs mínimos de início, fim e erro. Se uma exceção inesperada ocorrer, ela registra `logger.exception` e retorna status `failed`, sem derrubar o worker inteiro.
+
+A idempotência continua no runner: execuções já concluídas para o mesmo site, agente e janela operacional são puladas, salvo uso explícito de `--force` na rotina manual.
+
+Para validar o agendamento no código:
+
+```bash
+.venv/bin/python manage.py test apps.ai_agents_center.tests.test_operational_runner
+```
 
 ## Tela para abrir depois da execução
 
@@ -97,6 +120,7 @@ A rotina não exige dados reais para o smoke test, mas uma demo com cliente fica
 - Flags de manutenção destacam ativos em atenção, criticidade ou recorrência de falha.
 - Flags de agenda destacam sobrecarga, conflito, risco de SLA ou capacidade ociosa.
 - Runs recentes mostram se a rotina executou ou se ainda há apenas planejamento/dry-run.
+- Após 06:30, a ausência de runs novos indica que vale checar Beat, worker Celery e logs da task `ai_agents_center.run_daily_operational_agents`.
 
 ## Se o dashboard vier vazio
 
@@ -106,7 +130,8 @@ Um painel vazio não significa falha obrigatória. Conferir nesta ordem:
 2. Verificar se existem sites ativos para a empresa do usuário logado.
 3. Rodar a rotina real sem `--dry-run` para a janela desejada.
 4. Confirmar se há dados operacionais suficientes para gerar recomendações, propostas ou flags.
-5. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
+5. Se a rotina automática já deveria ter rodado, conferir se Beat/worker Celery estão ativos e procurar logs da task `ai_agents_center.run_daily_operational_agents`.
+6. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
 
 ## Dependências para piloto real
 

@@ -53,6 +53,81 @@ def _day_bounds(day):
     return start, start + timezone.timedelta(days=1)
 
 
+def _format_age(delta):
+    if delta is None:
+        return "-"
+    total_seconds = max(int(delta.total_seconds()), 0)
+    days, remainder = divmod(total_seconds, 86400)
+    hours, _ = divmod(remainder, 3600)
+    if days:
+        return f"{days}d {hours}h"
+    return f"{hours}h"
+
+
+def _build_operational_review_metrics(*, proposals, recommendations, runs, latest_runs_queryset=None):
+    now = timezone.now()
+    pending_proposals = proposals.filter(status=AgentActionProposal.Status.PENDING_APPROVAL)
+    pending_created_at = list(pending_proposals.values_list("created_at", flat=True))
+    oldest_pending_created_at = min(pending_created_at) if pending_created_at else None
+    average_pending_age = None
+    if pending_created_at:
+        average_pending_age = sum((now - created_at for created_at in pending_created_at), timezone.timedelta()) / len(pending_created_at)
+
+    latest_runs_queryset = latest_runs_queryset or runs
+    latest_runs_by_agent = []
+    for agent_slug in OPERATIONAL_AGENT_SLUGS:
+        latest_run = latest_runs_queryset.filter(agent__slug=agent_slug).order_by("-created_at").first()
+        latest_runs_by_agent.append(
+            {
+                "agent_slug": agent_slug,
+                "run": latest_run,
+                "status": latest_run.get_status_display() if latest_run else "Sem execução",
+                "finished_at": latest_run.finished_at or latest_run.created_at if latest_run else None,
+            }
+        )
+
+    pending_count = pending_proposals.count()
+    approved_count = proposals.filter(status=AgentActionProposal.Status.APPROVED).count()
+    rejected_count = proposals.filter(status=AgentActionProposal.Status.REJECTED).count()
+    open_recommendations_count = recommendations.filter(status=AgentRecommendation.Status.OPEN).count()
+    reviewed_recommendations_count = recommendations.filter(
+        status__in=[
+            AgentRecommendation.Status.REVIEWED,
+            AgentRecommendation.Status.ACCEPTED,
+            AgentRecommendation.Status.DISMISSED,
+            AgentRecommendation.Status.APPLIED,
+        ]
+    ).count()
+    runs_today_count = runs.count()
+    successful_runs_count = runs.filter(status=AgentRun.Status.COMPLETED).count()
+    failed_runs_count = runs.filter(status=AgentRun.Status.FAILED).count()
+
+    return {
+        "pending_proposals": pending_count,
+        "approved_proposals": approved_count,
+        "rejected_proposals": rejected_count,
+        "open_recommendations": open_recommendations_count,
+        "reviewed_recommendations": reviewed_recommendations_count,
+        "runs_today": runs_today_count,
+        "successful_runs": successful_runs_count,
+        "failed_runs": failed_runs_count,
+        "average_pending_age": _format_age(average_pending_age),
+        "oldest_pending_age": _format_age(now - oldest_pending_created_at if oldest_pending_created_at else None),
+        "oldest_pending_created_at": oldest_pending_created_at,
+        "latest_runs_by_agent": latest_runs_by_agent,
+        "cards": [
+            {"label": "Decisões pendentes", "value": pending_count, "detail": "propostas aguardando revisão"},
+            {"label": "Aprovadas", "value": approved_count, "detail": "propostas aprovadas"},
+            {"label": "Rejeitadas", "value": rejected_count, "detail": "propostas rejeitadas"},
+            {"label": "Recomendações abertas", "value": open_recommendations_count, "detail": "triagens pendentes"},
+            {"label": "Recomendações revisadas", "value": reviewed_recommendations_count, "detail": "reviewed/accepted/dismissed/applied"},
+            {"label": "Runs no período", "value": runs_today_count, "detail": f"{successful_runs_count} sucesso / {failed_runs_count} falha"},
+            {"label": "Idade média pendente", "value": _format_age(average_pending_age), "detail": "propostas pendentes"},
+            {"label": "Pendente mais antiga", "value": _format_age(now - oldest_pending_created_at if oldest_pending_created_at else None), "detail": "tempo parada"},
+        ],
+    }
+
+
 def get_operations_health_context(*, tenant_context):
     company = tenant_context.get("active_company") or tenant_context.get("company")
     operational_agent_slugs = OPERATIONAL_AGENT_SLUGS
@@ -114,6 +189,14 @@ def get_operations_health_context(*, tenant_context):
         item["agent__slug"]: item["total"]
         for item in runs.values("agent__slug").annotate(total=Count("id"))
     }
+    today = timezone.localdate()
+    today_start, today_end = _day_bounds(today)
+    review_metrics = _build_operational_review_metrics(
+        proposals=proposals.filter(created_at__gte=today_start, created_at__lt=today_end),
+        recommendations=recommendations.filter(created_at__gte=today_start, created_at__lt=today_end),
+        runs=runs.filter(created_at__gte=today_start, created_at__lt=today_end),
+        latest_runs_queryset=runs,
+    )
     operational_agent_status = [
         {
             "agent_slug": "maintenance-agent",
@@ -175,6 +258,7 @@ def get_operations_health_context(*, tenant_context):
         "open_asset_flags": list(open_asset_flags.order_by("-attention_score", "-updated_at")[:8]),
         "open_schedule_flags": list(open_schedule_flags.order_by("-attention_score", "-updated_at")[:8]),
         "recent_runs": list(runs.order_by("-created_at")[:8]),
+        "review_metrics": review_metrics,
         "quick_links": [
             {"label": "Recomendações", "href": "admin-shell:ai-agents-recommendations"},
             {"label": "Propostas", "href": "admin-shell:ai-agents-proposals"},
@@ -254,24 +338,49 @@ def get_operational_review_queue_context(*, tenant_context, filters=None):
         schedule_flags = schedule_flags.filter(agent__slug=selected_agent)
         runs = runs.filter(agent__slug=selected_agent)
 
-    if selected_status:
-        recommendations = recommendations.filter(status=selected_status)
-        proposals = proposals.filter(status=selected_status)
-        asset_flags = asset_flags.filter(status=selected_status)
-        schedule_flags = schedule_flags.filter(status=selected_status)
-        runs = runs.filter(status=selected_status)
-    else:
-        recommendations = recommendations.filter(status=AgentRecommendation.Status.OPEN)
-        proposals = proposals.filter(status=AgentActionProposal.Status.PENDING_APPROVAL)
-        asset_flags = asset_flags.filter(status__in=[AgentAssetAttentionFlag.Status.ACTIVE, AgentAssetAttentionFlag.Status.WATCHING])
-        schedule_flags = schedule_flags.filter(status__in=[AgentScheduleHealthFlag.Status.ACTIVE, AgentScheduleHealthFlag.Status.WATCHING])
-
     if selected_site_id:
         recommendations = recommendations.filter(site_id=selected_site_id)
         proposals = proposals.filter(agent_run__site_id=selected_site_id)
         asset_flags = asset_flags.filter(site_id=selected_site_id)
         schedule_flags = schedule_flags.filter(site_id=selected_site_id)
         runs = runs.filter(site_id=selected_site_id)
+
+    latest_runs_queryset = AgentRun.objects.select_related("agent", "company", "site", "triggered_by").filter(
+        agent__slug__in=OPERATIONAL_AGENT_SLUGS
+    )
+    if company is not None:
+        latest_runs_queryset = latest_runs_queryset.filter(company=company)
+    if selected_agent in OPERATIONAL_AGENT_SLUGS:
+        latest_runs_queryset = latest_runs_queryset.filter(agent__slug=selected_agent)
+    if selected_site_id:
+        latest_runs_queryset = latest_runs_queryset.filter(site_id=selected_site_id)
+
+    metric_recommendations = recommendations
+    metric_proposals = proposals
+    metric_runs = runs.filter(created_at__gte=review_start, created_at__lt=review_end)
+
+    if selected_status:
+        recommendations = recommendations.filter(status=selected_status)
+        proposals = proposals.filter(status=selected_status)
+        asset_flags = asset_flags.filter(status=selected_status)
+        schedule_flags = schedule_flags.filter(status=selected_status)
+        runs = runs.filter(status=selected_status)
+        metric_recommendations = metric_recommendations.filter(status=selected_status)
+        metric_proposals = metric_proposals.filter(status=selected_status)
+        metric_runs = metric_runs.filter(status=selected_status)
+        latest_runs_queryset = latest_runs_queryset.filter(status=selected_status)
+    else:
+        recommendations = recommendations.filter(status=AgentRecommendation.Status.OPEN)
+        proposals = proposals.filter(status=AgentActionProposal.Status.PENDING_APPROVAL)
+        asset_flags = asset_flags.filter(status__in=[AgentAssetAttentionFlag.Status.ACTIVE, AgentAssetAttentionFlag.Status.WATCHING])
+        schedule_flags = schedule_flags.filter(status__in=[AgentScheduleHealthFlag.Status.ACTIVE, AgentScheduleHealthFlag.Status.WATCHING])
+
+    review_metrics = _build_operational_review_metrics(
+        proposals=metric_proposals,
+        recommendations=metric_recommendations,
+        runs=metric_runs,
+        latest_runs_queryset=latest_runs_queryset,
+    )
 
     recommendation_list = list(recommendations.order_by("-attention_score", "-created_at")[:50])
     proposal_list = list(proposals.order_by("-created_at")[:50])
@@ -302,11 +411,16 @@ def get_operational_review_queue_context(*, tenant_context, filters=None):
         ],
         "site_options": list(sites[:100]),
         "summary_cards": [
-            {"label": "Propostas pendentes", "value": len(proposal_list)},
-            {"label": "Recomendações abertas", "value": len(recommendation_list)},
-            {"label": "Flags relevantes", "value": len(asset_flag_list) + len(schedule_flag_list)},
-            {"label": "Runs hoje/ontem", "value": len(run_list)},
+            {"label": "Decisões pendentes", "value": review_metrics["pending_proposals"]},
+            {"label": "Propostas aprovadas", "value": review_metrics["approved_proposals"]},
+            {"label": "Propostas rejeitadas", "value": review_metrics["rejected_proposals"]},
+            {"label": "Recomendações abertas", "value": review_metrics["open_recommendations"]},
+            {"label": "Recomendações revisadas", "value": review_metrics["reviewed_recommendations"]},
+            {"label": "Runs no dia", "value": review_metrics["runs_today"]},
+            {"label": "Runs com sucesso", "value": review_metrics["successful_runs"]},
+            {"label": "Runs com falha", "value": review_metrics["failed_runs"]},
         ],
+        "review_metrics": review_metrics,
         "recommendations": recommendation_list,
         "proposals": proposal_list,
         "asset_flags": asset_flag_list,

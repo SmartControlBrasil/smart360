@@ -116,6 +116,23 @@ Para validar o agendamento no código:
 
 A Operational Review Queue não executa manutenção real, não envia e-mail e não altera agenda externa. Ela apenas organiza a revisão humana e reaproveita o status interno de recomendações/propostas.
 
+## Métricas do piloto operacional
+
+A fila `/app/operations/review/` mostra métricas simples para medir se o piloto está virando decisão humana rastreável:
+
+- Propostas pendentes: decisões que ainda precisam de aprovação ou rejeição humana.
+- Propostas aprovadas: propostas aprovadas internamente no período filtrado, sem execução automática de manutenção ou agenda externa.
+- Propostas rejeitadas: propostas recusadas pelo operador, idealmente com motivo registrado.
+- Recomendações abertas: itens de triagem ainda não revisados.
+- Recomendações revisadas: recomendações em status `reviewed`, `accepted`, `dismissed` ou `applied`, conforme campos já existentes.
+- Runs no dia: execuções dos agentes no período filtrado.
+- Runs com sucesso/falha: leitura rápida para confirmar se a rotina rodou e se algum agente falhou.
+- Idade média pendente: tempo médio que propostas pendentes estão aguardando decisão.
+- Pendente mais antiga: maior fila parada; quando cresce, normalmente indica falha no processo humano de revisão, não necessariamente falha do agente.
+- Última execução por agente: confirmação operacional de que `maintenance-agent` e `scheduling-agent` executaram recentemente.
+
+Use os filtros da Review Queue para ler as métricas por agente, status, data ou site quando necessário. Na rotina diária, a pergunta principal é: existe proposta pendente antiga demais para uma decisão do operador?
+
 ## Telas para abrir depois da execução
 
 Abrir `/app/operations/review/` para responder: o que preciso revisar hoje no piloto operacional? Conferir:

@@ -23,6 +23,35 @@
 
     <div class="table-card">
         <div class="section-header">
+            <h2>Resumo da revisão operacional</h2>
+            <p class="muted-block">Sinais mínimos para saber se há decisão humana pendente depois da rotina diária.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Propostas pendentes</th>
+                        <th>Aprovadas</th>
+                        <th>Rejeitadas</th>
+                        <th>Runs hoje</th>
+                        <th>Pendente mais antiga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ review_metrics.pending_proposals }}</td>
+                        <td>{{ review_metrics.approved_proposals }}</td>
+                        <td>{{ review_metrics.rejected_proposals }}</td>
+                        <td>{{ review_metrics.runs_today }}</td>
+                        <td>{{ review_metrics.oldest_pending_age }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
             <h2>Rotina operacional dos agentes</h2>
             <p class="muted-block">Leitura por agente para a rotina diária de manutenção e agenda.</p>
         </div>

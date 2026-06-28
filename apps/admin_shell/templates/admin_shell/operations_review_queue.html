@@ -64,6 +64,34 @@
         {% endfor %}
     </div>
 
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Métricas do piloto operacional</h2>
+            <p class="muted-block">Resumo rastreável das decisões humanas e da execução dos agentes no período filtrado.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Pendente mais antiga</th>
+                        <th>Idade média pendente</th>
+                        <th>Última execução maintenance-agent</th>
+                        <th>Última execução scheduling-agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{% if review_metrics.oldest_pending_created_at %}{{ review_metrics.oldest_pending_age }}<br><span class="muted-block">{{ review_metrics.oldest_pending_created_at|date:"d/m/Y H:i" }}</span>{% else %}-{% endif %}</td>
+                        <td>{{ review_metrics.average_pending_age }}</td>
+                        {% for item in review_metrics.latest_runs_by_agent %}
+                            <td>{{ item.status }}{% if item.finished_at %}<br><span class="muted-block">{{ item.finished_at|date:"d/m/Y H:i" }}</span>{% endif %}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     {% if not has_review_items %}
     <div class="table-card">
         <div class="section-header">

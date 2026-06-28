@@ -195,6 +195,9 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, reverse("admin-shell:ai-agents-proposals"))
         self.assertContains(response, "Maintenance Intelligence Agent")
         self.assertContains(response, "Scheduling Optimization Agent")
+        self.assertContains(response, "Resumo da revisão operacional")
+        self.assertEqual(response.context["review_metrics"]["pending_proposals"], 1)
+        self.assertEqual(response.context["review_metrics"]["runs_today"], 2)
 
     def test_operations_review_url_resolves_to_view(self):
         resolved = resolve("/app/operations/review/")
@@ -207,10 +210,16 @@ class OperationsHealthViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin_shell/operations_review_queue.html")
         self.assertContains(response, "Operational Review Queue")
+        self.assertContains(response, "Métricas do piloto operacional")
+        self.assertContains(response, "Decisões pendentes")
+        self.assertContains(response, "Runs com falha")
+        self.assertContains(response, "Sem execução")
         self.assertContains(response, "Fila vazia")
         self.assertContains(response, ".venv/bin/python manage.py seed_operational_pilot_data")
         self.assertContains(response, ".venv/bin/python manage.py run_operational_agents")
         self.assertContains(response, "Nenhuma proposta pendente")
+        self.assertEqual(response.context["review_metrics"]["pending_proposals"], 0)
+        self.assertEqual(response.context["review_metrics"]["runs_today"], 0)
 
     def test_operations_review_shows_operational_agent_data(self):
         self.create_agent_data()
@@ -228,6 +237,63 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "Aprovar")
         self.assertContains(response, "Rejeitar")
 
+    def test_operations_review_metrics_count_decisions_and_runs(self):
+        data = self.create_agent_data()
+        failed_run = AgentRun.objects.create(
+            agent=data["maintenance_agent"],
+            company=self.company,
+            site=self.site,
+            trigger_type=AgentRun.TriggerType.SCHEDULED,
+            status=AgentRun.Status.FAILED,
+            error_message="Falha simulada para métrica.",
+            finished_at=timezone.now(),
+        )
+        AgentActionProposal.objects.create(
+            agent_run=data["scheduling_run"],
+            action_type="approve_test",
+            title="Proposta aprovada para métrica",
+            status=AgentActionProposal.Status.APPROVED,
+            approved_by=self.user,
+            approved_at=timezone.now(),
+        )
+        AgentActionProposal.objects.create(
+            agent_run=failed_run,
+            action_type="reject_test",
+            title="Proposta rejeitada para métrica",
+            status=AgentActionProposal.Status.REJECTED,
+            rejected_by=self.user,
+            rejected_at=timezone.now(),
+            rejection_reason="Sem janela operacional.",
+        )
+        AgentRecommendation.objects.create(
+            agent_run=data["maintenance_run"],
+            company=self.company,
+            site=self.site,
+            recommendation_type=AgentRecommendation.RecommendationType.CRITICAL_ASSET_WATCH,
+            title="Recomendação revisada para métrica",
+            summary="Item já triado pelo operador.",
+            severity=AgentRecommendation.Severity.MEDIUM,
+            priority=AgentRecommendation.Priority.MEDIUM,
+            status=AgentRecommendation.Status.REVIEWED,
+            attention_score=41,
+        )
+
+        response = self.client.get(reverse("admin-shell:operations-review"))
+
+        self.assertEqual(response.status_code, 200)
+        metrics = response.context["review_metrics"]
+        self.assertEqual(metrics["pending_proposals"], 1)
+        self.assertEqual(metrics["approved_proposals"], 1)
+        self.assertEqual(metrics["rejected_proposals"], 1)
+        self.assertEqual(metrics["open_recommendations"], 1)
+        self.assertEqual(metrics["reviewed_recommendations"], 1)
+        self.assertEqual(metrics["runs_today"], 3)
+        self.assertEqual(metrics["successful_runs"], 2)
+        self.assertEqual(metrics["failed_runs"], 1)
+        self.assertContains(response, "Pendente mais antiga")
+        self.assertContains(response, "Propostas aprovadas")
+        self.assertContains(response, "Runs com sucesso")
+
     def test_operations_review_filters_by_agent(self):
         self.create_agent_data()
 
@@ -238,6 +304,8 @@ class OperationsHealthViewTests(TestCase):
         self.assertContains(response, "Chiller com risco operacional elevado")
         self.assertNotContains(response, "Reorganizar agenda técnica")
         self.assertNotContains(response, "Agenda com sobrecarga no período da tarde")
+        self.assertEqual(response.context["review_metrics"]["pending_proposals"], 0)
+        self.assertEqual(response.context["review_metrics"]["open_recommendations"], 1)
 
     def test_operations_review_marks_recommendation_reviewed(self):
         data = self.create_agent_data()

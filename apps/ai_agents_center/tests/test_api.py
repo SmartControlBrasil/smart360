@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+from unittest.mock import patch
 from datetime import timedelta
 
 from django.urls import reverse
@@ -158,6 +159,29 @@ class AIAgentsCenterApiTests(APITestCase):
         list_response = self.client.get(reverse("ai-agent-briefings-list"), {"company": self.company.id})
         self.assertEqual(list_response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(_payload_items(list_response)), 1)
+
+    def test_briefing_generation_handles_missing_problematic_assets(self):
+        analytics_payload = {
+            "summary_cards": [
+                {"label": "Receita", "value": Decimal("1000.00")},
+                {"label": "Custo", "value": Decimal("600.00")},
+                {"label": "Margem", "value": "40%"},
+                {"label": "SLA", "value": "95%"},
+                {"label": "Preventivas", "value": 3},
+                {"label": "Backlog", "value": 2},
+            ],
+        }
+
+        with patch.object(ExecutiveAnalyticsService, "build_executive_dashboard", return_value=analytics_payload):
+            briefing = AIBriefingComposer.generate_briefing(
+                briefing_type=AIBriefing.BriefingType.DAILY_EXECUTIVE,
+                audience=AIBriefing.Audience.MANAGER,
+                company=self.company,
+                user=self.user,
+            )
+
+        self.assertIn("0 ativos problemáticos", briefing.summary)
+        self.assertEqual(briefing.content["cards"][2]["value"], 2)
 
     def test_briefing_scope_respects_company(self):
         other_company = CompanyFactory(name="Other AI", slug="other-ai")
@@ -1509,6 +1533,42 @@ class AIAgentsCenterApiTests(APITestCase):
         session_public_id = response.data["session"]["public_id"]
         self.assertTrue(ManagerCopilotSession.objects.filter(public_id=session_public_id).exists())
         self.assertEqual(ManagerCopilotMessage.objects.filter(session__public_id=session_public_id).count(), 2)
+
+    def test_manager_copilot_persists_decimal_payload_as_json(self):
+        period = ExecutiveAnalyticsService.get_period(reference_date=timezone.localdate(), period_type=OperationalMetrics.PeriodType.MONTHLY)
+        OperationalMetrics.objects.create(
+            company=self.company,
+            period_type=period.period_type,
+            period_start=period.start,
+            period_end=period.end,
+            total_work_orders=4,
+            total_revenue=Decimal("1234.56"),
+            total_cost=Decimal("789.10"),
+            total_profit=Decimal("445.46"),
+            sla_compliance_rate=Decimal("97.50"),
+            avg_response_time=Decimal("2.25"),
+        )
+
+        response = self.client.post(
+            reverse("ai-agent-copilot-query"),
+            {"query": "Quais sao os maiores riscos operacionais hoje?", "company": self.company.id},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        message = ManagerCopilotMessage.objects.filter(role=ManagerCopilotMessage.Role.ASSISTANT).latest("created_at")
+        json.dumps(message.structured_payload)
+
+        def contains_decimal(value):
+            if isinstance(value, Decimal):
+                return True
+            if isinstance(value, dict):
+                return any(contains_decimal(item) for item in value.values())
+            if isinstance(value, list):
+                return any(contains_decimal(item) for item in value)
+            return False
+
+        self.assertFalse(contains_decimal(message.structured_payload))
 
     def test_manager_copilot_generates_observability_logs(self):
         self.client.post(

@@ -44,6 +44,35 @@ class RealtimeEventBusServiceTests(TestCase):
         self.assertTrue(SystemEventLog.objects.filter(event_type="event.published").exists())
         self.assertTrue(SystemEventLog.objects.filter(event_type="event.delivered").exists())
 
+    def test_publish_domain_event_is_idempotent_for_same_event_key(self):
+        first_event = RealtimeEventBus.publish_domain_event(
+            event_name="decision.awaiting_approval",
+            source_module="ai_decision_engine",
+            company=self.company,
+            site=self.site,
+            aggregate_type="decision",
+            aggregate_id="decision-idempotent",
+            payload={"summary": "Approval required"},
+            correlation_id="corr-idempotent",
+            request_id="req-idempotent",
+        )
+
+        second_event = RealtimeEventBus.publish_domain_event(
+            event_name="decision.awaiting_approval",
+            source_module="ai_decision_engine",
+            company=self.company,
+            site=self.site,
+            aggregate_type="decision",
+            aggregate_id="decision-idempotent",
+            payload={"summary": "Approval required"},
+            correlation_id="corr-idempotent",
+            request_id="req-idempotent",
+        )
+
+        self.assertEqual(second_event.id, first_event.id)
+        self.assertEqual(IntegrationEvent.objects.filter(event_key=first_event.event_key).count(), 1)
+        self.assertEqual(first_event.deliveries.count(), second_event.deliveries.count())
+
     @patch("apps.integration_bus.services.realtime_bus.MaintenanceAgentTriggerService.trigger_for_failure_event")
     def test_reactive_failure_event_triggers_agent_once_and_is_idempotent(self, trigger_for_failure_event):
         failure_event = FailureEventFactory(asset=self.asset)

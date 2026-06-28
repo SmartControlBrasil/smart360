@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 
 from django.db import transaction
 from django.http import StreamingHttpResponse
 from django.utils import timezone
+from django.utils.text import slugify
 
 from apps.ai_agents_center.services.anomaly_triggers import AnomalyAgentTriggerService
 from apps.ai_agents_center.services.maintenance_triggers import MaintenanceAgentTriggerService
@@ -262,9 +264,27 @@ class RealtimeEventBus:
         event_type=IntegrationEvent.EventType.DOMAIN,
     ):
         normalized_name = normalize_event_name(event_name)
+        event_metadata = metadata or {}
+        effective_request_id = request_id or get_request_id()
+        effective_correlation_id = correlation_id or get_correlation_id()
+        event_key_seed = event_metadata.get("system_event_public_id") or "|".join(
+            [
+                effective_correlation_id,
+                effective_request_id,
+                source_module,
+                normalized_name,
+                aggregate_type,
+                str(aggregate_id),
+            ]
+        )
+        event_key = slugify(event_key_seed)
+        if len(event_key) > 180:
+            digest = hashlib.sha256(event_key_seed.encode("utf-8")).hexdigest()[:32]
+            event_key = f"{event_key[:147]}-{digest}"
         event = IntegrationEventService.record_event(
             event_name=normalized_name,
             event_version=1,
+            event_key=event_key,
             source_module=source_module,
             event_type=event_type,
             company=company,
@@ -272,12 +292,14 @@ class RealtimeEventBus:
             aggregate_type=aggregate_type,
             aggregate_id=aggregate_id,
             payload=payload or {},
-            metadata=metadata or {},
-            request_id=request_id or get_request_id(),
-            correlation_id=correlation_id or get_correlation_id(),
+            metadata=event_metadata,
+            request_id=effective_request_id,
+            correlation_id=effective_correlation_id,
             priority=priority or event_priority_for(normalized_name),
             occurred_at=timezone.now(),
         )
+        if event.status == IntegrationEvent.Status.PUBLISHED and event.published_at:
+            return event
         IntegrationEventService.publish_event(event=event)
         SystemEventService.log_system_event(
             event_type="event.published",

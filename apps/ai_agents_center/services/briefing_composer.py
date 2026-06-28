@@ -110,6 +110,14 @@ class AIBriefingComposer:
             period_type=OperationalMetrics.PeriodType.DAILY if period.start == period.end else OperationalMetrics.PeriodType.MONTHLY,
             reference_date=period.end,
         )
+        summary_cards = analytics.get("summary_cards") or []
+        problematic_assets = analytics.get("problematic_assets") or []
+
+        def card_value(index, default="0"):
+            if len(summary_cards) <= index:
+                return default
+            return summary_cards[index].get("value", default)
+
         attention_assets = list(
             AgentAssetAttentionFlag.objects.select_related("asset", "site", "latest_recommendation")
             .filter(company=company, status__in=["active", "watching"])
@@ -149,14 +157,14 @@ class AIBriefingComposer:
         if not actions:
             actions.append("Revisar recomendacoes abertas e manter monitoramento do dashboard.")
         cards = [
-            {"label": "Receita", "value": str(analytics["summary_cards"][0]["value"]), "meta": "periodo"},
-            {"label": "Margem", "value": str(analytics["summary_cards"][2]["value"]), "meta": "periodo"},
-            {"label": "Backlog", "value": analytics["summary_cards"][5]["value"], "meta": "OS abertas"},
-            {"label": "SLA", "value": str(analytics["summary_cards"][3]["value"]), "meta": "taxa do periodo"},
+            {"label": "Receita", "value": str(card_value(0)), "meta": "periodo"},
+            {"label": "Margem", "value": str(card_value(2)), "meta": "periodo"},
+            {"label": "Backlog", "value": card_value(5), "meta": "OS abertas"},
+            {"label": "SLA", "value": str(card_value(3)), "meta": "taxa do periodo"},
         ]
         return {
             "title": "Daily Executive Briefing" if period.start == period.end else "Weekly Executive Summary",
-            "summary": f"{company.name}: {analytics['summary_cards'][5]['value']} OS abertas, {len(analytics['problematic_assets'])} ativos problemáticos e SLA de {analytics['summary_cards'][3]['value']}.",
+            "summary": f"{company.name}: {card_value(5)} OS abertas, {len(problematic_assets)} ativos problemáticos e SLA de {card_value(3)}.",
             "priorities": priorities,
             "alerts": alerts,
             "recommendations": [
@@ -337,8 +345,8 @@ class AIBriefingComposer:
             title=payload["title"],
             summary=payload["summary"],
             period_label=payload["period"]["label"],
-            period_start=period.start,
-            period_end=period.end,
+            period_start=payload["period"]["start"],
+            period_end=payload["period"]["end"],
             content=payload,
             source_agents=payload.get("source_agents", []),
             source_recommendation_ids=payload.get("source_recommendation_ids", []),

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import date, datetime, timedelta
+from decimal import Decimal
+from uuid import UUID
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -32,6 +34,22 @@ from shared_kernel.observability.context import get_request_id
 
 
 User = get_user_model()
+
+
+def _json_ready(value):
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, Decimal):
+        return str(value)
+    if isinstance(value, (date, datetime, UUID)):
+        return str(value)
+    if isinstance(value, dict):
+        return {key: _json_ready(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_ready(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_ready(item) for item in value]
+    return value
 
 
 @dataclass(frozen=True)
@@ -947,30 +965,32 @@ class ManagerCopilotService:
             comparison=comparison,
             entity_summary=entity_summary,
         )
+        context_snapshot = _json_ready(context)
+        response_payload = _json_ready(response_payload)
         referenced_agents = sorted({item["agent_slug"] for item in recommendations})
 
         ManagerCopilotMessage.objects.create(
             session=session,
             role=ManagerCopilotMessage.Role.USER,
             content=query,
-            detected_intent=context["intent"],
-            context_snapshot=context,
+            detected_intent=context_snapshot["intent"],
+            context_snapshot=context_snapshot,
             referenced_agents=referenced_agents,
         )
         ManagerCopilotMessage.objects.create(
             session=session,
             role=ManagerCopilotMessage.Role.ASSISTANT,
             content=response_payload["summary"],
-            detected_intent=context["intent"],
-            context_snapshot=context,
+            detected_intent=context_snapshot["intent"],
+            context_snapshot=context_snapshot,
             referenced_agents=referenced_agents,
             structured_payload=response_payload,
         )
         session.title = cls._session_title(session, query)
         session.status = ManagerCopilotSession.Status.ACTIVE
-        session.last_intent = context["intent"]
+        session.last_intent = context_snapshot["intent"]
         session.last_query = query
-        session.current_context = context
+        session.current_context = context_snapshot
         session.message_count = session.messages.count()
         session.save(
             update_fields=[
@@ -1007,7 +1027,7 @@ class ManagerCopilotService:
             site=site,
             payload={
                 "request_id": request_id,
-                "intent": context["intent"],
+                "intent": context_snapshot["intent"],
                 "agents_consulted": referenced_agents,
                 "recommendation_count": len(recommendations),
                 "proposal_count": len(proposals),
@@ -1015,7 +1035,7 @@ class ManagerCopilotService:
         )
         return {
             "session": session,
-            "context": context,
+            "context": context_snapshot,
             "response": response_payload,
             "suggestions": cls.get_suggestions(tenant_context=tenant_context, session=session),
             "messages": list(session.messages.order_by("created_at")[:20]),

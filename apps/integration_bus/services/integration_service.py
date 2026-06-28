@@ -107,7 +107,22 @@ class WorkflowService:
 class IntegrationEventService:
     @staticmethod
     def record_event(**validated_data):
-        event = IntegrationEvent.objects.create(**validated_data)
+        event_key = validated_data.get("event_key")
+        if event_key:
+            event, created = IntegrationEvent.objects.get_or_create(
+                event_key=event_key,
+                defaults=validated_data,
+            )
+            if not created:
+                IntegrationLogService.log(
+                    source_module=event.source_module,
+                    event_name=event.event_name,
+                    message=f"Integration event '{event.event_name}' replay ignored.",
+                    payload={"event_id": event.id, "status": event.status, "event_key": event.event_key},
+                )
+                return event
+        else:
+            event = IntegrationEvent.objects.create(**validated_data)
         IntegrationLogService.log(
             source_module=event.source_module,
             event_name=event.event_name,

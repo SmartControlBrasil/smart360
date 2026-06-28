@@ -1,7 +1,9 @@
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core import mail
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework.test import APITestCase
@@ -95,6 +97,19 @@ class AtlasOpportunityReviewApiTests(APITestCase):
         self.assertEqual(opportunity.status, CommercialOpportunity.Status.CONVERTED_TO_LEAD)
         self.assertEqual(Lead.objects.count(), 1)
         self.assertEqual(response.data["lead_public_id"], str(opportunity.lead.public_id))
+
+    def test_conversion_does_not_send_email_automatically(self):
+        opportunity = self._opportunity(status=CommercialOpportunity.Status.APPROVED)
+
+        with patch("django.core.mail.send_mail") as send_mail_mock:
+            response = self.client.post(reverse("ai-agent-commercial-opportunities-convert-to-lead", kwargs={"public_id": opportunity.public_id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(send_mail_mock.call_count, 0)
+        self.assertEqual(len(mail.outbox), 0)
+        opportunity.refresh_from_db()
+        self.assertEqual(opportunity.status, CommercialOpportunity.Status.CONVERTED_TO_LEAD)
+        self.assertEqual(Lead.objects.count(), 1)
 
     def test_converted_opportunity_cannot_convert_twice(self):
         opportunity = self._opportunity(status=CommercialOpportunity.Status.APPROVED)

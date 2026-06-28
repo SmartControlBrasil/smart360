@@ -2,10 +2,42 @@
 **Módulo:** Inteligência Comercial Avançada (PoC - São Paulo & Grande SP)
 **Agente Operacional de IA:** Atlas
 
-**Objetivo:** Captação, qualificação e abordagem automatizada de leads B2B no setor educacional para a linha de robótica Xyron (LIRO / LittleBot).
+**Objetivo:** Captação e qualificação de prospects B2B no setor educacional para revisão humana no Smart360 antes de qualquer conversão comercial.
+
+## Status operacional atual no Smart360
+
+O Atlas opera em duas camadas conectadas, com revisão humana obrigatória:
+
+1. A PoC em `apps/atlas_agent/` coleta, enriquece e pontua prospects públicos.
+2. O cliente `apps/atlas_agent/api_client.py` envia prospects qualificados para `POST /api/v1/ai-agents/atlas/import-prospects/`.
+3. A API cria `CommercialOpportunity` em `READY_FOR_REVIEW`, preservando origem, lote, contatos institucionais e dados de auditoria em `AtlasProspectImportBatch`.
+4. Um humano aprova ou rejeita a oportunidade no Smart360.
+5. Somente oportunidades `APPROVED` podem ser convertidas manualmente para `Lead` no Growth Engine.
+
+Não há criação direta de Lead pela PoC e não há envio automático de e-mail nesta etapa. O cold mail permanece documentado como capacidade experimental desativada, não como rotina de produção.
+
+### Comandos seguros
+
+```bash
+# validação geral
+.venv/bin/python manage.py check
+
+# testes focados Atlas
+.venv/bin/python manage.py test apps.ai_agents_center.tests.test_atlas_importer apps.ai_agents_center.tests.test_atlas_opportunity_review apps.ai_agents_center.tests.test_atlas_standalone_integration apps.ai_agents_center.tests.test_atlas_opportunities
+```
+
+### Variáveis de ambiente da PoC
+
+- `ATLAS_ENV`: mantém dry-run quando diferente de `production`.
+- `ATLAS_API_BASE_URL`: URL do Smart360 interno/local.
+- `ATLAS_API_TOKEN`: token de API; não deve ser commitado.
+- `ATLAS_COMPANY_ID`: empresa alvo da fila de oportunidades.
+- `ATLAS_MIN_SCORE`: score mínimo para enviar à API oficial.
+
+Se `ATLAS_API_TOKEN` ou `ATLAS_COMPANY_ID` estiverem ausentes, a PoC pula a sincronização oficial em modo seguro. O pipeline principal imprime que cold mail está desativado e não instancia envio SMTP.
 
 ## 1. ARQUITETURA DE INFRAESTRUTURA E BLINDAGEM DE DOMÍNIO
-Para garantir que a operação de e-mails em lote não afete a reputação do domínio principal da corporação (`smartcontrolbrasil.com.br`), o Atlas gerencia uma estrutura de isolamento total.
+Caso a capacidade de e-mail seja retomada no futuro, ela deve ficar isolada do domínio principal da corporação (`smartcontrolbrasil.com.br`). Nesta etapa, o domínio dedicado é apenas referência/configuração segura, sem disparo real.
 
 *   **Domínio de Prospecção Dedicado:** `mcautomation.com.br` (Registrado no Registro.br).
 *   **Servidor de E-mail:** Google Workspace (Plano Business Starter).
@@ -34,16 +66,18 @@ O motor de busca do Atlas operará de forma modular, dividindo a coleta e o trat
 *   **Priorização máxima (Score 5)** para escolas com Ensino Fundamental II e Ensino Médio (público-alvo do LittleBot e LIRO).
 
 ## 3. ARMAZENAMENTO E MATRIZ DE LEADS
-Os dados estruturados pelo Atlas são injetados diretamente em tempo real em uma Planilha Matriz de Leads via Webhooks ou integrações de API no Google Sheets.
+Os dados estruturados pela PoC podem ser espelhados em uma Planilha Matriz de Leads para conferência operacional, mas a fila oficial de revisão é a API do Smart360 em `CommercialOpportunity`.
 
 **Estrutura de Atributos do Objeto (Campos):**
 Instituição | Tipo (Pública/Privada) | Cidade | Região | Nome do Decisor | Cargo | E-mail de Contato | Telefone | Status da Abordagem | Lead Scoring | Notas
 
 ## 4. RÉGUA DE ABORDAGEM (COLD MAILING) E LGPD
-O sistema de envios coordenado pelo Atlas utilizará templates de conversão rápida e direta, garantindo conformidade com a LGPD através de gatilhos explícitos de Opt-Out.
+O envio automático de e-mails está desativado no fluxo atual. A PoC pode manter templates e testes em dry-run para avaliação interna, mas produção não deve disparar cold mail nem criar campanhas automaticamente.
 
-*   **Gatilho de Saída (LGPD):** Inclusão obrigatória de tag de remoção voluntária ao final de cada e-mail ("Caso não deseje receber mais comunicações, responda com Descadastrar").
-*   **Modelos de Mensagem:** Mensagens altamente customizadas usando variáveis dinâmicas extraídas pelo raspador (`[Nome do Diretor]`, `[Nome da Escola]`, `[Cidade]`), focando nos desafios pedagógicos da BNCC e nos robôs LIRO e LittleBot como escopos principais de aplicação tecnológica.
+*   **Sem envio automático:** prospects importados viram `CommercialOpportunity`, não mensagem enviada.
+*   **Revisão humana obrigatória:** apenas oportunidades aprovadas podem virar `Lead` no Growth Engine.
+*   **Domínio dedicado:** `mcautomation.com.br` permanece apenas como referência/configuração segura de isolamento; não ativar disparo real nesta etapa.
+*   **LGPD futura:** qualquer retomada de e-mail exigirá opt-out explícito, revisão jurídica/comercial e configuração separada de produção.
 
 ## 5. FLUXO DE GESTÃO DE RESPOSTAS E QUALIFICAÇÃO (PIPELINE COMERCIAL)
 Definição dos estados de transição do lead após a interação com o sistema.

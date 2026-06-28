@@ -48,6 +48,26 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
 
         self.assertEqual(qualified_prospects([low_score, qualified]), [qualified])
 
+
+    def test_poc_payload_targets_review_queue_without_email_fields(self):
+        lead = Lead(
+            institution_name="Escola Sem Envio",
+            city="Sao Paulo",
+            region="Vila Mariana",
+            website_domain="escola-sem-envio.test",
+            contact_email="direcao@escola-sem-envio.test",
+            lead_score=7,
+        )
+
+        row = prospect_to_api_row(lead)
+
+        self.assertEqual(row["company_name"], "Escola Sem Envio")
+        self.assertEqual(row["source"], "google_maps")
+        self.assertIn("Score de qualificacao Atlas PoC: 7/10", row["notes"])
+        self.assertNotIn("lead_status", row)
+        self.assertNotIn("send_email", row)
+        self.assertNotIn("outreach_status", row)
+
     def test_client_posts_prospects_to_official_endpoint(self):
         response = Mock()
         response.json.return_value = {
@@ -88,6 +108,30 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
         self.assertEqual(request.kwargs["json"]["source"], "google_maps")
         self.assertEqual(request.kwargs["json"]["rows"], [prospect_to_api_row(lead)])
         self.assertIn("Score de qualificacao Atlas PoC: 8/10", request.kwargs["json"]["rows"][0]["notes"])
+
+
+    def test_client_preserves_partial_import_errors(self):
+        response = Mock()
+        response.json.return_value = {
+            "public_id": "batch-456",
+            "status": "completed",
+            "created_opportunities": 1,
+            "skipped_duplicates": 0,
+            "errors": [{"row": 2, "company_name": "Escola Com Erro", "error": "Linha invalida"}],
+        }
+        session = Mock()
+        session.post.return_value = response
+        client = AtlasAPIClient(
+            base_url="https://smart360.test/",
+            token="secret-token",
+            company_id=42,
+            session=session,
+        )
+
+        result = client.import_prospects([Lead("Escola Modelo", "Sao Paulo", "Vila Mariana", lead_score=8)])
+
+        self.assertEqual(result.created_opportunities, 1)
+        self.assertEqual(result.errors, [{"row": 2, "company_name": "Escola Com Erro", "error": "Linha invalida"}])
 
     def test_cold_mailer_remains_in_dry_run_by_default(self):
         self.assertTrue(ColdMailer().dry_run)

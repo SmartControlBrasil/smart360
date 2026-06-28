@@ -230,3 +230,47 @@ class AtlasImporterApiTests(APITestCase):
         opportunity = CommercialOpportunity.objects.get(company_name="Escola Modelo")
         self.assertEqual(opportunity.status, CommercialOpportunity.Status.READY_FOR_REVIEW)
         self.assertIsNone(opportunity.lead)
+
+    def test_internal_api_reports_partial_batch_errors(self):
+        payload = {
+            "company": self.company.id,
+            "source": "google_maps",
+            "filename": "api-partial.json",
+            "rows": [
+                {
+                    "company_name": "Escola Valida",
+                    "segment": "Educacao",
+                    "city": "Sao Paulo",
+                    "state": "SP",
+                    "contact_email": "direcao@escola-valida.test",
+                    "notes": "interesse em robotica educacional",
+                },
+                {
+                    "company_name": "Escola Com Erro",
+                    "segment": "Educacao",
+                    "notes": "falha controlada",
+                },
+                {
+                    "segment": "Sem nome",
+                    "city": "Campinas",
+                },
+            ],
+        }
+        original_build = OpportunityBuilderService.build_from_analysis
+
+        def build_side_effect(*, analysis, company, source, **kwargs):
+            if analysis.opportunity.get("company_name") == "Escola Com Erro":
+                raise ValueError("Linha invalida para processamento Atlas.")
+            return original_build(analysis=analysis, company=company, source=source, **kwargs)
+
+        with patch.object(OpportunityBuilderService, "build_from_analysis", side_effect=build_side_effect):
+            response = self.client.post(reverse("ai-agent-atlas-import-prospects"), payload, format="json")
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["status"], AtlasProspectImportBatch.Status.COMPLETED)
+        self.assertEqual(response.data["created_opportunities"], 1)
+        self.assertEqual(response.data["skipped_empty_rows"], 1)
+        self.assertEqual(len(response.data["errors"]), 1)
+        self.assertEqual(response.data["errors"][0]["company_name"], "Escola Com Erro")
+        self.assertEqual(CommercialOpportunity.objects.filter(company_name="Escola Valida").count(), 1)
+        self.assertFalse(CommercialOpportunity.objects.filter(company_name="Escola Com Erro").exists())

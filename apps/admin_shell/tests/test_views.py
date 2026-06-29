@@ -2343,6 +2343,15 @@ class AdminShellViewTests(TestCase):
         self.assertContains(response, "AI Copilot para Gestor")
         self.assertContains(response, "Conversa atual")
 
+    def test_manager_copilot_page_loads_with_querystring(self):
+        response = self.client.get(
+            f"{reverse('admin-shell:ai-manager-copilot')}?source=scheduling&question=Quais+tecnicos+estao+sobrecarregados+amanha"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "AI Copilot para Gestor")
+        self.assertContains(response, "Contexto atual")
+        self.assertContains(response, "Sessoes recentes")
+
     def test_voiceops_center_page_loads(self):
         company = self._create_voiceops_data()
         session = self.client.session

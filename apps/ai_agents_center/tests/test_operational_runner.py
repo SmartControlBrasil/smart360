@@ -2,19 +2,29 @@ from datetime import timedelta
 from io import StringIO
 from unittest.mock import patch
 
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 
 from config.celery import app as celery_app
 
-from apps.ai_agents_center.models import AgentDefinition, AgentRun
+from apps.ai_agents_center.models import (
+    AgentActionProposal,
+    AgentAssetAttentionFlag,
+    AgentDefinition,
+    AgentRecommendation,
+    AgentRun,
+    AgentScheduleHealthFlag,
+)
 from apps.ai_agents_center.services.operational_runner import OperationalAgentRunItem
+from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
 from apps.ai_agents_center.services.registry import AgentRegistryService
 from apps.ai_agents_center.tasks import run_daily_operational_agents
 from apps.admin_shell.services.ai_agents_center import get_operations_health_context
+from apps.ai_decision_engine.models import AgentDecision, DecisionExecution
 from apps.companies.models import Company
-from apps.smart_system.models import Asset, FailureEvent, MaintenanceClient, OperationalSite, ScheduledVisit, ServiceOrder
+from apps.smart_system.models import Asset, AssetCategory, FailureEvent, MaintenanceClient, OperationalSite, ScheduledVisit, ServiceOrder
 
 
 class OperationalAgentsRunnerCommandTests(TestCase):
@@ -76,6 +86,10 @@ class OperationalAgentsRunnerCommandTests(TestCase):
         self.assertEqual(maintenance_mock.call_count, 0)
         self.assertEqual(scheduling_mock.call_count, 0)
         self.assertEqual(AgentRun.objects.count(), 0)
+        self.assertEqual(AgentRecommendation.objects.count(), 0)
+        self.assertEqual(AgentActionProposal.objects.count(), 0)
+        self.assertEqual(AgentAssetAttentionFlag.objects.count(), 0)
+        self.assertEqual(AgentScheduleHealthFlag.objects.count(), 0)
         self.assertIn("PLANNED maintenance-agent", output.getvalue())
         self.assertIn("PLANNED scheduling-agent", output.getvalue())
 
@@ -143,12 +157,88 @@ class OperationalAgentsCeleryTaskTests(TestCase):
         self.assertEqual(payload["results"][0]["agent_slug"], "maintenance-agent")
         self.assertEqual(payload["results"][1]["agent_slug"], "scheduling-agent")
 
+    def test_run_daily_operational_agents_task_reports_unexpected_failure(self):
+        with patch("apps.ai_agents_center.tasks.OperationalAgentsRunner.run_daily", side_effect=RuntimeError("boom")):
+            payload = run_daily_operational_agents()
+
+        self.assertEqual(payload, {"status": "failed", "error": "unexpected_exception"})
+
     def test_operational_agents_beat_schedule_is_registered(self):
         beat_entry = celery_app.conf.beat_schedule["ai-agents-operational-daily-0630"]
 
         self.assertEqual(beat_entry["task"], "ai_agents_center.run_daily_operational_agents")
         self.assertEqual(str(beat_entry["schedule"]._orig_hour), "6")
         self.assertEqual(str(beat_entry["schedule"]._orig_minute), "30")
+
+
+class OperationalProposalApprovalTests(TestCase):
+    def setUp(self):
+        AgentRegistryService.bootstrap_registry()
+        self.user = get_user_model().objects.create_superuser(
+            email="ops-approver@smart360.local",
+            password="StrongPass123",
+        )
+        self.company = Company.objects.create(name="Aprovação Operacional", slug="aprovacao-operacional")
+        self.client_model = MaintenanceClient.objects.create(company=self.company, display_name="Aprovação Operacional")
+        self.site = OperationalSite.objects.create(maintenance_client=self.client_model, name="Unidade Aprovação")
+        self.category = AssetCategory.objects.create(name="Categoria Aprovação", slug="categoria-aprovacao")
+        self.asset = Asset.objects.create(
+            operational_site=self.site,
+            category=self.category,
+            asset_tag="APP-001",
+            name="Compressor Aprovação",
+        )
+        self.run = AgentRun.objects.create(
+            agent=AgentDefinition.objects.get(slug="maintenance-agent"),
+            company=self.company,
+            site=self.site,
+            trigger_type=AgentRun.TriggerType.SCHEDULED,
+            trigger_reference="operational:test",
+            status=AgentRun.Status.COMPLETED,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+
+    def _proposal(self, *, action_type="open_inspection_work_order"):
+        return AgentActionProposal.objects.create(
+            agent_run=self.run,
+            action_type=action_type,
+            target_entity="asset",
+            target_entity_id=str(self.asset.public_id),
+            title="Abrir inspeção operacional",
+            summary="Inspeção aprovada pela fila operacional.",
+            proposed_payload={"asset_public_id": str(self.asset.public_id), "maintenance_type": ServiceOrder.MaintenanceType.INSPECTION},
+            priority="high",
+            approval_required=True,
+        )
+
+    def test_operational_proposal_approval_executes_valid_decision_handler(self):
+        proposal = self._proposal()
+        existing_orders = ServiceOrder.objects.count()
+
+        AgentCoordinatorService.approve_proposal(proposal=proposal, approved_by=self.user, company=self.company)
+
+        proposal.refresh_from_db()
+        decision = proposal.decision
+        self.assertEqual(proposal.status, AgentActionProposal.Status.APPROVED)
+        self.assertEqual(decision.decision_status, AgentDecision.DecisionStatus.EXECUTED)
+        self.assertEqual(ServiceOrder.objects.count(), existing_orders + 1)
+        self.assertTrue(decision.executions.filter(execution_status=DecisionExecution.ExecutionStatus.SUCCEEDED).exists())
+
+    def test_operational_proposal_without_handler_is_approved_without_breaking_queue(self):
+        proposal = self._proposal()
+        existing_orders = ServiceOrder.objects.count()
+
+        with patch("apps.ai_decision_engine.services.handlers.DecisionHandlerRegistry.get_handler", return_value=None):
+            AgentCoordinatorService.approve_proposal(proposal=proposal, approved_by=self.user, company=self.company)
+
+        proposal.refresh_from_db()
+        decision = proposal.decision
+        self.assertEqual(proposal.status, AgentActionProposal.Status.APPROVED)
+        self.assertEqual(decision.decision_status, AgentDecision.DecisionStatus.APPROVED)
+        self.assertIn("no handler registered", decision.decision_reason)
+        self.assertEqual(ServiceOrder.objects.count(), existing_orders)
+        self.assertFalse(decision.executions.exists())
 
 
 class OperationalPilotSeedCommandTests(TestCase):
@@ -203,6 +293,21 @@ class OperationalPilotSeedCommandTests(TestCase):
         self.assertEqual(scheduling_mock.call_count, 0)
         self.assertIn("PLANNED maintenance-agent", output.getvalue())
         self.assertIn("PLANNED scheduling-agent", output.getvalue())
+
+    def test_run_operational_agents_real_execution_after_seed_creates_expected_data(self):
+        call_command("seed_operational_pilot_data", stdout=StringIO())
+        target_date = (timezone.localdate() + timedelta(days=1)).isoformat()
+
+        call_command("run_operational_agents", date=target_date, stdout=StringIO())
+
+        self.assertEqual(AgentRun.objects.filter(status=AgentRun.Status.COMPLETED).count(), 2)
+        self.assertTrue(AgentRecommendation.objects.filter(agent_run__agent__slug="maintenance-agent").exists())
+        self.assertTrue(AgentRecommendation.objects.filter(agent_run__agent__slug="scheduling-agent").exists())
+        self.assertTrue(AgentActionProposal.objects.filter(agent_run__agent__slug__in=["maintenance-agent", "scheduling-agent"]).exists())
+        self.assertTrue(
+            AgentAssetAttentionFlag.objects.filter(agent__slug="maintenance-agent").exists()
+            or AgentScheduleHealthFlag.objects.filter(agent__slug="scheduling-agent").exists()
+        )
 
     def test_seed_operational_pilot_data_reset_removes_only_seed_records(self):
         other_company = Company.objects.create(name="Cliente Real", slug="cliente-real")

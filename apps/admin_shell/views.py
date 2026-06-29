@@ -2213,8 +2213,7 @@ class OperationalReviewProposalApproveView(ShellContextMixin, View):
     enforce_billing_access = False
 
     def post(self, request, proposal_id, *args, **kwargs):
-        from apps.ai_agents_center.services.orchestrator import get_decision_orchestrator
-        from apps.ai_decision_engine.services.approvals import DecisionApprovalService
+        from apps.ai_agents_center.services.orchestrator import AgentCoordinatorService
 
         tenant_context = self.get_tenant_context()
         company = tenant_context.get("active_company") or tenant_context.get("company")
@@ -2224,15 +2223,8 @@ class OperationalReviewProposalApproveView(ShellContextMixin, View):
         if company is not None:
             queryset = queryset.filter(agent_run__company=company)
         proposal = get_object_or_404(queryset, public_id=proposal_id)
-        decision = getattr(proposal, "decision", None)
-        if decision is None:
-            decision = get_decision_orchestrator().receive_action_proposal(proposal=proposal)
-        DecisionApprovalService.approve(decision=decision, approved_by=request.user, comment="Aprovada na fila operacional.", execute=False)
-        proposal.status = AgentActionProposal.Status.APPROVED
-        proposal.approved_by = request.user
-        proposal.approved_at = timezone.now()
-        proposal.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
-        messages.success(request, "Proposta aprovada no fluxo interno de decisão, sem execução operacional automática.")
+        AgentCoordinatorService.approve_proposal(proposal=proposal, approved_by=request.user, company=proposal.agent_run.company)
+        messages.success(request, "Proposta aprovada no fluxo interno de decisão.")
         return redirect(reverse("admin-shell:operations-review"))
 
 

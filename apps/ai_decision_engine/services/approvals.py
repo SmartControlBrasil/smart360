@@ -9,6 +9,7 @@ from apps.ai_shared.interfaces.decision_engine import get_decision_execution_ser
 from apps.ai_decision_engine.models import AgentDecision, DecisionApproval, DecisionExecution
 from apps.ai_simulation_engine.models import SimulationType
 from apps.ai_simulation_engine.services.decision_support import SimulationDecisionSupportService
+from apps.observability_center.services.observability_service import SystemEventService
 
 from .audit import ALLOW, DENY, DecisionAuditService
 
@@ -119,6 +120,38 @@ class DecisionApprovalService:
             },
         )
         if execute:
+            from .handlers import DecisionHandlerRegistry
+
+            if DecisionHandlerRegistry.get_handler(decision.normalized_action_type) is None:
+                decision.decision_reason = (
+                    f"Approved without execution: no handler registered for {decision.normalized_action_type}."
+                )
+                decision.save(update_fields=["decision_reason", "updated_at"])
+                DecisionAuditService.log_event(
+                    decision=decision,
+                    event_type="decision.execution.not_available",
+                    actor_mode="system",
+                    actor_user=approved_by,
+                    message=decision.decision_reason,
+                    metadata={"action_type": decision.action_type, "normalized_action_type": decision.normalized_action_type},
+                )
+                SystemEventService.log_system_event(
+                    event_type="decision.execution.not_available",
+                    source_module="ai_decision_engine",
+                    message=decision.decision_reason,
+                    severity="warning",
+                    entity_type=decision.target_entity or decision.normalized_action_type,
+                    entity_id=decision.target_entity_id or str(decision.public_id),
+                    user=approved_by,
+                    company=decision.company,
+                    site=decision.site,
+                    payload={
+                        "decision_public_id": str(decision.public_id),
+                        "action_type": decision.action_type,
+                        "normalized_action_type": decision.normalized_action_type,
+                    },
+                )
+                return approval
             decision_execution_service = get_decision_execution_service()
             return decision_execution_service.execute(
                 decision=decision,

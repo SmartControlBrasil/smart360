@@ -27,7 +27,7 @@ Esse teste valida que:
 
 - o registry contém `maintenance-agent` e `scheduling-agent`;
 - `run_operational_agents --dry-run` planeja os dois agentes sem executar análise real;
-- nenhum `AgentRun` é criado no dry-run;
+- nenhum `AgentRun`, recomendação, proposta ou flag é criado no dry-run;
 - o contexto de `/app/operations/health/` é montado sem erro;
 - a task `ai_agents_center.run_daily_operational_agents` está registrada no Beat às 06:30.
 
@@ -114,7 +114,31 @@ Para validar o agendamento no código:
 5. Marca recomendações como revisadas quando a triagem operacional estiver concluída.
 6. Acompanha `/app/operations/health/` para visão de saúde, flags e runs recentes.
 
-A Operational Review Queue não executa manutenção real, não envia e-mail e não altera agenda externa. Ela apenas organiza a revisão humana e reaproveita o status interno de recomendações/propostas.
+A Operational Review Queue aprova/rejeita pelo `AgentCoordinatorService`, que encaminha a proposta para o AI Decision Engine. Quando o `action_type` normalizado tem handler válido, a aprovação humana pode materializar uma alteração operacional controlada, como criação de OS, flag de atenção, ajuste de agenda ou registro auditável. Quando não há handler válido, a proposta fica apenas aprovada/rastreável e a ausência de execução é registrada no audit trail/event log. A fila não envia e-mail, não aciona LLM e não altera sistemas externos.
+
+## Action types e execução downstream
+
+Os agentes operacionais geram aliases de `action_type`. O AI Decision Engine normaliza esses aliases antes de decidir se existe execução downstream.
+
+Action types operacionais com execução real quando aprovados e com payload válido:
+
+- `open_inspection_work_order` -> `create_work_order_proposal`: cria uma `ServiceOrder` controlada.
+- `review_preventive_plan` e `reevaluate_preventive_frequency` -> `create_preventive_review_task`: cria OS/tarefa de revisão preventiva.
+- `mark_asset_under_watch` -> `mark_asset_attention`: atualiza `AgentAssetAttentionFlag`.
+- `create_technical_analysis` e `review_checklist_strategy` -> `create_investigation_task`: registra investigação/evento operacional auditável.
+- `reassign_visits_between_technicians`, `block_schedule_for_review`, `move_visit_to_earlier_slot` e `schedule_unassigned_visit` -> `create_schedule_adjustment_proposal`: ajusta visita/agenda controlada.
+- `reorder_route_plan` -> `reorder_route_proposal`: marca `RoutePlan` para revisão com ordem proposta.
+- `suggest_alternative_technician_via_matching` -> `assign_marketplace_candidate_proposal`: tenta alocação via marketplace quando houver solicitação/candidato válidos.
+
+Action types apenas rastreáveis no piloto:
+
+- Qualquer `action_type` sem policy/handler válido no AI Decision Engine. A aprovação não deve quebrar a fila; ela registra status aprovado e evento `decision.execution.not_available`, sem alterar estado operacional.
+- Propostas cujo handler existe, mas o payload não resolve o alvo operacional, podem falhar na execução e ficam auditadas como `decision.execution.failed`; nesse caso houve tentativa real, mas sem materialização.
+
+Diferença prática:
+
+- Proposta apenas rastreável: muda status/auditoria da proposta e da decisão, mas não cria/edita OS, visita, rota, flag ou evento operacional.
+- Proposta que altera estado operacional: passa por policy, aprovação humana e handler do Decision Engine; depois cria ou atualiza o artefato operacional correspondente.
 
 ## Alertas internos do piloto
 
@@ -215,6 +239,20 @@ Um painel vazio não significa falha obrigatória. Conferir nesta ordem:
 6. Abrir `/app/operations/review/` para revisar a fila do dia.
 7. Se a rotina automática já deveria ter rodado, conferir se Beat/worker Celery estão ativos e procurar logs da task `ai_agents_center.run_daily_operational_agents`.
 8. Abrir `/app/operations/health/` novamente e verificar também as telas de Recomendações, Propostas, Runs, Maintenance Health e Scheduling Health.
+
+## Checklist real de produção
+
+Antes de considerar o piloto operacional ativo em produção, confirmar:
+
+- Celery worker ativo e processando a fila onde `ai_agents_center.run_daily_operational_agents` roda.
+- Celery Beat ativo com a entrada `ai-agents-operational-daily-0630`.
+- Smoke manual: `.venv/bin/python manage.py run_operational_agents --dry-run` mostra `PLANNED maintenance-agent` e `PLANNED scheduling-agent` para os sites esperados.
+- Execução manual controlada: `.venv/bin/python manage.py run_operational_agents --site-id <id>` conclui sem `failed`.
+- Health: `/app/operations/health/` abre para o operador e mostra runs/alertas coerentes.
+- Review: `/app/operations/review/` abre para o operador e mostra propostas pendentes quando existirem.
+- Rotina humana diária: após a janela das 06:30, alguém revisa propostas, marca recomendações revisadas e checa alertas internos.
+- Interpretação de aprovação: status `approved` sem execução significa decisão rastreável; status de decisão `executed` e `DecisionExecution.succeeded` indicam alteração operacional real.
+- Logs: falhas da task Celery aparecem como `logger.exception` e payload `status=failed`; falhas de handler aparecem no audit/event log do AI Decision Engine.
 
 ## Dependências para piloto real
 

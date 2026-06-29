@@ -389,8 +389,20 @@ class Command(BaseCommand):
         site_ids = list(
             OperationalSite.objects.filter(maintenance_client__company=company, name=site_name).values_list("id", flat=True)
         )
-        asset_ids = list(Asset.objects.filter(asset_tag__startswith=f"{ASSET_TAG_PREFIX}-").values_list("id", flat=True))
-        service_order_ids = list(ServiceOrder.objects.filter(order_number__startswith=f"{ORDER_PREFIX}-").values_list("id", flat=True))
+        asset_ids = list(
+            Asset.objects.filter(
+                operational_site_id__in=site_ids,
+                asset_tag__startswith=f"{ASSET_TAG_PREFIX}-",
+                metadata__seed_key=SEED_KEY,
+            ).values_list("id", flat=True)
+        )
+        service_order_ids = list(
+            ServiceOrder.objects.filter(
+                operational_site_id__in=site_ids,
+                order_number__startswith=f"{ORDER_PREFIX}-",
+                notes__icontains="seed_key=operational_pilot",
+            ).values_list("id", flat=True)
+        )
 
         ScheduledVisit.objects.filter(company=company, metadata__seed_key=SEED_KEY).delete()
         TechnicianSchedule.objects.filter(company=company, metadata__seed_key=SEED_KEY).delete()

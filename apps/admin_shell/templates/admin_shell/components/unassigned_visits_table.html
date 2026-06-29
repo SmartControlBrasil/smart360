@@ -1,6 +1,7 @@
 <section class="schedule-panel">
     <div class="section-heading">
         <h2>{{ title|default:"Visitas nao alocadas" }}</h2>
+        {% if description %}<p>{{ description }}</p>{% endif %}
     </div>
     <div class="table-shell">
         <table class="data-table">
@@ -26,7 +27,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6">Nenhuma visita pendente de alocacao.</td>
+                        <td colspan="6">{{ empty_message|default:"Nenhuma visita pendente de alocacao." }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

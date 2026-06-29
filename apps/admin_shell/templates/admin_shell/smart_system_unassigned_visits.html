@@ -1,10 +1,7 @@
 {% extends "admin_shell/base.html" %}
 
 {% block shell_content %}
-<section class="page-hero">
-    <h1>{{ page_title }}</h1>
-    <p>{{ page_description }}</p>
+<section class="smart-system-page smart-system-page--scheduling">
+    {% include "admin_shell/components/unassigned_visits_table.html" with rows=unassigned_rows title="Fila pendente de alocacao" description="Visitas aguardando tecnico e prontas para distribuição operacional." empty_message="Nenhuma visita pendente de alocacao para o periodo." %}
 </section>
-
-{% include "admin_shell/components/unassigned_visits_table.html" with rows=unassigned_rows title="Fila pendente de alocacao" %}
 {% endblock %}

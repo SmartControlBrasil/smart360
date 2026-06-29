@@ -1,26 +1,115 @@
 {% extends "admin_shell/base.html" %}
-{% block content %}
-<section class="stat-grid">
-    {% for card in summary_cards %}<article class="stat-card"><span>{{ card.label }}</span><strong>{{ card.value }}</strong></article>{% endfor %}
-</section>
-<section class="content-grid two-column">
-    <div class="table-card">
-        <div class="panel-card"><h2>Conversas recentes</h2><p>Atendimentos públicos iniciados pela Lívia.</p></div>
-        <table class="data-table"><thead><tr><th>Conversa</th><th>Status</th><th>Visitante</th><th>Mensagens</th><th>Atualizada</th></tr></thead><tbody>
-            {% for conversation in recent_conversations %}<tr><td><a href="{% url 'admin-shell:livia-conversation-detail' conversation.id %}">#{{ conversation.id }}</a></td><td>{{ conversation.get_status_display }}</td><td>{{ conversation.visitor_name|default:conversation.session_key }}</td><td>{{ conversation.message_count }}</td><td>{{ conversation.updated_at|date:"d/m/Y H:i" }}</td></tr>{% empty %}<tr><td colspan="5">Nenhuma conversa registrada.</td></tr>{% endfor %}
-        </tbody></table>
-    </div>
-    <div class="table-card">
-        <div class="panel-card"><h2>Handoffs pendentes</h2><p>Casos que pedem contato humano.</p></div>
-        <table class="data-table"><thead><tr><th>Conversa</th><th>Status</th><th>Motivo</th><th>Criado em</th></tr></thead><tbody>
-            {% for handoff in pending_handoffs %}<tr><td><a href="{% url 'admin-shell:livia-conversation-detail' handoff.conversation_id %}">#{{ handoff.conversation_id }}</a></td><td>{{ handoff.get_status_display }}</td><td>{{ handoff.reason|truncatechars:80 }}</td><td>{{ handoff.created_at|date:"d/m/Y H:i" }}</td></tr>{% empty %}<tr><td colspan="4">Nenhum handoff pendente.</td></tr>{% endfor %}
-        </tbody></table>
-    </div>
-</section>
-<section class="table-card">
-    <div class="panel-card"><h2>Leads recentes</h2><p>Últimos dados comerciais capturados.</p></div>
-    <table class="data-table"><thead><tr><th>Nome</th><th>Empresa</th><th>Contato</th><th>Interesse</th><th>Urgência</th><th>Qualificado</th></tr></thead><tbody>
-        {% for lead in recent_leads %}<tr><td>{{ lead.name|default:"-" }}</td><td>{{ lead.company|default:"-" }}</td><td>{{ lead.phone|default:lead.email|default:"-" }}</td><td>{{ lead.service_interest|default:"-" }}</td><td>{{ lead.get_urgency_display }}</td><td>{{ lead.is_qualified|yesno:"Sim,Não" }}</td></tr>{% empty %}<tr><td colspan="6">Nenhum lead capturado.</td></tr>{% endfor %}
-    </tbody></table>
-</section>
+
+{% block shell_content %}
+<div class="page-shell livia-dashboard-page">
+    <section class="smart-kpi-grid smart-kpi-grid--compact">
+        {% for card in summary_cards %}
+        <article class="stat-card">
+            <span class="stat-card-label">{{ card.label }}</span>
+            <strong>{{ card.value }}</strong>
+        </article>
+        {% endfor %}
+    </section>
+
+    <section class="livia-section-stack">
+        <div class="livia-section table-card livia-table-card">
+            <div class="section-header">
+                <h2>Conversas recentes</h2>
+                <p class="muted-block">Atendimentos públicos iniciados pela Lívia.</p>
+            </div>
+            <div class="table-wrapper livia-table-wrapper">
+                <table class="table-smart livia-table livia-table--wide livia-dashboard-conversations-table">
+                    <thead>
+                        <tr>
+                            <th class="livia-col-id">Conversa</th>
+                            <th class="livia-col-status">Status</th>
+                            <th class="livia-col-person">Visitante</th>
+                            <th class="livia-col-count">Mensagens</th>
+                            <th class="livia-col-date">Atualizada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conversation in recent_conversations %}
+                        <tr>
+                            <td class="livia-nowrap"><a href="{% url 'admin-shell:livia-conversation-detail' conversation.id %}">#{{ conversation.id }}</a></td>
+                            <td class="livia-nowrap">{{ conversation.get_status_display }}</td>
+                            <td class="livia-text-cell">{{ conversation.visitor_name|default:conversation.session_key }}</td>
+                            <td class="livia-count-cell">{{ conversation.message_count }}</td>
+                            <td class="livia-date-cell">{{ conversation.updated_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">Nenhuma conversa registrada.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="livia-section table-card livia-table-card">
+            <div class="section-header">
+                <h2>Handoffs pendentes</h2>
+                <p class="muted-block">Casos que pedem contato humano.</p>
+            </div>
+            <div class="table-wrapper livia-table-wrapper">
+                <table class="table-smart livia-table livia-handoffs-table">
+                    <thead>
+                        <tr>
+                            <th class="livia-col-id">Conversa</th>
+                            <th class="livia-col-status">Status</th>
+                            <th class="livia-col-message">Motivo</th>
+                            <th class="livia-col-date">Criado em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for handoff in pending_handoffs %}
+                        <tr>
+                            <td class="livia-nowrap"><a href="{% url 'admin-shell:livia-conversation-detail' handoff.conversation_id %}">#{{ handoff.conversation_id }}</a></td>
+                            <td class="livia-nowrap">{{ handoff.get_status_display }}</td>
+                            <td class="livia-message-cell">{{ handoff.reason|truncatechars:120 }}</td>
+                            <td class="livia-date-cell">{{ handoff.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">Nenhum handoff pendente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="livia-section table-card livia-table-card">
+        <div class="section-header">
+            <h2>Leads recentes</h2>
+            <p class="muted-block">Últimos dados comerciais capturados.</p>
+        </div>
+        <div class="table-wrapper livia-table-wrapper">
+            <table class="table-smart livia-table livia-table--wide livia-leads-table">
+                <thead>
+                    <tr>
+                        <th class="livia-col-person">Nome</th>
+                        <th class="livia-col-company">Empresa</th>
+                        <th class="livia-col-contact">Contato</th>
+                        <th class="livia-col-message">Interesse</th>
+                        <th class="livia-col-status">Urgência</th>
+                        <th class="livia-col-status">Qualificado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lead in recent_leads %}
+                    <tr>
+                        <td class="livia-text-cell">{{ lead.name|default:"-" }}</td>
+                        <td class="livia-text-cell">{{ lead.company|default:"-" }}</td>
+                        <td class="livia-text-cell">{{ lead.phone|default:lead.email|default:"-" }}</td>
+                        <td class="livia-message-cell">{{ lead.service_interest|default:"-" }}</td>
+                        <td class="livia-nowrap">{{ lead.get_urgency_display }}</td>
+                        <td class="livia-nowrap">{{ lead.is_qualified|yesno:"Sim,Não" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">Nenhum lead capturado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
 {% endblock %}

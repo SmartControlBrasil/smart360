@@ -1,6 +1,7 @@
 <section class="schedule-panel">
     <div class="section-heading">
         <h2>{{ title|default:"Sequencia da rota" }}</h2>
+        {% if description %}<p>{{ description }}</p>{% endif %}
     </div>
     <div class="route-sequence-list">
         {% for visit in visits %}
@@ -21,7 +22,7 @@
                 </div>
             </article>
         {% empty %}
-            <p class="empty-state">Nenhuma visita programada nesta agenda.</p>
+            <p class="empty-state">{{ empty_message|default:"Nenhuma visita programada nesta agenda." }}</p>
         {% endfor %}
     </div>
 </section>

@@ -38,6 +38,27 @@ class LiviaDashboardTests(TestCase):
             is_qualified=True,
         )
 
+
+    def test_livia_dashboard_loads_with_responsive_tables(self):
+        response = self.client.get(reverse("admin-shell:livia-dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "admin_shell/livia_dashboard.html")
+        self.assertContains(response, "Lívia Assistente")
+        self.assertContains(response, "Conversas recentes")
+        self.assertContains(response, "livia-table-wrapper")
+        self.assertContains(response, "livia-dashboard-conversations-table")
+
+    def test_livia_conversation_list_loads_with_responsive_table(self):
+        response = self.client.get(reverse("admin-shell:livia-conversations"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "admin_shell/livia_conversations.html")
+        self.assertContains(response, "Conversas")
+        self.assertContains(response, "Cliente Teste")
+        self.assertContains(response, "livia-table-wrapper")
+        self.assertContains(response, "livia-conversations-table")
+
     def test_dashboard_leads_responds_for_admin_user(self):
         response = self.client.get(reverse("admin-shell:livia-leads"))
 

@@ -278,6 +278,11 @@ urlpatterns = [
     path("field/sync/", TechnicianSyncCenterView.as_view(), name="technician-app-sync"),
     path("field/profile/", TechnicianProfileView.as_view(), name="technician-app-profile"),
     path("app/context/scope/", SetActiveContextView.as_view(), name="set-active-context"),
+    path("app/operations/health/", OperationsHealthView.as_view(), name="operations-health"),
+    path("app/operations/review/", OperationalReviewQueueView.as_view(), name="operations-review"),
+    path("app/operations/review/recommendations/<uuid:recommendation_id>/reviewed/", OperationalReviewRecommendationReviewedView.as_view(), name="operations-review-recommendation-reviewed"),
+    path("app/operations/review/proposals/<uuid:proposal_id>/approve/", OperationalReviewProposalApproveView.as_view(), name="operations-review-proposal-approve"),
+    path("app/operations/review/proposals/<uuid:proposal_id>/reject/", OperationalReviewProposalRejectView.as_view(), name="operations-review-proposal-reject"),
     # Client portal legado do Admin Shell: mantido operacional, mas fora de /portal/.
     # /portal/ fica reservado ao Portal do Cliente externo em apps.technical_portal.
     # TODO: migrar rotas de base tecnica search/category para /base-tecnica/.
@@ -440,11 +445,6 @@ urlpatterns = [
         TechnicalProductDetailView.as_view(),
         name="technical-catalog-product-detail",
     ),
-    path("app/operations/health/", OperationsHealthView.as_view(), name="operations-health"),
-    path("app/operations/review/", OperationalReviewQueueView.as_view(), name="operations-review"),
-    path("app/operations/review/recommendations/<uuid:recommendation_id>/reviewed/", OperationalReviewRecommendationReviewedView.as_view(), name="operations-review-recommendation-reviewed"),
-    path("app/operations/review/proposals/<uuid:proposal_id>/approve/", OperationalReviewProposalApproveView.as_view(), name="operations-review-proposal-approve"),
-    path("app/operations/review/proposals/<uuid:proposal_id>/reject/", OperationalReviewProposalRejectView.as_view(), name="operations-review-proposal-reject"),
     path("app/ai-agents/", AIAgentsDashboardView.as_view(), name="ai-agents-dashboard"),
     path("app/ai-agents/briefings/", AIBriefingListView.as_view(), name="ai-briefings"),
     path("app/ai-agents/briefings/generate/", AIBriefingGenerateView.as_view(), name="ai-briefing-generate"),

@@ -45,10 +45,15 @@ class OperationsHealthViewTests(TestCase):
             slug="ai_agents_admin",
             defaults={"name": "ai_agents_admin", "module_name": "ai_agents_center", "description": "AI agents admin"},
         )
-        action, _ = PermissionAction.objects.get_or_create(
+        approve_action, _ = PermissionAction.objects.get_or_create(
             domain=domain,
             action_name="approve",
             defaults={"description": "Approve AI agent proposals"},
+        )
+        view_action, _ = PermissionAction.objects.get_or_create(
+            domain=domain,
+            action_name="view",
+            defaults={"description": "View AI agent operations"},
         )
         for slug, name in [
             ("maintenance-manager", "Maintenance Manager"),
@@ -60,12 +65,13 @@ class OperationsHealthViewTests(TestCase):
                 slug=slug,
                 defaults={"name": name, "description": "Operational pilot approver", "is_system_role": False},
             )
-            RolePermission.objects.get_or_create(
-                role=role,
-                permission_domain=domain,
-                permission_action=action,
-                defaults={"is_allowed": True},
-            )
+            for action in (approve_action, view_action):
+                RolePermission.objects.get_or_create(
+                    role=role,
+                    permission_domain=domain,
+                    permission_action=action,
+                    defaults={"is_allowed": True},
+                )
             UserRoleAssignment.objects.get_or_create(
                 user=self.user,
                 role=role,
@@ -162,6 +168,7 @@ class OperationsHealthViewTests(TestCase):
         }
 
     def test_operations_health_url_resolves_to_view(self):
+        self.assertEqual(reverse("admin-shell:operations-health"), "/app/operations/health/")
         resolved = resolve("/app/operations/health/")
 
         self.assertIs(resolved.func.view_class, OperationsHealthView)
@@ -172,6 +179,7 @@ class OperationsHealthViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin_shell/operations_health.html")
         self.assertContains(response, "Operação Técnica Inteligente")
+        self.assertContains(response, 'href="/app/operations/review/"')
         self.assertContains(response, "Rotina operacional dos agentes")
         self.assertContains(response, "maintenance-agent")
         self.assertContains(response, "scheduling-agent")
@@ -238,9 +246,33 @@ class OperationsHealthViewTests(TestCase):
         self.assertTrue(any(alert["title"] == "Proposta pendente antiga" for alert in response.context["operational_alerts"]))
 
     def test_operations_review_url_resolves_to_view(self):
+        self.assertEqual(reverse("admin-shell:operations-review"), "/app/operations/review/")
         resolved = resolve("/app/operations/review/")
 
         self.assertIs(resolved.func.view_class, OperationalReviewQueueView)
+
+    def test_operations_review_action_urls_resolve_to_public_app_paths(self):
+        data = self.create_agent_data()
+
+        reviewed_url = reverse(
+            "admin-shell:operations-review-recommendation-reviewed",
+            kwargs={"recommendation_id": data["recommendation"].public_id},
+        )
+        approve_url = reverse(
+            "admin-shell:operations-review-proposal-approve",
+            kwargs={"proposal_id": data["proposal"].public_id},
+        )
+        reject_url = reverse(
+            "admin-shell:operations-review-proposal-reject",
+            kwargs={"proposal_id": data["proposal"].public_id},
+        )
+
+        self.assertEqual(reviewed_url, f"/app/operations/review/recommendations/{data['recommendation'].public_id}/reviewed/")
+        self.assertEqual(approve_url, f"/app/operations/review/proposals/{data['proposal'].public_id}/approve/")
+        self.assertEqual(reject_url, f"/app/operations/review/proposals/{data['proposal'].public_id}/reject/")
+        self.assertEqual(resolve(reviewed_url).view_name, "admin-shell:operations-review-recommendation-reviewed")
+        self.assertEqual(resolve(approve_url).view_name, "admin-shell:operations-review-proposal-approve")
+        self.assertEqual(resolve(reject_url).view_name, "admin-shell:operations-review-proposal-reject")
 
     def test_operations_review_page_loads_empty_state(self):
         response = self.client.get(reverse("admin-shell:operations-review"))

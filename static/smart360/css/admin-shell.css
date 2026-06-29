@@ -5109,3 +5109,128 @@ body.sidebar-collapsed .shell-nav-attex .nav-submenu {
 }
 /* === /SMART360 Attex-like sidebar accordion === */
 
+/* Lívia Assistente · tabelas do Admin Shell */
+.livia-dashboard-page,
+.livia-conversations-page {
+    display: grid;
+    gap: var(--space-6);
+    min-width: 0;
+}
+
+.livia-section-stack {
+    display: grid;
+    gap: var(--space-6);
+    min-width: 0;
+}
+
+.livia-section {
+    min-width: 0;
+}
+
+.livia-table-card {
+    min-width: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.livia-table-card .section-header {
+    padding: var(--space-6) var(--space-6) 0;
+    margin-bottom: var(--space-4);
+}
+
+.livia-table-card .section-header h2 {
+    margin: 0 0 var(--space-2);
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+.livia-table-card .section-header p {
+    margin: 0;
+    line-height: 1.55;
+}
+
+.livia-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 var(--space-6) var(--space-6);
+}
+
+.livia-table {
+    width: 100%;
+    min-width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.livia-table--wide {
+    min-width: 1180px;
+}
+
+.livia-conversations-table {
+    min-width: 1220px;
+}
+
+.livia-handoffs-table {
+    min-width: 940px;
+}
+
+.livia-leads-table {
+    min-width: 1180px;
+}
+
+.livia-table th,
+.livia-table td {
+    vertical-align: top;
+    padding: var(--space-3) var(--space-4);
+    line-height: 1.5;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.livia-table thead th {
+    padding-bottom: calc(var(--space-3) + 2px);
+    white-space: nowrap;
+}
+
+.livia-table tbody tr + tr td {
+    border-top: 1px solid color-mix(in srgb, var(--shell-border) 82%, transparent);
+}
+
+.livia-col-id { width: 92px; }
+.livia-col-status { width: 150px; }
+.livia-col-person { width: 210px; }
+.livia-col-company { width: 200px; }
+.livia-col-contact { width: 200px; }
+.livia-col-source { width: 240px; }
+.livia-col-count { width: 110px; }
+.livia-col-date { width: 168px; }
+.livia-col-message { width: auto; min-width: 320px; }
+
+.livia-nowrap,
+.livia-date-cell,
+.livia-count-cell,
+.livia-cell-nowrap {
+    white-space: nowrap;
+}
+
+.livia-date-cell {
+    font-variant-numeric: tabular-nums;
+    color: var(--shell-muted);
+}
+
+.livia-count-cell {
+    text-align: center;
+}
+
+.livia-text-cell,
+.livia-message-cell,
+.livia-cell-long {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+

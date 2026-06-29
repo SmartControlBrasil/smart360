@@ -1,10 +1,7 @@
 {% extends "admin_shell/base.html" %}
 
 {% block shell_content %}
-<section class="page-hero">
-    <h1>{{ page_title }}</h1>
-    <p>{{ page_description }}</p>
+<section class="smart-system-page smart-system-page--scheduling">
+    {% include "admin_shell/components/schedule_calendar.html" %}
 </section>
-
-{% include "admin_shell/components/schedule_calendar.html" %}
 {% endblock %}

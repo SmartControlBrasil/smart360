@@ -1,25 +1,31 @@
 {% extends "admin_shell/base.html" %}
 
 {% block shell_content %}
-<section class="page-hero">
-    <h1>{{ page_title }}</h1>
-    <p>{{ page_description }}</p>
-</section>
+<section class="smart-system-page smart-system-page--scheduling">
+    <div class="dashboard-kpi-grid">
+        {% for item in schedule_kpis %}
+            {% include "admin_shell/components/maintenance_kpi_card.html" with kpi=item %}
+        {% endfor %}
+    </div>
 
-<section class="dashboard-kpi-grid">
-    {% for item in schedule_kpis %}
-        {% include "admin_shell/components/maintenance_kpi_card.html" with item=item %}
-    {% endfor %}
-</section>
+    <section class="schedule-panel">
+        <div class="section-heading">
+            <h2>Carga dos tecnicos</h2>
+            <p>Leitura consolidada da pressao da agenda e da distribuicao por tecnico.</p>
+        </div>
+        {% if technician_load_cards %}
+            <div class="schedule-load-grid">
+                {% for card in technician_load_cards %}
+                    {% include "admin_shell/components/technician_load_card.html" with card=card %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">Nenhum tecnico com carga planejada para o periodo.</p>
+        {% endif %}
+    </section>
 
-<section class="schedule-load-grid">
-    {% for card in technician_load_cards %}
-        {% include "admin_shell/components/technician_load_card.html" %}
-    {% empty %}
-        <p class="empty-state">Nenhuma carga planejada para a data selecionada.</p>
-    {% endfor %}
+    {% include "admin_shell/components/route_sequence_list.html" with visits=today_visits title="Visitas do dia" description="Sequencia sugerida para a operacao de campo no periodo selecionado." empty_message="Nenhuma visita agendada para o periodo." %}
+    {% include "admin_shell/components/route_sequence_list.html" with visits=conflict_visits title="Conflitos da agenda" description="Visitas com sobreposicao, indisponibilidade ou alerta de roteirizacao." empty_message="Nenhum conflito identificado para o periodo." %}
+    {% include "admin_shell/components/unassigned_visits_table.html" with rows=unassigned_visits title="Visitas sem tecnico" description="Fila que ainda precisa de distribuicao para um tecnico disponivel." empty_message="Nenhuma visita sem tecnico para o periodo." %}
 </section>
-
-{% include "admin_shell/components/route_sequence_list.html" with visits=today_visits title="Visitas do dia" %}
-{% include "admin_shell/components/unassigned_visits_table.html" with rows=unassigned_visits %}
 {% endblock %}

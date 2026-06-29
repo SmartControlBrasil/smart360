@@ -948,6 +948,30 @@ class AdminShellViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Agenda &amp; rotas", html=False)
         self.assertContains(response, "Visita agendada")
+        self.assertContains(response, "Visitas hoje")
+        self.assertContains(response, "Nao alocadas")
+        self.assertContains(response, "Conflitos")
+        self.assertContains(response, "Rotas geradas")
+        self.assertContains(response, "OS pendentes")
+        self.assertContains(response, "Sequencia sugerida para a operacao de campo no periodo selecionado.")
+        self.assertNotContains(response, 'class="page-hero"')
+
+    def test_scheduling_dashboard_empty_state_is_explicit(self):
+        empty_company = CompanyFactory(name="Agenda Vazia", slug="agenda-vazia")
+        MembershipFactory(user=self.user, company=empty_company, is_primary=False)
+        assign_smart_system_role(self.user, "planner", company=empty_company)
+        session = self.client.session
+        session["smart_system_active_company_id"] = empty_company.id
+        session.pop("smart_system_active_site_id", None)
+        session.save()
+
+        response = self.client.get(reverse("admin-shell:smart-system-scheduling"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nenhum tecnico com carga planejada para o periodo.")
+        self.assertContains(response, "Nenhuma visita agendada para o periodo.")
+        self.assertContains(response, "Nenhum conflito identificado para o periodo.")
+        self.assertContains(response, "Nenhuma visita sem tecnico para o periodo.")
+        self.assertNotContains(response, 'class="page-hero"')
 
     def test_scheduling_calendar_and_technician_agenda_load(self):
         self._create_schedule_data()

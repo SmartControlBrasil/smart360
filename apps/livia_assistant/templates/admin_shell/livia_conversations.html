@@ -1,7 +1,64 @@
 {% extends "admin_shell/base.html" %}
-{% block content %}
-<section class="panel-card"><form method="get" class="filter-form"><label>Status</label><select name="status"><option value="">Todos</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="quick-action-button" type="submit">Filtrar</button></form></section>
-<section class="table-card"><table class="data-table"><thead><tr><th>ID</th><th>Status</th><th>Visitante</th><th>Empresa</th><th>Origem</th><th>Mensagens</th><th>Atualizada</th></tr></thead><tbody>
-{% for conversation in conversations %}<tr><td><a href="{% url 'admin-shell:livia-conversation-detail' conversation.id %}">#{{ conversation.id }}</a></td><td>{{ conversation.get_status_display }}</td><td>{{ conversation.visitor_name|default:conversation.session_key }}</td><td>{{ conversation.company_name|default:"-" }}</td><td>{{ conversation.source_page|default:"-" }}</td><td>{{ conversation.message_count }}</td><td>{{ conversation.updated_at|date:"d/m/Y H:i" }}</td></tr>{% empty %}<tr><td colspan="7">Nenhuma conversa encontrada.</td></tr>{% endfor %}
-</tbody></table></section>
+
+{% block shell_content %}
+<div class="page-shell livia-conversations-page">
+    <form method="get" class="livia-section table-card livia-filter-card">
+        <div class="section-header">
+            <h2>Filtros</h2>
+            <p class="muted-block">Filtre o histórico por status da conversa.</p>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>Status</span>
+                <select name="status">
+                    <option value="">Todos</option>
+                    {% for value,label in status_choices %}
+                        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="page-actions">
+            <button class="quick-action-button" type="submit">Filtrar</button>
+            <a class="btn-secondary" href="{% url 'admin-shell:livia-conversations' %}">Limpar</a>
+        </div>
+    </form>
+
+    <section class="livia-section table-card livia-table-card">
+        <div class="section-header">
+            <h2>Conversas</h2>
+            <p class="muted-block">Histórico recente de atendimentos públicos e pré-qualificação comercial.</p>
+        </div>
+        <div class="table-wrapper livia-table-wrapper">
+            <table class="table-smart livia-table livia-conversations-table">
+                <thead>
+                    <tr>
+                        <th class="livia-col-id">ID</th>
+                        <th class="livia-col-status">Status</th>
+                        <th class="livia-col-person">Visitante</th>
+                        <th class="livia-col-company">Empresa</th>
+                        <th class="livia-col-source">Origem</th>
+                        <th class="livia-col-count">Mensagens</th>
+                        <th class="livia-col-date">Atualizada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conversation in conversations %}
+                    <tr>
+                        <td class="livia-nowrap"><a href="{% url 'admin-shell:livia-conversation-detail' conversation.id %}">#{{ conversation.id }}</a></td>
+                        <td class="livia-nowrap">{{ conversation.get_status_display }}</td>
+                        <td class="livia-text-cell">{{ conversation.visitor_name|default:conversation.session_key }}</td>
+                        <td class="livia-text-cell">{{ conversation.company_name|default:"-" }}</td>
+                        <td class="livia-message-cell">{{ conversation.source_page|default:"-" }}</td>
+                        <td class="livia-count-cell">{{ conversation.message_count }}</td>
+                        <td class="livia-date-cell">{{ conversation.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7">Nenhuma conversa encontrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
 {% endblock %}

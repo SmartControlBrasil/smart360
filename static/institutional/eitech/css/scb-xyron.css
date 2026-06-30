@@ -265,3 +265,25 @@
     border-bottom: none;
   }
 }
+
+
+
+.xyron-page .xyron-contrast-section,
+.xyron-page .xyron-contrast-section h1,
+.xyron-page .xyron-contrast-section h2,
+.xyron-page .xyron-contrast-section h3,
+.xyron-page .xyron-contrast-section h4,
+.xyron-page .xyron-contrast-section h5,
+.xyron-page .xyron-contrast-section h6,
+.xyron-page .xyron-contrast-section p,
+.xyron-page .xyron-contrast-section li,
+.xyron-page .xyron-contrast-section span,
+.xyron-page .xyron-contrast-section strong,
+.xyron-page .xyron-contrast-section a,
+.xyron-page .xyron-contrast-section div {
+  color: #ffffff !important;
+}
+
+.xyron-page .xyron-contrast-section img {
+  color: initial;
+}

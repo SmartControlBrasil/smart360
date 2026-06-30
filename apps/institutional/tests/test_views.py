@@ -52,6 +52,9 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertTemplateUsed(
             response, "institutional/eitech/pages/xyron-robotics.html"
         )
+        self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
+        self.assertContains(response, 'class="xyron-page"')
+        self.assertContains(response, 'xyron-dark-section')
 
     def test_engenharia_embarcada_canonical_url(self):
         self.assertEqual(

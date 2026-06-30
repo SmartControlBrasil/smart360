@@ -319,3 +319,75 @@ class OperationalPilotSeedCommandTests(TestCase):
         self.assertFalse(Company.objects.filter(slug="empresa-piloto-smart360").exists())
         self.assertFalse(Asset.objects.filter(asset_tag__startswith="OPS-PILOT-").exists())
         self.assertFalse(ServiceOrder.objects.filter(order_number__startswith="OPS-PILOT-OS-").exists())
+
+
+
+class OperationalAgentsRuntimeCheckCommandTests(TestCase):
+    def setUp(self):
+        AgentRegistryService.bootstrap_registry()
+        self.company = Company.objects.create(name="Diagnostico Operacional", slug="diagnostico-operacional")
+        self.client_model = MaintenanceClient.objects.create(company=self.company, display_name="Diagnostico Operacional")
+        self.site = OperationalSite.objects.create(maintenance_client=self.client_model, name="Unidade Diagnostico")
+        self.category = AssetCategory.objects.create(name="Categoria Diagnostico", slug="categoria-diagnostico")
+        self.asset = Asset.objects.create(
+            operational_site=self.site,
+            category=self.category,
+            asset_tag="DIAG-001",
+            name="Ativo Diagnostico",
+        )
+
+    def _run_command(self):
+        output = StringIO()
+        before_counts = {
+            "agent_runs": AgentRun.objects.count(),
+            "action_proposals": AgentActionProposal.objects.count(),
+        }
+
+        call_command("check_operational_agents_runtime", stdout=output)
+
+        after_counts = {
+            "agent_runs": AgentRun.objects.count(),
+            "action_proposals": AgentActionProposal.objects.count(),
+        }
+        self.assertEqual(after_counts, before_counts)
+        return output.getvalue()
+
+    def test_check_operational_agents_runtime_command_runs_without_persisting_and_handles_no_runs(self):
+        output = self._run_command()
+
+        self.assertIn("registry maintenance-agent code=present db=present", output)
+        self.assertIn("registry scheduling-agent code=present db=present", output)
+        self.assertIn("task ai_agents_center.run_daily_operational_agents import=present celery=registered", output)
+        self.assertIn("beat ai-agents-operational-daily-0630 task=ok schedule=present time=06:30", output)
+        self.assertIn("timezone django=America/Sao_Paulo celery=America/Sao_Paulo match=yes", output)
+        self.assertIn("agent_runs none_found", output)
+        self.assertIn("pending_proposals older_than_24h=0", output)
+
+    def test_check_operational_agents_runtime_command_reports_old_pending_proposals(self):
+        agent_run = AgentRun.objects.create(
+            agent=AgentDefinition.objects.get(slug="maintenance-agent"),
+            company=self.company,
+            site=self.site,
+            trigger_type=AgentRun.TriggerType.SCHEDULED,
+            trigger_reference="diagnostic",
+            status=AgentRun.Status.COMPLETED,
+            started_at=timezone.now(),
+            finished_at=timezone.now(),
+        )
+        proposal = AgentActionProposal.objects.create(
+            agent_run=agent_run,
+            action_type="open_inspection_work_order",
+            target_entity="asset",
+            target_entity_id=str(self.asset.public_id),
+            title="Proposta diagnostica",
+            summary="Proposta usada para validar o comando de runtime.",
+            proposed_payload={"asset_public_id": str(self.asset.public_id)},
+            priority="medium",
+            approval_required=True,
+        )
+        AgentActionProposal.objects.filter(pk=proposal.pk).update(created_at=timezone.now() - timedelta(days=2))
+
+        output = self._run_command()
+
+        self.assertIn("agent_runs latest=maintenance-agent", output)
+        self.assertIn("pending_proposals older_than_24h=1", output)

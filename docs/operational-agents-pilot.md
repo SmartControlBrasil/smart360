@@ -244,15 +244,74 @@ Um painel vazio não significa falha obrigatória. Conferir nesta ordem:
 
 Antes de considerar o piloto operacional ativo em produção, confirmar:
 
-- Celery worker ativo e processando a fila onde `ai_agents_center.run_daily_operational_agents` roda.
-- Celery Beat ativo com a entrada `ai-agents-operational-daily-0630`.
-- Smoke manual: `.venv/bin/python manage.py run_operational_agents --dry-run` mostra `PLANNED maintenance-agent` e `PLANNED scheduling-agent` para os sites esperados.
-- Execução manual controlada: `.venv/bin/python manage.py run_operational_agents --site-id <id>` conclui sem `failed`.
-- Health: `/app/operations/health/` abre para o operador e mostra runs/alertas coerentes.
-- Review: `/app/operations/review/` abre para o operador e mostra propostas pendentes quando existirem.
-- Rotina humana diária: após a janela das 06:30, alguém revisa propostas, marca recomendações revisadas e checa alertas internos.
-- Interpretação de aprovação: status `approved` sem execução significa decisão rastreável; status de decisão `executed` e `DecisionExecution.succeeded` indicam alteração operacional real.
-- Logs: falhas da task Celery aparecem como `logger.exception` e payload `status=failed`; falhas de handler aparecem no audit/event log do AI Decision Engine.
+1. O serviço principal está de pé:
+
+```bash
+systemctl status smart360.service
+```
+
+2. Se o deploy expõe units separados, confirmar worker e Beat também.
+
+Exemplos comuns:
+
+```bash
+systemctl status smart360-celery-worker.service
+systemctl status smart360-celery-beat.service
+```
+
+3. Revisar logs do serviço e, quando houver units separadas, acompanhar worker e Beat:
+
+```bash
+journalctl -u smart360.service -f
+journalctl -u smart360-celery-worker.service -f
+journalctl -u smart360-celery-beat.service -f
+```
+
+4. Rodar a checagem geral da aplicação:
+
+```bash
+.venv/bin/python manage.py check
+```
+
+5. Rodar a checagem de runtime operacional, se o command estiver disponível:
+
+```bash
+.venv/bin/python manage.py check_operational_agents_runtime
+```
+
+6. Validar o smoke manual do piloto:
+
+```bash
+.venv/bin/python manage.py run_operational_agents --dry-run
+.venv/bin/python manage.py run_operational_agents
+```
+
+7. Abrir as telas operacionais:
+
+- `/app/operations/health/`
+- `/app/operations/review/`
+
+8. Conferir o fluxo humano diário:
+
+- revisar propostas pendentes na Review Queue;
+- aprovar ou rejeitar apenas o que tiver contexto claro;
+- tratar propostas aprovadas como decisão rastreável, e não como garantia de execução real;
+- confirmar na Health se houve `AgentRun`, flags ou recomendações esperadas depois da janela das 06:30.
+
+9. Interpretar o tipo de problema pela evidência disponível:
+
+- Problema de aplicação Django: `manage.py check` falha, views/commands falham localmente ou o command de runtime acusa registry/config ausentes.
+- Problema de worker Celery: o Django responde, mas não aparecem execuções reais após a janela agendada e os logs do worker não mostram a task.
+- Problema de Beat/agendamento: a task existe e o worker está saudável, mas o Beat não agenda `ai_agents_center.run_daily_operational_agents` às 06:30 ou a entrada não aparece na configuração.
+- Problema de dados vazios: o command de runtime mostra registry e Beat OK, mas não há `AgentRun` recentes nem propostas pendentes; nesse caso o ambiente está pronto, só falta massa operacional.
+
+10. Interpretar a aprovação humana:
+
+- status `approved` sem execução significa decisão rastreável;
+- status `executed` com decisão e `DecisionExecution.succeeded` indicam alteração operacional real;
+- quando o handler não existe, a aprovação segue sem quebrar a fila e o evento fica registrado como ausência de execução downstream.
+
+11. Se a janela automática já deveria ter rodado, procurar primeiro o log da task `ai_agents_center.run_daily_operational_agents` e depois revisar se Beat e worker estão ativos.
 
 ## Dependências para piloto real
 

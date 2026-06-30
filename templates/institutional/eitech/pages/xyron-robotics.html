@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
 {% endblock %}
 
+{% block body_extra %} class="xyron-page"{% endblock %}
+
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
   <div class="hero3-section-area scb-xyron-hero-bg">
@@ -97,7 +99,7 @@
   <!--===== HERO AREA ENDS =======-->
 
   <!--===== ABOUT AREA STARTS =======-->
-  <div class="about3-section-area sp1">
+  <div class="about3-section-area sp1 xyron-dark-section">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6">
@@ -225,53 +227,108 @@
   <!--===== PARA QUEM END =======-->
 
   <!--===== DORES XYRON =======-->
-  <div class="others3-section-area sp1">
+  <div class="others3-section-area sp1 xyron-contrast-section">
     <img src="{% static 'institutional/eitech/img/elements/elements29.png' %}" alt="" aria-hidden="true" class="elements29">
+  
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6">
           <div class="others-heading heading4">
-            <h5 data-aos="fade-left" data-aos-duration="700"><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="" aria-hidden="true">Dores reais da operação</h5>
+            <h5 data-aos="fade-left" data-aos-duration="700">
+              <img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="" aria-hidden="true">
+              Dores reais da operação
+            </h5>
+  
             <div class="space20"></div>
+  
             <h2 class="text-anime-style-3">Desafios que a robótica inteligente ajuda a resolver</h2>
+  
             <div class="space18"></div>
-            <p data-aos="fade-left" data-aos-duration="800">Robôs, sensores, câmeras e software trabalham juntos para ampliar presença, gerar alertas e apoiar equipes com informação em tempo real.</p>
+  
+            <p data-aos="fade-left" data-aos-duration="800">
+              Robôs, sensores, câmeras e software trabalham juntos para ampliar presença, gerar alertas e apoiar equipes com informação em tempo real.
+            </p>
           </div>
+  
           <div class="space28"></div>
+  
           <div class="row heading5">
             <div class="col-md-6" data-aos="fade-left" data-aos-duration="850">
               <ul class="list-unstyled">
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Segurança reativa e dependente só de pessoas</li>
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Falta de monitoramento contínuo</li>
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Controle de acesso manual e vulnerável</li>
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Baixa inovação na recepção e atendimento</li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Segurança reativa e dependente só de pessoas
+                </li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Falta de monitoramento contínuo
+                </li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Controle de acesso manual e vulnerável
+                </li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Baixa inovação na recepção e atendimento
+                </li>
               </ul>
             </div>
+  
             <div class="col-md-6" data-aos="fade-left" data-aos-duration="920">
               <ul class="list-unstyled">
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Falta de recursos interativos em escolas</li>
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Áreas de risco expondo pessoas</li>
-                <li class="mb-3"><img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true"> Dados e alertas espalhados em sistemas isolados</li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Falta de recursos interativos em escolas
+                </li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Áreas de risco expondo pessoas
+                </li>
+                <li class="mb-3">
+                  <img src="{% static 'institutional/eitech/img/icons/check3.svg' %}" alt="" aria-hidden="true">
+                  Dados e alertas espalhados em sistemas isolados
+                </li>
               </ul>
             </div>
           </div>
+  
           <div class="space28"></div>
+  
           <div class="btn-area1" data-aos="fade-left" data-aos-duration="1000">
-            <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            <a href="{% url 'institutional:contact' %}" class="vl-btn4">
+              Solicitar diagnóstico <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
           </div>
         </div>
+  
         <div class="col-lg-1"></div>
+  
         <div class="col-lg-5 mt-5 mt-lg-0">
-          <div class="about-header-area heading5">
-            <h3>Tecnologia aplicada com propósito</h3>
-            <div class="space14"></div>
-            <p>Os robôs ampliam a capacidade das equipes, apoiando tarefas repetitivas, presença contínua, interação e atuação em locais de maior risco.</p>
-            <div class="space16"></div>
-            <p>Por isso, cada projeto começa pelo ambiente e pelo objetivo da operação, com escolha adequada da solução, integração e treinamento.</p>
+          <div class="xyron-purpose-image">
+            <img
+              loading="lazy"
+              class="img-fluid"
+              src="{% static 'institutional/eitech/img/all-images/blog/linha-completa-robot.png' %}"
+              alt="Linha completa de robôs Xyron | Smart Control Brasil"
+            >
           </div>
+  
           <div class="space28"></div>
-          <div class="img1 image-anime">
-            <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/blog/linha-completa-robot.png' %}" alt="Linha Completa Robot | Smart Control Brasil">
+  
+          <div class="about-header-area heading5 xyron-purpose-text">
+            <h3>Tecnologia aplicada com propósito</h3>
+  
+            <div class="space14"></div>
+  
+            <p>
+              Os robôs ampliam a capacidade das equipes, apoiando tarefas repetitivas, presença contínua, interação e atuação em locais de maior risco.
+            </p>
+  
+            <div class="space16"></div>
+  
+            <p>
+              Por isso, cada projeto começa pelo ambiente e pelo objetivo da operação, com escolha adequada da solução, integração e treinamento.
+            </p>
           </div>
         </div>
       </div>

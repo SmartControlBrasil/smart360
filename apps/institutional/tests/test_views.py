@@ -29,6 +29,7 @@ class InstitutionalRoutesTests(SimpleTestCase):
             "institutional:service_automacao_industrial_clps",
             "institutional:service_robotica_integracao",
             "institutional:parceiro_xyron_robotics",
+            "institutional:xyron_robotics",
             "institutional:xyron_liro_littlebot",
             "institutional:seguranca_da_informacao",
             "institutional:sites_sistemas_marketing",
@@ -58,6 +59,16 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
         self.assertContains(response, 'class="xyron-page"')
         self.assertContains(response, 'xyron-dark-section')
+        self.assertContains(response, "Linha Xyron Robotics")
+        self.assertNotContains(response, "Ficha técnica e recursos")
+        self.assertNotContains(response, "Capacidade da bateria")
+
+    def test_xyron_robotics_solutions_url_renders_vitrine(self):
+        response = self.client.get(reverse("institutional:xyron_robotics"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "institutional/eitech/pages/xyron-robotics.html")
+        self.assertContains(response, "Linha Xyron Robotics")
 
     def test_xyron_robotics_page_links_to_all_robot_details(self):
         response = self.client.get(reverse("institutional:parceiro_xyron_robotics"))
@@ -85,6 +96,9 @@ class InstitutionalRoutesTests(SimpleTestCase):
                 self.assertContains(response, robot["name"])
                 self.assertContains(response, "Robôs Xyron")
                 self.assertContains(response, "Ver mais robôs Xyron")
+                self.assertContains(response, "Funções principais")
+                self.assertContains(response, "Ficha técnica e recursos")
+                self.assertContains(response, "Cuidados comerciais")
                 self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
                 self.assertNotContains(response, "hero3-section-area")
 
@@ -123,6 +137,7 @@ class InstitutionalRoutesTests(SimpleTestCase):
             ("patrol-orbit", "não é substituir completamente equipes de segurança"),
             ("waiterbot", "não deve ser tratado como substituto completo de garçons"),
             ("carebot", "não realiza promessa médica"),
+            ("mowerbot", "corte de grama"),
         ]
 
         for slug, text in checks:

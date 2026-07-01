@@ -90,6 +90,11 @@ urlpatterns = [
         name="parceiro_xyron_robotics",
     ),
     path(
+        "solucoes/xyron-robotics/",
+        views.parceiro_xyron_robotics,
+        name="xyron_robotics",
+    ),
+    path(
         "solucoes/xyron-robotics/liro-littlebot/",
         views.xyron_liro_littlebot,
         name="xyron_liro_littlebot",

@@ -95,7 +95,36 @@
               <div class="space20"></div>
               <p>{{ paragraph }}</p>
             {% endfor %}
-            <div class="space14"></div>
+            <div class="space32"></div>
+            <h3>Funções principais</h3>
+            <div class="space20"></div>
+            <div class="row">
+              {% for function in robot.functions %}
+                <div class="col-lg-6 col-md-6">
+                  <ul class="list">
+                    <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">{{ function }}</li>
+                  </ul>
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="space32"></div>
+            <h3>Ficha técnica e recursos</h3>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                {% for label, value in robot.technical_specs %}
+                  <li class="xyron-product-specs__item">
+                    <span class="xyron-product-specs__label">{{ label }}</span>
+                    <span class="xyron-product-specs__value">{{ value }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h3>Aplicações e benefícios</h3>
+            <div class="space20"></div>
             <div class="row">
               {% for column in benefit_columns %}
                 <div class="col-lg-6 col-md-6">
@@ -105,6 +134,12 @@
                     {% endfor %}
                   </ul>
                 </div>
+              {% endfor %}
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              {% for item in robot.ideal_for %}
+                <span class="xyron-product-tags__tag">{{ item }}</span>
               {% endfor %}
             </div>
             <div class="space32"></div>
@@ -124,6 +159,13 @@
                 </div>
               {% endfor %}
             </div>
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>{{ robot.commercial_notes }}</p>
+            </div>
+
             <div class="space32"></div>
             <h3>{{ robot.approach_title }}</h3>
             <div class="space20"></div>

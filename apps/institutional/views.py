@@ -9,7 +9,7 @@ from django.core.validators import validate_email
 from django.http import Http404
 from django.shortcuts import redirect, render
 
-from .xyron_robots import get_featured_xyron_robots, get_other_xyron_robots, get_xyron_robot
+from .xyron_robots import XYRON_ROBOTS, get_featured_xyron_robots, get_other_xyron_robots, get_xyron_robot
 
 
 logger = logging.getLogger(__name__)
@@ -239,7 +239,11 @@ def team(request):
 
 
 def parceiro_xyron_robotics(request):
-    return render(request, "institutional/eitech/pages/xyron-robotics.html")
+    return render(
+        request,
+        "institutional/eitech/pages/xyron-robotics.html",
+        {"xyron_robots": XYRON_ROBOTS},
+    )
 
 
 def _render_xyron_robot_detail(request, slug):

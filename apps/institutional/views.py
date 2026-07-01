@@ -6,7 +6,10 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.core.validators import validate_email
+from django.http import Http404
 from django.shortcuts import redirect, render
+
+from .xyron_robots import get_other_xyron_robots, get_xyron_robot
 
 
 logger = logging.getLogger(__name__)
@@ -237,6 +240,31 @@ def team(request):
 
 def parceiro_xyron_robotics(request):
     return render(request, "institutional/eitech/pages/xyron-robotics.html")
+
+
+def _render_xyron_robot_detail(request, slug):
+    robot = get_xyron_robot(slug)
+    if robot is None:
+        raise Http404("Robô Xyron não encontrado")
+
+    sidebar_robots = get_other_xyron_robots(slug)
+    benefits = robot.get("benefits", [])
+    split_at = (len(benefits) + 1) // 2
+    context = {
+        "robot": robot,
+        "sidebar_robots": sidebar_robots,
+        "related_robots": sidebar_robots[:3],
+        "benefit_columns": [benefits[:split_at], benefits[split_at:]],
+    }
+    return render(request, "institutional/eitech/pages/xyron-liro-littlebot.html", context)
+
+
+def xyron_robot_detail(request, slug):
+    return _render_xyron_robot_detail(request, slug)
+
+
+def xyron_liro_littlebot(request):
+    return _render_xyron_robot_detail(request, "liro-littlebot")
 
 
 def projects(request):

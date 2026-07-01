@@ -287,3 +287,363 @@
 .xyron-page .xyron-contrast-section img {
   color: initial;
 }
+
+/* LIRO / LittleBot service detail refinements */
+.xyron-detail-page .inner-page-hero-area {
+  min-height: 360px;
+}
+
+.xyron-detail-page .inner-header h1 {
+  letter-spacing: 0;
+}
+
+.xyron-detail-page .inner-header a,
+.xyron-detail-page .inner-header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xyron-detail-page .xyron-service-detail {
+  background: #ffffff;
+}
+
+.xyron-detail-page .service-widget-sidebar {
+  background: linear-gradient(180deg, #f5f2ff 0%, #eef2ff 100%);
+  border: 1px solid rgba(88, 56, 168, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgba(26, 16, 51, 0.08);
+  padding: 18px;
+}
+
+.xyron-detail-page .service-widget-sidebar h3 {
+  color: #160f2f;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.xyron-detail-page .service-widget-sidebar .search-area,
+.xyron-detail-page .service-widget-sidebar .category-list-area,
+.xyron-detail-page .service-widget-sidebar .tags-area,
+.xyron-detail-page .service-widget-sidebar .contact-boxarea {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(88, 56, 168, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(26, 16, 51, 0.04);
+  padding: 22px;
+}
+
+.xyron-detail-page .service-widget-sidebar .search-area form input {
+  border: 1px solid rgba(88, 56, 168, 0.08);
+  border-radius: 10px;
+  padding: 17px 46px 17px 16px;
+}
+
+.xyron-detail-page .service-widget-sidebar .search-area form button {
+  align-items: center;
+  background: #6d4bfb;
+  border-radius: 9px;
+  color: #ffffff;
+  display: inline-flex;
+  height: 38px;
+  justify-content: center;
+  right: 7px;
+  top: 7px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  width: 38px;
+}
+
+.xyron-detail-page .service-widget-sidebar .search-area form button:hover,
+.xyron-detail-page .service-widget-sidebar .search-area form button:focus-visible {
+  background: #5838a8;
+  transform: translateY(-1px);
+}
+
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li {
+  margin-top: 12px;
+}
+
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a {
+  border: 1px solid rgba(88, 56, 168, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(26, 16, 51, 0.04);
+  min-height: 58px;
+  padding: 17px 18px;
+  transform: translateY(0);
+}
+
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a span {
+  align-items: center;
+  background: rgba(109, 75, 251, 0.1);
+  border-radius: 50%;
+  color: #6d4bfb;
+  display: inline-flex;
+  flex: 0 0 30px;
+  height: 30px;
+  justify-content: center;
+  margin-left: 14px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  width: 30px;
+}
+
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a:hover,
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a:focus-visible,
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a.is-active {
+  background: #6d4bfb;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a:hover span,
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a:focus-visible span,
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a.is-active span {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.xyron-detail-page .service-widget-sidebar .category-list-area ul li a::after,
+.xyron-detail-page .service-widget-sidebar .tags-area ul li a::after {
+  display: none;
+}
+
+.xyron-detail-page .service-widget-sidebar .tags-area ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.xyron-detail-page .service-widget-sidebar .tags-area ul li a {
+  border: 1px solid rgba(88, 56, 168, 0.08);
+  border-radius: 999px;
+  font-size: 14px;
+  line-height: 1;
+  margin: 0;
+  padding: 10px 13px;
+}
+
+.xyron-detail-page .service-widget-sidebar .tags-area ul li a:hover,
+.xyron-detail-page .service-widget-sidebar .tags-area ul li a:focus-visible {
+  background: #6d4bfb;
+  color: #ffffff;
+}
+
+.xyron-detail-page .service-widget-sidebar .contact-boxarea p {
+  color: #4d5870;
+  font-size: 16px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.xyron-detail-page .service-widget-sidebar .contact-boxarea .vl-btn2 {
+  border-radius: 10px;
+  display: inline-flex;
+  justify-content: center;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.xyron-detail-page .service2-widget-sidebar {
+  padding-left: 44px;
+}
+
+.xyron-detail-page .service2-widget-sidebar > .img1:first-child img,
+.xyron-detail-page .service2-widget-sidebar .row .img1 img {
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(26, 16, 51, 0.08);
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.xyron-detail-page .service2-widget-sidebar > .img1:first-child img {
+  max-height: 430px;
+}
+
+.xyron-detail-page .service2-widget-sidebar h3 {
+  color: #160f2f;
+  font-size: 31px;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.xyron-detail-page .service2-widget-sidebar p {
+  color: #4d5870;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.xyron-detail-page .service2-widget-sidebar .list {
+  margin: 0;
+}
+
+.xyron-detail-page .service2-widget-sidebar .list li {
+  align-items: flex-start;
+  background: #f6f4ff;
+  border: 1px solid rgba(88, 56, 168, 0.08);
+  border-radius: 12px;
+  display: flex;
+  gap: 10px;
+  line-height: 1.45;
+  margin-top: 14px;
+  min-height: 58px;
+  padding: 14px 16px;
+}
+
+.xyron-detail-page .service2-widget-sidebar .list li img {
+  flex: 0 0 20px;
+  margin: 1px 0 0;
+}
+
+.xyron-detail-page .service2-widget-sidebar .pera-box {
+  border: 1px solid rgba(88, 56, 168, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(26, 16, 51, 0.08);
+  padding: 26px 28px 26px 34px;
+}
+
+.xyron-detail-page .service2-widget-sidebar .pera-box::after {
+  border-radius: 14px 0 0 14px;
+  width: 7px;
+}
+
+.xyron-detail-page .service2-widget-sidebar .pera-box h4 {
+  color: #160f2f;
+  line-height: 1.25;
+}
+
+.xyron-detail-page .faq-widget-area .accordion .space24 {
+  height: 14px;
+}
+
+.xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item {
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(26, 16, 51, 0.07);
+  overflow: hidden;
+}
+
+.xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item button {
+  border-radius: 14px;
+  font-size: 19px;
+  line-height: 1.35;
+  padding: 22px 62px 22px 22px;
+  text-transform: none;
+}
+
+.xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item button::before {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item button.accordion-button:not(.collapsed) {
+  border-radius: 14px 14px 0 0;
+  padding: 22px 62px 18px 22px;
+}
+
+.xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item .accordion-body p {
+  line-height: 1.7;
+  padding: 0 24px 24px;
+}
+
+.xyron-detail-page .xyron-related-robots .service1-boxarea {
+  border: 1px solid rgba(88, 56, 168, 0.08);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 26px;
+}
+
+.xyron-detail-page .xyron-related-robots .service1-boxarea > a {
+  line-height: 1.3;
+}
+
+.xyron-detail-page .xyron-related-robots .service1-boxarea p {
+  flex: 1;
+  line-height: 1.65;
+}
+
+.xyron-detail-page .xyron-related-robots .service1-boxarea:hover,
+.xyron-detail-page .xyron-related-robots .service1-boxarea:focus-within {
+  transform: translateY(-4px);
+}
+
+@media (max-width: 991px) {
+  .xyron-detail-page .service-widget-sidebar {
+    margin-bottom: 34px;
+    position: static;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar {
+    margin-top: 0;
+    padding-left: 0;
+  }
+
+  .xyron-detail-page .xyron-related-robots .service1-boxarea {
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .xyron-detail-page .inner-page-hero-area {
+    min-height: 300px;
+  }
+
+  .xyron-detail-page .inner-header a,
+  .xyron-detail-page .inner-header span {
+    gap: 6px;
+  }
+
+  .xyron-detail-page .service-widget-sidebar {
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .xyron-detail-page .service-widget-sidebar .search-area,
+  .xyron-detail-page .service-widget-sidebar .category-list-area,
+  .xyron-detail-page .service-widget-sidebar .tags-area,
+  .xyron-detail-page .service-widget-sidebar .contact-boxarea {
+    padding: 18px;
+  }
+
+  .xyron-detail-page .service-widget-sidebar .category-list-area ul li a {
+    font-size: 16px;
+    line-height: 1.25;
+    min-height: 54px;
+    padding: 15px 14px;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar h3 {
+    font-size: 27px;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar p {
+    font-size: 16px;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar .list li {
+    font-size: 16px;
+    min-height: auto;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar .pera-box {
+    padding: 22px 20px 22px 28px;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item button {
+    font-size: 17px;
+    line-height: 1.4;
+    padding: 20px 58px 20px 18px;
+  }
+
+  .xyron-detail-page .service2-widget-sidebar .faq-widget-area .accordion .accordion-item button.accordion-button:not(.collapsed) {
+    padding: 20px 58px 16px 18px;
+  }
+
+  .xyron-detail-page .xyron-related-robots .service1-boxarea {
+    padding: 22px;
+  }
+}

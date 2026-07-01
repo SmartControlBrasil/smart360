@@ -3,6 +3,8 @@ from django.core import mail
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
+from apps.institutional.xyron_robots import XYRON_ROBOTS
+
 TEST_MIDDLEWARE = [
     mw
     for mw in settings.MIDDLEWARE
@@ -27,6 +29,7 @@ class InstitutionalRoutesTests(SimpleTestCase):
             "institutional:service_automacao_industrial_clps",
             "institutional:service_robotica_integracao",
             "institutional:parceiro_xyron_robotics",
+            "institutional:xyron_liro_littlebot",
             "institutional:seguranca_da_informacao",
             "institutional:sites_sistemas_marketing",
         ]
@@ -55,6 +58,79 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
         self.assertContains(response, 'class="xyron-page"')
         self.assertContains(response, 'xyron-dark-section')
+
+    def test_xyron_robotics_page_links_to_all_robot_details(self):
+        response = self.client.get(reverse("institutional:parceiro_xyron_robotics"))
+
+        self.assertEqual(response.status_code, 200)
+        for robot in XYRON_ROBOTS:
+            with self.subTest(robot=robot["slug"]):
+                self.assertContains(
+                    response,
+                    reverse("institutional:xyron_robot_detail", args=[robot["slug"]]),
+                )
+        self.assertContains(response, "MowerBot")
+
+    def test_all_xyron_robot_detail_pages_render(self):
+        for robot in XYRON_ROBOTS:
+            with self.subTest(robot=robot["slug"]):
+                response = self.client.get(
+                    reverse("institutional:xyron_robot_detail", args=[robot["slug"]])
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(
+                    response, "institutional/eitech/pages/xyron-liro-littlebot.html"
+                )
+                self.assertContains(response, robot["name"])
+                self.assertContains(response, "Robôs Xyron")
+                self.assertContains(response, "Ver mais robôs Xyron")
+                self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
+                self.assertNotContains(response, "hero3-section-area")
+
+    def test_xyron_robot_sidebar_excludes_current_robot(self):
+        expected_count = len(XYRON_ROBOTS) - 1
+
+        for robot in XYRON_ROBOTS:
+            with self.subTest(robot=robot["slug"]):
+                response = self.client.get(
+                    reverse("institutional:xyron_robot_detail", args=[robot["slug"]])
+                )
+
+                sidebar_robots = response.context["sidebar_robots"]
+                sidebar_slugs = [item["slug"] for item in sidebar_robots]
+                self.assertEqual(len(sidebar_robots), expected_count)
+                self.assertNotIn(robot["slug"], sidebar_slugs)
+                self.assertContains(response, 'data-robot-slug="', count=expected_count)
+
+    def test_xyron_robot_detail_contains_other_robot_links(self):
+        response = self.client.get(
+            reverse("institutional:xyron_robot_detail", args=["mowerbot"])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            reverse("institutional:xyron_robot_detail", args=["liro-littlebot"]),
+        )
+        self.assertContains(
+            response,
+            reverse("institutional:xyron_robot_detail", args=["carebot"]),
+        )
+        self.assertEqual(response.context["robot"]["slug"], "mowerbot")
+
+    def test_xyron_liro_legacy_url_name_still_renders_detail(self):
+        response = self.client.get(reverse("institutional:xyron_liro_littlebot"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "LIRO / LittleBot")
+        self.assertContains(response, "O LIRO substitui o professor?")
+        self.assertEqual(response.context["robot"]["slug"], "liro-littlebot")
+
+    def test_unknown_xyron_robot_returns_404(self):
+        response = self.client.get("/solucoes/xyron-robotics/nao-existe/")
+
+        self.assertEqual(response.status_code, 404)
 
     def test_engenharia_embarcada_canonical_url(self):
         self.assertEqual(

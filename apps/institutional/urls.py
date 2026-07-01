@@ -89,6 +89,16 @@ urlpatterns = [
         views.parceiro_xyron_robotics,
         name="parceiro_xyron_robotics",
     ),
+    path(
+        "solucoes/xyron-robotics/liro-littlebot/",
+        views.xyron_liro_littlebot,
+        name="xyron_liro_littlebot",
+    ),
+    path(
+        "solucoes/xyron-robotics/<slug:slug>/",
+        views.xyron_robot_detail,
+        name="xyron_robot_detail",
+    ),
     path("contato/", views.contact, name="contact"),
     path("equipe/", views.team, name="team"),
     path("projetos/", views.projects, name="projects"),

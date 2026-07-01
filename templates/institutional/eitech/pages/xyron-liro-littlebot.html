@@ -1,0 +1,212 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}{{ robot.name }} | Robôs Xyron | Smart Control Brasil{% endblock %}
+{% block meta_description %}{{ robot.subtitle }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/elements1.png' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>{{ robot.name }}</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:parceiro_xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>{{ robot.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            <div class="search-area">
+              <h3>Buscar</h3>
+              <div class="space24"></div>
+              <form action="{% url 'institutional:parceiro_xyron_robotics' %}" method="get">
+                <input type="text" name="q" placeholder="Buscar robô...">
+                <button type="submit" aria-label="Buscar robô Xyron"><i class="fa-solid fa-magnifying-glass"></i></button>
+              </form>
+            </div>
+            <div class="space30"></div>
+
+            <div class="category-list-area" data-current-robot="{{ robot.slug }}">
+              <h3>Robôs Xyron</h3>
+              <div class="space10"></div>
+              <ul>
+                {% for sidebar_robot in sidebar_robots %}
+                  <li data-robot-slug="{{ sidebar_robot.slug }}"><a href="{% url 'institutional:xyron_robot_detail' sidebar_robot.slug %}">{{ sidebar_robot.name }} <span><i class="fa-solid fa-angle-right"></i></span></a></li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                {% for tag in robot.tags %}
+                  <li><a href="{% url 'institutional:contact' %}">#{{ tag }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se {{ robot.short_name }} faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static robot.image %}" alt="{{ robot.name }} da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h3>{{ robot.name }}</h3>
+            <div class="space20"></div>
+            <p>{{ robot.subtitle }}</p>
+            {% for paragraph in robot.intro %}
+              <div class="space20"></div>
+              <p>{{ paragraph }}</p>
+            {% endfor %}
+            <div class="space14"></div>
+            <div class="row">
+              {% for column in benefit_columns %}
+                <div class="col-lg-6 col-md-6">
+                  <ul class="list">
+                    {% for benefit in column %}
+                      <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">{{ benefit }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>{{ robot.purpose_title }}</h4>
+              <div class="space12"></div>
+              <p>{{ robot.purpose }}</p>
+            </div>
+            <div class="space18"></div>
+            <div class="row">
+              {% for image_path in robot.secondary_images %}
+                <div class="col-lg-6 col-md-6">
+                  <div class="space30"></div>
+                  <div class="img1 reveal image-anime">
+                    <img src="{% static image_path %}" alt="{{ robot.name }} em aplicação Xyron Robotics">
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="space32"></div>
+            <h3>{{ robot.approach_title }}</h3>
+            <div class="space20"></div>
+            {% for paragraph in robot.approach %}
+              <p>{{ paragraph }}</p>
+              {% if not forloop.last %}<div class="space20"></div>{% endif %}
+            {% endfor %}
+
+            <div class="space48"></div>
+            <h3>Perguntas frequentes</h3>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronRobot">
+                {% for question, answer in robot.faq %}
+                  <div class="space24"></div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button{% if not forloop.first %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#xyronFaq{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="xyronFaq{{ forloop.counter }}">
+                        {{ question }}
+                      </button>
+                    </h2>
+                    <div id="xyronFaq{{ forloop.counter }}" class="accordion-collapse collapse{% if forloop.first %} show{% endif %}" data-bs-parent="#accordionXyronRobot">
+                      <div class="accordion-body">
+                        <p>{{ answer }}</p>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h3>Próximo passo</h3>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie {{ robot.short_name }} com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  <!--===== SERVICE AREA STARTS =======-->
+  <div class="service1-section-area sp2 xyron-related-robots" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 m-auto">
+          <div class="heading2 text-center space-margin60">
+            <h2>Ver mais robôs Xyron</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        {% for related_robot in related_robots %}
+          <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="{{ forloop.counter }}00">
+            <div class="service1-boxarea">
+              <div class="icons">
+                <img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt="" aria-hidden="true">
+              </div>
+              <div class="arrow">
+                <a href="{% url 'institutional:xyron_robot_detail' related_robot.slug %}" aria-label="Ver {{ related_robot.name }}"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+              <div class="space24"></div>
+              <a href="{% url 'institutional:xyron_robot_detail' related_robot.slug %}">{{ related_robot.name }}</a>
+              <div class="space16"></div>
+              <p>{{ related_robot.subtitle }}</p>
+              <div class="space24"></div>
+              <h5>0{{ forloop.counter }}</h5>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE AREA ENDS =======-->
+{% endblock %}

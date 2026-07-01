@@ -397,7 +397,7 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
         return (
             "A Xyron Robotics é uma empresa de tecnologia robótica com soluções para educação, recepção, atendimento, segurança, limpeza, saúde, entrega, inspeção e operação autônoma. "
             "A Smart Control Brasil conecta essas soluções às aplicações reais do cliente, com diagnóstico, escolha do robô, implantação, treinamento e integração. "
-            "As principais linhas incluem LIRO/LittleBot, NeoBot, HygiBot, OrbitBot, Buddy Bot, WaiterBot, CareBot, HostBot e MowerBot."
+            "As principais linhas incluem LIRO/LittleBot, NeoBot, HygiBot, OrbitBot/Patrol Bot, Buddy Bot, WaiterBot, CareBot, HostBot e MowerBot. Página interna: /parceiros/xyron-robotics/."
         )
     if "buddy bot" in top:
         if _asks_availability(normalized_text):
@@ -408,8 +408,7 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             )
         return (
             "O Buddy Bot é um robô quadrúpede da linha Xyron, indicado para inspeção, segurança patrimonial, resgate, engenharia, obras, indústrias e áreas de difícil acesso. "
-            "Por não depender de rodas, atua melhor em terrenos irregulares e ambientes hostis. "
-            "No catálogo: 61 x 37 x 40 cm, 12 kg, autonomia de 2 horas, carregamento em 1 hora, câmera 1920 x 1080 e inclinação máxima de 40°."
+            "Ele apoia equipes em terrenos irregulares e ambientes hostis, sem substituir análise de risco, operadores ou protocolos humanos de segurança. Página interna: /solucoes/xyron-robotics/buddy/."
         )
     if recent_product == "neobot":
         if any(term in normalized_text for term in ("altura", "dimensao", "dimensoes", "tamanho", "medida", "qual a altura")):
@@ -438,14 +437,13 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
     if "neo bot" in top:
         return (
             "O Neo Bot é um robô de recepção e atendimento da linha Xyron, indicado para empresas, eventos, escolas e lojas. "
-            "Ele oferece interação multilíngue, suporte com IA e experiência interativa para visitantes. "
-            "No catálogo: 45 x 100 x 40 cm, 18 kg, tela 10,1 polegadas, bateria de 20.000 mAh, autonomia de até 10 horas e carregamento aproximado de 9 horas."
+            "Ele apoia orientação, apresentações e interação com visitantes, sem substituir a equipe de recepção ou atendimento humano. Página interna: /solucoes/xyron-robotics/neobot/."
         )
     if "hygibot" in top:
         return (
             "O HygiBot, também tratado como Dune/Duno Bot em algumas conversas, é o robô de limpeza autônoma da linha Xyron. "
             "Ele combina funções como lavar, varrer, aspirar e passar pano seco, apoiando equipes de limpeza em shoppings, indústrias, hospitais, supermercados, hotéis, academias e grandes áreas internas. "
-            "É uma solução indicada para academias e operações com alto fluxo em grandes áreas internas."
+            "Ele ajuda a padronizar rotinas, mas não substitui supervisão, planejamento de limpeza ou equipe humana. Página interna: /solucoes/xyron-robotics/hygibot/."
         )
     if "neobot" in top or "nebot" in normalized_text or ("neo" in normalized_text and "hostbot" not in normalized_text):
         if any(term in normalized_text for term in ("altura", "dimensao", "dimensoes", "tamanho", "medida")):
@@ -477,7 +475,7 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             )
         return (
             "O NeoBot é um robô recepcionista inteligente da Xyron para atendimento, recepção e experiências interativas em ambientes de alto fluxo. "
-            "Ele combina IA, reconhecimento facial, navegação autônoma, gestão de conteúdo e comunicação multilíngue."
+            "Ele apoia a jornada de visitantes e a comunicação institucional, sem substituir atendimento humano em situações sensíveis. Página interna: /solucoes/xyron-robotics/neobot/."
         )
     if "liro - planos de aula" in top or "planos de aula" in top:
         return (
@@ -492,7 +490,7 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
     if "liro - robo educacional com ia" in top or "liro" in top:
         return (
             "O LIRO é um robô educacional com IA da Xyron que apoia sala de aula, engajamento e mediação pedagógica, "
-            "respeitando o planejamento do professor e competências da BNCC."
+            "respeitando o planejamento do professor e competências da BNCC. Ele não substitui o professor. Página interna: /solucoes/xyron-robotics/liro-littlebot/."
         )
     if "orbitbot" in top:
         if "termica" in normalized_text or "temperatura" in normalized_text:
@@ -502,37 +500,34 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             )
         return (
             "O OrbitBot é um robô de segurança autônoma com navegação a laser, patrulha 24/7 e monitoramento contínuo. "
-            "Ele é indicado para ambientes amplos que exigem cobertura previsível e preventiva."
+            "Ele apoia equipes de segurança em ambientes amplos que exigem cobertura previsível e preventiva, sem substituir vigilantes, central de monitoramento ou protocolos de emergência. Página interna: /solucoes/xyron-robotics/orbit/."
         )
     if "liro" in top or "littlebot" in top:
         return (
             "O LIRO, também chamado LittleBot, é um robô educacional inteligente para escolas, famílias, creches e clínicas. "
-            "Ele apoia interação, aprendizagem, entretenimento e inclusão, com voz, reconhecimento facial, toque, chamada de vídeo e monitoramento remoto."
+            "Ele apoia interação, aprendizagem, entretenimento e inclusão, sempre como ferramenta complementar ao professor, família ou equipe multidisciplinar. Página interna: /solucoes/xyron-robotics/liro-littlebot/."
         )
     if "orbit bot" in top or "patrol bot" in top:
         return (
-            "O Orbit Bot, também tratado como Patrol Bot, é um robô de segurança para grandes áreas com navegação autônoma, patrulhamento programado e identificação visual por IA. "
-            "Ele apoia prevenção de riscos com monitoramento em tempo real."
+            "O Orbit Bot, também tratado como Patrol Bot, é um robô de segurança para grandes áreas com navegação autônoma e patrulhamento programado. Ele apoia prevenção de riscos e rotinas de monitoramento, mas não substitui vigilantes, análise humana ou resposta a emergências. Página interna: /solucoes/xyron-robotics/orbit/."
         )
     if "waiterbot" in top:
         return (
             "O WaiterBot é um robô de entrega e apoio operacional para restaurantes, hotéis e supermercados. "
-            "Ele navega de forma autônoma, faz entregas em pontos definidos, retorna bandejas e volta automaticamente para carregamento."
+            "Ele apoia entregas internas e retorno de bandejas em pontos definidos, sem substituir garçons, atendimento humano ou gestão da operação. Página interna: /solucoes/xyron-robotics/waiterbot/."
         )
     if "carebot" in top:
         return (
             "O CareBot é um robô assistivo para saúde e cuidado residencial, clínicas, hospitais e farmácias. "
-            "Ele pode apoiar chamadas rápidas, monitoramento de indicadores, teleatendimento e alertas."
+            "Ele pode apoiar chamadas rápidas, teleatendimento, alertas e acompanhamento assistivo, mas não substitui médicos, enfermagem, cuidadores ou avaliação clínica. Página interna: /solucoes/xyron-robotics/carebot/."
         )
     if "hostbot" in top:
         return (
-            "O HostBot é um robô host para recepção e eventos, com duas telas, desvio automático de obstáculos e interação com IA. "
-            "É indicado para empresas, comércios, museus, galerias, concessionárias e bancos."
+            "O HostBot é um robô host para recepção, eventos e orientação de visitantes. É indicado para empresas, comércios, museus, galerias, concessionárias e bancos, como apoio à experiência presencial e sem substituir equipe humana. Página interna: /solucoes/xyron-robotics/hostbot/."
         )
     if "mowerbot" in top:
         return (
-            "O MowerBot é um robô cortador de grama por controle remoto para terrenos irregulares e taludes. "
-            "Ele aumenta a segurança do operador e a produtividade no corte de vegetação em áreas externas."
+            "O MowerBot é um robô cortador de grama para áreas externas, terrenos irregulares, taludes, jardins, praças e campos. Ele apoia produtividade e segurança operacional no corte de vegetação, mas exige avaliação do terreno e operação responsável. Página interna: /solucoes/xyron-robotics/mowerbot/."
         )
     return ""
 
@@ -1443,7 +1438,29 @@ def _is_mitsubishi_motors_topic(normalized_text):
 
 
 def _is_robot_recommendation_question(normalized_text):
-    return "qual rob" in normalized_text and any(term in normalized_text for term in ("serve", "ideal", "indica", "recomenda"))
+    if "qual rob" in normalized_text and any(term in normalized_text for term in ("serve", "ideal", "indica", "recomenda")):
+        return True
+    return any(
+        term in normalized_text
+        for term in (
+            "robo educacional",
+            "robo para escola",
+            "robo de limpeza",
+            "higienizacao",
+            "higienização",
+            "robo de seguranca",
+            "robo de segurança",
+            "robo garcom",
+            "robo garçom",
+            "robo recepcionista",
+            "robo para recepcao",
+            "robo para recepção",
+            "robo para eventos",
+            "robo corta grama",
+            "robo cortador de grama",
+            "cortar grama",
+        )
+    )
 
 
 def _is_automation_diagnostic_question(normalized_text):
@@ -1455,18 +1472,49 @@ def _recommend_robot_by_scenario(normalized_text):
         return (
             "Para esse cenário, eu avaliaria 1) LIRO/LittleBot para interação e aprendizagem, "
             "2) Neo Bot para recepção interativa e 3) HostBot para ambientes com fluxo de visitantes. "
-            "A escolha depende da faixa etária, objetivo pedagógico e formato de uso no dia a dia."
+            "O LIRO não substitui o professor; ele entra como apoio pedagógico. "
+            "A escolha depende da faixa etária, objetivo pedagógico e formato de uso no dia a dia. "
+            "Página do LIRO: /solucoes/xyron-robotics/liro-littlebot/."
         )
-    if any(term in normalized_text for term in ("segurança", "patrulha", "ronda", "monitoramento", "patrulhamento")):
+    if any(term in normalized_text for term in ("limpeza", "higienizacao", "higienização", "shopping", "academia", "hospital")):
+        return (
+            "Para limpeza em áreas internas, o HygiBot/Dune Bot costuma ser o caminho principal. "
+            "Ele apoia varrição, aspiração e rotinas programadas, sem substituir supervisão e equipe de limpeza. "
+            "Para filtrar melhor, preciso saber área aproximada, tipo de piso e frequência de uso. "
+            "Página interna: /solucoes/xyron-robotics/hygibot/."
+        )
+    if any(term in normalized_text for term in ("segurança", "seguranca", "patrulha", "ronda", "monitoramento", "patrulhamento")):
         return (
             "Para segurança e patrulhamento, as opções mais aderentes costumam ser 1) Orbit Bot/Patrol Bot para grandes áreas internas, "
-            "2) Buddy Bot para terreno irregular e áreas externas e 3) HostBot quando a recepção também precisa de dissuasão e orientação. "
-            "Posso te ajudar a filtrar pela área e tipo de risco."
+            "2) Buddy Bot para terreno irregular e áreas externas e 3) HostBot quando a recepção também precisa de orientação. "
+            "Esses robôs apoiam a equipe de segurança, mas não substituem vigilantes, central de monitoramento ou protocolos de emergência. "
+            "Página do Orbit: /solucoes/xyron-robotics/orbit/."
         )
-    if any(term in normalized_text for term in ("restaurante", "hotel", "bandeja", "entrega", "food")):
+    if any(term in normalized_text for term in ("restaurante", "hotel", "bandeja", "entrega", "food", "garcom", "garçom")):
         return (
-            "Para operação de entrega interna, o WaiterBot costuma ser a opção principal por navegação autônoma e suporte a múltiplas rotas. "
-            "Dependendo do fluxo de atendimento, pode ser combinado com Neo Bot ou HostBot na recepção."
+            "Para operação de entrega interna, o WaiterBot costuma ser a opção principal. "
+            "Ele apoia garçons e equipe de salão, sem vender a ideia de substituir todo o atendimento humano. "
+            "Dependendo do fluxo, pode ser combinado com Neo Bot ou HostBot na recepção. "
+            "Página interna: /solucoes/xyron-robotics/waiterbot/."
+        )
+    if any(term in normalized_text for term in ("recepcao", "recepção", "recepcionista", "evento", "eventos", "visitante", "visitantes")):
+        return (
+            "Para recepção e eventos, eu compararia NeoBot e HostBot. "
+            "O NeoBot é mais voltado a atendimento e interação inteligente; o HostBot é forte para orientação e presença em eventos. "
+            "Eles apoiam a experiência dos visitantes, sem substituir equipe humana. "
+            "Links: /solucoes/xyron-robotics/neobot/ e /solucoes/xyron-robotics/hostbot/."
+        )
+    if any(term in normalized_text for term in ("saude", "saúde", "idoso", "idosos", "clinica", "clínica", "teleatendimento")):
+        return (
+            "Para saúde e cuidado assistivo, o CareBot é a opção Xyron mais aderente. "
+            "Ele pode apoiar teleatendimento, alertas e acompanhamento, mas não substitui médicos, cuidadores ou equipe clínica. "
+            "Página interna: /solucoes/xyron-robotics/carebot/."
+        )
+    if any(term in normalized_text for term in ("grama", "corta grama", "cortador", "talude", "jardim", "area verde", "área verde")):
+        return (
+            "Para corte de grama, jardim e áreas externas, o MowerBot é o robô indicado. "
+            "Ele apoia produtividade e segurança no corte de vegetação, mas depende de avaliação do terreno e da rotina de operação. "
+            "Página interna: /solucoes/xyron-robotics/mowerbot/."
         )
     return (
         "Posso te sugerir de 1 a 3 robôs ideais, mas preciso de um contexto rápido: "
@@ -1476,6 +1524,8 @@ def _recommend_robot_by_scenario(normalized_text):
 
 def _looks_like_unknown_robot_model(normalized_text):
     if any(term in normalized_text for term in ("cheiro de queimado", "risco eletrico", "risco elétrico", "incendio", "incêndio", "fumaça", "fumaca", "curto", "choque")):
+        return False
+    if _is_robot_recommendation_question(normalized_text):
         return False
     if "connectbot" not in normalized_text and "bot" not in normalized_text and "robo" not in normalized_text and "robô" not in normalized_text:
         return False

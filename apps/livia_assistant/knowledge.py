@@ -26,9 +26,18 @@ class LiviaKnowledgeService:
         "duno",
         "hygibot",
         "waiter",
+        "waiterbot",
+        "garcom",
+        "restaurante",
         "carebot",
+        "saude",
+        "clinica",
         "hostbot",
+        "recepcao",
+        "eventos",
         "mowerbot",
+        "grama",
+        "jardim",
     }
     CLEANING_INTENT_TERMS = {
         "limpeza",
@@ -45,6 +54,12 @@ class LiviaKnowledgeService:
         "cachorro",
         "quadrupede",
     }
+    LIRO_INTENT_TERMS = {"liro", "little", "littlebot", "educacional", "escola", "creche", "infantil"}
+    WAITER_INTENT_TERMS = {"waiter", "waiterbot", "garcom", "restaurante", "bandeja", "food"}
+    CARE_INTENT_TERMS = {"carebot", "saude", "clinica", "idoso", "idosos", "telemedicina", "teleatendimento"}
+    HOST_INTENT_TERMS = {"hostbot", "host", "recepcao", "recepcionista", "evento", "eventos", "visitante"}
+    MOWER_INTENT_TERMS = {"mowerbot", "mower", "grama", "jardim", "talude", "cortador"}
+    ORBIT_INTENT_TERMS = {"orbit", "orbitbot", "patrol", "seguranca", "patrulha", "ronda", "vigilancia"}
     STOPWORDS = {
         "que",
         "para",
@@ -153,13 +168,35 @@ class LiviaKnowledgeService:
 
         if terms and buddy_terms.intersection(terms) and slug == "xyron-buddy-bot":
             score += 60
+        liro_specific_terms = {"apae", "neurodivergente", "neurodivergencia", "autismo", "tea", "tdah", "inclusao", "multidisciplinar"}
+        liro_plan_terms = {"plano", "aula", "pedagogico", "pedagogica", "bncc", "infantil", "fundamental", "medio", "historia", "quiz"}
+        if self.LIRO_INTENT_TERMS.intersection(terms) and slug == "xyron-liro-littlebot":
+            score += 58
+        if liro_specific_terms.intersection(terms) and slug == "xyron-liro-apae-clinicas":
+            score += 150
+        if liro_plan_terms.intersection(terms) and slug == "xyron-liro-planos-aula-pedagogico":
+            score += 150
+        if (liro_specific_terms.intersection(terms) or liro_plan_terms.intersection(terms)) and slug == "xyron-liro-littlebot":
+            score -= 80
         if {"neo", "neobot", "nebot"}.intersection(terms) and slug == "xyron-neo-bot":
             score += 55
         if {"neo", "neobot", "nebot"}.intersection(terms) and slug == "xyron-hostbot":
             score -= 30
-        if {"orbit", "patrol"}.intersection(terms) and slug == "xyron-orbit-patrol-bot":
-            score += 55
+        if self.ORBIT_INTENT_TERMS.intersection(terms) and slug == "xyron-orbit-patrol-bot":
+            score += 95
+        if self.ORBIT_INTENT_TERMS.intersection(terms) and slug == "xyron-robotics-visao-geral":
+            score -= 50
         if cleaning_terms.intersection(terms) and slug == "xyron-hygibot-dune-bot":
+            score += 55
+        if self.WAITER_INTENT_TERMS.intersection(terms) and slug == "xyron-waiterbot":
+            score += 55
+        if self.CARE_INTENT_TERMS.intersection(terms) and slug == "xyron-carebot":
+            score += 95
+        if self.CARE_INTENT_TERMS.intersection(terms) and slug.startswith("xyron-liro-") and not {"liro", "littlebot", "apae"}.intersection(terms):
+            score -= 70
+        if self.HOST_INTENT_TERMS.intersection(terms) and slug == "xyron-hostbot":
+            score += 55
+        if self.MOWER_INTENT_TERMS.intersection(terms) and slug == "xyron-mowerbot":
             score += 55
         if cleaning_terms.intersection(terms) and slug == "xyron-hygibot-dune-bot" and "robo" in terms:
             score += 20
@@ -210,6 +247,18 @@ class LiviaKnowledgeService:
             expansions.append("neobot neo bot robo de recepcao")
         if "neobot" in normalized_query:
             expansions.append("neo bot robo de recepcao")
+        if "robo educacional" in normalized_query or "robo para escola" in normalized_query or "robô para escola" in normalized_query:
+            expansions.append("liro littlebot robo educacional escola professor")
+        if "garcom" in normalized_query or "garçom" in normalized_query or "restaurante" in normalized_query:
+            expansions.append("waiterbot waiter bot robo garcom restaurante bandeja entrega")
+        if "saude" in normalized_query or "clínica" in normalized_query or "clinica" in normalized_query or "idoso" in normalized_query:
+            expansions.append("carebot care bot robo saude clinica teleatendimento cuidado")
+        if "recepcao" in normalized_query or "recepção" in normalized_query or "evento" in normalized_query:
+            expansions.append("hostbot host bot neobot robo recepcao eventos visitantes")
+        if "grama" in normalized_query or "jardim" in normalized_query or "talude" in normalized_query:
+            expansions.append("mowerbot mower bot robo cortador grama jardim talude")
+        if "ronda" in normalized_query or "patrulha" in normalized_query or "seguranca" in normalized_query or "segurança" in normalized_query:
+            expansions.append("orbitbot orbit patrol bot robo seguranca patrulha ronda")
         if "duno" in normalized_query or "dune" in normalized_query:
             expansions.append("hygibot hygi bot robo de limpeza")
         if "hygbot" in normalized_query or "higibot" in normalized_query:

@@ -1347,6 +1347,90 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertNotIn("hostbot", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_school_robot_recommends_liro_without_replacing_teacher(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-school-scenario")
+        text = "qual robô para escola você recomenda?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertTrue("liro" in lowered or "littlebot" in lowered)
+        self.assertIn("não substitui", lowered)
+        self.assertIn("professor", lowered)
+        self.assertIn("/solucoes/xyron-robotics/liro-littlebot/", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_security_robot_recommends_patrol_or_orbit_with_caution(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-security-scenario")
+        text = "preciso de um robô de segurança para ronda"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertTrue("patrol" in lowered or "orbit" in lowered)
+        self.assertTrue("não substitui" in lowered or "não substituem" in lowered or "sem substituir" in lowered)
+        self.assertTrue("vigilante" in lowered or "equipe de segurança" in lowered)
+        self.assertIn("/solucoes/xyron-robotics/orbit/", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_restaurant_robot_recommends_waiterbot_without_absolute_replacement(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-waiter-scenario")
+        text = "qual robô garçom serve para restaurante?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("waiterbot", lowered)
+        self.assertTrue("sem substituir" in lowered or "sem vender a ideia de substituir" in lowered)
+        self.assertIn("/solucoes/xyron-robotics/waiterbot/", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_health_robot_recommends_carebot_without_medical_promise(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-care-scenario")
+        text = "qual robô para cuidado em clínica de saúde?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("carebot", lowered)
+        self.assertIn("não substitui", lowered)
+        self.assertTrue("médic" in lowered or "medic" in lowered or "equipe clínica" in lowered)
+        self.assertIn("/solucoes/xyron-robotics/carebot/", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_reception_events_robot_recommends_hostbot_or_neobot(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-host-scenario")
+        text = "preciso de robô recepcionista para eventos"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertTrue("hostbot" in lowered or "neobot" in lowered)
+        self.assertTrue("/solucoes/xyron-robotics/hostbot/" in lowered or "/solucoes/xyron-robotics/neobot/" in lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_grass_cutting_robot_recommends_mowerbot(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-mower-scenario")
+        text = "qual robô para cortar grama no jardim?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertIn("mowerbot", lowered)
+        self.assertIn("/solucoes/xyron-robotics/mowerbot/", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_cleaning_robot_recommends_hygibot(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-cleaning-scenario")
+        text = "qual robô de limpeza para higienização?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+        self.assertTrue("hygibot" in lowered or "dune" in lowered or "duno" in lowered)
+        self.assertIn("/solucoes/xyron-robotics/hygibot/", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_neobot_context_battery_duration(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="neo-context-battery")

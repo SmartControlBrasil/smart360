@@ -9,7 +9,7 @@ from django.core.validators import validate_email
 from django.http import Http404
 from django.shortcuts import redirect, render
 
-from .xyron_robots import get_other_xyron_robots, get_xyron_robot
+from .xyron_robots import get_featured_xyron_robots, get_other_xyron_robots, get_xyron_robot
 
 
 logger = logging.getLogger(__name__)
@@ -253,7 +253,7 @@ def _render_xyron_robot_detail(request, slug):
     context = {
         "robot": robot,
         "sidebar_robots": sidebar_robots,
-        "related_robots": sidebar_robots[:3],
+        "related_robots": get_featured_xyron_robots(slug),
         "benefit_columns": [benefits[:split_at], benefits[split_at:]],
     }
     return render(request, "institutional/eitech/pages/xyron-liro-littlebot.html", context)

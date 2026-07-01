@@ -103,6 +103,48 @@ class InstitutionalRoutesTests(SimpleTestCase):
                 self.assertNotIn(robot["slug"], sidebar_slugs)
                 self.assertContains(response, 'data-robot-slug="', count=expected_count)
 
+    def test_xyron_robot_detail_sidebar_does_not_link_to_current_page(self):
+        for robot in XYRON_ROBOTS:
+            with self.subTest(robot=robot["slug"]):
+                response = self.client.get(
+                    reverse("institutional:xyron_robot_detail", args=[robot["slug"]])
+                )
+
+                current_url = reverse("institutional:xyron_robot_detail", args=[robot["slug"]])
+                sidebar_slugs = [item["slug"] for item in response.context["sidebar_robots"]]
+                related_slugs = [item["slug"] for item in response.context["related_robots"]]
+                self.assertNotIn(robot["slug"], sidebar_slugs)
+                self.assertNotIn(robot["slug"], related_slugs)
+                self.assertNotContains(response, f'href="{current_url}"')
+
+    def test_xyron_robot_detail_keeps_consultative_guardrails(self):
+        checks = [
+            ("liro-littlebot", "não substitui o professor"),
+            ("patrol-orbit", "não é substituir completamente equipes de segurança"),
+            ("waiterbot", "não deve ser tratado como substituto completo de garçons"),
+            ("carebot", "não realiza promessa médica"),
+        ]
+
+        for slug, text in checks:
+            with self.subTest(slug=slug):
+                response = self.client.get(reverse("institutional:xyron_robot_detail", args=[slug]))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, text)
+
+    def test_xyron_robot_detail_referenced_images_exist(self):
+        from pathlib import Path
+
+        static_root = Path(settings.BASE_DIR) / "static"
+        missing = []
+        for robot in XYRON_ROBOTS:
+            image_paths = [robot["image"], *robot.get("secondary_images", [])]
+            for image_path in image_paths:
+                if not (static_root / image_path).exists():
+                    missing.append((robot["slug"], image_path))
+
+        self.assertEqual(missing, [])
+
     def test_xyron_robot_detail_contains_other_robot_links(self):
         response = self.client.get(
             reverse("institutional:xyron_robot_detail", args=["mowerbot"])

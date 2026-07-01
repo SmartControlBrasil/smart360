@@ -180,3 +180,7 @@ def get_xyron_robot(slug):
 
 def get_other_xyron_robots(slug):
     return [robot for robot in XYRON_ROBOTS if robot["slug"] != slug]
+
+
+def get_featured_xyron_robots(slug, limit=3):
+    return get_other_xyron_robots(slug)[:limit]

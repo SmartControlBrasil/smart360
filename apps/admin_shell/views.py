@@ -146,7 +146,10 @@ from .services.smart_system_checklists import (
 )
 from .services.smart_system_failures import get_failure_detail_context, get_failure_listing_context
 from .services.smart_system_parts import get_part_detail_context, get_part_listing_context, get_stock_movement_context
-from .services.smart_system_contracts import get_contract_detail_context, get_contract_listing_context
+from .services.smart_system_contracts import (
+    get_contract_detail_context as get_smart_system_contract_detail_context,
+    get_contract_listing_context,
+)
 from .services.smart_system_quotes import get_quote_detail_context, get_quote_listing_context
 from .services.smart_system_preventives import (
     get_preventive_calendar_context,
@@ -3896,6 +3899,7 @@ class SmartSystemPartDetailView(ScopedResourceTemplateView):
         context = super().get_context_data(**kwargs)
         part = self.scoped_resource
         context["part"] = part
+        context["movements"] = part.get("movements", [])
         context["page_actions"] = part["page_actions"]
         context["page_title"] = part["code"]
         context["page_description"] = part["name"]
@@ -4228,7 +4232,7 @@ class SmartSystemContractDetailView(ScopedResourceTemplateView):
     resource_type = "maintenance_contract"
 
     def load_scoped_resource(self):
-        return get_contract_detail_context(self.request, self.kwargs["contract_number"], tenant_context=self.get_tenant_context())
+        return get_smart_system_contract_detail_context(self.request, self.kwargs["contract_number"], tenant_context=self.get_tenant_context())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -4260,7 +4264,7 @@ class SmartSystemContractActivateView(SmartSystemOperationalRouteMixin, SmartSys
     log_permission_decision = True
 
     def post(self, request, contract_number):
-        payload = get_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
+        payload = get_smart_system_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
         if payload is None:
             return self.handle_scope_denied()
         MaintenanceContractService.activate_contract(contract=payload["contract"], user=request.user)
@@ -4274,7 +4278,7 @@ class SmartSystemContractSuspendView(SmartSystemOperationalRouteMixin, SmartSyst
     log_permission_decision = True
 
     def post(self, request, contract_number):
-        payload = get_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
+        payload = get_smart_system_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
         if payload is None:
             return self.handle_scope_denied()
         MaintenanceContractService.suspend_contract(
@@ -4292,7 +4296,7 @@ class SmartSystemContractGeneratePreventivesView(SmartSystemOperationalRouteMixi
     log_permission_decision = True
 
     def post(self, request, contract_number):
-        payload = get_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
+        payload = get_smart_system_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
         if payload is None:
             return self.handle_scope_denied()
         MaintenanceContractService.generate_due_preventives(contract=payload["contract"], generated_by=request.user)
@@ -4306,7 +4310,7 @@ class SmartSystemContractGenerateBillingView(SmartSystemOperationalRouteMixin, S
     log_permission_decision = True
 
     def post(self, request, contract_number):
-        payload = get_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
+        payload = get_smart_system_contract_detail_context(request, contract_number, tenant_context=build_shell_tenant_context(request))
         if payload is None:
             return self.handle_scope_denied()
         MaintenanceContractService.generate_billing_cycle(contract=payload["contract"], generated_by=request.user)
@@ -5159,6 +5163,9 @@ class SmartSystemChecklistDetailView(ScopedResourceTemplateView):
         context = super().get_context_data(**kwargs)
         checklist = self.scoped_resource
         context["checklist"] = checklist
+        execution = (checklist.get("executions") or [{}])[0]
+        execution.setdefault("alerts", checklist.get("alerts", []))
+        context["execution"] = execution
         context["page_actions"] = checklist["page_actions"]
         context["page_title"] = checklist["code"]
         context["page_description"] = checklist["name"]

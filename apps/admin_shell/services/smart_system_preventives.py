@@ -451,7 +451,7 @@ def get_preventive_calendar_context(tenant_context=None):
     for day in PREVENTIVE_CALENDAR:
         events = [
             event
-            for event in day["events"]
+            for event in day.get("events", [])
             if record_matches_scope({"client": _site_to_client(event["site"]), "site": event["site"]}, tenant_context or {})
         ]
         if events:

@@ -898,13 +898,16 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertTrue("patrulh" in lowered or "seguranca autonoma" in lowered or "navegacao a laser" in lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_curated_prompt_orbit_thermal(self):
+    def test_curated_prompt_orbit_thermal_uses_technical_guardrail(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="curated-orbit-thermal")
         self.service.register_user_message(conversation, "orbit tem câmera térmica?")
         response = self.service.generate_response(conversation, "orbit tem câmera térmica?")
         lowered = response.reply.lower()
-        self.assertTrue("termica" in lowered or "temperatura" in lowered)
+
+        self.assertIn("variam conforme modelo", lowered)
+        self.assertIn("/solucoes/xyron-robotics/patrol-orbit/", lowered)
+        self.assertNotRegex(lowered, r"-?\d+°?c")
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_xyron_overview_question_returns_company_ecosystem(self):
@@ -913,11 +916,13 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "o que é a xyron?")
         response = self.service.generate_response(conversation, "o que é a xyron?")
         lowered = response.reply.lower()
-        self.assertIn("xyron robotics", lowered)
-        self.assertTrue("empresa" in lowered or "solu" in lowered or "ecossistema" in lowered)
+        self.assertIn("/solucoes/xyron-robotics/", lowered)
+        self.assertIn("vitrine", lowered)
         self.assertIn("liro", lowered)
         self.assertIn("hygibot", lowered)
         self.assertIn("buddy", lowered)
+        self.assertNotIn("ficha técnica", lowered)
+        self.assertNotIn("capacidade da bateria", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_xyron_single_term_returns_overview(self):
@@ -926,7 +931,22 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "xyron")
         response = self.service.generate_response(conversation, "xyron")
         lowered = response.reply.lower()
-        self.assertIn("xyron robotics", lowered)
+        self.assertIn("/solucoes/xyron-robotics/", lowered)
+        self.assertIn("vitrine", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_general_robot_question_points_to_overview_page(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-general-robots")
+        text = "Quais robôs vocês têm?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+
+        self.assertIn("/solucoes/xyron-robotics/", lowered)
+        self.assertIn("vitrine", lowered)
+        self.assertLess(len(response.reply), 500)
+        self.assertNotIn("ficha técnica", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_alias_hygbot_returns_hygibot_not_safety(self):
@@ -1337,14 +1357,18 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertTrue("hygibot" in lowered or "duno" in lowered or "dune" in lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_nebot_typo_returns_neobot_not_hostbot(self):
+    def test_nebot_typo_returns_neobot_guardrail_not_hostbot(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="nebot-height")
         self.service.register_user_message(conversation, "qual é a altura do nebot")
         response = self.service.generate_response(conversation, "qual é a altura do nebot")
         lowered = response.reply.lower()
-        self.assertTrue("neobot" in lowered or "100 cm" in lowered or "45 x 100 x 40" in lowered)
+
+        self.assertIn("/solucoes/xyron-robotics/neobot/", lowered)
+        self.assertIn("variam conforme modelo", lowered)
         self.assertNotIn("hostbot", lowered)
+        self.assertNotIn("100 cm", lowered)
+        self.assertNotIn("45 x 100 x 40", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_xyron_school_robot_recommends_liro_without_replacing_teacher(self):
@@ -1370,7 +1394,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertTrue("patrol" in lowered or "orbit" in lowered)
         self.assertTrue("não substitui" in lowered or "não substituem" in lowered or "sem substituir" in lowered)
         self.assertTrue("vigilante" in lowered or "equipe de segurança" in lowered)
-        self.assertIn("/solucoes/xyron-robotics/orbit/", lowered)
+        self.assertIn("/solucoes/xyron-robotics/patrol-orbit/", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_xyron_restaurant_robot_recommends_waiterbot_without_absolute_replacement(self):
@@ -1431,7 +1455,7 @@ class LiviaAssistantServiceTests(TestCase):
         self.assertIn("/solucoes/xyron-robotics/hygibot/", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_neobot_context_battery_duration(self):
+    def test_neobot_context_battery_duration_uses_technical_guardrail(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="neo-context-battery")
         self.service.register_user_message(conversation, "fale sobre o NeoBot")
@@ -1439,10 +1463,14 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "quanto tempo dura a bateria?")
         response = self.service.generate_response(conversation, "quanto tempo dura a bateria?")
         lowered = response.reply.lower()
-        self.assertTrue("10 horas" in lowered or "autonomia" in lowered)
+
+        self.assertIn("variam conforme modelo", lowered)
+        self.assertIn("/solucoes/xyron-robotics/neobot/", lowered)
+        self.assertNotIn("10 horas", lowered)
+        self.assertNotIn("20.000", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
-    def test_neobot_context_recharge_time(self):
+    def test_neobot_context_recharge_time_uses_technical_guardrail(self):
         self._seed_knowledge()
         conversation = self.service.get_or_create_conversation(session_key="neo-context-recharge")
         self.service.register_user_message(conversation, "fale sobre o NeoBot")
@@ -1450,7 +1478,10 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "a recarga é feita em quanto tempo?")
         response = self.service.generate_response(conversation, "a recarga é feita em quanto tempo?")
         lowered = response.reply.lower()
-        self.assertTrue("9 horas" in lowered or "aproximadamente 9" in lowered)
+
+        self.assertIn("variam conforme modelo", lowered)
+        self.assertIn("/solucoes/xyron-robotics/neobot/", lowered)
+        self.assertNotIn("9 horas", lowered)
 
     @override_settings(LIVIA_AI_PROVIDER="fallback")
     def test_neobot_context_battery_reserve_not_invented(self):
@@ -1461,10 +1492,52 @@ class LiviaAssistantServiceTests(TestCase):
         self.service.register_user_message(conversation, "tem bateria reserva?")
         response = self.service.generate_response(conversation, "tem bateria reserva?")
         lowered = response.reply.lower()
-        self.assertIn("na base atual", lowered)
-        self.assertIn("não tenho confirmação", lowered)
-        self.assertIn("validar com a equipe", lowered)
-        self.assertNotIn("tem bateria reserva", lowered.replace("não", ""))
+
+        self.assertIn("variam conforme modelo", lowered)
+        self.assertIn("avaliação técnica", lowered)
+        self.assertIn("/solucoes/xyron-robotics/neobot/", lowered)
+        self.assertNotIn("20.000", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_price_stock_deadline_question_does_not_invent_absolute_answer(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-price-stock")
+        text = "Quanto custa o WaiterBot, tem estoque e prazo de entrega?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+
+        self.assertIn("dependem do modelo", lowered)
+        self.assertIn("validar", lowered)
+        self.assertIn("/solucoes/xyron-robotics/", lowered)
+        self.assertNotIn("r$", lowered)
+        self.assertNotIn("pronta entrega garantida", lowered)
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_technical_specs_question_does_not_invent_numbers(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-specs-guardrail")
+        text = "Me passa a ficha técnica do CareBot com peso, bateria e sensores"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+
+        self.assertIn("variam conforme modelo", lowered)
+        self.assertIn("/solucoes/xyron-robotics/carebot/", lowered)
+        self.assertIn("avaliação técnica", lowered)
+        self.assertNotRegex(lowered, r"\d+\s?(kg|mah|horas|cm|mm)")
+
+    @override_settings(LIVIA_AI_PROVIDER="fallback")
+    def test_xyron_demo_light_interaction_recommends_buddy(self):
+        self._seed_knowledge()
+        conversation = self.service.get_or_create_conversation(session_key="xyron-buddy-scenario")
+        text = "qual robô para demonstração e interação leve?"
+        self.service.register_user_message(conversation, text)
+        response = self.service.generate_response(conversation, text)
+        lowered = response.reply.lower()
+
+        self.assertIn("buddy", lowered)
+        self.assertIn("/solucoes/xyron-robotics/buddy/", lowered)
 
     def test_lead_state_machine_transitions(self):
         snapshot = resolve_state(

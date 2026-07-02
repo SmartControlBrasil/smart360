@@ -177,11 +177,27 @@ class FallbackLiviaAIClient(LiviaAIClient):
                 return post_qualified_reply
 
         if is_price_question(normalized):
+            if _has_xyron_context(normalized, messages):
+                return (
+                    "Preço, prazo, estoque e disponibilidade dos robôs Xyron dependem do modelo, configuração, acessórios e escopo de implantação. "
+                    "Para evitar uma resposta absoluta, eu preciso validar com a equipe comercial/técnica. A vitrine geral fica em /solucoes/xyron-robotics/."
+                )
             if is_web_system_context(messages, normalized):
                 return build_web_system_price_answer()
             return (
                 "O valor depende da configuração, aplicação, disponibilidade e escopo de implantação. "
                 "Para estimar corretamente, preciso entender objetivo, volume de uso, integrações e nível de implantação."
+            )
+
+        if _asks_availability(normalized) and _has_xyron_context(normalized, messages):
+            if any(term in normalized for term in ("cao robo", "cachorro robo", "robo cachorro", "quadrupede", "buddy", "budy")):
+                return (
+                    "O Buddy Bot é o cão robô da linha Xyron. Estoque, pronta entrega e prazo precisam ser confirmados conforme configuração e disponibilidade comercial. "
+                    "Página interna: /solucoes/xyron-robotics/buddy/. Posso encaminhar a validação com a equipe da Smart Control Brasil?"
+                )
+            return (
+                "Estoque, pronta entrega e prazo dos robôs Xyron precisam ser confirmados conforme modelo e configuração. "
+                "Posso direcionar pela vitrine /solucoes/xyron-robotics/ e encaminhar a validação com a equipe comercial/técnica."
             )
 
         ai_data_reply = build_ai_data_answer(normalized)
@@ -222,7 +238,7 @@ class FallbackLiviaAIClient(LiviaAIClient):
         if _looks_like_unknown_robot_model(normalized):
             return (
                 "Não encontrei esse modelo na base atual da Smart Control Brasil. "
-                "Você quis dizer LIRO/LittleBot, NeoBot, HygiBot, OrbitBot, Buddy Bot, WaiterBot, CareBot, HostBot ou MowerBot?"
+                "Você quis dizer LIRO/LittleBot, NeoBot, HygiBot, Patrol/Orbit, Buddy Bot, WaiterBot, CareBot, HostBot ou MowerBot?"
             )
 
         if is_maintenance_question(normalized) and not lead_detected:
@@ -388,16 +404,89 @@ def _summarize_knowledge_context(knowledge_context):
     return first
 
 
+
+XYRON_DETAIL_LINKS = {
+    "liro": "/solucoes/xyron-robotics/liro-littlebot/",
+    "littlebot": "/solucoes/xyron-robotics/liro-littlebot/",
+    "neobot": "/solucoes/xyron-robotics/neobot/",
+    "neo": "/solucoes/xyron-robotics/neobot/",
+    "buddy": "/solucoes/xyron-robotics/buddy/",
+    "patrol": "/solucoes/xyron-robotics/patrol-orbit/",
+    "orbit": "/solucoes/xyron-robotics/patrol-orbit/",
+    "hygibot": "/solucoes/xyron-robotics/hygibot/",
+    "hygi": "/solucoes/xyron-robotics/hygibot/",
+    "dune": "/solucoes/xyron-robotics/hygibot/",
+    "duno": "/solucoes/xyron-robotics/hygibot/",
+    "hostbot": "/solucoes/xyron-robotics/hostbot/",
+    "host": "/solucoes/xyron-robotics/hostbot/",
+    "waiterbot": "/solucoes/xyron-robotics/waiterbot/",
+    "waiter": "/solucoes/xyron-robotics/waiterbot/",
+    "carebot": "/solucoes/xyron-robotics/carebot/",
+    "care": "/solucoes/xyron-robotics/carebot/",
+    "mowerbot": "/solucoes/xyron-robotics/mowerbot/",
+    "mower": "/solucoes/xyron-robotics/mowerbot/",
+}
+
+
+def _xyron_detail_link_for_text(text, fallback="/solucoes/xyron-robotics/"):
+    for term, link in XYRON_DETAIL_LINKS.items():
+        if term in text:
+            return link
+    return fallback
+
+
+def _is_xyron_technical_spec_question(normalized_text):
+    return any(
+        term in normalized_text
+        for term in (
+            "ficha tecnica",
+            "especificacao",
+            "especificacoes",
+            "autonomia",
+            "bateria",
+            "recarga",
+            "carregamento",
+            "carregar",
+            "tempo de carga",
+            "duracao",
+            "dura",
+            "peso",
+            "sensor",
+            "sensores",
+            "camera",
+            "termica",
+            "temperatura",
+            "velocidade",
+            "dimensao",
+            "dimensoes",
+            "tamanho",
+            "altura",
+            "medida",
+            "certificacao",
+            "certificacoes",
+        )
+    )
+
+
+def _build_xyron_specs_guardrail(normalized_text, product_text=""):
+    link = _xyron_detail_link_for_text(f"{normalized_text} {product_text}")
+    return (
+        "Os recursos e especificações dos robôs Xyron variam conforme modelo, configuração e escopo de implantação. "
+        f"Para evitar passar número desatualizado ou fora de contexto, recomendo ver a página do modelo em {link} e validar a configuração com uma avaliação técnica da Smart Control Brasil."
+    )
+
 def _reply_from_knowledge(knowledge_context, normalized_text, recent_product=""):
     lines = [line.strip("- ").strip() for line in knowledge_context.splitlines() if line.startswith("- ")]
     if not lines:
         return ""
     top = lines[0].lower()
+    if _is_xyron_technical_spec_question(normalized_text):
+        return _build_xyron_specs_guardrail(normalized_text, f"{recent_product} {top}")
     if "xyron robotics - visao geral" in top or "xyron robotics - visão geral" in top:
         return (
-            "A Xyron Robotics é uma empresa de tecnologia robótica com soluções para educação, recepção, atendimento, segurança, limpeza, saúde, entrega, inspeção e operação autônoma. "
-            "A Smart Control Brasil conecta essas soluções às aplicações reais do cliente, com diagnóstico, escolha do robô, implantação, treinamento e integração. "
-            "As principais linhas incluem LIRO/LittleBot, NeoBot, HygiBot, OrbitBot/Patrol Bot, Buddy Bot, WaiterBot, CareBot, HostBot e MowerBot. Página interna: /parceiros/xyron-robotics/."
+            "Temos uma linha Xyron para educação, recepção, segurança, limpeza, atendimento, cuidado assistido, demonstração e áreas externas, "
+            "com LIRO/LittleBot, NeoBot, HygiBot, Patrol/Orbit, Buddy, WaiterBot, CareBot, HostBot e MowerBot. "
+            "A vitrine geral fica em /solucoes/xyron-robotics/. Para eu te indicar o robô certo, o uso seria em escola, empresa, restaurante, clínica, condomínio, evento ou área externa?"
         )
     if "buddy bot" in top:
         if _asks_availability(normalized_text):
@@ -410,30 +499,6 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             "O Buddy Bot é um robô quadrúpede da linha Xyron, indicado para inspeção, segurança patrimonial, resgate, engenharia, obras, indústrias e áreas de difícil acesso. "
             "Ele apoia equipes em terrenos irregulares e ambientes hostis, sem substituir análise de risco, operadores ou protocolos humanos de segurança. Página interna: /solucoes/xyron-robotics/buddy/."
         )
-    if recent_product == "neobot":
-        if any(term in normalized_text for term in ("altura", "dimensao", "dimensoes", "tamanho", "medida", "qual a altura")):
-            return (
-                "O NeoBot tem dimensões de 45 x 100 x 40 cm. "
-                "Considerando essas medidas, a altura aproximada é de 100 cm."
-            )
-        if "peso" in normalized_text:
-            return "O peso informado do NeoBot no catálogo é de 18 kg."
-        if "tela" in normalized_text:
-            return "O NeoBot possui tela HD de 10,1 polegadas."
-        if any(term in normalized_text for term in ("duracao", "dura", "autonomia", "tempo da bateria", "bateria dura")):
-            return (
-                "O NeoBot tem autonomia de até 10 horas de operação contínua. "
-                "A bateria informada no catálogo é de 20.000 mAh."
-            )
-        if any(term in normalized_text for term in ("recarga", "carregamento", "carregar", "tempo de carga")):
-            return "O tempo de carregamento do NeoBot é de aproximadamente 9 horas."
-        if "bateria reserva" in normalized_text:
-            return (
-                "Na base atual não tenho confirmação sobre bateria reserva para o NeoBot. "
-                "O catálogo informa bateria de 20.000 mAh, autonomia de até 10 horas e carregamento aproximado de 9 horas. "
-                "Para confirmar bateria reserva ou acessórios, preciso validar com a equipe comercial/técnica da Smart Control Brasil."
-            )
-
     if "neo bot" in top:
         return (
             "O Neo Bot é um robô de recepção e atendimento da linha Xyron, indicado para empresas, eventos, escolas e lojas. "
@@ -446,28 +511,6 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             "Ele ajuda a padronizar rotinas, mas não substitui supervisão, planejamento de limpeza ou equipe humana. Página interna: /solucoes/xyron-robotics/hygibot/."
         )
     if "neobot" in top or "nebot" in normalized_text or ("neo" in normalized_text and "hostbot" not in normalized_text):
-        if any(term in normalized_text for term in ("altura", "dimensao", "dimensoes", "tamanho", "medida")):
-            return (
-                "O NeoBot tem dimensões de 45 x 100 x 40 cm. "
-                "Considerando essas medidas, a altura aproximada é de 100 cm."
-            )
-        if "peso" in normalized_text:
-            return "O peso informado do NeoBot no catálogo é de 18 kg."
-        if "tela" in normalized_text:
-            return "O NeoBot possui tela HD de 10,1 polegadas."
-        if any(term in normalized_text for term in ("duracao", "dura", "autonomia", "tempo da bateria", "bateria dura")):
-            return (
-                "O NeoBot tem autonomia de até 10 horas de operação contínua. "
-                "A bateria informada no catálogo é de 20.000 mAh."
-            )
-        if any(term in normalized_text for term in ("recarga", "carregamento", "carregar", "tempo de carga")):
-            return "O tempo de carregamento do NeoBot é de aproximadamente 9 horas."
-        if "bateria reserva" in normalized_text:
-            return (
-                "Na base atual não tenho confirmação sobre bateria reserva para o NeoBot. "
-                "O catálogo informa bateria de 20.000 mAh, autonomia de até 10 horas e carregamento aproximado de 9 horas. "
-                "Para confirmar bateria reserva ou acessórios, preciso validar com a equipe comercial/técnica da Smart Control Brasil."
-            )
         if "idioma" in normalized_text or "idiomas" in normalized_text:
             return (
                 "O NeoBot tem comunicação multilíngue e pode operar em mais de 20 idiomas, "
@@ -493,14 +536,9 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
             "respeitando o planejamento do professor e competências da BNCC. Ele não substitui o professor. Página interna: /solucoes/xyron-robotics/liro-littlebot/."
         )
     if "orbitbot" in top:
-        if "termica" in normalized_text or "temperatura" in normalized_text:
-            return (
-                "Sim. O OrbitBot possui imagem térmica para vigilância e monitoramento preventivo, "
-                "com faixa de temperatura de -5°C a 150°C no catálogo."
-            )
         return (
             "O OrbitBot é um robô de segurança autônoma com navegação a laser, patrulha 24/7 e monitoramento contínuo. "
-            "Ele apoia equipes de segurança em ambientes amplos que exigem cobertura previsível e preventiva, sem substituir vigilantes, central de monitoramento ou protocolos de emergência. Página interna: /solucoes/xyron-robotics/orbit/."
+            "Ele apoia equipes de segurança em ambientes amplos que exigem cobertura previsível e preventiva, sem substituir vigilantes, central de monitoramento ou protocolos de emergência. Página interna: /solucoes/xyron-robotics/patrol-orbit/."
         )
     if "liro" in top or "littlebot" in top:
         return (
@@ -509,7 +547,7 @@ def _reply_from_knowledge(knowledge_context, normalized_text, recent_product="")
         )
     if "orbit bot" in top or "patrol bot" in top:
         return (
-            "O Orbit Bot, também tratado como Patrol Bot, é um robô de segurança para grandes áreas com navegação autônoma e patrulhamento programado. Ele apoia prevenção de riscos e rotinas de monitoramento, mas não substitui vigilantes, análise humana ou resposta a emergências. Página interna: /solucoes/xyron-robotics/orbit/."
+            "O Orbit Bot, também tratado como Patrol Bot, é um robô de segurança para grandes áreas com navegação autônoma e patrulhamento programado. Ele apoia prevenção de riscos e rotinas de monitoramento, mas não substitui vigilantes, análise humana ou resposta a emergências. Página interna: /solucoes/xyron-robotics/patrol-orbit/."
         )
     if "waiterbot" in top:
         return (
@@ -738,6 +776,30 @@ def is_price_question(normalized_text):
     )
     return any(term in normalized_text for term in price_terms)
 
+
+
+def _has_xyron_context(normalized_text, messages=None):
+    text = _conversation_text(messages or [], normalized_text)
+    return any(
+        term in text
+        for term in (
+            "xyron",
+            "robo",
+            "robos",
+            "robot",
+            "liro",
+            "littlebot",
+            "neobot",
+            "buddy",
+            "patrol",
+            "orbit",
+            "hygibot",
+            "hostbot",
+            "waiterbot",
+            "carebot",
+            "mowerbot",
+        )
+    )
 
 def _conversation_text(messages, current_normalized=""):
     parts = [current_normalized]
@@ -1459,6 +1521,18 @@ def _is_robot_recommendation_question(normalized_text):
             "robo corta grama",
             "robo cortador de grama",
             "cortar grama",
+            "cao robo",
+            "cachorro robo",
+            "robo cachorro",
+            "robo quadrupede",
+            "demonstracao",
+            "demonstração",
+            "interacao leve",
+            "interação leve",
+            "inspecao",
+            "inspeção",
+            "area dificil",
+            "área difícil",
         )
     )
 
@@ -1488,7 +1562,7 @@ def _recommend_robot_by_scenario(normalized_text):
             "Para segurança e patrulhamento, as opções mais aderentes costumam ser 1) Orbit Bot/Patrol Bot para grandes áreas internas, "
             "2) Buddy Bot para terreno irregular e áreas externas e 3) HostBot quando a recepção também precisa de orientação. "
             "Esses robôs apoiam a equipe de segurança, mas não substituem vigilantes, central de monitoramento ou protocolos de emergência. "
-            "Página do Orbit: /solucoes/xyron-robotics/orbit/."
+            "Página do Orbit: /solucoes/xyron-robotics/patrol-orbit/."
         )
     if any(term in normalized_text for term in ("restaurante", "hotel", "bandeja", "entrega", "food", "garcom", "garçom")):
         return (
@@ -1515,6 +1589,12 @@ def _recommend_robot_by_scenario(normalized_text):
             "Para corte de grama, jardim e áreas externas, o MowerBot é o robô indicado. "
             "Ele apoia produtividade e segurança no corte de vegetação, mas depende de avaliação do terreno e da rotina de operação. "
             "Página interna: /solucoes/xyron-robotics/mowerbot/."
+        )
+    if any(term in normalized_text for term in ("demonstracao", "demonstração", "interacao leve", "interação leve", "inspecao", "inspeção", "area dificil", "área difícil", "quadrupede", "cao robo", "cachorro robo")):
+        return (
+            "Para demonstração, interação leve, inspeção ou áreas de difícil acesso, o Buddy Bot pode ser a opção Xyron mais aderente. "
+            "Ele apoia equipes em inspeções e presença em ambientes complexos, sem substituir operadores, análise de risco ou protocolos humanos. "
+            "Página interna: /solucoes/xyron-robotics/buddy/."
         )
     return (
         "Posso te sugerir de 1 a 3 robôs ideais, mas preciso de um contexto rápido: "

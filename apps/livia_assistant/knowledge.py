@@ -12,7 +12,9 @@ class LiviaKnowledgeService:
 
     XYRON_INTENT_TERMS = {
         "robo",
+        "robos",
         "robot",
+        "robots",
         "bot",
         "xyron",
         "liro",
@@ -47,13 +49,7 @@ class LiviaKnowledgeService:
         "duno",
         "dunobot",
     }
-    BUDDY_INTENT_TERMS = {
-        "buddy",
-        "budy",
-        "cao",
-        "cachorro",
-        "quadrupede",
-    }
+    BUDDY_INTENT_TERMS = {"buddy", "budy", "cao", "cachorro", "quadrupede", "demonstracao", "interacao", "inspecao", "dificil"}
     LIRO_INTENT_TERMS = {"liro", "little", "littlebot", "educacional", "escola", "creche", "infantil"}
     WAITER_INTENT_TERMS = {"waiter", "waiterbot", "garcom", "restaurante", "bandeja", "food"}
     CARE_INTENT_TERMS = {"carebot", "saude", "clinica", "idoso", "idosos", "telemedicina", "teleatendimento"}
@@ -272,8 +268,6 @@ class LiviaKnowledgeService:
         return " ".join(expansions)
 
     def _is_xyron_overview_query(self, normalized_query: str, terms: list[str]) -> bool:
-        if "xyron" not in terms:
-            return False
         query = f" {normalized_query.strip()} "
         overview_patterns = (
             " o que e a xyron ",
@@ -281,8 +275,35 @@ class LiviaKnowledgeService:
             " quem e a xyron ",
             " quem e xyron ",
             " empresa xyron ",
+            " quais robos ",
+            " quais robo ",
+            " que robos ",
+            " que robo ",
+            " robos voces tem ",
+            " robos trabalham ",
+            " linha de robos ",
+            " linha xyron ",
+            " me fale dos robos ",
+            " me fala dos robos ",
         )
         if any(pattern in query for pattern in overview_patterns):
+            return True
+        has_general_robot_query = {"robo", "robos", "robot", "robots"}.intersection(terms) and any(
+            marker in query for marker in (" quais ", " que ", " voces tem ", " trabalham ", " linha ", " catalogo ", " vitrine ")
+        )
+        if has_general_robot_query and not any(
+            specific.intersection(terms)
+            for specific in (
+                self.LIRO_INTENT_TERMS,
+                self.WAITER_INTENT_TERMS,
+                self.CARE_INTENT_TERMS,
+                self.HOST_INTENT_TERMS,
+                self.MOWER_INTENT_TERMS,
+                self.ORBIT_INTENT_TERMS,
+                self.CLEANING_INTENT_TERMS,
+                self.BUDDY_INTENT_TERMS,
+            )
+        ):
             return True
         # Query curta apenas com a marca.
         return len(terms) <= 2 and "xyron" in terms

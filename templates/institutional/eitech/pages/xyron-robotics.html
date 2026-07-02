@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
 {% endblock %}
 
-{% block body_extra %} class="xyron-page"{% endblock %}
+{% block body_extra %} class="xyron-page xyron-overview-page"{% endblock %}
 
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
@@ -457,155 +457,76 @@
         </div>
       </div>
       <div class="space40"></div>
-      <div class="xyron-product-catalog">
-        <div class="row">
-          {% for robot in xyron_robots %}
-            <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="{{ forloop.counter }}00">
-              <article class="xyron-product-card h-100">
-                <div class="xyron-product-card__media">
-                  <img loading="lazy" src="{% static robot.image %}" alt="{{ robot.name }} da Xyron Robotics">
-                </div>
-                <div class="space20"></div>
-                <span class="xyron-product-tags__tag">{{ robot.primary_application }}</span>
-                <div class="space16"></div>
-                <h3>{{ robot.name }}</h3>
-                <div class="space12"></div>
-                <p>{{ robot.summary|default:robot.subtitle }}</p>
-                <div class="space24"></div>
-                <div class="btn-area1">
-                  <a href="{% url 'institutional:xyron_robot_detail' robot.slug %}" class="vl-btn4">Saber mais <i class="fa-solid fa-arrow-right ms-2"></i></a>
-                </div>
-              </article>
+      <div class="xyron-robot-showcase">
+        {% for robot in xyron_robots %}
+          <article class="xyron-robot-row{% if forloop.counter|divisibleby:'2' %} xyron-robot-row--reverse{% endif %}" data-aos="fade-up" data-aos-duration="{{ forloop.counter }}00">
+            <div class="xyron-robot-row__media">
+              <img loading="lazy" src="{% static robot.image %}" alt="{{ robot.name }} da Xyron Robotics">
             </div>
-          {% endfor %}
-        </div>
+            <div class="xyron-robot-row__content heading5">
+              <span class="xyron-overview-badge">{{ robot.primary_application }}</span>
+              <div class="space14"></div>
+              <h3>{{ robot.name }}</h3>
+              <div class="space12"></div>
+              <p>{{ robot.summary|default:robot.subtitle }}</p>
+              <div class="space18"></div>
+              <ul class="xyron-robot-row__bullets">
+                {% for function in robot.functions|slice:":4" %}
+                  <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>{{ function }}</span></li>
+                {% endfor %}
+              </ul>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:xyron_robot_detail' robot.slug %}" class="vl-btn4">Saber mais <i class="fa-solid fa-arrow-right ms-2"></i></a>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
       </div>
 
     </div>
   </div>
   <!--===== FEATURES AREA ENDS =======-->
 
-  <!--===== PRICING AREA STARTS =======-->
-  <div class="pricingplan1-section-area sp2">
-    <img src="{% static 'institutional/eitech/img/elements/elements30.png' %}" alt="" aria-hidden="true" class="elements30">
+  <!--===== PROCESS AREA STARTS =======-->
+  <div class="xyron-process-section sp2">
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 m-auto">
-          <div class="pricing-header heading5 text-center">
-            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="" aria-hidden="true">Soluções por aplicação</h5>
+        <div class="col-lg-8 m-auto">
+          <div class="heading heading5 text-center">
+            <h5><img src="{% static 'institutional/eitech/img/icons/sub-logo3.svg' %}" alt="" aria-hidden="true">Processo consultivo</h5>
             <div class="space20"></div>
-            <h2 class="text-anime-style-3">Modelos de implantação definidos para cada ambiente</h2>
+            <h2 class="text-anime-style-3">Como a Smart Control Brasil conduz projetos com robôs Xyron</h2>
+            <div class="space16"></div>
+            <p>Nosso trabalho começa pelo diagnóstico do ambiente, escolha do robô adequado, validação do cenário, demonstração, integração e orientação técnica para uso responsável.</p>
           </div>
-          <div class="space24"></div>
-          <p class="text-center px-lg-4">Cada solução é dimensionada após diagnóstico da aplicação, considerando ambiente, objetivos, infraestrutura, integrações, treinamento e suporte necessários.</p>
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="tab-content">
-            <div id="monthly">
-              <div class="row">
-                <div class="col-lg-4 col-md-6" data-aos="flip-right" data-aos-duration="800">
-                  <div class="single-pricing-area">
-                    <div class="pricing-box">
-                      <h3>Educação e escolas</h3>
-                      <div class="space14"></div>
-                      <p>Para instituições que buscam aprendizagem interativa, inclusão, segurança escolar, comunicação e controle de acesso integrado.</p>
-                      <div class="space12"></div>
-                      <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">LIRO / Little Bot para interação educacional</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Kit Xyron School com solução integrada</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Nexneo para comunicação, alertas e BI</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Câmeras, catracas e controle de acesso</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Implantação e treinamento conforme a escola</li>
-                      </ul>
-                      <div class="space28"></div>
-                      <h2>Solução personalizada</h2>
-                      <div class="space24"></div>
-                      <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 col-md-6" data-aos="flip-right" data-aos-duration="900">
-                  <div class="single-pricing-area">
-                    <div class="pricing-box">
-                      <h3>Recepção e atendimento</h3>
-                      <div class="space14"></div>
-                      <p>Para empresas, eventos e espaços que desejam modernizar o atendimento e criar experiências de recepção interativas.</p>
-                      <div class="space12"></div>
-                      <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Neo Bot para recepção e interação</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Apresentação de produtos e serviços</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Apoio a visitantes e eventos</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Configuração alinhada à experiência desejada</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Implantação e orientação da equipe</li>
-                      </ul>
-                      <div class="space28"></div>
-                      <h2>Solução personalizada</h2>
-                      <div class="space24"></div>
-                      <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Montar solução</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 col-md-6" data-aos="flip-right" data-aos-duration="1000">
-                  <div class="single-pricing-area">
-                    <div class="pricing-box">
-                      <h3>Segurança e patrulhamento</h3>
-                      <div class="space14"></div>
-                      <p>Para operações que precisam de monitoramento contínuo, patrulha autônoma, visão inteligente e resposta rápida.</p>
-                      <div class="space12"></div>
-                      <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Patrol Bot, Orbit Bot e Buddy Bot</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Monitoramento em tempo real e alertas</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Visão noturna, imagem térmica e sensores</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">IA aplicada à detecção e prevenção de riscos</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Integração com a equipe de segurança</li>
-                      </ul>
-                      <div class="space28"></div>
-                      <h2>Solução personalizada</h2>
-                      <div class="space24"></div>
-                      <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4 col-md-6 m-auto" data-aos="flip-right" data-aos-duration="1100">
-                  <div class="single-pricing-area">
-                    <div class="pricing-box">
-                      <h3>Projetos especiais e integração</h3>
-                      <div class="space14"></div>
-                      <p>Para projetos que combinam robôs, câmeras, controle de acesso, software, infraestrutura existente e necessidades específicas.</p>
-                      <div class="space12"></div>
-                      <ul>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Diagnóstico técnico e operacional</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Definição da arquitetura da solução</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Integração com sistemas e infraestrutura</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Treinamento das equipes envolvidas</li>
-                        <li><img src="{% static 'institutional/eitech/img/icons/check4.svg' %}" alt="" aria-hidden="true">Acompanhamento após a implantação</li>
-                      </ul>
-                      <div class="space28"></div>
-                      <h2>Solução personalizada</h2>
-                      <div class="space24"></div>
-                      <div class="btn-area1">
-                        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Alinhar solução</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="space40"></div>
+      <div class="xyron-process-grid">
+        <article class="xyron-process-card" data-aos="fade-up" data-aos-duration="800">
+          <span>01</span>
+          <h3>Diagnóstico do cenário</h3>
+          <p>Entendemos o ambiente, público, operação e objetivo.</p>
+        </article>
+        <article class="xyron-process-card" data-aos="fade-up" data-aos-duration="900">
+          <span>02</span>
+          <h3>Escolha do robô certo</h3>
+          <p>Indicamos o modelo Xyron mais adequado sem empurrar solução genérica.</p>
+        </article>
+        <article class="xyron-process-card" data-aos="fade-up" data-aos-duration="1000">
+          <span>03</span>
+          <h3>Implantação orientada</h3>
+          <p>Apoiamos demonstração, configuração, integração e uso responsável.</p>
+        </article>
+      </div>
+      <div class="space36"></div>
+      <div class="btn-area1 text-center">
+        <a href="{% url 'institutional:contact' %}" class="vl-btn4">Solicitar diagnóstico <i class="fa-solid fa-arrow-right ms-2"></i></a>
       </div>
     </div>
   </div>
-  <!--===== PRICING AREA ENDS =======-->
+  <!--===== PROCESS AREA ENDS =======-->
 
   <!--===== FAQ AREA STARTS =======-->
   <div class="faq3-section-area sp1">

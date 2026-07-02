@@ -57,11 +57,16 @@ class InstitutionalRoutesTests(SimpleTestCase):
             response, "institutional/eitech/pages/xyron-robotics.html"
         )
         self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
-        self.assertContains(response, 'class="xyron-page"')
+        self.assertContains(response, 'class="xyron-page xyron-overview-page"')
         self.assertContains(response, 'xyron-dark-section')
+        self.assertContains(response, 'xyron-robot-showcase')
+        self.assertContains(response, 'xyron-robot-row')
         self.assertContains(response, "Linha Xyron Robotics")
+        self.assertContains(response, "Saber mais")
+        self.assertContains(response, "Como a Smart Control Brasil conduz projetos com robôs Xyron")
         self.assertNotContains(response, "Ficha técnica e recursos")
         self.assertNotContains(response, "Capacidade da bateria")
+        self.assertNotContains(response, "Solução personalizada")
 
     def test_xyron_robotics_solutions_url_renders_vitrine(self):
         response = self.client.get(reverse("institutional:xyron_robotics"))

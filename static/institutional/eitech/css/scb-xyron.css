@@ -647,3 +647,212 @@
     padding: 22px;
   }
 }
+
+/* Xyron overview page */
+.xyron-overview-page .features3-section-area {
+  scroll-margin-top: 110px;
+}
+
+.xyron-overview-page .xyron-robot-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.xyron-overview-page .xyron-robot-row {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(88, 56, 168, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(26, 16, 51, 0.08);
+  display: grid;
+  gap: 32px;
+  grid-template-columns: minmax(260px, 38%) 1fr;
+  overflow: hidden;
+  padding: 28px;
+}
+
+.xyron-overview-page .xyron-robot-row__media {
+  align-items: center;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(135deg, #f7f6ff 0%, #eef4ff 100%);
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.xyron-overview-page .xyron-robot-row--reverse .xyron-robot-row__media {
+  order: 2;
+}
+
+.xyron-overview-page .xyron-robot-row--reverse .xyron-robot-row__content {
+  order: 1;
+}
+
+.xyron-overview-page .xyron-robot-row__media img {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.xyron-overview-page .xyron-robot-row__content h3 {
+  color: #160f2f;
+  font-size: 32px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.xyron-overview-page .xyron-robot-row__content p {
+  color: #4f4961;
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.xyron-overview-page .xyron-overview-badge {
+  background: rgba(88, 56, 168, 0.1);
+  border-radius: 999px;
+  color: #5838a8;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 8px 14px;
+}
+
+.xyron-overview-page .xyron-robot-row__bullets {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+.xyron-overview-page .xyron-robot-row__bullets li {
+  align-items: flex-start;
+  color: #28213d;
+  display: flex;
+  font-size: 16px;
+  gap: 10px;
+  line-height: 1.55;
+}
+
+.xyron-overview-page .xyron-robot-row__bullets li i {
+  color: #5838a8;
+  flex: 0 0 auto;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.xyron-overview-page .xyron-process-section {
+  background: #f7f8fc;
+  position: relative;
+}
+
+.xyron-overview-page .xyron-process-section .heading p {
+  color: #4f4961;
+  line-height: 1.75;
+}
+
+.xyron-overview-page .xyron-process-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.xyron-overview-page .xyron-process-card {
+  background: #ffffff;
+  border: 1px solid rgba(88, 56, 168, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 16px 38px rgba(26, 16, 51, 0.07);
+  min-height: 220px;
+  padding: 30px;
+}
+
+.xyron-overview-page .xyron-process-card span {
+  align-items: center;
+  background: #5838a8;
+  border-radius: 50%;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 700;
+  height: 44px;
+  justify-content: center;
+  margin-bottom: 22px;
+  width: 44px;
+}
+
+.xyron-overview-page .xyron-process-card h3 {
+  color: #160f2f;
+  font-size: 24px;
+  line-height: 1.25;
+  margin: 0 0 12px;
+}
+
+.xyron-overview-page .xyron-process-card p {
+  color: #4f4961;
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 991px) {
+  .xyron-overview-page .xyron-robot-row {
+    gap: 24px;
+    grid-template-columns: 1fr;
+    padding: 24px;
+  }
+
+  .xyron-overview-page .xyron-robot-row__media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .xyron-overview-page .xyron-robot-row--reverse .xyron-robot-row__media,
+  .xyron-overview-page .xyron-robot-row--reverse .xyron-robot-row__content {
+    order: initial;
+  }
+
+  .xyron-overview-page .xyron-process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .xyron-overview-page .xyron-process-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 575px) {
+  .xyron-overview-page .xyron-robot-showcase {
+    gap: 22px;
+  }
+
+  .xyron-overview-page .xyron-robot-row {
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  .xyron-overview-page .xyron-robot-row__media {
+    border-radius: 12px;
+    padding: 18px;
+  }
+
+  .xyron-overview-page .xyron-robot-row__content h3 {
+    font-size: 26px;
+  }
+
+  .xyron-overview-page .xyron-robot-row__content p,
+  .xyron-overview-page .xyron-robot-row__bullets li {
+    font-size: 15px;
+  }
+
+  .xyron-overview-page .xyron-process-card {
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .xyron-overview-page .xyron-process-card h3 {
+    font-size: 21px;
+  }
+}
+

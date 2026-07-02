@@ -1,6 +1,8 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
+from .xyron_robots import XYRON_ROBOTS
+
 class StaticViewSitemap(Sitemap):
     priority = 0.8
     changefreq = 'weekly'
@@ -20,6 +22,8 @@ class StaticViewSitemap(Sitemap):
             'institutional:engenharia_embarcada',
             'institutional:refrigeracao',
             'institutional:service_diagnostico_ia_dados_automacao',
+            'institutional:xyron_robotics',
+            *[("institutional:xyron_robot_detail", robot["slug"]) for robot in XYRON_ROBOTS],
             'institutional:blog',
             'institutional:contact',
             'institutional:team',
@@ -41,4 +45,7 @@ class StaticViewSitemap(Sitemap):
         ]
 
     def location(self, item):
+        if isinstance(item, tuple):
+            route_name, slug = item
+            return reverse(route_name, args=[slug])
         return reverse(item)

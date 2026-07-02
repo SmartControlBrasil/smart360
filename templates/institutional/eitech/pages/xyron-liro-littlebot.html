@@ -1,14 +1,32 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}{{ robot.name }} | Robôs Xyron | Smart Control Brasil{% endblock %}
-{% block meta_description %}{{ robot.subtitle }}{% endblock %}
+{% block title %}{{ robot.seo_title }}{% endblock %}
+{% block meta_description %}{{ robot.meta_description }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
 {% endblock %}
 
 {% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ robot.name|escapejs }}",
+  "description": "{{ robot.meta_description|escapejs }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "{{ robot.schema_category|escapejs }}",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' robot.slug %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static robot.image %}"
+}
+</script>
+{% endblock %}
 
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
@@ -24,7 +42,7 @@
           <div class="inner-header text-center heading1">
             <h1>{{ robot.name }}</h1>
             <div class="space28"></div>
-            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:parceiro_xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>{{ robot.name }}</span>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>{{ robot.name }}</span>
           </div>
         </div>
       </div>
@@ -41,7 +59,7 @@
             <div class="search-area">
               <h3>Buscar</h3>
               <div class="space24"></div>
-              <form action="{% url 'institutional:parceiro_xyron_robotics' %}" method="get">
+              <form action="{% url 'institutional:xyron_robotics' %}" method="get">
                 <input type="text" name="q" placeholder="Buscar robô...">
                 <button type="submit" aria-label="Buscar robô Xyron"><i class="fa-solid fa-magnifying-glass"></i></button>
               </form>
@@ -88,7 +106,7 @@
               <img src="{% static robot.image %}" alt="{{ robot.name }} da Xyron Robotics">
             </div>
             <div class="space32"></div>
-            <h3>{{ robot.name }}</h3>
+            <h2>{{ robot.name }}</h2>
             <div class="space20"></div>
             <p>{{ robot.subtitle }}</p>
             {% for paragraph in robot.intro %}
@@ -96,7 +114,7 @@
               <p>{{ paragraph }}</p>
             {% endfor %}
             <div class="space32"></div>
-            <h3>Funções principais</h3>
+            <h2>Funções principais</h2>
             <div class="space20"></div>
             <div class="row">
               {% for function in robot.functions %}
@@ -109,7 +127,7 @@
             </div>
 
             <div class="space32"></div>
-            <h3>Ficha técnica e recursos</h3>
+            <h2>Ficha técnica e recursos</h2>
             <div class="space20"></div>
             <div class="xyron-product-specs">
               <ul class="xyron-product-specs__list">
@@ -123,7 +141,7 @@
             </div>
 
             <div class="space32"></div>
-            <h3>Aplicações e benefícios</h3>
+            <h2>Aplicações e benefícios</h2>
             <div class="space20"></div>
             <div class="row">
               {% for column in benefit_columns %}
@@ -167,7 +185,7 @@
             </div>
 
             <div class="space32"></div>
-            <h3>{{ robot.approach_title }}</h3>
+            <h2>{{ robot.approach_title }}</h2>
             <div class="space20"></div>
             {% for paragraph in robot.approach %}
               <p>{{ paragraph }}</p>
@@ -175,7 +193,7 @@
             {% endfor %}
 
             <div class="space48"></div>
-            <h3>Perguntas frequentes</h3>
+            <h2>Perguntas frequentes</h2>
             <div class="space20"></div>
             <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
 
@@ -200,7 +218,7 @@
             </div>
 
             <div class="space48"></div>
-            <h3>Próximo passo</h3>
+            <h2>Próximo passo</h2>
             <div class="space20"></div>
             <div class="pera-box">
               <h4>Avalie {{ robot.short_name }} com a Smart Control Brasil</h4>

@@ -3,6 +3,9 @@
 XYRON_ROBOTS = [
     {
         "slug": "liro-littlebot",
+        "seo_title": "LIRO / LittleBot | Robô Educacional Xyron | Smart Control Brasil",
+        "meta_description": "Robô educacional Xyron para escolas, espaços maker e projetos pedagógicos com IA responsável, robótica e mediação humana.",
+        "schema_category": "Robô educacional Xyron",
         "name": "LIRO / LittleBot",
         "short_name": "LIRO / LittleBot",
         "subtitle": "Robô educacional com IA para experiências pedagógicas, projetos maker e interação humano-robô com mediação humana.",
@@ -40,6 +43,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "neobot",
+        "seo_title": "NeoBot | Robô de Recepção e Comunicação | Smart Control Brasil",
+        "meta_description": "NeoBot Xyron para recepção, orientação de visitantes, eventos, showrooms e comunicação institucional com implantação consultiva.",
+        "schema_category": "Robô de recepção e comunicação",
         "name": "NeoBot",
         "short_name": "NeoBot",
         "subtitle": "Robô de recepção e atendimento para comunicação institucional, orientação de visitantes e experiências de relacionamento.",
@@ -59,6 +65,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "buddy",
+        "seo_title": "Buddy | Robô Social e Interativo Xyron | Smart Control Brasil",
+        "meta_description": "Buddy Xyron para interação, demonstrações tecnológicas, educação, eventos e aproximação humano-robô com orientação técnica.",
+        "schema_category": "Robô social e interativo",
         "name": "Buddy",
         "short_name": "Buddy",
         "subtitle": "Robô compacto e social para interação, demonstrações, educação, eventos e aproximação humano-robô.",
@@ -75,6 +84,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "patrol-orbit",
+        "seo_title": "Patrol / Orbit | Robô de Segurança e Ronda | Smart Control Brasil",
+        "meta_description": "Robô Xyron para apoio a rondas, inspeção, presença ostensiva e monitoramento assistido, sem substituir integralmente a equipe de segurança.",
+        "schema_category": "Robô de segurança e ronda",
         "name": "Patrol / Orbit",
         "short_name": "Patrol / Orbit",
         "subtitle": "Robôs para segurança patrimonial, rondas, inspeção e monitoramento assistido em ambientes corporativos e condominiais.",
@@ -91,6 +103,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "hygibot",
+        "seo_title": "HygiBot | Robô de Limpeza e Higienização | Smart Control Brasil",
+        "meta_description": "HygiBot Xyron para apoio à limpeza, higienização e padronização operacional em escolas, clínicas, hospitais, condomínios e ambientes comerciais.",
+        "schema_category": "Robô de limpeza e higienização",
         "name": "HygiBot",
         "short_name": "HygiBot",
         "subtitle": "Robô de limpeza e higienização para padronizar rotinas em ambientes comerciais, educacionais, hospitalares e condominiais.",
@@ -107,6 +122,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "hostbot",
+        "seo_title": "HostBot | Robô de Recepção e Hospitalidade | Smart Control Brasil",
+        "meta_description": "HostBot Xyron para recepção, hospitalidade, orientação de visitantes, eventos, hotéis, restaurantes, clínicas e empresas.",
+        "schema_category": "Robô de recepção e hospitalidade",
         "name": "HostBot",
         "short_name": "HostBot",
         "subtitle": "Robô host para hospitalidade, recepção, eventos, restaurantes, hotéis, clínicas e orientação de visitantes.",
@@ -123,6 +141,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "waiterbot",
+        "seo_title": "WaiterBot | Robô Garçom de Apoio Operacional | Smart Control Brasil",
+        "meta_description": "WaiterBot Xyron para apoio ao atendimento de salão, transporte interno de itens e redução de deslocamentos em restaurantes, hotéis e eventos.",
+        "schema_category": "Robô garçom de apoio operacional",
         "name": "WaiterBot",
         "short_name": "WaiterBot",
         "subtitle": "Robô de apoio ao atendimento de salão e entrega interna para restaurantes, bares, hotéis, eventos e ambientes de serviço.",
@@ -139,6 +160,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "carebot",
+        "seo_title": "CareBot | Robô de Apoio Assistido | Smart Control Brasil",
+        "meta_description": "CareBot Xyron para interação, orientação e apoio assistido em clínicas, hospitais e casas de repouso, sem promessa médica.",
+        "schema_category": "Robô de apoio assistido",
         "name": "CareBot",
         "short_name": "CareBot",
         "subtitle": "Robô de cuidado assistido para clínicas, hospitais, casas de repouso e ambientes de apoio a equipes e pacientes.",
@@ -155,6 +179,9 @@ XYRON_ROBOTS = [
     },
     {
         "slug": "mowerbot",
+        "seo_title": "MowerBot | Robô Cortador de Grama Xyron | Smart Control Brasil",
+        "meta_description": "MowerBot Xyron para corte de grama, manutenção de áreas externas, jardins, condomínios, clubes, escolas, hotéis e áreas corporativas.",
+        "schema_category": "Robô cortador de grama",
         "name": "MowerBot",
         "short_name": "MowerBot",
         "subtitle": "Robô cortador de grama para áreas externas, condomínios, clubes, escolas, hotéis e manutenção paisagística automatizada.",

@@ -57,11 +57,15 @@ class InstitutionalRoutesTests(SimpleTestCase):
             response, "institutional/eitech/pages/xyron-robotics.html"
         )
         self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
+        self.assertContains(response, "Xyron Robotics no Brasil | Robôs para Educação, Segurança, Limpeza e Atendimento")
+        self.assertContains(response, "Conheça a linha Xyron Robotics com a Smart Control Brasil: robôs para educação, recepção, segurança, limpeza, atendimento, cuidado assistido e áreas externas.")
+        self.assertContains(response, "CollectionPage")
         self.assertContains(response, 'class="xyron-page xyron-overview-page"')
         self.assertContains(response, 'xyron-dark-section')
         self.assertContains(response, 'xyron-robot-showcase')
         self.assertContains(response, 'xyron-robot-row')
         self.assertContains(response, "Linha Xyron Robotics")
+        self.assertContains(response, "<h1", count=1)
         self.assertContains(response, "Saber mais")
         self.assertContains(response, "Como a Smart Control Brasil conduz projetos com robôs Xyron")
         self.assertNotContains(response, "Ficha técnica e recursos")
@@ -99,12 +103,22 @@ class InstitutionalRoutesTests(SimpleTestCase):
                     response, "institutional/eitech/pages/xyron-liro-littlebot.html"
                 )
                 self.assertContains(response, robot["name"])
+                self.assertContains(response, robot["seo_title"])
+                self.assertContains(response, robot["meta_description"])
+                self.assertContains(response, f"<h1>{robot['name']}</h1>", html=True)
+                self.assertContains(response, "<h1", count=1)
+                self.assertContains(response, "Product")
+                self.assertContains(response, "Xyron Robotics")
                 self.assertContains(response, "Robôs Xyron")
                 self.assertContains(response, "Ver mais robôs Xyron")
                 self.assertContains(response, "Funções principais")
                 self.assertContains(response, "Ficha técnica e recursos")
+                self.assertContains(response, "Aplicações e benefícios")
                 self.assertContains(response, "Cuidados comerciais")
+                self.assertContains(response, "Perguntas frequentes")
                 self.assertContains(response, "institutional/eitech/css/scb-xyron.css")
+                self.assertContains(response, reverse("institutional:contact"))
+                self.assertContains(response, reverse("institutional:xyron_robotics"))
                 self.assertNotContains(response, "hero3-section-area")
 
     def test_xyron_robot_sidebar_excludes_current_robot(self):
@@ -135,6 +149,18 @@ class InstitutionalRoutesTests(SimpleTestCase):
                 self.assertNotIn(robot["slug"], sidebar_slugs)
                 self.assertNotIn(robot["slug"], related_slugs)
                 self.assertNotContains(response, f'href="{current_url}"')
+
+    def test_sitemap_includes_xyron_overview_and_robot_pages(self):
+        response = self.client.get("/sitemap.xml")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("institutional:xyron_robotics"))
+        for robot in XYRON_ROBOTS:
+            with self.subTest(robot=robot["slug"]):
+                self.assertContains(
+                    response,
+                    reverse("institutional:xyron_robot_detail", args=[robot["slug"]]),
+                )
 
     def test_xyron_robot_detail_keeps_consultative_guardrails(self):
         checks = [

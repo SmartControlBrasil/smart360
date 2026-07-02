@@ -1,14 +1,35 @@
 {% extends 'institutional/eitech/base.html' %}
 {% load static %}
 
-{% block title %}Xyron Robotics | Robótica, Segurança e Educação | Smart Control Brasil{% endblock %}
-{% block meta_description %}Soluções Xyron Robotics com a Smart Control Brasil: robôs educacionais, recepção, segurança, patrulhamento, monitoramento, controle de acesso, software e kits integrados para escolas, empresas, condomínios, indústrias e cidades.{% endblock %}
+{% block title %}Xyron Robotics no Brasil | Robôs para Educação, Segurança, Limpeza e Atendimento{% endblock %}
+{% block meta_description %}Conheça a linha Xyron Robotics com a Smart Control Brasil: robôs para educação, recepção, segurança, limpeza, atendimento, cuidado assistido e áreas externas.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
 {% endblock %}
 
 {% block body_extra %} class="xyron-page xyron-overview-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Xyron Robotics no Brasil",
+  "description": "Conheça a linha Xyron Robotics com a Smart Control Brasil: robôs para educação, recepção, segurança, limpeza, atendimento, cuidado assistido e áreas externas.",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robotics' %}",
+  "hasPart": [
+    {% for robot in xyron_robots %}
+    {
+      "@type": "WebPage",
+      "name": "{{ robot.name|escapejs }}",
+      "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' robot.slug %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
   <!--===== HERO AREA STARTS =======-->

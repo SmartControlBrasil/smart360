@@ -462,6 +462,7 @@
   max-height: 430px;
 }
 
+.xyron-detail-page .service2-widget-sidebar h2,
 .xyron-detail-page .service2-widget-sidebar h3 {
   color: #160f2f;
   font-size: 31px;
@@ -616,6 +617,7 @@
     padding: 15px 14px;
   }
 
+  .xyron-detail-page .service2-widget-sidebar h2,
   .xyron-detail-page .service2-widget-sidebar h3 {
     font-size: 27px;
   }

@@ -162,6 +162,55 @@ class InstitutionalRoutesTests(SimpleTestCase):
                     reverse("institutional:xyron_robot_detail", args=[robot["slug"]]),
                 )
 
+    def test_clps_project_route_renders_without_template_error(self):
+        response = self.client.get(reverse("institutional:automacao_industrial_clps_ihms"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response,
+            "institutional/eitech/pages/projects/automacao-industrial-clps.html",
+        )
+        self.assertContains(
+            response,
+            "Automação Industrial com CLPs, IHMs e Integração de Máquinas",
+        )
+        self.assertContains(response, "Solicitar diagnóstico")
+
+    @override_settings(LIVIA_ASSISTANT_ENABLED=True)
+    def test_livia_enabled_disables_hostgator_bubblechat(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "whatsapp-floating-button")
+        self.assertContains(response, "livia-chat-widget")
+        self.assertNotContains(response, "agent-factory-chat.hostgator.io")
+
+    @override_settings(LIVIA_ASSISTANT_ENABLED=False)
+    def test_livia_disabled_keeps_hostgator_bubblechat_fallback(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "whatsapp-floating-button")
+        self.assertNotContains(response, "livia-chat-widget")
+        self.assertContains(response, "agent-factory-chat.hostgator.io")
+
+    def test_sitemap_includes_week1_public_routes(self):
+        response = self.client.get("/sitemap.xml")
+
+        self.assertEqual(response.status_code, 200)
+        expected_routes = [
+            "institutional:representada_mitsubishi_automacao",
+            "institutional:blog_page_2",
+            "institutional:blog_robotica_escolas_empresas_cidades",
+            "institutional:blog_dados_operacionais_empresa_inteligente",
+            "institutional:projects_page_2",
+            "institutional:projects_page_3",
+            "institutional:automacao_industrial_clps_ihms",
+        ]
+        for route_name in expected_routes:
+            with self.subTest(route_name=route_name):
+                self.assertContains(response, reverse(route_name))
+
     def test_xyron_robot_detail_keeps_consultative_guardrails(self):
         checks = [
             ("liro-littlebot", "não substitui o professor"),

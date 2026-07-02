@@ -1,0 +1,120 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-projects.css' %}">
+{% endblock %}
+
+{% block title %}Automação Industrial com CLPs, IHMs e Integração de Máquinas | Smart Control Brasil{% endblock %}
+{% block meta_description %}Projetos de automação industrial com CLPs, IHMs, inversores, servos, retrofit, diagnóstico técnico e integração segura de máquinas.{% endblock %}
+
+{% block content %}
+<div class="inner-page-hero-area scb-project-hero">
+  <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+  <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+  <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+  <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="inner-header text-center heading1">
+          <h1>Automação Industrial com CLPs, IHMs e Integração de Máquinas</h1>
+          <div class="space28"></div>
+          <a href="{% url 'institutional:home' %}">Home <i class="fa-solid fa-angle-right"></i> Projeto <i class="fa-solid fa-angle-right"></i> <span>Automação Industrial com CLPs, IHMs e Integração de Máquinas</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="case-single-section-area sp1">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 m-auto">
+        <div class="case-sider-widget-area scb-project-widget-reset">
+          <div class="img1 image-anime reveal">
+            <img loading="lazy" src="{% static 'institutional/eitech/img/all-images/case/case-img12.png' %}" alt="Automação industrial com CLPs e IHMs | Smart Control Brasil">
+          </div>
+          <div class="space32"></div>
+          <h3>Escopo técnico</h3>
+          <div class="space20"></div>
+          <p>A frente de automação industrial apoia empresas que precisam modernizar comandos, integrar máquinas, reduzir paradas e dar mais previsibilidade para operação e manutenção.</p>
+          <p><strong>Cliente:</strong> Smart Control Brasil</p>
+          <p><strong>Status:</strong> Frente de atuação em automação industrial</p>
+          <p><strong>Foco:</strong> Mitsubishi, CLPs, IHMs, inversores, servos, retrofit, diagnóstico técnico e integração segura</p>
+          <div class="space20"></div>
+          <p>O trabalho pode envolver diagnóstico de painéis e comandos existentes, revisão de lógica, especificação de arquitetura, programação de CLPs e IHMs, integração com acionamentos e preparação de dados para supervisão.</p>
+          <div class="space20"></div>
+          <p>Em projetos de retrofit, a prioridade é preservar a segurança operacional, reduzir risco de parada e planejar a transição técnica de forma compatível com a realidade da máquina e da equipe de manutenção.</p>
+          <div class="space50"></div>
+          <h3>Aplicações atendidas</h3>
+          <div class="space20"></div>
+          <p>Atuamos em melhorias de máquinas, células automatizadas, integração de sinais, atualização de interfaces, acionamentos e bases técnicas para supervisórios e indicadores industriais.</p>
+          <div class="space12"></div>
+          <div class="row">
+            <div class="col-lg-4 col-md-6">
+              <ul class="list">
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">CLPs Mitsubishi e multimarcas</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">IHMs e telas de operação</li>
+              </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <ul class="list">
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Inversores e servoacionamentos</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Retrofit de máquinas e painéis</li>
+              </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <ul class="list">
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Diagnóstico técnico em campo</li>
+                <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Integração segura de máquinas</li>
+              </ul>
+            </div>
+          </div>
+          <div class="space32"></div>
+          <div class="btn-area1">
+            <a href="{% url 'institutional:contact' %}" class="vl-btn2">Solicitar diagnóstico <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="{% url 'institutional:service_automacao_industrial_clps' %}" class="vl-btn2">Conhecer solução <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="case-inner-area sp2 scb-project-section-bg">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5 m-auto">
+        <div class="heading2 space-margin60 text-center">
+          <h2>Projetos relacionados</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-md-6">
+        <div class="case-slider-boxarea">
+          <div class="img1 image-anime"><img loading="lazy" src="{% static 'institutional/eitech/img/all-images/case/case-img1.png' %}" alt="Case Img1 | Smart Control Brasil"></div>
+          <div class="content-area">
+            <p>Supervisão industrial e dados operacionais</p>
+            <div class="space16"></div>
+            <a href="{% url 'institutional:supervisao_dados_industriais' %}">Ver projetos</a>
+            <div class="arrow"><a href="{% url 'institutional:supervisao_dados_industriais' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação"><i class="fa-solid fa-arrow-right"></i></a></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-6">
+        <div class="case-slider-boxarea">
+          <div class="img1 image-anime"><img loading="lazy" src="{% static 'institutional/eitech/img/all-images/case/case-img2.png' %}" alt="Case Img2 | Smart Control Brasil"></div>
+          <div class="content-area">
+            <p>Robótica industrial e células automatizadas</p>
+            <div class="space16"></div>
+            <a href="{% url 'institutional:robotica_celulas_automatizadas' %}">Falar com especialista</a>
+            <div class="arrow"><a href="{% url 'institutional:robotica_celulas_automatizadas' %}" aria-label="Clique para obter mais detalhes sobre este serviço técnico de automação"><i class="fa-solid fa-arrow-right"></i></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Mapping
+
+from .api_client import DEFAULT_MIN_SCORE
+
+
+UNSAFE_ATLAS_TOKENS = {"", "mock-token", "default", "changeme", "change-me", "atlas-token"}
+DEFAULT_MAX_PROSPECTS_PER_RUN = 10
+
+
+class AtlasConfigError(ValueError):
+    """Raised when the standalone Atlas PoC has unsafe or incomplete configuration."""
+
+
+def _as_int(value: str | None, default: int, *, name: str) -> int:
+    if value in (None, ""):
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise AtlasConfigError(f"{name} precisa ser um inteiro.") from exc
+
+
+def _as_bool(value: str | None, default: bool = False) -> bool:
+    if value in (None, ""):
+        return default
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+@dataclass(frozen=True)
+class AtlasPocConfig:
+    env: str = "development"
+    api_base_url: str = "http://127.0.0.1:8000"
+    api_token: str = ""
+    company_id: int = 0
+    min_score: int = DEFAULT_MIN_SCORE
+    max_prospects_per_run: int = DEFAULT_MAX_PROSPECTS_PER_RUN
+    segment: str = "escola particular"
+    city: str = "Vila Mariana"
+    google_places_api_key: str = ""
+    apollo_api_key: str = ""
+    enable_sheets: bool = False
+    enable_mailer: bool = False
+
+    @classmethod
+    def from_env(cls, environ: Mapping[str, str]) -> "AtlasPocConfig":
+        config = cls(
+            env=(environ.get("ATLAS_ENV") or "development").strip().lower(),
+            api_base_url=(environ.get("ATLAS_API_BASE_URL") or "http://127.0.0.1:8000").strip(),
+            api_token=(environ.get("ATLAS_API_TOKEN") or "").strip(),
+            company_id=_as_int(environ.get("ATLAS_COMPANY_ID"), 0, name="ATLAS_COMPANY_ID"),
+            min_score=_as_int(environ.get("ATLAS_MIN_SCORE"), DEFAULT_MIN_SCORE, name="ATLAS_MIN_SCORE"),
+            max_prospects_per_run=_as_int(
+                environ.get("ATLAS_MAX_PROSPECTS_PER_RUN"),
+                DEFAULT_MAX_PROSPECTS_PER_RUN,
+                name="ATLAS_MAX_PROSPECTS_PER_RUN",
+            ),
+            segment=(environ.get("ATLAS_SEGMENT") or "escola particular").strip(),
+            city=(environ.get("ATLAS_CITY") or "Vila Mariana").strip(),
+            google_places_api_key=(environ.get("GOOGLE_PLACES_API_KEY") or "").strip(),
+            apollo_api_key=(environ.get("APOLLO_API_KEY") or "").strip(),
+            enable_sheets=_as_bool(environ.get("ATLAS_ENABLE_SHEETS"), False),
+            enable_mailer=False,
+        )
+        config.validate()
+        return config
+
+    @property
+    def production(self) -> bool:
+        return self.env == "production"
+
+    @property
+    def mock_mode(self) -> bool:
+        return not self.production and (not self.google_places_api_key or not self.apollo_api_key)
+
+    @property
+    def can_sync_api(self) -> bool:
+        return bool(self.api_base_url and self.api_token and self.company_id > 0 and self.api_token not in UNSAFE_ATLAS_TOKENS)
+
+    def validate(self) -> None:
+        if self.max_prospects_per_run <= 0:
+            raise AtlasConfigError("ATLAS_MAX_PROSPECTS_PER_RUN precisa ser maior que zero.")
+        if self.min_score < 0:
+            raise AtlasConfigError("ATLAS_MIN_SCORE nao pode ser negativo.")
+        if not self.segment:
+            raise AtlasConfigError("ATLAS_SEGMENT precisa ser configurado.")
+        if not self.city:
+            raise AtlasConfigError("ATLAS_CITY precisa ser configurada.")
+        if self.production:
+            missing = []
+            if not self.api_base_url:
+                missing.append("ATLAS_API_BASE_URL")
+            if not self.api_token:
+                missing.append("ATLAS_API_TOKEN")
+            if self.company_id <= 0:
+                missing.append("ATLAS_COMPANY_ID")
+            if missing:
+                raise AtlasConfigError("Production exige: " + ", ".join(missing) + ".")
+            if self.api_token in UNSAFE_ATLAS_TOKENS:
+                raise AtlasConfigError("ATLAS_API_TOKEN inseguro nao pode ser usado em production.")

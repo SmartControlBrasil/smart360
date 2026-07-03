@@ -18,12 +18,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Count, Q
 
 from apps.access_control_center.services.access_service import AccessAuditService
-from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentRecommendation
+from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentRecommendation, CommercialOpportunity
 from apps.ai_agents_center.services.briefing_composer import AIBriefingComposer
 from apps.ai_agents_center.services.client_portal_copilot import ClientPortalCopilotService
+from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
 from apps.ai_decision_engine.models import AgentDecision
 from apps.ai_decision_engine.services.orchestrator import DecisionOrchestrator
 from apps.analytics_platform.models import OperationalMetrics
@@ -260,6 +261,128 @@ class ClientPortalUserAdminMixin(ShellContextMixin):
             }
         )
         return context
+
+
+class AtlasCommercialOpportunityListView(ShellContextMixin, TemplateView):
+    template_name = "admin_shell/atlas_opportunities.html"
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+
+    STATUS_CARDS = [
+        (CommercialOpportunity.Status.NEW, "Novas"),
+        (CommercialOpportunity.Status.ENRICHING, "Enriquecendo"),
+        (CommercialOpportunity.Status.READY_FOR_REVIEW, "Prontas para revisão"),
+        (CommercialOpportunity.Status.APPROVED, "Aprovadas"),
+        (CommercialOpportunity.Status.REJECTED, "Rejeitadas"),
+        (CommercialOpportunity.Status.CONVERTED_TO_LEAD, "Convertidas para lead"),
+    ]
+
+    def get_queryset(self):
+        queryset = CommercialOpportunity.objects.select_related("lead", "reviewed_by", "converted_by").order_by(
+            "-created_at",
+            "-commercial_score",
+        )
+        status = self.request.GET.get("status", "").strip()
+        source = self.request.GET.get("source", "").strip()
+        query = self.request.GET.get("q", "").strip()
+        if status:
+            queryset = queryset.filter(status=status)
+        if source:
+            queryset = queryset.filter(source=source)
+        if query:
+            queryset = queryset.filter(
+                Q(company_name__icontains=query)
+                | Q(segment__icontains=query)
+                | Q(city__icontains=query)
+                | Q(state__icontains=query)
+                | Q(recommended_product__icontains=query)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        status_counts = {
+            row["status"]: row["total"]
+            for row in CommercialOpportunity.objects.values("status").annotate(total=Count("id"))
+        }
+        context.update(
+            {
+                "current_module_slug": "ai-agents-center",
+                "page_title": "Atlas Comercial",
+                "page_description": "Revisão operacional de oportunidades comerciais do Atlas antes de conversão manual para lead.",
+                "breadcrumbs": [
+                    {"label": "Dashboard", "url": "admin-shell:dashboard"},
+                    {"label": "Intelligence", "url": None},
+                    {"label": "Atlas Comercial", "url": None},
+                ],
+                "filters": {
+                    "q": self.request.GET.get("q", "").strip(),
+                    "status": self.request.GET.get("status", "").strip(),
+                    "source": self.request.GET.get("source", "").strip(),
+                },
+                "status_options": CommercialOpportunity.Status.choices,
+                "source_options": CommercialOpportunity.Source.choices,
+                "summary_cards": [
+                    {"label": label, "value": status_counts.get(status, 0)}
+                    for status, label in self.STATUS_CARDS
+                ],
+                "opportunities": self.get_queryset()[:100],
+            }
+        )
+        return context
+
+
+class AtlasCommercialOpportunityActionView(ShellContextMixin, View):
+    http_method_names = ["post"]
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+    action_name = ""
+
+    def post(self, request, *args, public_id, **kwargs):
+        opportunity = get_object_or_404(CommercialOpportunity.objects.select_related("lead"), public_id=public_id)
+        action = getattr(self, "action_name", "")
+
+        if action == "approve":
+            if opportunity.status == CommercialOpportunity.Status.CONVERTED_TO_LEAD:
+                messages.warning(request, "Oportunidade já convertida em lead; aprovação não foi alterada.")
+            else:
+                opportunity.status = CommercialOpportunity.Status.APPROVED
+                opportunity.reviewed_by = request.user
+                opportunity.reviewed_at = timezone.now()
+                opportunity.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
+                messages.success(request, "Oportunidade aprovada.")
+            return redirect("admin-shell:atlas-opportunities")
+
+        if action == "reject":
+            if opportunity.status == CommercialOpportunity.Status.CONVERTED_TO_LEAD:
+                messages.warning(request, "Oportunidade já convertida em lead; rejeição não foi aplicada.")
+            else:
+                opportunity.status = CommercialOpportunity.Status.REJECTED
+                opportunity.reviewed_by = request.user
+                opportunity.reviewed_at = timezone.now()
+                opportunity.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
+                messages.success(request, "Oportunidade rejeitada.")
+            return redirect("admin-shell:atlas-opportunities")
+
+        if action == "convert":
+            if opportunity.status == CommercialOpportunity.Status.CONVERTED_TO_LEAD or opportunity.lead_id:
+                messages.info(request, "Oportunidade já convertida em lead.")
+                return redirect("admin-shell:atlas-opportunities")
+            if opportunity.status != CommercialOpportunity.Status.APPROVED:
+                messages.warning(request, "Apenas oportunidades aprovadas podem virar lead.")
+                return redirect("admin-shell:atlas-opportunities")
+            try:
+                lead = OpportunityBuilderService.convert_to_lead(opportunity=opportunity, user=request.user)
+            except ValueError as exc:
+                messages.warning(request, str(exc))
+            else:
+                messages.success(request, f"Oportunidade convertida para lead #{lead.id}.")
+            return redirect("admin-shell:atlas-opportunities")
+
+        messages.error(request, "Ação Atlas não reconhecida.")
+        return redirect("admin-shell:atlas-opportunities")
 
 
 class ClientPortalUserListView(ClientPortalUserAdminMixin, TemplateView):

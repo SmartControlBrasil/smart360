@@ -1,0 +1,124 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-secondary" href="{% url 'admin-shell:ai-agents-dashboard' %}">AI Agents Center</a>
+            <a class="btn-secondary" href="{% url 'admin-shell:growth-livia-leads' %}">Leads comerciais</a>
+        </div>
+    </div>
+
+    <form method="get" class="table-card">
+        <div class="section-header">
+            <h2>Filtros</h2>
+            <p class="muted-block">Refine por empresa, segmento, status e origem.</p>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>Busca</span>
+                <input type="search" name="q" value="{{ filters.q }}" placeholder="Empresa, segmento, cidade ou produto">
+            </label>
+            <label>
+                <span>Status</span>
+                <select name="status">
+                    <option value="">Todos</option>
+                    {% for value, label in status_options %}
+                        <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Origem</span>
+                <select name="source">
+                    <option value="">Todas</option>
+                    {% for value, label in source_options %}
+                        <option value="{{ value }}" {% if filters.source == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="page-actions">
+            <button class="quick-action-button" type="submit">Aplicar filtros</button>
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-opportunities' %}">Limpar</a>
+        </div>
+    </form>
+
+    <div class="kpi-grid">
+        {% for card in summary_cards %}
+        <article class="stat-card">
+            <span class="stat-label">{{ card.label }}</span>
+            <strong class="stat-value">{{ card.value }}</strong>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Oportunidades Atlas</h2>
+            <p class="muted-block">A conversão para Lead só fica disponível após aprovação humana.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Segmento</th>
+                        <th>Cidade/UF</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Origem</th>
+                        <th>Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opportunity in opportunities %}
+                    <tr>
+                        <td>
+                            <strong>{{ opportunity.company_name }}</strong>
+                            <br><span class="muted-block">{{ opportunity.title }}</span>
+                        </td>
+                        <td>{{ opportunity.segment|default:"-" }}</td>
+                        <td>{{ opportunity.city|default:"-" }}{% if opportunity.state %}/{{ opportunity.state }}{% endif %}</td>
+                        <td>
+                            {{ opportunity.commercial_score }}
+                            <br><span class="muted-block">conf. {{ opportunity.confidence_score }}</span>
+                        </td>
+                        <td>{{ opportunity.get_status_display }}</td>
+                        <td>{{ opportunity.get_source_display }}</td>
+                        <td>{{ opportunity.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if opportunity.status != "converted_to_lead" %}
+                                <form method="post" action="{% url 'admin-shell:atlas-opportunity-approve' public_id=opportunity.public_id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button" type="submit">Aprovar</button>
+                                </form>
+                                <form method="post" action="{% url 'admin-shell:atlas-opportunity-reject' public_id=opportunity.public_id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button quick-action-button--ghost" type="submit">Rejeitar</button>
+                                </form>
+                            {% endif %}
+                            {% if opportunity.status == "approved" %}
+                                <form method="post" action="{% url 'admin-shell:atlas-opportunity-convert' public_id=opportunity.public_id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="quick-action-button" type="submit">Converter para lead</button>
+                                </form>
+                            {% elif opportunity.status == "converted_to_lead" %}
+                                Lead #{{ opportunity.lead_id|default:"-" }}
+                            {% else %}
+                                <span class="muted-block">Conversão bloqueada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8">Nenhuma oportunidade comercial encontrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

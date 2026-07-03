@@ -816,67 +816,52 @@ class AnomalyAnalysisRunView(APIView):
         return Response(AgentRunSerializer(run).data, status=status.HTTP_201_CREATED)
 
 
-import os
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from django.conf import settings
+
+
+LEGACY_ATLAS_UNSAFE_TOKENS = {"", "mock-token", "default", "changeme", "change-me", "atlas-token"}
+
 
 class AtlasLeadIngestionView(APIView):
     """
-    Endpoint (M2M) para ingestão de leads processados pelo robô Atlas.
-    Valida token estático (ATLAS_API_TOKEN) e aplica regras de anti-duplicação.
+    DEPRECATED: endpoint legado do fluxo AtlasLead/PendingAtlasLead.
+
+    Mantido apenas para compatibilidade de clientes antigos, com proteção por
+    token explícito. Ele não cria mais AtlasLead nem Lead. O fluxo oficial é
+    /api/v1/ai-agents/atlas/import-prospects/, que cria CommercialOpportunity
+    para revisão humana antes de qualquer conversão para Growth Engine Lead.
     """
-    permission_classes = [] # Custom authentication implemented in post
-    
+    permission_classes = []  # Machine-to-machine legacy token gate.
+
+    def _expected_token(self):
+        return (getattr(settings, "ATLAS_API_TOKEN", "") or "").strip()
+
     def post(self, request, *args, **kwargs):
-        # 1. Validação de Token Machine-to-Machine
-        auth_header = request.headers.get("Authorization")
-        expected_token = os.getenv("ATLAS_API_TOKEN", "mock-token")
-        
-        if not auth_header or auth_header != f"Bearer {expected_token}":
-            return Response({"error": "Unauthorized or invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
-            
-        # 2. Desserialização do array de leads
-        leads_data = request.data if isinstance(request.data, list) else [request.data]
-        
-        from apps.ai_agents_center.api.serializers import AtlasLeadSerializer
-        from apps.ai_agents_center.models import AtlasLead
-        
-        created_count = 0
-        skipped_count = 0
-        errors = []
-        
-        for idx, lead_payload in enumerate(leads_data):
-            serializer = AtlasLeadSerializer(data=lead_payload)
-            if serializer.is_valid():
-                email = serializer.validated_data.get("email_contato")
-                razao_social = serializer.validated_data.get("razao_social")
-                cidade = serializer.validated_data.get("cidade")
-                
-                # Regra de Anti-duplicidade
-                is_duplicate = False
-                if email and AtlasLead.objects.filter(email_contato=email).exists():
-                    is_duplicate = True
-                elif razao_social and cidade and AtlasLead.objects.filter(razao_social=razao_social, cidade=cidade).exists():
-                    is_duplicate = True
-                elif razao_social and not cidade and AtlasLead.objects.filter(razao_social=razao_social).exists():
-                    is_duplicate = True
-                    
-                if is_duplicate:
-                    skipped_count += 1
-                else:
-                    serializer.save()
-                    created_count += 1
-            else:
-                errors.append({"index": idx, "errors": serializer.errors})
-                
-        return Response({
-            "message": "Ingestão concluída",
-            "created": created_count,
-            "skipped_duplicates": skipped_count,
-            "errors": errors
-        }, status=status.HTTP_201_CREATED if created_count > 0 else status.HTTP_200_OK)
+        expected_token = self._expected_token()
+        if expected_token in LEGACY_ATLAS_UNSAFE_TOKENS:
+            return Response(
+                {
+                    "detail": "Legacy AtlasLead ingestion is disabled until a secure ATLAS_API_TOKEN is configured.",
+                    "deprecated": True,
+                    "official_endpoint": "/api/v1/ai-agents/atlas/import-prospects/",
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header != f"Bearer {expected_token}":
+            return Response({"detail": "Unauthorized or invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(
+            {
+                "detail": "The AtlasLead ingestion endpoint is deprecated and no longer creates AtlasLead records.",
+                "deprecated": True,
+                "legacy_flow": "AtlasLead/PendingAtlasLead",
+                "official_flow": "PoC/CSV/API -> import-prospects -> CommercialOpportunity -> human review -> convert_to_lead -> Growth Engine Lead",
+                "official_endpoint": "/api/v1/ai-agents/atlas/import-prospects/",
+            },
+            status=status.HTTP_410_GONE,
+        )
 
 
 class AIBriefingGenerateView(APIView):

@@ -16,6 +16,38 @@ O Atlas opera em duas camadas conectadas, com revisão humana obrigatória:
 
 Não há criação direta de Lead pela PoC e não há envio automático de e-mail nesta etapa. O cold mail permanece documentado como capacidade experimental desativada, não como rotina de produção.
 
+## Depreciação AtlasLead / PendingAtlasLead
+
+O fluxo `AtlasLead` / `PendingAtlasLead` é legado. Ele existiu como fila inicial de ingestão e revisão da PoC, mas foi substituído por `CommercialOpportunity` para unificar auditoria, revisão humana, decisões do Decision Engine e conversão controlada para `growth_engine.Lead`.
+
+### Fluxo oficial
+
+`PoC/CSV/API -> import-prospects -> CommercialOpportunity -> revisão humana -> approved/rejected -> convert_to_lead -> Growth Engine Lead`
+
+Endpoint oficial:
+
+```text
+POST /api/v1/ai-agents/atlas/import-prospects/
+```
+
+### Fluxo legado
+
+`POST /api/v1/ai-agents/atlas-leads/ingest/ -> AtlasLead -> PendingAtlasLead admin`
+
+Esse caminho está deprecated. O endpoint legado permanece protegido por token apenas para clientes antigos, mas não cria novos `AtlasLead`, não cria `Lead` direto e responde com orientação para o endpoint oficial. Tokens inseguros como `mock-token`, `default` ou vazio não são aceitos como configuração válida.
+
+### Política de compatibilidade
+
+- As tabelas e migrations de `AtlasLead` e `PendingAtlasLead` permanecem intactas.
+- Registros antigos podem ser consultados no Django Admin, marcado como legado.
+- Novas integrações devem usar somente `CommercialOpportunity`.
+- Decision Engine, Admin Shell Atlas Comercial e PoC standalone devem permanecer baseados em `CommercialOpportunity`.
+- Nenhum fluxo Atlas atual deve enviar e-mail, chamar APIs externas ou converter diretamente para Lead sem aprovação humana.
+
+### Remoção futura
+
+A remoção completa do legado deve ocorrer em sprint futura, depois de inventário dos dados antigos, plano de exportação/arquivamento, comunicação aos consumidores do endpoint legado e janela de descontinuação formal. Até lá, o legado fica congelado e impedido de crescer.
+
 ### Comandos seguros
 
 ```bash

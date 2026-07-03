@@ -317,15 +317,19 @@ logger = logging.getLogger(__name__)
 
 def trigger_n8n_webhook(lead):
     """
-    Mock Webhook trigger for n8n integration.
-    Fires when a lead is approved by human moderation.
+    DEPRECATED: marcador legado do fluxo AtlasLead/PendingAtlasLead.
+
+    Mantido sem chamada externa real para compatibilidade com dados antigos.
+    Novos fluxos Atlas devem revisar CommercialOpportunity e converter via
+    OpportunityBuilderService.convert_to_lead.
     """
-    logger.info(f"[N8N WEBHOOK MOCK] Lead Aprovado e enviado para n8n: {lead.razao_social} - Email: {lead.email_contato}")
-    # Aqui entraria a chamada real requests.post(url, json=payload)
+    logger.info(f"[ATLAS LEGACY NOOP] Lead legado aprovado no admin: {lead.razao_social} - Email: {lead.email_contato}")
 
 
 @admin.register(AtlasLead)
 class AtlasLeadAdmin(admin.ModelAdmin):
+    """DEPRECATED: admin somente para consulta/compatibilidade de AtlasLead legado."""
+
     list_display = ("razao_social", "cidade", "score", "segmento", "status", "created_at")
     list_filter = ("status", "segmento", "cidade")
     search_fields = ("razao_social", "email_contato", "cidade")
@@ -336,8 +340,10 @@ class AtlasLeadAdmin(admin.ModelAdmin):
 @admin.register(PendingAtlasLead)
 class PendingAtlasLeadAdmin(admin.ModelAdmin):
     """
-    Painel de Moderação Humana (Interface de Revisão do Marcelo).
-    Focado especificamente em 'Leads Pendentes do Atlas'.
+    DEPRECATED: painel legado de moderação AtlasLead/PendingAtlasLead.
+
+    Mantido apenas para revisão de registros antigos. O fluxo oficial de
+    revisão humana Atlas é a tela Admin Shell baseada em CommercialOpportunity.
     """
     list_display = ("razao_social", "cidade", "score", "segmento", "notas_resumo", "status")
     search_fields = ("razao_social", "cidade", "email_contato")
@@ -354,7 +360,7 @@ class PendingAtlasLeadAdmin(admin.ModelAdmin):
         return (obj.notas[:100] + '...') if len(obj.notas) > 100 else obj.notas
     notas_resumo.short_description = "Notas (Fit Comercial / Produtos)"
 
-    @admin.action(description="Aprovar Leads Selecionados")
+    @admin.action(description="LEGADO: aprovar AtlasLead selecionado")
     def approve_selected_leads(self, request, queryset):
         approved = 0
         for lead in queryset:
@@ -362,9 +368,9 @@ class PendingAtlasLeadAdmin(admin.ModelAdmin):
             lead.save()
             trigger_n8n_webhook(lead)
             approved += 1
-        self.message_user(request, f"{approved} leads aprovados com sucesso. Webhooks disparados.", messages.SUCCESS)
+        self.message_user(request, f"{approved} AtlasLead legados aprovados. Nenhum fluxo novo foi criado.", messages.SUCCESS)
 
-    @admin.action(description="Rejeitar/Arquivar Leads Selecionados")
+    @admin.action(description="LEGADO: rejeitar/arquivar AtlasLead selecionado")
     def reject_selected_leads(self, request, queryset):
         rejected = queryset.update(status='rejected')
         self.message_user(request, f"{rejected} leads foram rejeitados/arquivados.", messages.WARNING)

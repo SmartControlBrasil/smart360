@@ -1380,8 +1380,14 @@ class AIBriefingDelivery(models.Model):
 
 class AtlasLead(models.Model):
     """
-    Modelo bruto para ingestão de leads gerados e enriquecidos pelo pipeline do Atlas (PoC).
-    Estes leads são ingeridos via API e aguardam revisão humana.
+    DEPRECATED: modelo bruto do fluxo AtlasLead/PendingAtlasLead legado.
+
+    O fluxo oficial do Atlas usa CommercialOpportunity:
+    PoC/CSV/API -> import-prospects -> CommercialOpportunity -> revisão humana
+    -> convert_to_lead -> Growth Engine Lead.
+
+    Este modelo permanece apenas para compatibilidade e consulta de dados antigos.
+    Não usar em novos fluxos de ingestão ou revisão.
     """
     class Segment(models.TextChoices):
         ESCOLA = "Escola / Educação", "Escola / Educação"
@@ -1426,7 +1432,10 @@ class AtlasLead(models.Model):
 
 class PendingAtlasLead(AtlasLead):
     """
-    Proxy model para criar uma view dedicada no Django Admin apenas para leads pendentes.
+    DEPRECATED: proxy do fluxo legado AtlasLead/PendingAtlasLead.
+
+    Mantido apenas para compatibilidade operacional com registros antigos no
+    Django Admin. Novas revisões Atlas devem usar CommercialOpportunity.
     """
     class Meta:
         proxy = True

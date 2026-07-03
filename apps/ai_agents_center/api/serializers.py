@@ -588,6 +588,8 @@ class ManagerCopilotSessionResetSerializer(serializers.Serializer):
 
 
 class AtlasLeadSerializer(serializers.ModelSerializer):
+    """DEPRECATED: serializer apenas para compatibilidade do modelo AtlasLead legado."""
+
     class Meta:
         from apps.ai_agents_center.models import AtlasLead
         model = AtlasLead

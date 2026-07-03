@@ -365,6 +365,119 @@ class EscalateOperationalAlertHandler(BaseDecisionHandler):
         )
 
 
+class ReviewCommercialOpportunityHandler(BaseDecisionHandler):
+    action_types = ("review_commercial_opportunity",)
+
+    def execute(self, *, decision: AgentDecision, actor=None) -> ActionHandlerResult:
+        from apps.ai_agents_center.models import CommercialOpportunity
+        from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
+
+        payload = decision.agent_action_proposal.proposed_payload or {}
+        opp_id = payload.get("commercial_opportunity_public_id") or decision.target_entity_id
+        if not opp_id:
+            raise ValueError("ID da oportunidade comercial ausente no payload.")
+
+        try:
+            opportunity = CommercialOpportunity.objects.get(public_id=opp_id)
+        except (ValueError, CommercialOpportunity.DoesNotExist):
+            opportunity = CommercialOpportunity.objects.get(id=opp_id)
+
+        OpportunityBuilderService.approve(opportunity=opportunity, user=actor)
+        return ActionHandlerResult(
+            summary=f"Oportunidade comercial {opportunity.company_name} aprovada.",
+            related_entity_type="commercial_opportunity",
+            related_entity_id=str(opportunity.public_id),
+            payload={"opportunity_public_id": str(opportunity.public_id), "status": opportunity.status},
+            rollback_supported=False,
+        )
+
+    def reject(self, *, decision: AgentDecision, actor=None, reason="") -> ActionHandlerResult:
+        from apps.ai_agents_center.models import CommercialOpportunity
+        from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
+
+        payload = decision.agent_action_proposal.proposed_payload or {}
+        opp_id = payload.get("commercial_opportunity_public_id") or decision.target_entity_id
+        if not opp_id:
+            raise ValueError("ID da oportunidade comercial ausente no payload.")
+
+        try:
+            opportunity = CommercialOpportunity.objects.get(public_id=opp_id)
+        except (ValueError, CommercialOpportunity.DoesNotExist):
+            opportunity = CommercialOpportunity.objects.get(id=opp_id)
+
+        OpportunityBuilderService.reject(opportunity=opportunity, user=actor, reason=reason)
+        return ActionHandlerResult(
+            summary=f"Oportunidade comercial {opportunity.company_name} rejeitada.",
+            related_entity_type="commercial_opportunity",
+            related_entity_id=str(opportunity.public_id),
+            payload={"opportunity_public_id": str(opportunity.public_id), "status": opportunity.status, "rejection_reason": reason},
+            rollback_supported=False,
+        )
+
+
+class EnrichCommercialOpportunityHandler(BaseDecisionHandler):
+    action_types = ("enrich_commercial_opportunity",)
+
+    def execute(self, *, decision: AgentDecision, actor=None) -> ActionHandlerResult:
+        from apps.ai_agents_center.models import CommercialOpportunity
+
+        payload = decision.agent_action_proposal.proposed_payload or {}
+        opp_id = payload.get("commercial_opportunity_public_id") or decision.target_entity_id
+        if not opp_id:
+            raise ValueError("ID da oportunidade comercial ausente no payload.")
+
+        try:
+            opportunity = CommercialOpportunity.objects.get(public_id=opp_id)
+        except (ValueError, CommercialOpportunity.DoesNotExist):
+            opportunity = CommercialOpportunity.objects.get(id=opp_id)
+
+        opportunity.status = CommercialOpportunity.Status.ENRICHING
+        opportunity.metadata = {
+            **(opportunity.metadata or {}),
+            "enrichment_trail": {
+                "timestamp": timezone.now().isoformat(),
+                "actor": str(actor) if actor else "Decision Engine",
+                "message": "Enriquecimento executado de forma deterministica.",
+            }
+        }
+        opportunity.save(update_fields=["status", "metadata", "updated_at"])
+
+        return ActionHandlerResult(
+            summary=f"Oportunidade comercial {opportunity.company_name} marcada como enriquecendo.",
+            related_entity_type="commercial_opportunity",
+            related_entity_id=str(opportunity.public_id),
+            payload={"opportunity_public_id": str(opportunity.public_id), "status": opportunity.status},
+            rollback_supported=False,
+        )
+
+
+class ConvertCommercialOpportunityToLeadHandler(BaseDecisionHandler):
+    action_types = ("convert_commercial_opportunity_to_lead",)
+
+    def execute(self, *, decision: AgentDecision, actor=None) -> ActionHandlerResult:
+        from apps.ai_agents_center.models import CommercialOpportunity
+        from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
+
+        payload = decision.agent_action_proposal.proposed_payload or {}
+        opp_id = payload.get("commercial_opportunity_public_id") or decision.target_entity_id
+        if not opp_id:
+            raise ValueError("ID da oportunidade comercial ausente no payload.")
+
+        try:
+            opportunity = CommercialOpportunity.objects.get(public_id=opp_id)
+        except (ValueError, CommercialOpportunity.DoesNotExist):
+            opportunity = CommercialOpportunity.objects.get(id=opp_id)
+
+        lead = OpportunityBuilderService.convert_to_lead(opportunity=opportunity, user=actor)
+        return ActionHandlerResult(
+            summary=f"Oportunidade {opportunity.company_name} convertida para o Lead {lead.company_name}.",
+            related_entity_type="lead",
+            related_entity_id=str(lead.public_id),
+            payload={"opportunity_public_id": str(opportunity.public_id), "lead_public_id": str(lead.public_id)},
+            rollback_supported=False,
+        )
+
+
 HANDLERS = [
     CreateWorkOrderHandler(),
     CreatePreventiveReviewTaskHandler(),
@@ -375,6 +488,9 @@ HANDLERS = [
     FlagContractProfitabilityAttentionHandler(),
     CreateInvestigationTaskHandler(),
     EscalateOperationalAlertHandler(),
+    ReviewCommercialOpportunityHandler(),
+    EnrichCommercialOpportunityHandler(),
+    ConvertCommercialOpportunityToLeadHandler(),
 ]
 
 

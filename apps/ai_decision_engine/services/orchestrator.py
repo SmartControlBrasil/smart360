@@ -343,6 +343,17 @@ class DecisionOrchestrator:
         proposal.rejected_at = timezone.now()
         proposal.rejection_reason = comment
         proposal.save(update_fields=["status", "rejected_by", "rejected_at", "rejection_reason", "updated_at"])
+
+        # Extensible rejection hook for handlers
+        from .handlers import DecisionHandlerRegistry
+        handler = DecisionHandlerRegistry.get_handler(decision.normalized_action_type)
+        if handler and hasattr(handler, "reject"):
+            try:
+                handler.reject(decision=decision, actor=rejected_by, reason=comment)
+            except Exception as e:
+                # Log or handle handler rejection exception gracefully
+                pass
+
         SystemEventService.log_system_event(
             event_type="decision.rejected",
             source_module="ai_decision_engine",

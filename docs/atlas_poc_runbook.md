@@ -17,7 +17,7 @@ A PoC coleta prospects, enriquece dados quando houver chaves reais, aplica scori
 | `ATLAS_API_TOKEN` | sim | vazio | Nunca usar `mock-token`, `default` ou valor placeholder em production. |
 | `ATLAS_COMPANY_ID` | sim | `0` | Empresa que receberá as oportunidades. |
 | `ATLAS_SOURCE` | não | `mock` (`google_places` em production por padrão) | Fonte da coleta: `mock` ou `google_places`. |
-| `ATLAS_MIN_SCORE` | não | `5` | Score mínimo para enviar à API oficial. |
+| `ATLAS_MIN_SCORE` | não | dinâmico | Score comercial mínimo (0-100) para qualificação e importação de prospects. Padrão: `5` em development/mock e `70` em production/google_places. |
 | `ATLAS_MAX_PROSPECTS_PER_RUN` | não | `10` | Limite operacional por execução. Manter baixo na PoC. |
 | `ATLAS_SEGMENT` | não | `escola particular` | Query/segmento pesquisado. |
 | `ATLAS_CITY` | não | `Vila Mariana` | Região/cidade pesquisada. |
@@ -26,7 +26,17 @@ A PoC coleta prospects, enriquece dados quando houver chaves reais, aplica scori
 | `ATLAS_ENABLE_SHEETS` | não | `false` | Sheets fica desligado por padrão. |
 | `ATLAS_SPREADSHEET_ID` | quando Sheets ativo | vazio | ID da planilha Google Sheets (preferencial, evita lookup por título). |
 | `GOOGLE_APPLICATION_CREDENTIALS` | quando Sheets ativo | vazio | Caminho do JSON de service account, fora do repositório. |
-| `ATLAS_ENABLE_MAILER` | não | `false` | Política fixa: mailer desligado. O `main.py` não chama o mailer. |
+| `ATLAS_ENABLE_MAILER` | não | `false` | Política fixa: mailer desligado. O `main.py` não chama o mailer. `ColdMailer` permanece em `dry_run=True` até opt-in explícito com `ATLAS_ENABLE_MAILER=true`. |
+
+### Entendendo os Scores
+
+O pipeline do Atlas utiliza duas métricas distintas para avaliar os prospects coletados:
+1. **Qualidade dos Dados (Enriquecimento)**: Uma nota de **0 a 10** calculada por `EnrichmentService` que mede o quão completos estão os dados do prospect (presença de e-mail, telefone, site, nome e cargo do decisor).
+2. **Score Comercial**: Uma nota de **0 a 100** calculada por `ScoringEngine` baseada no segmento de atuação, aderência geográfica (região de SP e Grande SP) e presença de decisor qualificado.
+
+O parâmetro de qualificação `ATLAS_MIN_SCORE` é avaliado estritamente contra o **Score Comercial (0-100)**.
+As duas notas são enviadas ao Smart360 e salvas no campo `notes` da oportunidade de forma transparente para auditoria do operador:
+`Score comercial Atlas: {lead.lead_score}/100. Qualidade dos dados: {lead.enrichment_quality_score}/10.`
 
 ## Execução local segura
 

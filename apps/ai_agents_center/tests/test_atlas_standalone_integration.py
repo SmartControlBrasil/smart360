@@ -63,7 +63,7 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
 
         self.assertEqual(row["company_name"], "Escola Sem Envio")
         self.assertEqual(row["source"], "google_maps")
-        self.assertIn("Score de qualificacao Atlas PoC: 7/10", row["notes"])
+        self.assertIn("Score comercial Atlas: 7/100. Qualidade dos dados: 0/10.", row["notes"])
         self.assertNotIn("lead_status", row)
         self.assertNotIn("send_email", row)
         self.assertNotIn("outreach_status", row)
@@ -109,7 +109,7 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
         self.assertEqual(request.kwargs["json"]["company"], 42)
         self.assertEqual(request.kwargs["json"]["source"], "google_maps")
         self.assertEqual(request.kwargs["json"]["rows"], [prospect_to_api_row(lead)])
-        self.assertIn("Score de qualificacao Atlas PoC: 8/10", request.kwargs["json"]["rows"][0]["notes"])
+        self.assertIn("Score comercial Atlas: 8/100. Qualidade dos dados: 0/10.", request.kwargs["json"]["rows"][0]["notes"])
 
 
     def test_client_preserves_partial_import_errors(self):

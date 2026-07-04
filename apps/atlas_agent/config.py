@@ -63,18 +63,29 @@ class AtlasPocConfig:
     def from_env(cls, environ: Mapping[str, str]) -> "AtlasPocConfig":
         places_key = (environ.get("ATLAS_GOOGLE_PLACES_KEY") or environ.get("GOOGLE_PLACES_API_KEY") or "").strip()
         apollo_key = (environ.get("ATLAS_APOLLO_KEY") or environ.get("APOLLO_API_KEY") or "").strip()
+        
+        env = (environ.get("ATLAS_ENV") or "development").strip().lower()
+        source = (environ.get("ATLAS_SOURCE") or ("google_places" if env == "production" else "mock")).strip().lower()
+        
+        if env == "production" and source == "google_places":
+            default_score = 70
+        else:
+            default_score = 5
+            
+        min_score = _as_int(environ.get("ATLAS_MIN_SCORE"), default_score, name="ATLAS_MIN_SCORE")
+
         config = cls(
-            env=(environ.get("ATLAS_ENV") or "development").strip().lower(),
+            env=env,
             api_base_url=(environ.get("ATLAS_API_BASE_URL") or "http://127.0.0.1:8000").strip(),
             api_token=(environ.get("ATLAS_API_TOKEN") or "").strip(),
             company_id=_as_int(environ.get("ATLAS_COMPANY_ID"), 0, name="ATLAS_COMPANY_ID"),
-            min_score=_as_int(environ.get("ATLAS_MIN_SCORE"), DEFAULT_MIN_SCORE, name="ATLAS_MIN_SCORE"),
+            min_score=min_score,
             max_prospects_per_run=_as_int(
                 environ.get("ATLAS_MAX_PROSPECTS_PER_RUN"),
                 DEFAULT_MAX_PROSPECTS_PER_RUN,
                 name="ATLAS_MAX_PROSPECTS_PER_RUN",
             ),
-            source=(environ.get("ATLAS_SOURCE") or ("google_places" if (environ.get("ATLAS_ENV") or "").strip().lower() == "production" else "mock")).strip().lower(),
+            source=source,
             segment=(environ.get("ATLAS_SEGMENT") or "escola particular").strip(),
             city=(environ.get("ATLAS_CITY") or "Vila Mariana").strip(),
             google_places_api_key=places_key,

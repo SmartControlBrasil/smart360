@@ -22,7 +22,8 @@ def prospect_to_api_row(lead: Lead) -> dict[str, str]:
     if website and not website.startswith(("http://", "https://")):
         website = f"https://{website}"
 
-    score_note = f"Score de qualificacao Atlas PoC: {lead.lead_score}/10."
+    quality_score = getattr(lead, "enrichment_quality_score", 0)
+    score_note = f"Score comercial Atlas: {lead.lead_score}/100. Qualidade dos dados: {quality_score}/10."
     region_note = f" Regiao pesquisada: {lead.region}." if lead.region else ""
     original_notes = f" {lead.notes.strip()}" if lead.notes and lead.notes.strip() else ""
 

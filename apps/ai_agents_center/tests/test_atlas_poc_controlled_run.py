@@ -84,6 +84,31 @@ class AtlasPocConfigTests(SimpleTestCase):
         self.assertFalse(config.can_sync_api)
         self.assertFalse(config.enable_mailer)
 
+    def test_dynamic_default_min_score(self):
+        config_dev = AtlasPocConfig.from_env({"ATLAS_ENV": "development", "ATLAS_SOURCE": "mock"})
+        self.assertEqual(config_dev.min_score, 5)
+
+        config_prod = AtlasPocConfig.from_env({
+            "ATLAS_ENV": "production",
+            "ATLAS_SOURCE": "google_places",
+            "ATLAS_API_BASE_URL": "https://smart360.test",
+            "ATLAS_API_TOKEN": "real-token",
+            "ATLAS_COMPANY_ID": "1",
+            "GOOGLE_PLACES_API_KEY": "places-key"
+        })
+        self.assertEqual(config_prod.min_score, 70)
+
+        config_explicit = AtlasPocConfig.from_env({
+            "ATLAS_ENV": "production",
+            "ATLAS_SOURCE": "google_places",
+            "ATLAS_API_BASE_URL": "https://smart360.test",
+            "ATLAS_API_TOKEN": "real-token",
+            "ATLAS_COMPANY_ID": "1",
+            "GOOGLE_PLACES_API_KEY": "places-key",
+            "ATLAS_MIN_SCORE": "85"
+        })
+        self.assertEqual(config_explicit.min_score, 85)
+
     def test_main_returns_error_code_for_critical_config_error(self):
         with patch("sys.stdout", new_callable=StringIO) as stdout:
             code = main(
@@ -133,7 +158,7 @@ class AtlasPocControlledRunTests(SimpleTestCase):
         self.assertEqual(ATLAS_IMPORT_PATH, "/api/v1/ai-agents/atlas/import-prospects/")
         self.assertNotIn("atlas-leads/ingest", ATLAS_IMPORT_PATH)
 
-        raw_leads = [self._lead("Escola Oficial")]
+        raw_leads = [self._lead("Escola Oficial", score=80)]
         config = AtlasPocConfig.from_env(
             {
                 "ATLAS_ENV": "production",

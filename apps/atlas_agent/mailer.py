@@ -6,6 +6,12 @@ from typing import List, Optional
 import time
 from .models import Lead
 
+
+def _mailer_enabled_from_env() -> bool:
+    value = (os.getenv("ATLAS_ENABLE_MAILER") or "").strip().lower()
+    return value in {"1", "true", "yes", "y", "on"}
+
+
 class ColdMailer:
     """
     Controlador de envio de E-mails Frios para a plataforma Google Workspace.
@@ -17,7 +23,8 @@ class ColdMailer:
         self.smtp_user = smtp_user or os.getenv("ATLAS_SMTP_USER") or os.getenv("SMTP_USER", "")
         self.smtp_pass = smtp_pass or os.getenv("ATLAS_SMTP_PASS") or os.getenv("SMTP_PASSWORD", "")
         if dry_run is None:
-            self.dry_run = os.getenv("ATLAS_ENV", "development") != "production"
+            # Opt-in explícito: só envia e-mail real com ATLAS_ENABLE_MAILER=true.
+            self.dry_run = not _mailer_enabled_from_env()
         else:
             self.dry_run = dry_run
 

@@ -207,8 +207,21 @@ ATLAS_API_TOKEN="token-real-seguro" \
 ATLAS_COMPANY_ID="1" \
 GOOGLE_PLACES_API_KEY="chave-google-real" \
 ATLAS_MAX_PROSPECTS_PER_RUN="10" \
-.venv/bin/python -m apps.atlas_agent.main
-```
+### Execução via Painel do Admin Shell
+
+O operador pode executar e validar o Atlas diretamente pelo painel do Admin Shell sem necessidade de acesso ao terminal/SSH:
+
+1. Acesse o menu **Atlas Comercial** > **Rodar Atlas** (ou vá direto para `/app/atlas/run/`).
+2. Preencha os parâmetros de busca:
+   - **Segmento / Termo de busca**: ex: `escola particular`.
+   - **Cidade / Região**: ex: `Vila Mariana`.
+   - **Fonte de dados**: escolha `Development / Mock` ou `Google Places` (se chaves estiverem configuradas).
+   - **Limite máximo**: limite máximo de prospects permitido via painel é **10**.
+   - **Score mínimo comercial**: padrão `5` para mock/dev, ou `70` para Google Places.
+3. Clique em **Validar configuração** para testar as variáveis operacionais e credenciais do ambiente de forma segura (validate-only).
+4. Clique em **Rodar busca controlada** para executar a busca manualmente. Um painel com o resumo da execução será exibido contendo as métricas de prospects coletados, enriquecidos, qualificados, rejeitados, importados e e-mails enviados (sempre 0).
+
+---
 
 ### Comando de Execução Real Manual
 

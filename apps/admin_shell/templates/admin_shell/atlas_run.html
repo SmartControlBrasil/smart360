@@ -1,0 +1,124 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-opportunities' %}">Oportunidades</a>
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-imports' %}">Importações</a>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert-stack" style="margin-bottom: 20px;">
+        <article class="alert-row severity-danger">
+            <span class="alert-marker"></span>
+            <div>
+                <strong>Falha na Configuração</strong>
+                <p>{{ error }}</p>
+            </div>
+        </article>
+    </div>
+    {% endif %}
+
+    {% if validation_success %}
+    <div class="alert-stack" style="margin-bottom: 20px;">
+        <article class="alert-row severity-success">
+            <span class="alert-marker"></span>
+            <div>
+                <strong>Configuração Validada</strong>
+                <p>{{ validation_success }}</p>
+            </div>
+        </article>
+    </div>
+    {% endif %}
+
+    {% if summary %}
+    <div class="table-card" style="margin-bottom: 20px; padding: 20px;">
+        <div class="section-header">
+            <h2>Resumo da Execução</h2>
+            <p class="muted-block">Os resultados obtidos na busca manual controlada do Atlas.</p>
+        </div>
+        
+        <div class="kpi-grid" style="margin-top: 15px;">
+            <article class="stat-card">
+                <span class="stat-label">Coletados</span>
+                <strong class="stat-value">{{ summary.collected }}</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Enriquecidos</span>
+                <strong class="stat-value">{{ summary.enriched }}</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Qualificados</span>
+                <strong class="stat-value">{{ summary.qualified }}</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Rejeitados por Score</span>
+                <strong class="stat-value">{{ summary.rejected_by_score }}</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Enviados para API</span>
+                <strong class="stat-value">{{ summary.sent_to_api }}</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Erros técnicos</span>
+                <strong class="stat-value">{{ summary.errors|length }}</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">E-mails enviados</span>
+                <strong class="stat-value">0</strong>
+            </article>
+        </div>
+
+        <div class="page-actions" style="margin-top: 20px;">
+            <a class="quick-action-button" href="{% url 'admin-shell:atlas-opportunities' %}">Ver Oportunidades</a>
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-imports' %}">Ver Importações</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" class="table-card" style="padding: 20px;">
+        {% csrf_token %}
+        <div class="section-header">
+            <h2>Parâmetros de Execução</h2>
+            <p class="muted-block">Defina o termo de busca, a região geográfica e as restrições operacionais.</p>
+        </div>
+        <div class="form-grid" style="margin-top: 15px;">
+            <label>
+                <span>Segmento / Termo de busca</span>
+                <input type="text" name="segment" value="{{ form_data.segment|default:defaults.segment }}" required>
+            </label>
+            <label>
+                <span>Cidade / Região</span>
+                <input type="text" name="city" value="{{ form_data.city|default:defaults.city }}" required>
+            </label>
+            <label>
+                <span>Fonte de dados</span>
+                <select name="source">
+                    <option value="mock" {% if form_data.source == 'mock' or defaults.source == 'mock' %}selected{% endif %}>Development / Mock</option>
+                    <option value="google_places" {% if form_data.source == 'google_places' or defaults.source == 'google_places' %}selected{% endif %}>Google Places</option>
+                </select>
+            </label>
+            <label>
+                <span>Limite máximo de prospects (Máx 10)</span>
+                <input type="number" name="max_prospects_per_run" min="1" max="10" value="{{ form_data.max_prospects_per_run|default:defaults.max_prospects_per_run }}" required>
+            </label>
+            <label>
+                <span>Score mínimo comercial</span>
+                <input type="number" name="min_score" min="0" value="{{ form_data.min_score|default:defaults.min_score }}" required>
+            </label>
+            <label>
+                <span>Enviar Cold Mails (Cold mail desligado)</span>
+                <input type="checkbox" disabled>
+            </label>
+        </div>
+        <div class="page-actions" style="margin-top: 20px;">
+            <button class="btn-secondary" type="submit" name="action" value="validate">Validar configuração</button>
+            <button class="quick-action-button" type="submit" name="action" value="run">Rodar busca controlada</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

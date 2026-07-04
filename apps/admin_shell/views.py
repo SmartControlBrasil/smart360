@@ -5442,3 +5442,171 @@ class SmartSystemChecklistExecutionDetailView(ScopedResourceTemplateView):
         ]
         context["current_module_slug"] = "smart-system"
         return context
+
+
+class AtlasRunView(ShellContextMixin, TemplateView):
+    template_name = "admin_shell/atlas_run.html"
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+
+    def get_context_data(self, **kwargs):
+        import os
+        context = super().get_context_data(**kwargs)
+        tenant_context = self.get_tenant_context()
+        company = tenant_context.get("company")
+
+        # Determine env and defaults
+        current_env = os.environ.get("ATLAS_ENV") or "development"
+        is_production = current_env == "production"
+        
+        default_source = "google_places" if is_production else "mock"
+        default_min_score = 70 if is_production else 5
+
+        context.update({
+            "current_module_slug": "ai-agents-center",
+            "page_title": "Rodar Atlas",
+            "page_description": "Configure e execute uma rodada manual controlada do agente comercial Atlas.",
+            "breadcrumbs": [
+                {"label": "Dashboard", "url": "admin-shell:dashboard"},
+                {"label": "Intelligence", "url": None},
+                {"label": "Atlas Comercial", "url": "admin-shell:atlas-opportunities"},
+                {"label": "Rodar Atlas", "url": None},
+            ],
+            "defaults": {
+                "segment": "escola particular",
+                "city": "Vila Mariana",
+                "source": default_source,
+                "max_prospects_per_run": 5,
+                "min_score": default_min_score,
+            },
+            "current_env": current_env,
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        import os
+        from django.contrib import messages
+        from apps.atlas_agent.config import AtlasPocConfig, AtlasConfigError
+        from apps.atlas_agent.main import run_pipeline
+
+        tenant_context = self.get_tenant_context()
+        company = tenant_context.get("company")
+        if not company and not request.user.is_superuser:
+            messages.error(request, "Selecione uma empresa ativa antes de rodar o Atlas.")
+            return self.get(request, *args, **kwargs)
+
+        action = request.POST.get("action")  # "validate" or "run"
+        segment = request.POST.get("segment", "").strip()
+        city = request.POST.get("city", "").strip()
+        source = request.POST.get("source", "").strip()
+        
+        try:
+            max_prospects = int(request.POST.get("max_prospects_per_run", 5))
+        except ValueError:
+            max_prospects = 5
+
+        try:
+            min_score = int(request.POST.get("min_score", 5))
+        except ValueError:
+            min_score = 5
+
+        # Check maximum allowed limits via dashboard (10 prospects)
+        if max_prospects > 10:
+            context = self.get_context_data()
+            context.update({
+                "error": "O limite máximo de prospects permitido via painel é 10.",
+                "form_data": {
+                    "segment": segment,
+                    "city": city,
+                    "source": source,
+                    "max_prospects_per_run": max_prospects,
+                    "min_score": min_score,
+                }
+            })
+            return self.render_to_response(context)
+
+        # Build env dictionary
+        env_dict = {
+            "ATLAS_ENV": os.environ.get("ATLAS_ENV") or "development",
+            "ATLAS_SOURCE": source,
+            "ATLAS_API_BASE_URL": request.build_absolute_uri("/").rstrip("/"),
+            "ATLAS_API_TOKEN": os.environ.get("ATLAS_API_TOKEN") or "mock-token",
+            "ATLAS_COMPANY_ID": str(company.id) if company else "0",
+            "ATLAS_MAX_PROSPECTS_PER_RUN": str(max_prospects),
+            "ATLAS_MIN_SCORE": str(min_score),
+            "ATLAS_SEGMENT": segment,
+            "ATLAS_CITY": city,
+            "GOOGLE_PLACES_API_KEY": os.environ.get("ATLAS_GOOGLE_PLACES_KEY") or os.environ.get("GOOGLE_PLACES_API_KEY") or "",
+            "APOLLO_API_KEY": os.environ.get("ATLAS_APOLLO_KEY") or os.environ.get("APOLLO_API_KEY") or "",
+            "ATLAS_ENABLE_SHEETS": "false",
+            "ATLAS_ENABLE_MAILER": "false",
+        }
+
+        if action == "validate":
+            env_dict["ATLAS_VALIDATE_ONLY"] = "true"
+
+        try:
+            config = AtlasPocConfig.from_env(env_dict)
+            if action == "validate":
+                if config.production and config.source == "google_places":
+                    validation_msg = "Configuração production validada para rodada real manual."
+                else:
+                    validation_msg = "Pré-validação development/mock concluída. Para rodada real, use ATLAS_ENV=production com ATLAS_API_TOKEN e GOOGLE_PLACES_API_KEY reais."
+                
+                context = self.get_context_data()
+                context.update({
+                    "validation_success": validation_msg,
+                    "form_data": {
+                        "segment": segment,
+                        "city": city,
+                        "source": source,
+                        "max_prospects_per_run": max_prospects,
+                        "min_score": min_score,
+                    }
+                })
+                return self.render_to_response(context)
+            
+            else:
+                # Execute pipeline!
+                summary = run_pipeline(config)
+                context = self.get_context_data()
+                context.update({
+                    "summary": summary,
+                    "form_data": {
+                        "segment": segment,
+                        "city": city,
+                        "source": source,
+                        "max_prospects_per_run": max_prospects,
+                        "min_score": min_score,
+                    }
+                })
+                return self.render_to_response(context)
+
+        except AtlasConfigError as exc:
+            context = self.get_context_data()
+            context.update({
+                "error": str(exc),
+                "form_data": {
+                    "segment": segment,
+                    "city": city,
+                    "source": source,
+                    "max_prospects_per_run": max_prospects,
+                    "min_score": min_score,
+                }
+            })
+            return self.render_to_response(context)
+        except Exception as exc:
+            context = self.get_context_data()
+            context.update({
+                "error": f"Erro inesperado durante a execução: {str(exc)}",
+                "form_data": {
+                    "segment": segment,
+                    "city": city,
+                    "source": source,
+                    "max_prospects_per_run": max_prospects,
+                    "min_score": min_score,
+                }
+            })
+            return self.render_to_response(context)
+

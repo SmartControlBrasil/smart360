@@ -610,6 +610,16 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                     "icon": "trend",
                     "children": [
                         {
+                            "label": "Rodar Atlas",
+                            "icon": "trend",
+                            "url_name": "admin-shell:atlas-run",
+                            "match_names": [
+                                "admin-shell:atlas-run",
+                            ],
+                            "permission_domain": "ai_agents_admin",
+                            "permission_action": "view",
+                        },
+                        {
                             "label": "Oportunidades",
                             "icon": "trend",
                             "url_name": "admin-shell:atlas-opportunities",

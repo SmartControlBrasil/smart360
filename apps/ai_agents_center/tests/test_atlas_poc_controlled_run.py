@@ -300,7 +300,46 @@ class AtlasPocControlledRunTests(SimpleTestCase):
             })
         self.assertEqual(code, 0)
         self.assertIn("Modo Pre-Validacao", stdout.getvalue())
-        self.assertIn("APTA para rodada real", stdout.getvalue())
+        self.assertIn("Configuração production validada para rodada real manual.", stdout.getvalue())
+        self.assertNotIn("APTA para rodada real", stdout.getvalue())
+        mock_run_pipeline.assert_not_called()
+
+    @patch("apps.atlas_agent.main.run_pipeline")
+    def test_validate_only_in_development_prints_mock_msg(self, mock_run_pipeline):
+        with patch("sys.stdout", new_callable=StringIO) as stdout:
+            code = main({
+                "ATLAS_VALIDATE_ONLY": "true",
+                "ATLAS_ENV": "development",
+                "ATLAS_API_BASE_URL": "https://smart360.test",
+                "ATLAS_API_TOKEN": "mock-token",
+                "ATLAS_COMPANY_ID": "1",
+            })
+        self.assertEqual(code, 0)
+        self.assertIn("Modo Pre-Validacao", stdout.getvalue())
+        self.assertIn("Pré-validação development/mock concluída.", stdout.getvalue())
+        self.assertNotIn("Configuração production validada", stdout.getvalue())
+        self.assertNotIn("APTA para rodada real", stdout.getvalue())
+        mock_run_pipeline.assert_not_called()
+
+    @patch("apps.atlas_agent.main.run_pipeline")
+    def test_validate_only_does_not_leak_secrets(self, mock_run_pipeline):
+        secret_token = "secret-tok-123456"
+        secret_places_key = "secret-places-key-999"
+        with patch("sys.stdout", new_callable=StringIO) as stdout:
+            code = main({
+                "ATLAS_VALIDATE_ONLY": "true",
+                "ATLAS_ENV": "production",
+                "ATLAS_API_BASE_URL": "https://smart360.test",
+                "ATLAS_API_TOKEN": secret_token,
+                "ATLAS_COMPANY_ID": "1",
+                "GOOGLE_PLACES_API_KEY": secret_places_key
+            })
+        self.assertEqual(code, 0)
+        output = stdout.getvalue()
+        self.assertNotIn(secret_token, output)
+        self.assertNotIn(secret_places_key, output)
+        self.assertIn("API Token: Presente", output)
+        self.assertIn("Google Places API Key: Presente", output)
         mock_run_pipeline.assert_not_called()
 
     def test_runbook_contains_real_run_manual_section(self):

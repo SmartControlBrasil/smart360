@@ -207,7 +207,10 @@ def main(environ: dict[str, str] | None = None) -> int:
                 status="Presente" if config.google_application_credentials else "Ausente",
             )
         )
-        print("[Atlas Config] A configuracao esta APTA para rodada real.")
+        if config.production and config.source == "google_places":
+            print("[Atlas Config] Configuração production validada para rodada real manual.")
+        else:
+            print("[Atlas Config] Pré-validação development/mock concluída. Para rodada real, use ATLAS_ENV=production com ATLAS_API_TOKEN e GOOGLE_PLACES_API_KEY reais.")
         return 0
 
     run_pipeline(config)

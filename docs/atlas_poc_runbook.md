@@ -112,6 +112,39 @@ Production falha com erro claro se faltar `ATLAS_API_BASE_URL`, `ATLAS_API_TOKEN
 
 Esta seção serve como guia e checklist para a primeira rodada piloto controlada usando dados reais.
 
+### Modos de Pré-validação e Execução
+
+#### A) Modo Development/Mock (Validate-Only)
+Valida se a estrutura local do ambiente de desenvolvimento/teste está correta usando dados de demonstração (mock). Nenhum segredo real é necessário.
+```bash
+ATLAS_ENV=development ATLAS_VALIDATE_ONLY=true .venv/bin/python -m apps.atlas_agent.main
+```
+*Garante o status básico de configuração sem contatar serviços reais.*
+
+#### B) Modo Production/Real (Validate-Only)
+Valida a configuração do ambiente de produção sem realizar chamadas externas ou persistir dados. Chave de API e token de produção reais são obrigatórios.
+```bash
+ATLAS_ENV=production ATLAS_SOURCE=google_places ATLAS_MAX_PROSPECTS_PER_RUN=5 ATLAS_MIN_SCORE=70 ATLAS_VALIDATE_ONLY=true ATLAS_API_TOKEN="token-real-mesmo" GOOGLE_PLACES_API_KEY="chave-real-mesmo" ATLAS_COMPANY_ID=1 .venv/bin/python -m apps.atlas_agent.main
+```
+
+> [!WARNING]
+> Valores como `token-real-seguro`, `chave-google-real`, `token-real-mesmo`, `chave-real-mesmo` ou `CHAVE_REAL` são **placeholders ilustrativos**. Não os utilize literalmente. A utilização de tokens inseguros conhecidos (e.g. `mock-token`) fará o validador falhar com erro crítico e retornar exit code `2`.
+
+#### C) Modo Production/Real (Execução Manual)
+Executa a coleta real com o scraper integrado ao Google Places e o enriquecimento de dados.
+```bash
+ATLAS_ENV=production ATLAS_SOURCE=google_places ATLAS_MAX_PROSPECTS_PER_RUN=5 ATLAS_MIN_SCORE=70 ATLAS_SEGMENT="escola particular" ATLAS_CITY="Vila Mariana" ATLAS_API_TOKEN="token-real-mesmo" GOOGLE_PLACES_API_KEY="chave-real-mesmo" ATLAS_COMPANY_ID=1 .venv/bin/python -m apps.atlas_agent.main
+```
+
+---
+
+### Boas Práticas de Segurança e Controles Operacionais
+
+1. **Variáveis em linha no comando**: Sempre prefira passar variáveis sensíveis (`ATLAS_API_TOKEN`, `GOOGLE_PLACES_API_KEY`) em linha na invocação do comando. Isso evita persistir chaves em arquivos de configuração locais (como o `.env`), mitigando vazamentos para o repositório.
+2. **Cold mail inativo**: O parâmetro `ATLAS_ENABLE_MAILER=false` é obrigatório para manter o envio de e-mails desabilitado no fluxo do piloto.
+3. **Limites e Qualificação**: O piloto deve limitar a execução a no máximo `5` prospects e exigir score de qualificação comercial real de `70` (escala 0-100).
+4. **Fluxo e Auditoria**: A revisão humana ocorre em `/app/atlas/opportunities/` e o operador pode rastrear execuções passadas e lotes de importação na tela `/app/atlas/imports/`.
+
 ## Primeira rodada real controlada
 
 Use esta configuração para a primeira rodada real com baixo risco operacional:

@@ -1,0 +1,94 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-opportunities' %}">Oportunidades</a>
+            <a class="btn-secondary" href="{% url 'admin-shell:ai-agents-dashboard' %}">AI Agents Center</a>
+        </div>
+    </div>
+
+    <form method="get" class="table-card">
+        <div class="section-header">
+            <h2>Filtros</h2>
+            <p class="muted-block">Refine por status e origem da importação.</p>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>Status</span>
+                <select name="status">
+                    <option value="">Todos</option>
+                    {% for value, label in status_options %}
+                        <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Origem</span>
+                <select name="source">
+                    <option value="">Todas</option>
+                    {% for value, label in source_options %}
+                        <option value="{{ value }}" {% if filters.source == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="page-actions">
+            <button class="quick-action-button" type="submit">Aplicar filtros</button>
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-imports' %}">Limpar</a>
+        </div>
+    </form>
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Lotes de Importação</h2>
+            <p class="muted-block">Resumos das execuções do scraper e uploads manuais do Atlas.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                     <tr>
+                         <th>Data / ID</th>
+                         <th>Origem</th>
+                         <th>Status</th>
+                         <th>Total Linhas</th>
+                         <th>Criados</th>
+                         <th>Duplicados</th>
+                         <th>Erros</th>
+                         <th>Ações</th>
+                     </tr>
+                </thead>
+                <tbody>
+                    {% for batch in batches %}
+                    <tr>
+                        <td>
+                            <strong>{{ batch.created_at|date:"d/m/Y H:i" }}</strong>
+                            <br><span class="muted-block">{{ batch.public_id }}</span>
+                        </td>
+                        <td>{{ batch.get_source_display }}</td>
+                        <td>{{ batch.get_status_display }}</td>
+                        <td>{{ batch.total_rows }}</td>
+                        <td>{{ batch.created_opportunities }}</td>
+                        <td>{{ batch.skipped_duplicates }}</td>
+                        <td>{{ batch.errors|length }}</td>
+                        <td>
+                            <a class="quick-action-button" href="{% url 'admin-shell:atlas-import-detail' public_id=batch.public_id %}">Detalhes</a>
+                            {% if batch.created_opportunities > 0 %}
+                                <a class="btn-secondary" href="{% url 'admin-shell:atlas-opportunities' %}?batch={{ batch.public_id }}">Ver Oportunidades</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center muted-block">Nenhuma importação encontrada.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

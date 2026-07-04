@@ -1,0 +1,97 @@
+{% extends "admin_shell/base.html" %}
+
+{% block shell_content %}
+<div class="page-shell">
+    <div class="page-header">
+        <h1>{{ page_title }}</h1>
+        <p class="muted-block">{{ page_description }}</p>
+        <div class="page-actions">
+            <a class="btn-secondary" href="{% url 'admin-shell:atlas-imports' %}">Voltar para Importações</a>
+            {% if batch.created_opportunities > 0 %}
+                <a class="quick-action-button" href="{% url 'admin-shell:atlas-opportunities' %}?batch={{ batch.public_id }}">Ver Oportunidades</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <article class="stat-card">
+            <span class="stat-label">Total Recebido</span>
+            <strong class="stat-value">{{ batch.total_rows }}</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Oportunidades Criadas</span>
+            <strong class="stat-value">{{ batch.created_opportunities }}</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Duplicados Ignorados</span>
+            <strong class="stat-value">{{ batch.skipped_duplicates }}</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Linhas com Erros</span>
+            <strong class="stat-value">{{ batch.errors|length }}</strong>
+        </article>
+    </div>
+
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Resumo da Execução</h2>
+            <p class="muted-block">Parâmetros operacionais e metadados de auditoria do lote.</p>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>ID do Lote (UUID)</span>
+                <input type="text" value="{{ batch.public_id }}" readonly>
+            </label>
+            <label>
+                <span>Origem</span>
+                <input type="text" value="{{ batch.get_source_display }}" readonly>
+            </label>
+            <label>
+                <span>Arquivo</span>
+                <input type="text" value="{{ batch.filename|default:"N/A (Scraper Standalone)" }}" readonly>
+            </label>
+            <label>
+                <span>Status Final</span>
+                <input type="text" value="{{ batch.get_status_display }}" readonly>
+            </label>
+            <label>
+                <span>Operador</span>
+                <input type="text" value="{{ batch.created_by.email|default:"Sistema / API" }}" readonly>
+            </label>
+            <label>
+                <span>Executado em</span>
+                <input type="text" value="{{ batch.created_at|date:"d/m/Y H:i" }}" readonly>
+            </label>
+        </div>
+    </div>
+
+    {% if batch.errors %}
+    <div class="table-card">
+        <div class="section-header">
+            <h2>Detalhamento de Erros</h2>
+            <p class="muted-block">Erros encontrados por linha do arquivo ou durante a execução.</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-smart">
+                <thead>
+                    <tr>
+                        <th>Linha</th>
+                        <th>Instituição</th>
+                        <th>Descrição da Falha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for err in batch.errors %}
+                    <tr>
+                        <td><strong>{{ err.row|default:"-" }}</strong></td>
+                        <td>{{ err.company_name|default:"Não identificada" }}</td>
+                        <td class="text-danger">{{ err.error }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

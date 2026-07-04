@@ -97,6 +97,8 @@ from .views import (
     AnalyticsExecutiveRefreshView,
     AtlasCommercialOpportunityActionView,
     AtlasCommercialOpportunityListView,
+    AtlasProspectImportListView,
+    AtlasProspectImportDetailView,
     BillingAdminDashboardView,
     BillingContractCancelView,
     BillingContractDetailView,
@@ -281,6 +283,8 @@ urlpatterns = [
     path("field/profile/", TechnicianProfileView.as_view(), name="technician-app-profile"),
     path("app/context/scope/", SetActiveContextView.as_view(), name="set-active-context"),
     path("app/atlas/opportunities/", AtlasCommercialOpportunityListView.as_view(), name="atlas-opportunities"),
+    path("app/atlas/imports/", AtlasProspectImportListView.as_view(), name="atlas-imports"),
+    path("app/atlas/imports/<uuid:public_id>/", AtlasProspectImportDetailView.as_view(), name="atlas-import-detail"),
     path(
         "app/atlas/opportunities/<uuid:public_id>/approve/",
         AtlasCommercialOpportunityActionView.as_view(action_name="approve"),

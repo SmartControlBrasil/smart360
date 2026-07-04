@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.db.models import Count, Q
 
 from apps.access_control_center.services.access_service import AccessAuditService
-from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentRecommendation, CommercialOpportunity
+from apps.ai_agents_center.models import AIBriefing, AgentActionProposal, AgentRecommendation, CommercialOpportunity, AtlasProspectImportBatch
 from apps.ai_agents_center.services.briefing_composer import AIBriefingComposer
 from apps.ai_agents_center.services.client_portal_copilot import ClientPortalCopilotService
 from apps.ai_agents_center.services.opportunity_builder import OpportunityBuilderService
@@ -286,10 +286,13 @@ class AtlasCommercialOpportunityListView(ShellContextMixin, TemplateView):
         status = self.request.GET.get("status", "").strip()
         source = self.request.GET.get("source", "").strip()
         query = self.request.GET.get("q", "").strip()
+        batch_id = self.request.GET.get("batch", "").strip()
         if status:
             queryset = queryset.filter(status=status)
         if source:
             queryset = queryset.filter(source=source)
+        if batch_id:
+            queryset = queryset.filter(metadata__import_batch_public_id=batch_id)
         if query:
             queryset = queryset.filter(
                 Q(company_name__icontains=query)
@@ -320,6 +323,7 @@ class AtlasCommercialOpportunityListView(ShellContextMixin, TemplateView):
                     "q": self.request.GET.get("q", "").strip(),
                     "status": self.request.GET.get("status", "").strip(),
                     "source": self.request.GET.get("source", "").strip(),
+                    "batch": self.request.GET.get("batch", "").strip(),
                 },
                 "status_options": CommercialOpportunity.Status.choices,
                 "source_options": CommercialOpportunity.Source.choices,
@@ -383,6 +387,71 @@ class AtlasCommercialOpportunityActionView(ShellContextMixin, View):
 
         messages.error(request, "Ação Atlas não reconhecida.")
         return redirect("admin-shell:atlas-opportunities")
+
+
+class AtlasProspectImportListView(ShellContextMixin, TemplateView):
+    template_name = "admin_shell/atlas_imports.html"
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+
+    def get_queryset(self):
+        queryset = AtlasProspectImportBatch.objects.select_related("created_by").order_by("-created_at")
+        status = self.request.GET.get("status", "").strip()
+        source = self.request.GET.get("source", "").strip()
+        if status:
+            queryset = queryset.filter(status=status)
+        if source:
+            queryset = queryset.filter(source=source)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        context.update({
+            "current_module_slug": "ai-agents-center",
+            "page_title": "Importações Atlas",
+            "page_description": "Histórico e resultado das execuções de importações de prospects do Atlas.",
+            "breadcrumbs": [
+                {"label": "Dashboard", "url": "admin-shell:dashboard"},
+                {"label": "Intelligence", "url": None},
+                {"label": "Atlas Comercial", "url": "admin-shell:atlas-opportunities"},
+                {"label": "Importações", "url": None},
+            ],
+            "filters": {
+                "status": self.request.GET.get("status", "").strip(),
+                "source": self.request.GET.get("source", "").strip(),
+            },
+            "status_options": AtlasProspectImportBatch.Status.choices,
+            "source_options": CommercialOpportunity.Source.choices,
+            "batches": queryset[:100],
+        })
+        return context
+
+
+class AtlasProspectImportDetailView(ShellContextMixin, TemplateView):
+    template_name = "admin_shell/atlas_import_detail.html"
+    permission_domain = "ai_agents_admin"
+    permission_action = "view"
+    enforce_billing_access = False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        batch = get_object_or_404(AtlasProspectImportBatch, public_id=self.kwargs["public_id"])
+        context.update({
+            "current_module_slug": "ai-agents-center",
+            "page_title": f"Detalhe da Importação {str(batch.public_id)[:8]}",
+            "page_description": f"Resumo da execução realizada em {batch.created_at.strftime('%d/%m/%Y %H:%M')}.",
+            "breadcrumbs": [
+                {"label": "Dashboard", "url": "admin-shell:dashboard"},
+                {"label": "Intelligence", "url": None},
+                {"label": "Atlas Comercial", "url": "admin-shell:atlas-opportunities"},
+                {"label": "Importações", "url": "admin-shell:atlas-imports"},
+                {"label": str(batch.public_id)[:8], "url": None},
+            ],
+            "batch": batch,
+        })
+        return context
 
 
 class ClientPortalUserListView(ClientPortalUserAdminMixin, TemplateView):

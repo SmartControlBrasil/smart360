@@ -608,15 +608,32 @@ def get_navigation(current_url_name="", current_module_slug="", permission_map=N
                 {
                     "label": "Atlas Comercial",
                     "icon": "trend",
-                    "url_name": "admin-shell:atlas-opportunities",
-                    "match_names": [
-                        "admin-shell:atlas-opportunities",
-                        "admin-shell:atlas-opportunity-approve",
-                        "admin-shell:atlas-opportunity-reject",
-                        "admin-shell:atlas-opportunity-convert",
+                    "children": [
+                        {
+                            "label": "Oportunidades",
+                            "icon": "trend",
+                            "url_name": "admin-shell:atlas-opportunities",
+                            "match_names": [
+                                "admin-shell:atlas-opportunities",
+                                "admin-shell:atlas-opportunity-approve",
+                                "admin-shell:atlas-opportunity-reject",
+                                "admin-shell:atlas-opportunity-convert",
+                            ],
+                            "permission_domain": "ai_agents_admin",
+                            "permission_action": "view",
+                        },
+                        {
+                            "label": "Importações",
+                            "icon": "list",
+                            "url_name": "admin-shell:atlas-imports",
+                            "match_names": [
+                                "admin-shell:atlas-imports",
+                                "admin-shell:atlas-import-detail",
+                            ],
+                            "permission_domain": "ai_agents_admin",
+                            "permission_action": "view",
+                        },
                     ],
-                    "permission_domain": "ai_agents_admin",
-                    "permission_action": "view",
                 },
                 {
                     "label": "Lívia Assistente",

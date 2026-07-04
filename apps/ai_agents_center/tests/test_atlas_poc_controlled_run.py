@@ -12,9 +12,34 @@ from apps.atlas_agent.models import Lead
 class AtlasPocConfigTests(SimpleTestCase):
     def test_production_without_token_fails(self):
         with self.assertRaises(AtlasConfigError) as ctx:
-            AtlasPocConfig.from_env({"ATLAS_ENV": "production", "ATLAS_API_BASE_URL": "https://smart360.test", "ATLAS_COMPANY_ID": "1"})
+            AtlasPocConfig.from_env({
+                "ATLAS_ENV": "production",
+                "ATLAS_API_BASE_URL": "https://smart360.test",
+                "ATLAS_COMPANY_ID": "1",
+                "GOOGLE_PLACES_API_KEY": "places-key"
+            })
 
         self.assertIn("ATLAS_API_TOKEN", str(ctx.exception))
+
+    def test_production_without_google_places_key_fails(self):
+        with self.assertRaises(AtlasConfigError) as ctx:
+            AtlasPocConfig.from_env({
+                "ATLAS_ENV": "production",
+                "ATLAS_API_BASE_URL": "https://smart360.test",
+                "ATLAS_API_TOKEN": "real-token",
+                "ATLAS_COMPANY_ID": "1"
+            })
+
+        self.assertIn("GOOGLE_PLACES_API_KEY", str(ctx.exception))
+
+    def test_excessive_max_prospects_limit_fails(self):
+        with self.assertRaises(AtlasConfigError) as ctx:
+            AtlasPocConfig.from_env({
+                "ATLAS_ENV": "development",
+                "ATLAS_MAX_PROSPECTS_PER_RUN": "51"
+            })
+
+        self.assertIn("excede o limite seguro de 50 prospects", str(ctx.exception))
 
     def test_production_with_mock_token_fails(self):
         with self.assertRaises(AtlasConfigError) as ctx:
@@ -24,6 +49,7 @@ class AtlasPocConfigTests(SimpleTestCase):
                     "ATLAS_API_BASE_URL": "https://smart360.test",
                     "ATLAS_API_TOKEN": "mock-token",
                     "ATLAS_COMPANY_ID": "1",
+                    "GOOGLE_PLACES_API_KEY": "places-key",
                 }
             )
 
@@ -45,6 +71,7 @@ class AtlasPocConfigTests(SimpleTestCase):
                     "ATLAS_API_BASE_URL": "https://smart360.test",
                     "ATLAS_API_TOKEN": "mock-token",
                     "ATLAS_COMPANY_ID": "1",
+                    "GOOGLE_PLACES_API_KEY": "places-key",
                 }
             )
 
@@ -193,15 +220,14 @@ class AtlasPocControlledRunTests(SimpleTestCase):
         self.assertTrue(os.path.exists(runbook_path), f"Runbook nao encontrado no caminho: {runbook_path}")
         with open(runbook_path, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("## Primeira rodada real recomendada", content)
-        self.assertIn("- Segmento: escolas particulares.", content)
-        self.assertIn("- Cidade: São Paulo/SP.", content)
-        self.assertIn("- Limite: `ATLAS_MAX_PROSPECTS_PER_RUN=10`.", content)
-        self.assertIn("- Score mínimo: `ATLAS_MIN_SCORE=70`.", content)
-        self.assertIn("- Revisar oportunidades em `/app/atlas/opportunities/`.", content)
-        self.assertIn("- Aprovar ou rejeitar manualmente cada oportunidade.", content)
-        self.assertIn("- Converter para Lead somente após revisão e aprovação humana.", content)
-        self.assertIn("- Manter `ATLAS_ENABLE_MAILER=false`; zero e-mails enviados.", content)
+        self.assertIn("## Rodada real manual com Google Places", content)
+        self.assertIn("- [ ] Validar a configuração do ambiente usando o comando de pré-validação.", content)
+        self.assertIn("- [ ] Confirmar que `ATLAS_ENV=production` está definido no ambiente.", content)
+        self.assertIn("- [ ] Confirmar que a chave `GOOGLE_PLACES_API_KEY` é válida e ativa.", content)
+        self.assertIn("- [ ] Confirmar que o `ATLAS_API_TOKEN` é seguro (não usar tokens inseguros como `mock-token`).", content)
+        self.assertIn("- [ ] Confirmar que o `ATLAS_COMPANY_ID` aponta para o ID da empresa correta.", content)
+        self.assertIn("- [ ] Verificar que o limite `ATLAS_MAX_PROSPECTS_PER_RUN` está definido para um valor seguro (máximo 10 no piloto).", content)
+        self.assertIn("- [ ] Garantir que cold mail e envio de e-mails permanecem desabilitados (`ATLAS_ENABLE_MAILER=false`).", content)
         self.assertIn("## Critérios de sucesso do piloto", content)
         self.assertIn("- Quantidade coletada.", content)
         self.assertIn("- Quantidade enriquecida.", content)
@@ -212,6 +238,40 @@ class AtlasPocControlledRunTests(SimpleTestCase):
         self.assertIn("- Oportunidades aprovadas.", content)
         self.assertIn("- Leads convertidos após revisão humana.", content)
         self.assertIn("- Zero e-mails enviados.", content)
+
+    @patch("apps.atlas_agent.main.run_pipeline")
+    def test_validate_only_mode_does_not_execute_pipeline(self, mock_run_pipeline):
+        with patch("sys.stdout", new_callable=StringIO) as stdout:
+            code = main({
+                "ATLAS_VALIDATE_ONLY": "true",
+                "ATLAS_ENV": "production",
+                "ATLAS_API_BASE_URL": "https://smart360.test",
+                "ATLAS_API_TOKEN": "real-token",
+                "ATLAS_COMPANY_ID": "1",
+                "GOOGLE_PLACES_API_KEY": "places-key"
+            })
+        self.assertEqual(code, 0)
+        self.assertIn("Modo Pre-Validacao", stdout.getvalue())
+        self.assertIn("APTA para rodada real", stdout.getvalue())
+        mock_run_pipeline.assert_not_called()
+
+    def test_runbook_contains_real_run_manual_section(self):
+        import os
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        runbook_path = os.path.abspath(os.path.join(current_dir, "../../../docs/atlas_poc_runbook.md"))
+        self.assertTrue(os.path.exists(runbook_path), f"Runbook nao encontrado no caminho: {runbook_path}")
+        with open(runbook_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("## Rodada real manual com Google Places", content)
+        self.assertIn("### Checklist Antes de Executar", content)
+        self.assertIn("### Variáveis Obrigatórias", content)
+        self.assertIn("### Comando de Pré-Validação", content)
+        self.assertIn("### Comando de Execução Real Manual", content)
+        self.assertIn("### Limites Recomendados", content)
+        self.assertIn("### Onde Revisar Oportunidades", content)
+        self.assertIn("### Como Interromper em Caso de Erro", content)
+        self.assertIn("### Política LGPD e Conformidade", content)
+
 
 
 from django.test import TestCase

@@ -9,7 +9,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from apps.atlas_agent.api_client import AtlasAPIClient, ATLAS_IMPORT_PATH, qualified_prospects
-from apps.atlas_agent.config import AtlasConfigError, AtlasPocConfig
+from apps.atlas_agent.config import AtlasConfigError, AtlasPocConfig, UNSAFE_ATLAS_TOKENS
 from apps.atlas_agent.enricher import EnrichmentService
 from apps.atlas_agent.scoring import ScoringEngine
 from apps.atlas_agent.scraper import SchoolScraper
@@ -61,16 +61,24 @@ def _write_csv(leads, filename: str = "atlas_leads_mock.csv") -> None:
 def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
     summary = AtlasRunSummary(mode=_safe_mode_label(config))
     print("--- ATLAS AGENT: PoC controlada iniciada ---")
-    print(f"[Atlas Config] modo={summary.mode}; cidade={config.city}; segmento={config.segment}; limite={config.max_prospects_per_run}")
+    source_label = "google_places" if config.production else "mock"
+    print(f"[Atlas Config] modo={summary.mode}; fonte={source_label}; segmento={config.segment}; cidade={config.city}; limite={config.max_prospects_per_run}; score minimo={config.min_score}")
     print(f"[Atlas Config] endpoint oficial={ATLAS_IMPORT_PATH}; cold mail=desligado")
 
-    scraper = SchoolScraper(google_api_key=config.google_places_api_key)
-    raw_leads = scraper.run_pipeline([config.city], [config.segment])
-    summary.collected = len(raw_leads)
+    scraper = SchoolScraper(google_api_key=config.google_places_api_key, production=config.production)
+    raw_leads = scraper.run_pipeline([config.city], [config.segment], max_results=config.max_prospects_per_run)
+    collected_count = getattr(scraper, "collected_count", 0)
+    if isinstance(collected_count, (int, float)) and not isinstance(collected_count, bool):
+        summary.collected = int(collected_count)
+    else:
+        summary.collected = len(raw_leads)
     limited_leads = raw_leads[: config.max_prospects_per_run]
-    if len(raw_leads) > len(limited_leads):
-        print(f"[Atlas Limit] {len(raw_leads) - len(limited_leads)} prospects ignorados pelo limite da execucao.")
     print(f"[Atlas Scraper] coletados={summary.collected}; considerados={len(limited_leads)}")
+    limited_count = getattr(scraper, "limited_count", 0)
+    if isinstance(limited_count, (int, float)) and not isinstance(limited_count, bool) and limited_count > 0:
+        print(f"[Atlas Limit] {limited_count} prospects ignorados pelo limite da execucao.")
+    elif len(raw_leads) > len(limited_leads):
+        print(f"[Atlas Limit] {len(raw_leads) - len(limited_leads)} prospects ignorados pelo limite da execucao.")
 
     enricher = EnrichmentService(api_key=config.apollo_api_key)
     enriched_leads = []
@@ -156,6 +164,14 @@ def main(environ: dict[str, str] | None = None) -> int:
     except AtlasConfigError as exc:
         print(f"[Atlas Config] erro critico: {exc}")
         return 2
+
+    if config.validate_only:
+        print("--- ATLAS AGENT: Modo Pre-Validacao ---")
+        print(f"[Atlas Config] ambiente={config.env}; cidade={config.city}; segmento={config.segment}; limite={config.max_prospects_per_run}; score minimo={config.min_score}")
+        print(f"[Atlas Config] Google Places API Key: {'Presente' if config.google_places_api_key else 'Ausente'}")
+        print(f"[Atlas Config] API Token: {'Presente' if config.api_token and config.api_token not in UNSAFE_ATLAS_TOKENS else 'Ausente'}")
+        print("[Atlas Config] A configuracao esta APTA para rodada real.")
+        return 0
 
     run_pipeline(config)
     return 0

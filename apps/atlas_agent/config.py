@@ -43,6 +43,7 @@ class AtlasPocConfig:
     apollo_api_key: str = ""
     enable_sheets: bool = False
     enable_mailer: bool = False
+    validate_only: bool = False
 
     @classmethod
     def from_env(cls, environ: Mapping[str, str]) -> "AtlasPocConfig":
@@ -63,6 +64,7 @@ class AtlasPocConfig:
             apollo_api_key=(environ.get("APOLLO_API_KEY") or "").strip(),
             enable_sheets=_as_bool(environ.get("ATLAS_ENABLE_SHEETS"), False),
             enable_mailer=False,
+            validate_only=_as_bool(environ.get("ATLAS_VALIDATE_ONLY"), False),
         )
         config.validate()
         return config
@@ -82,6 +84,8 @@ class AtlasPocConfig:
     def validate(self) -> None:
         if self.max_prospects_per_run <= 0:
             raise AtlasConfigError("ATLAS_MAX_PROSPECTS_PER_RUN precisa ser maior que zero.")
+        if self.max_prospects_per_run > 50:
+            raise AtlasConfigError("ATLAS_MAX_PROSPECTS_PER_RUN excede o limite seguro de 50 prospects para o piloto.")
         if self.min_score < 0:
             raise AtlasConfigError("ATLAS_MIN_SCORE nao pode ser negativo.")
         if not self.segment:
@@ -96,6 +100,8 @@ class AtlasPocConfig:
                 missing.append("ATLAS_API_TOKEN")
             if self.company_id <= 0:
                 missing.append("ATLAS_COMPANY_ID")
+            if not self.google_places_api_key:
+                missing.append("GOOGLE_PLACES_API_KEY")
             if missing:
                 raise AtlasConfigError("Production exige: " + ", ".join(missing) + ".")
             if self.api_token in UNSAFE_ATLAS_TOKENS:

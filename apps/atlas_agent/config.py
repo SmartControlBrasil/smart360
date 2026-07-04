@@ -58,6 +58,8 @@ class AtlasPocConfig:
     enable_sheets: bool = False
     enable_mailer: bool = False
     validate_only: bool = False
+    csv_output_path: str = ""
+    mock_csv_path: str = ""
 
     @classmethod
     def from_env(cls, environ: Mapping[str, str]) -> "AtlasPocConfig":
@@ -95,6 +97,8 @@ class AtlasPocConfig:
             enable_sheets=_as_bool(environ.get("ATLAS_ENABLE_SHEETS"), False),
             enable_mailer=False,
             validate_only=_as_bool(environ.get("ATLAS_VALIDATE_ONLY"), False),
+            csv_output_path=(environ.get("ATLAS_CSV_OUTPUT_PATH") or "").strip(),
+            mock_csv_path=(environ.get("ATLAS_MOCK_CSV_PATH") or "").strip(),
         )
         config.validate()
         return config

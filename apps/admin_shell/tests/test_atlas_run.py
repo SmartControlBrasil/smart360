@@ -136,3 +136,105 @@ class AtlasRunDashboardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Production exige")
         self.assertNotContains(response, "Configuração production validada")
+
+    @patch("apps.atlas_agent.main.SchoolScraper")
+    @patch("apps.atlas_agent.main.EnrichmentService")
+    @patch("apps.atlas_agent.main.ScoringEngine")
+    def test_post_run_mock_without_cwd_permissions_returns_controlled_error(self, mock_scoring, mock_enricher, mock_scraper):
+        lead = StandaloneLead("Escola Vila", "Sao Paulo", "Vila Mariana", lead_score=80)
+        mock_scraper.return_value.run_pipeline.return_value = [lead]
+        mock_enricher.return_value.process_lead.side_effect = lambda l: l
+        mock_scoring.return_value.process_lead.side_effect = lambda l: l
+
+        with patch.dict(os.environ, {
+            "ATLAS_CSV_OUTPUT_PATH": "/root/readonly_directory_for_test/leads.csv",
+            "ATLAS_API_TOKEN": "mock-token"
+        }):
+            response = self.client.post(reverse("admin-shell:atlas-run"), {
+                "action": "run",
+                "segment": "escola particular",
+                "city": "Vila Mariana",
+                "source": "mock",
+                "max_prospects_per_run": "5",
+                "min_score": "5",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Falha na Configuração")
+        self.assertContains(response, "Arquivo mock indisponível ou sem permissão")
+        self.assertNotContains(response, "Erro inesperado")
+
+    @patch("apps.atlas_agent.main.SchoolScraper")
+    @patch("apps.atlas_agent.main.EnrichmentService")
+    @patch("apps.atlas_agent.main.ScoringEngine")
+    @patch("apps.atlas_agent.api_client.requests.Session")
+    def test_post_run_mock_with_different_cwd_and_absolute_resolution(self, mock_session_cls, mock_scoring, mock_enricher, mock_scraper):
+        import tempfile
+        import shutil
+        from pathlib import Path
+        from apps.atlas_agent import main as atlas_main
+        
+        # Setup mocks
+        lead = StandaloneLead("Escola Cwd Test", "Sao Paulo", "Vila Mariana", lead_score=80)
+        mock_scraper.return_value.run_pipeline.return_value = [lead]
+        mock_enricher.return_value.process_lead.side_effect = lambda l: l
+        mock_scoring.return_value.process_lead.side_effect = lambda l: l
+
+        api_response = Mock()
+        api_response.json.return_value = {
+            "public_id": "batch-cwd-123",
+            "status": "completed",
+            "processed_rows": 1,
+            "created_opportunities": 1,
+            "skipped_duplicates": 0,
+            "errors": [],
+        }
+        session = Mock()
+        session.post.return_value = api_response
+        mock_session_cls.return_value = session
+
+        # Save current CWD
+        old_cwd = os.getcwd()
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Change directory to a temp folder to simulate running from Gunicorn / different CWD
+            os.chdir(temp_dir)
+            
+            # Target output file path (relative filename)
+            relative_target_name = "test_leads_cwd_override.csv"
+            expected_absolute_dir = Path(atlas_main.__file__).resolve().parent
+            expected_absolute_file = expected_absolute_dir / relative_target_name
+            
+            # Remove output file if exists
+            if expected_absolute_file.exists():
+                os.remove(expected_absolute_file)
+
+            with patch.dict(os.environ, {
+                "ATLAS_MOCK_CSV_PATH": relative_target_name,
+                "ATLAS_API_TOKEN": "real-safe-token-for-test"
+            }):
+                response = self.client.post(reverse("admin-shell:atlas-run"), {
+                    "action": "run",
+                    "segment": "escola particular",
+                    "city": "Vila Mariana",
+                    "source": "mock",
+                    "max_prospects_per_run": "5",
+                    "min_score": "5",
+                })
+            
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, "Resumo da Execução")
+            
+            # Assert file was written to apps/atlas_agent/ folder, NOT to the temp_dir CWD!
+            self.assertTrue(expected_absolute_file.exists())
+            self.assertFalse((Path(temp_dir) / relative_target_name).exists())
+            
+            # Clean up output file
+            if expected_absolute_file.exists():
+                os.remove(expected_absolute_file)
+                
+        finally:
+            os.chdir(old_cwd)
+            shutil.rmtree(temp_dir)
+

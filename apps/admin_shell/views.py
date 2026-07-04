@@ -5541,6 +5541,8 @@ class AtlasRunView(ShellContextMixin, TemplateView):
             "APOLLO_API_KEY": os.environ.get("ATLAS_APOLLO_KEY") or os.environ.get("APOLLO_API_KEY") or "",
             "ATLAS_ENABLE_SHEETS": "false",
             "ATLAS_ENABLE_MAILER": "false",
+            "ATLAS_MOCK_CSV_PATH": os.environ.get("ATLAS_MOCK_CSV_PATH") or "",
+            "ATLAS_CSV_OUTPUT_PATH": os.environ.get("ATLAS_CSV_OUTPUT_PATH") or "",
         }
 
         if action == "validate":

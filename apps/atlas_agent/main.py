@@ -48,24 +48,36 @@ def _load_env_file() -> None:
         load_dotenv(override=False)
 
 
-def _write_csv(leads, filename: str = "atlas_leads_mock.csv") -> None:
-    with open(filename, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "Instituicao",
-            "Tipo",
-            "Cidade",
-            "Regiao",
-            "Nome_Decisor",
-            "Cargo",
-            "Email",
-            "Telefone",
-            "Status",
-            "Score",
-            "Notas",
-        ])
-        for lead in leads:
-            writer.writerow(lead.to_csv_row())
+DEFAULT_MOCK_CSV_PATH = (Path(__file__).resolve().parent / "atlas_leads_mock.csv").resolve()
+
+
+def _write_csv(leads, filepath: Path | str) -> None:
+    try:
+        path = Path(filepath)
+        if not path.is_absolute():
+            path = (Path(__file__).resolve().parent / path).resolve()
+        if path.parent:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Instituicao",
+                "Tipo",
+                "Cidade",
+                "Regiao",
+                "Nome_Decisor",
+                "Cargo",
+                "Email",
+                "Telefone",
+                "Status",
+                "Score",
+                "Notas",
+            ])
+            for lead in leads:
+                writer.writerow(lead.to_csv_row())
+        print(f"[Atlas CSV] CSV gravado com sucesso em: {path}")
+    except (OSError, PermissionError) as exc:
+        raise AtlasConfigError("Arquivo mock indisponível ou sem permissão") from exc
 
 
 def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
@@ -169,7 +181,14 @@ def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
         print("[Atlas Sheets] desabilitado por ATLAS_ENABLE_SHEETS=false.")
 
     print("[Atlas Mailer] desabilitado por politica da Sprint Atlas 04. Nenhum e-mail sera enviado.")
-    _write_csv(qualified_leads)
+    raw_path = config.mock_csv_path or config.csv_output_path
+    if raw_path:
+        csv_path = Path(raw_path)
+        if not csv_path.is_absolute():
+            csv_path = (Path(__file__).resolve().parent / csv_path).resolve()
+    else:
+        csv_path = DEFAULT_MOCK_CSV_PATH
+    _write_csv(qualified_leads, csv_path)
 
     print("--- ATLAS AGENT: resumo final ---")
     print(

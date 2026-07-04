@@ -127,6 +127,7 @@ class AtlasPocControlledRunTests(SimpleTestCase):
         response.json.return_value = {
             "public_id": "batch-1",
             "status": "completed",
+            "processed_rows": 1,
             "created_opportunities": 1,
             "skipped_duplicates": 0,
             "errors": [],
@@ -174,6 +175,7 @@ class AtlasPocControlledRunTests(SimpleTestCase):
         response.json.return_value = {
             "public_id": "batch-1",
             "status": "completed",
+            "processed_rows": 1,
             "created_opportunities": 1,
             "skipped_duplicates": 0,
             "errors": [],

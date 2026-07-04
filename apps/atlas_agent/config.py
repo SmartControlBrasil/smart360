@@ -6,7 +6,17 @@ from typing import Mapping
 from .api_client import DEFAULT_MIN_SCORE
 
 
-UNSAFE_ATLAS_TOKENS = {"", "mock-token", "default", "changeme", "change-me", "atlas-token"}
+UNSAFE_ATLAS_TOKENS = {
+    "",
+    "...",
+    "mock-token",
+    "default",
+    "changeme",
+    "change-me",
+    "atlas-token",
+    "test",
+    "demo",
+}
 DEFAULT_MAX_PROSPECTS_PER_RUN = 10
 
 
@@ -41,12 +51,16 @@ class AtlasPocConfig:
     city: str = "Vila Mariana"
     google_places_api_key: str = ""
     apollo_api_key: str = ""
+    spreadsheet_id: str = ""
+    google_application_credentials: str = ""
     enable_sheets: bool = False
     enable_mailer: bool = False
     validate_only: bool = False
 
     @classmethod
     def from_env(cls, environ: Mapping[str, str]) -> "AtlasPocConfig":
+        places_key = (environ.get("ATLAS_GOOGLE_PLACES_KEY") or environ.get("GOOGLE_PLACES_API_KEY") or "").strip()
+        apollo_key = (environ.get("ATLAS_APOLLO_KEY") or environ.get("APOLLO_API_KEY") or "").strip()
         config = cls(
             env=(environ.get("ATLAS_ENV") or "development").strip().lower(),
             api_base_url=(environ.get("ATLAS_API_BASE_URL") or "http://127.0.0.1:8000").strip(),
@@ -60,8 +74,10 @@ class AtlasPocConfig:
             ),
             segment=(environ.get("ATLAS_SEGMENT") or "escola particular").strip(),
             city=(environ.get("ATLAS_CITY") or "Vila Mariana").strip(),
-            google_places_api_key=(environ.get("GOOGLE_PLACES_API_KEY") or "").strip(),
-            apollo_api_key=(environ.get("APOLLO_API_KEY") or "").strip(),
+            google_places_api_key=places_key,
+            apollo_api_key=apollo_key,
+            spreadsheet_id=(environ.get("ATLAS_SPREADSHEET_ID") or "").strip(),
+            google_application_credentials=(environ.get("GOOGLE_APPLICATION_CREDENTIALS") or "").strip(),
             enable_sheets=_as_bool(environ.get("ATLAS_ENABLE_SHEETS"), False),
             enable_mailer=False,
             validate_only=_as_bool(environ.get("ATLAS_VALIDATE_ONLY"), False),

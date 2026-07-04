@@ -73,6 +73,7 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
         response.json.return_value = {
             "public_id": "batch-123",
             "status": "completed",
+            "processed_rows": 1,
             "created_opportunities": 1,
             "skipped_duplicates": 0,
             "errors": [],
@@ -97,6 +98,7 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
         result = client.import_prospects([lead])
 
         self.assertEqual(result.created_opportunities, 1)
+        self.assertEqual(result.processed_rows, 1)
         response.raise_for_status.assert_called_once_with()
         request = session.post.call_args
         self.assertEqual(
@@ -115,6 +117,7 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
         response.json.return_value = {
             "public_id": "batch-456",
             "status": "completed",
+            "processed_rows": 1,
             "created_opportunities": 1,
             "skipped_duplicates": 0,
             "errors": [{"row": 2, "company_name": "Escola Com Erro", "error": "Linha invalida"}],
@@ -131,6 +134,7 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
         result = client.import_prospects([Lead("Escola Modelo", "Sao Paulo", "Vila Mariana", lead_score=8)])
 
         self.assertEqual(result.created_opportunities, 1)
+        self.assertEqual(result.processed_rows, 1)
         self.assertEqual(result.errors, [{"row": 2, "company_name": "Escola Com Erro", "error": "Linha invalida"}])
 
     def test_cold_mailer_remains_in_dry_run_by_default(self):

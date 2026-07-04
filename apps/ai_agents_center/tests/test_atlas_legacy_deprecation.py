@@ -63,8 +63,8 @@ class AtlasLegacyDeprecationApiTests(APITestCase):
         self.assertIn("secure ATLAS_API_TOKEN", response.data["detail"])
         self.assertEqual(AtlasLead.objects.count(), 0)
 
+    @override_settings(ATLAS_API_TOKEN="secure-import-token")
     def test_official_import_creates_commercial_opportunity(self):
-        self.client.force_authenticate(self.user)
         payload = {
             "company": self.company.id,
             "source": "google_maps",
@@ -81,7 +81,12 @@ class AtlasLegacyDeprecationApiTests(APITestCase):
             ],
         }
 
-        response = self.client.post(reverse("ai-agent-atlas-import-prospects"), payload, format="json")
+        response = self.client.post(
+            reverse("ai-agent-atlas-import-prospects"),
+            payload,
+            format="json",
+            HTTP_AUTHORIZATION="Bearer secure-import-token",
+        )
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["created_opportunities"], 1)

@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
@@ -203,8 +203,8 @@ class AtlasImporterApiTests(APITestCase):
         self.user = UserFactory(email="atlas-import-api@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
         self.company = CompanyFactory(name="Atlas API Import", slug="atlas-api-import")
         Membership.objects.create(user=self.user, company=self.company, is_primary=True)
-        self.client.force_authenticate(self.user)
 
+    @override_settings(ATLAS_API_TOKEN="secure-import-token")
     def test_internal_api_imports_json_rows(self):
         payload = {
             "company": self.company.id,
@@ -222,7 +222,12 @@ class AtlasImporterApiTests(APITestCase):
             ],
         }
 
-        response = self.client.post(reverse("ai-agent-atlas-import-prospects"), payload, format="json")
+        response = self.client.post(
+            reverse("ai-agent-atlas-import-prospects"),
+            payload,
+            format="json",
+            HTTP_AUTHORIZATION="Bearer secure-import-token",
+        )
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["created_opportunities"], 1)
@@ -231,6 +236,7 @@ class AtlasImporterApiTests(APITestCase):
         self.assertEqual(opportunity.status, CommercialOpportunity.Status.READY_FOR_REVIEW)
         self.assertIsNone(opportunity.lead)
 
+    @override_settings(ATLAS_API_TOKEN="secure-import-token")
     def test_internal_api_reports_partial_batch_errors(self):
         payload = {
             "company": self.company.id,
@@ -264,7 +270,12 @@ class AtlasImporterApiTests(APITestCase):
             return original_build(analysis=analysis, company=company, source=source, **kwargs)
 
         with patch.object(OpportunityBuilderService, "build_from_analysis", side_effect=build_side_effect):
-            response = self.client.post(reverse("ai-agent-atlas-import-prospects"), payload, format="json")
+            response = self.client.post(
+                reverse("ai-agent-atlas-import-prospects"),
+                payload,
+                format="json",
+                HTTP_AUTHORIZATION="Bearer secure-import-token",
+            )
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["status"], AtlasProspectImportBatch.Status.COMPLETED)
@@ -274,3 +285,17 @@ class AtlasImporterApiTests(APITestCase):
         self.assertEqual(response.data["errors"][0]["company_name"], "Escola Com Erro")
         self.assertEqual(CommercialOpportunity.objects.filter(company_name="Escola Valida").count(), 1)
         self.assertFalse(CommercialOpportunity.objects.filter(company_name="Escola Com Erro").exists())
+
+    @override_settings(ATLAS_API_TOKEN="secure-import-token")
+    def test_internal_api_rejects_missing_token(self):
+        payload = {
+            "company": self.company.id,
+            "source": "manual",
+            "filename": "api-import.json",
+            "rows": [{"company_name": "Sem Token"}],
+        }
+
+        response = self.client.post(reverse("ai-agent-atlas-import-prospects"), payload, format="json")
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data["detail"], "Unauthorized or invalid token.")

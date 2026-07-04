@@ -86,3 +86,13 @@ __pycache__/
 *$py.class
 docs/xyron/
 docs/xyron/
+
+# Secrets / credentials
+*.json
+*credentials*.json
+*gcp*.json
+*.pem
+*.key
+.env
+secrets/
+apps/atlas_agent/*.json

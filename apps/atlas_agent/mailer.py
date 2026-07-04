@@ -14,8 +14,8 @@ class ColdMailer:
     def __init__(self, smtp_user: Optional[str] = None, smtp_pass: Optional[str] = None, dry_run: Optional[bool] = None):
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
-        self.smtp_user = smtp_user or os.getenv("SMTP_USER", "")
-        self.smtp_pass = smtp_pass or os.getenv("SMTP_PASSWORD", "")
+        self.smtp_user = smtp_user or os.getenv("ATLAS_SMTP_USER") or os.getenv("SMTP_USER", "")
+        self.smtp_pass = smtp_pass or os.getenv("ATLAS_SMTP_PASS") or os.getenv("SMTP_PASSWORD", "")
         if dry_run is None:
             self.dry_run = os.getenv("ATLAS_ENV", "development") != "production"
         else:

@@ -44,6 +44,7 @@ def prospect_to_api_row(lead: Lead) -> dict[str, str]:
 class AtlasImportResult:
     public_id: str
     status: str
+    processed_rows: int
     created_opportunities: int
     skipped_duplicates: int
     errors: list[dict]
@@ -96,6 +97,7 @@ class AtlasAPIClient:
         return AtlasImportResult(
             public_id=str(payload.get("public_id") or ""),
             status=str(payload.get("status") or ""),
+            processed_rows=int(payload.get("processed_rows") or 0),
             created_opportunities=int(payload.get("created_opportunities") or 0),
             skipped_duplicates=int(payload.get("skipped_duplicates") or 0),
             errors=list(payload.get("errors") or []),

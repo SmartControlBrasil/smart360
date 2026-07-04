@@ -23,7 +23,29 @@ A PoC coleta prospects, enriquece dados quando houver chaves reais, aplica scori
 | `GOOGLE_PLACES_API_KEY` | para busca real | vazio | Ausente em development ativa fallback mock do scraper. |
 | `APOLLO_API_KEY` | para enriquecimento real | vazio | Ausente em development ativa fallback mock do enriquecimento. |
 | `ATLAS_ENABLE_SHEETS` | não | `false` | Sheets fica desligado por padrão. |
+| `ATLAS_SPREADSHEET_ID` | quando Sheets ativo | vazio | ID da planilha Google Sheets (preferencial, evita lookup por título). |
+| `GOOGLE_APPLICATION_CREDENTIALS` | quando Sheets ativo | vazio | Caminho do JSON de service account, fora do repositório. |
 | `ATLAS_ENABLE_MAILER` | não | `false` | Política fixa: mailer desligado. O `main.py` não chama o mailer. |
+
+## Execução local segura
+
+Use este fluxo para rodar localmente sem expor segredos:
+
+1. Mantenha o JSON fora do repositório, por exemplo:
+   - `~/.smart360/secrets/atlas-gcp-credentials.json`
+2. Exporte as variáveis no shell atual:
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/home/marcelo/.smart360/secrets/atlas-gcp-credentials.json"
+export ATLAS_API_TOKEN="$(grep '^ATLAS_API_TOKEN=' .env | cut -d= -f2-)"
+export ATLAS_ENABLE_SHEETS=true
+.venv/bin/python -m apps.atlas_agent.main
+```
+
+Regras de segurança:
+- Nunca colar JSON/token em chat, issue, commit ou print.
+- Nunca commitar `.env` nem arquivos JSON de credenciais.
+- Manter cold mail desligado e fluxo oficial via `import-prospects`.
 
 ## Execução Development/Mock
 

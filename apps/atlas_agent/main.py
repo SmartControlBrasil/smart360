@@ -38,6 +38,16 @@ def _safe_mode_label(config: AtlasPocConfig) -> str:
     return "development-real-keys"
 
 
+def _load_env_file() -> None:
+    """Carrega .env do raiz do repositório, sem sobrescrever variáveis exportadas."""
+    repo_root = Path(__file__).resolve().parents[2]
+    env_file = repo_root / ".env"
+    if env_file.exists():
+        load_dotenv(dotenv_path=env_file, override=False)
+    else:
+        load_dotenv(override=False)
+
+
 def _write_csv(leads, filename: str = "atlas_leads_mock.csv") -> None:
     with open(filename, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -133,8 +143,24 @@ def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
         print("[Atlas API] sincronizacao pulada: nenhum prospect atingiu o score minimo.")
 
     if config.enable_sheets:
-        sheets_db = GoogleSheetsIntegration(spreadsheet_title="Planilha Matriz de Leads - Inteligência Comercial (PoC)")
-        sheets_db.push_leads_batch(qualified_leads)
+        has_credentials = bool(config.google_application_credentials)
+        has_spreadsheet_id = bool(config.spreadsheet_id)
+        print(
+            "[Atlas Sheets] habilitado; credencial={cred}; spreadsheet_id={sheet}.".format(
+                cred="presente" if has_credentials else "ausente",
+                sheet="presente" if has_spreadsheet_id else "ausente",
+            )
+        )
+        sheets_db = GoogleSheetsIntegration(
+            spreadsheet_title="Planilha Matriz de Leads - Inteligência Comercial (PoC)",
+            spreadsheet_id=config.spreadsheet_id,
+            credentials_path=config.google_application_credentials,
+        )
+        try:
+            sheets_db.push_leads_batch(qualified_leads)
+        except Exception as exc:  # pragma: no cover - guardrail for manual runs
+            summary.errors.append(f"sheets:{exc}")
+            print("[Atlas Sheets] falha resumida na gravacao; fluxo principal mantido.")
     else:
         print("[Atlas Sheets] desabilitado por ATLAS_ENABLE_SHEETS=false.")
 
@@ -158,7 +184,7 @@ def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
 
 
 def main(environ: dict[str, str] | None = None) -> int:
-    load_dotenv()
+    _load_env_file()
     try:
         config = AtlasPocConfig.from_env(environ or os.environ)
     except AtlasConfigError as exc:
@@ -170,6 +196,13 @@ def main(environ: dict[str, str] | None = None) -> int:
         print(f"[Atlas Config] ambiente={config.env}; cidade={config.city}; segmento={config.segment}; limite={config.max_prospects_per_run}; score minimo={config.min_score}")
         print(f"[Atlas Config] Google Places API Key: {'Presente' if config.google_places_api_key else 'Ausente'}")
         print(f"[Atlas Config] API Token: {'Presente' if config.api_token and config.api_token not in UNSAFE_ATLAS_TOKENS else 'Ausente'}")
+        print(f"[Atlas Config] Sheets: {'Habilitado' if config.enable_sheets else 'Desabilitado'}")
+        print(f"[Atlas Config] Spreadsheet ID: {'Presente' if config.spreadsheet_id else 'Ausente'}")
+        print(
+            "[Atlas Config] Credencial Google Application: {status}".format(
+                status="Presente" if config.google_application_credentials else "Ausente",
+            )
+        )
         print("[Atlas Config] A configuracao esta APTA para rodada real.")
         return 0
 

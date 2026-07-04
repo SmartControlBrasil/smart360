@@ -363,22 +363,27 @@ class CommercialOpportunityViewSet(ScopedAIAgentsMixin, viewsets.ReadOnlyModelVi
 
 
 class AtlasProspectImportView(APIView):
-    permission_classes = [AIAgentsPermission]
-    permission_action = "manage"
+    authentication_classes = []
+    permission_classes = []
 
     def post(self, request, *args, **kwargs):
+        expected_token = (getattr(settings, "ATLAS_API_TOKEN", "") or "").strip()
+        if expected_token in LEGACY_ATLAS_UNSAFE_TOKENS:
+            return Response({"detail": "Unauthorized or invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header != f"Bearer {expected_token}":
+            return Response({"detail": "Unauthorized or invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+
         serializer = AtlasProspectImportSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         company = serializer.validated_data["company"]
-        membership = Membership.objects.filter(user=request.user, company=company).first()
-        if membership is None and not getattr(request.user, "is_superuser", False):
-            return Response({"detail": "Company not accessible for current user."}, status=status.HTTP_403_FORBIDDEN)
         batch = AtlasImporterService.import_rows(
             rows=serializer.validated_data["rows"],
             company=company,
             source=serializer.validated_data.get("source", CommercialOpportunity.Source.MANUAL),
             filename=serializer.validated_data.get("filename", ""),
-            created_by=request.user,
+            created_by=None,
         )
         return Response(AtlasProspectImportBatchSerializer(batch).data, status=status.HTTP_201_CREATED)
 
@@ -819,7 +824,7 @@ class AnomalyAnalysisRunView(APIView):
 from django.conf import settings
 
 
-LEGACY_ATLAS_UNSAFE_TOKENS = {"", "mock-token", "default", "changeme", "change-me", "atlas-token"}
+LEGACY_ATLAS_UNSAFE_TOKENS = {"", "...", "mock-token", "default", "changeme", "change-me", "atlas-token", "test", "demo"}
 
 
 class AtlasLeadIngestionView(APIView):

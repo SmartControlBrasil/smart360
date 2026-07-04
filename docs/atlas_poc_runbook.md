@@ -29,9 +29,11 @@ A PoC coleta prospects, enriquece dados quando houver chaves reais, aplica scori
 
 ```bash
 ATLAS_ENV=development \
-ATLAS_MAX_PROSPECTS_PER_RUN=5 \
 ATLAS_SEGMENT="escola particular" \
 ATLAS_CITY="Vila Mariana" \
+ATLAS_MIN_SCORE="70" \
+ATLAS_MAX_PROSPECTS_PER_RUN="5" \
+ATLAS_ENABLE_MAILER="false" \
 .venv/bin/python -m apps.atlas_agent.main
 ```
 
@@ -45,7 +47,7 @@ ATLAS_API_BASE_URL="https://smart360.seu-dominio-interno" \
 ATLAS_API_TOKEN="token-real-seguro" \
 ATLAS_COMPANY_ID="123" \
 ATLAS_MAX_PROSPECTS_PER_RUN="10" \
-ATLAS_MIN_SCORE="5" \
+ATLAS_MIN_SCORE="70" \
 ATLAS_SEGMENT="escola particular" \
 ATLAS_CITY="Vila Mariana" \
 GOOGLE_PLACES_API_KEY="chave-real" \
@@ -71,6 +73,51 @@ Production falha com erro claro se faltar `ATLAS_API_BASE_URL`, `ATLAS_API_TOKEN
 - Confirmar limite baixo em `ATLAS_MAX_PROSPECTS_PER_RUN`.
 - Confirmar que `ATLAS_ENABLE_SHEETS=false`, exceto em teste manual específico.
 - Confirmar que cold mail permanece desligado.
+
+## Primeira rodada real recomendada
+
+Configuração sugerida para o primeiro piloto com Google Places/Apollo:
+
+- Segmento: escolas particulares.
+- Cidade: São Paulo/SP.
+- Limite: `ATLAS_MAX_PROSPECTS_PER_RUN=10`.
+- Score mínimo: `ATLAS_MIN_SCORE=70`.
+- Endpoint oficial: `/api/v1/ai-agents/atlas/import-prospects/`.
+- Revisar oportunidades em `/app/atlas/opportunities/`.
+- Aprovar ou rejeitar manualmente cada oportunidade.
+- Converter para Lead somente após revisão e aprovação humana.
+- Manter `ATLAS_ENABLE_MAILER=false`; zero e-mails enviados.
+
+Exemplo de execução controlada:
+
+```bash
+ATLAS_ENV=production \
+ATLAS_API_BASE_URL="https://smart360.seu-dominio-interno" \
+ATLAS_API_TOKEN="token-real-seguro" \
+ATLAS_COMPANY_ID="123" \
+ATLAS_SEGMENT="escola particular" \
+ATLAS_CITY="São Paulo/SP" \
+ATLAS_MIN_SCORE="70" \
+ATLAS_MAX_PROSPECTS_PER_RUN="10" \
+ATLAS_ENABLE_MAILER="false" \
+GOOGLE_PLACES_API_KEY="chave-real" \
+APOLLO_API_KEY="chave-real" \
+.venv/bin/python -m apps.atlas_agent.main
+```
+
+## Critérios de sucesso do piloto
+
+Registrar após a execução:
+
+- Quantidade coletada.
+- Quantidade enriquecida.
+- Quantidade acima do score mínimo.
+- Quantidade importada para `CommercialOpportunity`.
+- Duplicados ignorados pela API oficial.
+- Oportunidades prontas para revisão.
+- Oportunidades aprovadas.
+- Leads convertidos após revisão humana.
+- Zero e-mails enviados.
 
 ## Revisão Após Execução
 

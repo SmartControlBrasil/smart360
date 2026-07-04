@@ -172,3 +172,92 @@ class AtlasPocControlledRunTests(SimpleTestCase):
         high_score = self._lead("Escola Alta", score=8)
 
         self.assertEqual(qualified_prospects([low_score, high_score], minimum_score=5), [high_score])
+
+    @patch("apps.atlas_agent.scraper.requests.get")
+    @patch("apps.atlas_agent.enricher.requests.post")
+    def test_mock_run_does_not_make_external_api_calls(self, mock_post, mock_get):
+        config = AtlasPocConfig.from_env({"ATLAS_ENV": "development"})
+        with patch("apps.atlas_agent.main._write_csv"):
+            summary = run_pipeline(config)
+
+        self.assertTrue(config.mock_mode)
+        mock_get.assert_not_called()
+        mock_post.assert_not_called()
+        self.assertEqual(summary.collected, 2)
+        self.assertEqual(summary.enriched, 2)
+
+    def test_runbook_contains_real_run_checklist(self):
+        import os
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        runbook_path = os.path.abspath(os.path.join(current_dir, "../../../docs/atlas_poc_runbook.md"))
+        self.assertTrue(os.path.exists(runbook_path), f"Runbook nao encontrado no caminho: {runbook_path}")
+        with open(runbook_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("## Primeira rodada real recomendada", content)
+        self.assertIn("- Segmento: escolas particulares.", content)
+        self.assertIn("- Cidade: São Paulo/SP.", content)
+        self.assertIn("- Limite: `ATLAS_MAX_PROSPECTS_PER_RUN=10`.", content)
+        self.assertIn("- Score mínimo: `ATLAS_MIN_SCORE=70`.", content)
+        self.assertIn("- Revisar oportunidades em `/app/atlas/opportunities/`.", content)
+        self.assertIn("- Aprovar ou rejeitar manualmente cada oportunidade.", content)
+        self.assertIn("- Converter para Lead somente após revisão e aprovação humana.", content)
+        self.assertIn("- Manter `ATLAS_ENABLE_MAILER=false`; zero e-mails enviados.", content)
+        self.assertIn("## Critérios de sucesso do piloto", content)
+        self.assertIn("- Quantidade coletada.", content)
+        self.assertIn("- Quantidade enriquecida.", content)
+        self.assertIn("- Quantidade acima do score mínimo.", content)
+        self.assertIn("- Quantidade importada para `CommercialOpportunity`.", content)
+        self.assertIn("- Duplicados ignorados pela API oficial.", content)
+        self.assertIn("- Oportunidades prontas para revisão.", content)
+        self.assertIn("- Oportunidades aprovadas.", content)
+        self.assertIn("- Leads convertidos após revisão humana.", content)
+        self.assertIn("- Zero e-mails enviados.", content)
+
+
+from django.test import TestCase
+from tests.factories.core import CompanyFactory, UserFactory
+from apps.companies.models import Membership
+from apps.ai_agents_center.services.atlas_importer import AtlasImporterService
+from apps.ai_agents_center.models import CommercialOpportunity
+
+class AtlasPocDatabaseTests(TestCase):
+    def setUp(self):
+        self.user = UserFactory(email="atlas-poc@smart360.local", password="StrongPass123", is_staff=True, is_superuser=True)
+        self.company = CompanyFactory(name="Atlas PoC Company", slug="atlas-poc-company")
+        Membership.objects.create(user=self.user, company=self.company, is_primary=True)
+
+    def test_repeated_execution_does_not_explode_on_duplicates(self):
+        rows = [
+            {
+                "company_name": "Escola Duplicada",
+                "segment": "escola particular",
+                "city": "Sao Paulo",
+                "state": "SP",
+                "website": "escola-duplicada.test",
+                "contact_email": "direcao@escola-duplicada.test",
+                "notes": "Alto fluxo de limpeza",
+            }
+        ]
+
+        # First import
+        batch_1 = AtlasImporterService.import_rows(
+            rows=rows,
+            company=self.company,
+            source="google_maps",
+            created_by=self.user,
+        )
+        self.assertEqual(batch_1.created_opportunities, 1)
+        self.assertEqual(batch_1.skipped_duplicates, 0)
+        self.assertEqual(CommercialOpportunity.objects.count(), 1)
+
+        # Second import (repeated execution)
+        batch_2 = AtlasImporterService.import_rows(
+            rows=rows,
+            company=self.company,
+            source="google_maps",
+            created_by=self.user,
+        )
+        self.assertEqual(batch_2.created_opportunities, 0)
+        self.assertEqual(batch_2.skipped_duplicates, 1)
+        # Verify no database/duplicity exceptions were raised, and it was handled gracefully
+        self.assertEqual(CommercialOpportunity.objects.count(), 1)

@@ -77,7 +77,7 @@ def _write_csv(leads, filepath: Path | str) -> None:
                 writer.writerow(lead.to_csv_row())
         print(f"[Atlas CSV] CSV gravado com sucesso em: {path}")
     except (OSError, PermissionError) as exc:
-        raise AtlasConfigError("Arquivo mock indisponível ou sem permissão") from exc
+        print(f"[Atlas CSV] Aviso: Nao foi possivel gravar o CSV de saida em {filepath}: {exc}. Continuando...")
 
 
 def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
@@ -91,6 +91,7 @@ def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
         google_api_key=config.google_places_api_key,
         production=config.production,
         source=config.source,
+        mock_csv_path=config.mock_csv_path,
     )
     raw_leads = scraper.run_pipeline([config.city], [config.segment], max_results=config.max_prospects_per_run)
     collected_count = getattr(scraper, "collected_count", 0)
@@ -181,14 +182,17 @@ def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
         print("[Atlas Sheets] desabilitado por ATLAS_ENABLE_SHEETS=false.")
 
     print("[Atlas Mailer] desabilitado por politica da Sprint Atlas 04. Nenhum e-mail sera enviado.")
-    raw_path = config.mock_csv_path or config.csv_output_path
-    if raw_path:
-        csv_path = Path(raw_path)
-        if not csv_path.is_absolute():
-            csv_path = (Path(__file__).resolve().parent / csv_path).resolve()
+    if config.write_csv_output:
+        raw_path = config.mock_csv_path or config.csv_output_path
+        if raw_path:
+            csv_path = Path(raw_path)
+            if not csv_path.is_absolute():
+                csv_path = (Path(__file__).resolve().parent / csv_path).resolve()
+        else:
+            csv_path = DEFAULT_MOCK_CSV_PATH
+        _write_csv(qualified_leads, csv_path)
     else:
-        csv_path = DEFAULT_MOCK_CSV_PATH
-    _write_csv(qualified_leads, csv_path)
+        print("[Atlas CSV] Gravacao do CSV de saida desabilitada por ATLAS_WRITE_CSV_OUTPUT=false.")
 
     print("--- ATLAS AGENT: resumo final ---")
     print(

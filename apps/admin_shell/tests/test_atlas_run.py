@@ -140,7 +140,7 @@ class AtlasRunDashboardTests(TestCase):
     @patch("apps.atlas_agent.main.SchoolScraper")
     @patch("apps.atlas_agent.main.EnrichmentService")
     @patch("apps.atlas_agent.main.ScoringEngine")
-    def test_post_run_mock_without_cwd_permissions_returns_controlled_error(self, mock_scoring, mock_enricher, mock_scraper):
+    def test_post_run_mock_without_cwd_permissions_does_not_crash(self, mock_scoring, mock_enricher, mock_scraper):
         lead = StandaloneLead("Escola Vila", "Sao Paulo", "Vila Mariana", lead_score=80)
         mock_scraper.return_value.run_pipeline.return_value = [lead]
         mock_enricher.return_value.process_lead.side_effect = lambda l: l
@@ -148,6 +148,30 @@ class AtlasRunDashboardTests(TestCase):
 
         with patch.dict(os.environ, {
             "ATLAS_CSV_OUTPUT_PATH": "/root/readonly_directory_for_test/leads.csv",
+            "ATLAS_API_TOKEN": "mock-token",
+            "ATLAS_WRITE_CSV_OUTPUT": "true"
+        }):
+            response = self.client.post(reverse("admin-shell:atlas-run"), {
+                "action": "run",
+                "segment": "escola particular",
+                "city": "Vila Mariana",
+                "source": "mock",
+                "max_prospects_per_run": "5",
+                "min_score": "5",
+            })
+
+        # Failure to write output CSV should be logged as warning, and pipeline should complete successfully (return 200 with summary)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Resumo da Execução")
+
+    @patch("apps.atlas_agent.main.EnrichmentService")
+    @patch("apps.atlas_agent.main.ScoringEngine")
+    def test_post_run_mock_with_missing_explicit_input_csv_returns_controlled_error(self, mock_scoring, mock_enricher):
+        mock_enricher.return_value.process_lead.side_effect = lambda l: l
+        mock_scoring.return_value.process_lead.side_effect = lambda l: l
+
+        with patch.dict(os.environ, {
+            "ATLAS_MOCK_CSV_PATH": "non_existent_file_for_test.csv",
             "ATLAS_API_TOKEN": "mock-token"
         }):
             response = self.client.post(reverse("admin-shell:atlas-run"), {
@@ -212,7 +236,8 @@ class AtlasRunDashboardTests(TestCase):
 
             with patch.dict(os.environ, {
                 "ATLAS_MOCK_CSV_PATH": relative_target_name,
-                "ATLAS_API_TOKEN": "real-safe-token-for-test"
+                "ATLAS_API_TOKEN": "real-safe-token-for-test",
+                "ATLAS_WRITE_CSV_OUTPUT": "true"
             }):
                 response = self.client.post(reverse("admin-shell:atlas-run"), {
                     "action": "run",

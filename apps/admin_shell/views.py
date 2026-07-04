@@ -5543,6 +5543,7 @@ class AtlasRunView(ShellContextMixin, TemplateView):
             "ATLAS_ENABLE_MAILER": "false",
             "ATLAS_MOCK_CSV_PATH": os.environ.get("ATLAS_MOCK_CSV_PATH") or "",
             "ATLAS_CSV_OUTPUT_PATH": os.environ.get("ATLAS_CSV_OUTPUT_PATH") or "",
+            "ATLAS_WRITE_CSV_OUTPUT": os.environ.get("ATLAS_WRITE_CSV_OUTPUT") or "false",
         }
 
         if action == "validate":

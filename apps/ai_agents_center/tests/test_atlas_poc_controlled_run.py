@@ -32,6 +32,27 @@ class AtlasPocConfigTests(SimpleTestCase):
 
         self.assertIn("GOOGLE_PLACES_API_KEY", str(ctx.exception))
 
+    def test_production_with_mock_source_does_not_require_google_places_key(self):
+        config = AtlasPocConfig.from_env(
+            {
+                "ATLAS_ENV": "production",
+                "ATLAS_SOURCE": "mock",
+                "ATLAS_API_BASE_URL": "https://smart360.test",
+                "ATLAS_API_TOKEN": "real-token",
+                "ATLAS_COMPANY_ID": "1",
+            }
+        )
+
+        self.assertEqual(config.source, "mock")
+        self.assertTrue(config.production)
+        self.assertTrue(config.mock_mode)
+
+    def test_invalid_source_fails(self):
+        with self.assertRaises(AtlasConfigError) as ctx:
+            AtlasPocConfig.from_env({"ATLAS_SOURCE": "random-source"})
+
+        self.assertIn("ATLAS_SOURCE invalida", str(ctx.exception))
+
     def test_excessive_max_prospects_limit_fails(self):
         with self.assertRaises(AtlasConfigError) as ctx:
             AtlasPocConfig.from_env({

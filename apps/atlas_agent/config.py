@@ -18,6 +18,7 @@ UNSAFE_ATLAS_TOKENS = {
     "demo",
 }
 DEFAULT_MAX_PROSPECTS_PER_RUN = 10
+SUPPORTED_ATLAS_SOURCES = {"mock", "google_places"}
 
 
 class AtlasConfigError(ValueError):
@@ -47,6 +48,7 @@ class AtlasPocConfig:
     company_id: int = 0
     min_score: int = DEFAULT_MIN_SCORE
     max_prospects_per_run: int = DEFAULT_MAX_PROSPECTS_PER_RUN
+    source: str = "mock"
     segment: str = "escola particular"
     city: str = "Vila Mariana"
     google_places_api_key: str = ""
@@ -72,6 +74,7 @@ class AtlasPocConfig:
                 DEFAULT_MAX_PROSPECTS_PER_RUN,
                 name="ATLAS_MAX_PROSPECTS_PER_RUN",
             ),
+            source=(environ.get("ATLAS_SOURCE") or ("google_places" if (environ.get("ATLAS_ENV") or "").strip().lower() == "production" else "mock")).strip().lower(),
             segment=(environ.get("ATLAS_SEGMENT") or "escola particular").strip(),
             city=(environ.get("ATLAS_CITY") or "Vila Mariana").strip(),
             google_places_api_key=places_key,
@@ -91,7 +94,11 @@ class AtlasPocConfig:
 
     @property
     def mock_mode(self) -> bool:
-        return not self.production and (not self.google_places_api_key or not self.apollo_api_key)
+        return self.source == "mock"
+
+    @property
+    def use_google_places(self) -> bool:
+        return self.source == "google_places"
 
     @property
     def can_sync_api(self) -> bool:
@@ -108,6 +115,8 @@ class AtlasPocConfig:
             raise AtlasConfigError("ATLAS_SEGMENT precisa ser configurado.")
         if not self.city:
             raise AtlasConfigError("ATLAS_CITY precisa ser configurada.")
+        if self.source not in SUPPORTED_ATLAS_SOURCES:
+            raise AtlasConfigError("ATLAS_SOURCE invalida. Use 'mock' ou 'google_places'.")
         if self.production:
             missing = []
             if not self.api_base_url:
@@ -116,7 +125,7 @@ class AtlasPocConfig:
                 missing.append("ATLAS_API_TOKEN")
             if self.company_id <= 0:
                 missing.append("ATLAS_COMPANY_ID")
-            if not self.google_places_api_key:
+            if self.use_google_places and not self.google_places_api_key:
                 missing.append("GOOGLE_PLACES_API_KEY")
             if missing:
                 raise AtlasConfigError("Production exige: " + ", ".join(missing) + ".")

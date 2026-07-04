@@ -32,10 +32,10 @@ class AtlasRunSummary:
 
 def _safe_mode_label(config: AtlasPocConfig) -> str:
     if config.production:
-        return "production-real"
+        return "production-google_places" if config.use_google_places else "production-mock"
     if config.mock_mode:
         return "development-mock"
-    return "development-real-keys"
+    return "development-google_places"
 
 
 def _load_env_file() -> None:
@@ -71,11 +71,15 @@ def _write_csv(leads, filename: str = "atlas_leads_mock.csv") -> None:
 def run_pipeline(config: AtlasPocConfig) -> AtlasRunSummary:
     summary = AtlasRunSummary(mode=_safe_mode_label(config))
     print("--- ATLAS AGENT: PoC controlada iniciada ---")
-    source_label = "google_places" if config.production else "mock"
+    source_label = config.source
     print(f"[Atlas Config] modo={summary.mode}; fonte={source_label}; segmento={config.segment}; cidade={config.city}; limite={config.max_prospects_per_run}; score minimo={config.min_score}")
     print(f"[Atlas Config] endpoint oficial={ATLAS_IMPORT_PATH}; cold mail=desligado")
 
-    scraper = SchoolScraper(google_api_key=config.google_places_api_key, production=config.production)
+    scraper = SchoolScraper(
+        google_api_key=config.google_places_api_key,
+        production=config.production,
+        source=config.source,
+    )
     raw_leads = scraper.run_pipeline([config.city], [config.segment], max_results=config.max_prospects_per_run)
     collected_count = getattr(scraper, "collected_count", 0)
     if isinstance(collected_count, (int, float)) and not isinstance(collected_count, bool):
@@ -193,7 +197,7 @@ def main(environ: dict[str, str] | None = None) -> int:
 
     if config.validate_only:
         print("--- ATLAS AGENT: Modo Pre-Validacao ---")
-        print(f"[Atlas Config] ambiente={config.env}; cidade={config.city}; segmento={config.segment}; limite={config.max_prospects_per_run}; score minimo={config.min_score}")
+        print(f"[Atlas Config] ambiente={config.env}; fonte={config.source}; cidade={config.city}; segmento={config.segment}; limite={config.max_prospects_per_run}; score minimo={config.min_score}")
         print(f"[Atlas Config] Google Places API Key: {'Presente' if config.google_places_api_key else 'Ausente'}")
         print(f"[Atlas Config] API Token: {'Presente' if config.api_token and config.api_token not in UNSAFE_ATLAS_TOKENS else 'Ausente'}")
         print(f"[Atlas Config] Sheets: {'Habilitado' if config.enable_sheets else 'Desabilitado'}")

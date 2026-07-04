@@ -8,9 +8,15 @@ class SchoolScraper:
     """
     Motor base para varredura em lote por quadrantes estruturados.
     """
-    def __init__(self, google_api_key: Optional[str] = None, production: bool = False):
+    def __init__(
+        self,
+        google_api_key: Optional[str] = None,
+        production: bool = False,
+        source: str = "mock",
+    ):
         self.google_api_key = google_api_key or os.getenv("GOOGLE_PLACES_API_KEY")
         self.production = production
+        self.source = (source or "mock").strip().lower()
         self.collected_count = 0
         self.limited_count = 0
         self.error_count = 0
@@ -42,20 +48,22 @@ class SchoolScraper:
         Busca escolas usando Google Places API (Text Search).
         Requer google_api_key.
         """
-        if not self.production:
-            print("[Atlas Scraper] Scraper is in mock mode (not production). Returning Mock Data.")
+        if self.source != "google_places":
+            print("[Atlas Scraper] fonte mock ativa (ATLAS_SOURCE=mock).")
             return self.search_schools_mock(query, region)
 
         if not self.google_api_key:
-            raise ValueError("[Atlas Scraper] Erro: Chave do Google Places ausente em production.")
+            print("[Atlas Scraper] fallback para mock: chave Google Places ausente.")
+            return self.search_schools_mock(query, region)
 
         full_query = f"{query} em {region}, São Paulo"
         encoded_query = urllib.parse.quote(full_query)
-        print(f"[Atlas Scraper] Searching Google Places for: {query} in {region}...")
+        print(f"[Atlas Scraper] fonte Google Places real ativa para query='{query}' regiao='{region}'.")
         url = f"https://maps.googleapis.com/maps/api/place/textsearch/json?query={encoded_query}&key={self.google_api_key}"
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=12)
+            response.raise_for_status()
             data = response.json()
             leads = []
 
@@ -72,8 +80,8 @@ class SchoolScraper:
             return leads
         except Exception as e:
             self.error_count += 1
-            print(f"[Atlas Scraper] Error fetching from Places API: {str(e)}")
-            return []
+            print(f"[Atlas Scraper] falha no Google Places ({str(e)}). fallback para mock.")
+            return self.search_schools_mock(query, region)
 
     def run_pipeline(self, regions: List[str], base_queries: List[str], max_results: int = 10) -> List[Lead]:
         """

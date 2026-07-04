@@ -16,6 +16,7 @@ A PoC coleta prospects, enriquece dados quando houver chaves reais, aplica scori
 | `ATLAS_API_BASE_URL` | sim | `http://127.0.0.1:8000` | Base interna/local do Smart360. |
 | `ATLAS_API_TOKEN` | sim | vazio | Nunca usar `mock-token`, `default` ou valor placeholder em production. |
 | `ATLAS_COMPANY_ID` | sim | `0` | Empresa que receberá as oportunidades. |
+| `ATLAS_SOURCE` | não | `mock` (`google_places` em production por padrão) | Fonte da coleta: `mock` ou `google_places`. |
 | `ATLAS_MIN_SCORE` | não | `5` | Score mínimo para enviar à API oficial. |
 | `ATLAS_MAX_PROSPECTS_PER_RUN` | não | `10` | Limite operacional por execução. Manter baixo na PoC. |
 | `ATLAS_SEGMENT` | não | `escola particular` | Query/segmento pesquisado. |
@@ -65,6 +66,7 @@ Sem `GOOGLE_PLACES_API_KEY` e `APOLLO_API_KEY`, a PoC usa dados mockados. Sem `A
 
 ```bash
 ATLAS_ENV=production \
+ATLAS_SOURCE=google_places \
 ATLAS_API_BASE_URL="https://smart360.seu-dominio-interno" \
 ATLAS_API_TOKEN="token-real-seguro" \
 ATLAS_COMPANY_ID="123" \
@@ -100,10 +102,35 @@ Production falha com erro claro se faltar `ATLAS_API_BASE_URL`, `ATLAS_API_TOKEN
 
 Esta seção serve como guia e checklist para a primeira rodada piloto controlada usando dados reais.
 
+## Primeira rodada real controlada
+
+Use esta configuração para a primeira rodada real com baixo risco operacional:
+
+```bash
+ATLAS_ENV=production \
+ATLAS_SOURCE=google_places \
+ATLAS_API_BASE_URL="http://127.0.0.1:8000" \
+ATLAS_API_TOKEN="token-real-seguro" \
+ATLAS_COMPANY_ID="1" \
+ATLAS_MAX_PROSPECTS_PER_RUN="5" \
+ATLAS_MIN_SCORE="70" \
+ATLAS_SEGMENT="escola particular" \
+ATLAS_CITY="Vila Mariana" \
+ATLAS_ENABLE_SHEETS=true \
+GOOGLE_PLACES_API_KEY="chave-google-real" \
+.venv/bin/python -m apps.atlas_agent.main
+```
+
+Critérios desta primeira rodada:
+- no máximo 5 prospects;
+- zero envio de e-mail (cold mail continua desligado);
+- revisão humana obrigatória em `/app/atlas/opportunities/`.
+
 ### Checklist Antes de Executar
 
 - [ ] Validar a configuração do ambiente usando o comando de pré-validação.
 - [ ] Confirmar que `ATLAS_ENV=production` está definido no ambiente.
+- [ ] Confirmar que `ATLAS_SOURCE=google_places` está definido para rodada real.
 - [ ] Confirmar que a chave `GOOGLE_PLACES_API_KEY` é válida e ativa.
 - [ ] Confirmar que o `ATLAS_API_TOKEN` é seguro (não usar tokens inseguros como `mock-token`).
 - [ ] Confirmar que o `ATLAS_COMPANY_ID` aponta para o ID da empresa correta.
@@ -114,6 +141,7 @@ Esta seção serve como guia e checklist para a primeira rodada piloto controlad
 
 - `ATLAS_ENV`: Definir como `production`.
 - `ATLAS_API_BASE_URL`: URL base do Smart360 (ex: `http://127.0.0.1:8000`).
+- `ATLAS_SOURCE`: Definir como `google_places` para coleta real.
 - `ATLAS_API_TOKEN`: Token de autenticação seguro.
 - `ATLAS_COMPANY_ID`: ID da empresa receptora das oportunidades.
 - `GOOGLE_PLACES_API_KEY`: Chave de API ativa do Google Places.
@@ -127,6 +155,7 @@ Permite validar todas as configurações sem fazer buscas no Google Places, sem 
 ```bash
 ATLAS_VALIDATE_ONLY=true \
 ATLAS_ENV=production \
+ATLAS_SOURCE=google_places \
 ATLAS_API_BASE_URL="http://127.0.0.1:8000" \
 ATLAS_API_TOKEN="token-real-seguro" \
 ATLAS_COMPANY_ID="1" \
@@ -141,6 +170,7 @@ Após a validação bem-sucedida, execute o comando abaixo para iniciar a rodada
 
 ```bash
 ATLAS_ENV=production \
+ATLAS_SOURCE=google_places \
 ATLAS_API_BASE_URL="http://127.0.0.1:8000" \
 ATLAS_API_TOKEN="token-real-seguro" \
 ATLAS_COMPANY_ID="1" \

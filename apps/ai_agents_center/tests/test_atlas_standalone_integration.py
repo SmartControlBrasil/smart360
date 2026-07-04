@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
 from django.urls import reverse
@@ -139,3 +139,53 @@ class AtlasStandaloneIntegrationTests(SimpleTestCase):
 
     def test_cold_mailer_remains_in_dry_run_by_default(self):
         self.assertTrue(ColdMailer().dry_run)
+
+    def test_enricher_does_not_set_commercial_score(self):
+        lead = Lead(
+            institution_name="Escola Inovacao",
+            city="Sao Paulo",
+            region="Vila Mariana",
+            website_domain="escola-inovacao.test",
+        )
+        enricher = EnrichmentService(provider="mock")
+        processed = enricher.process_lead(lead)
+        # Should populate enrichment_quality_score (0-10) but NOT lead_score (which stays default 0)
+        self.assertGreater(processed.enrichment_quality_score, 0)
+        self.assertEqual(processed.lead_score, 0)
+
+    def test_scoring_engine_defines_commercial_score(self):
+        from apps.atlas_agent.scoring import ScoringEngine
+        lead = Lead(
+            institution_name="Escola Comercial",
+            city="Sao Paulo",
+            region="Vila Mariana",
+            website_domain="escola-comercial.test",
+            enrichment_quality_score=8,
+        )
+        scoring = ScoringEngine()
+        processed = scoring.process_lead(lead)
+        # lead_score should be 0-100 commercial score (in SP with decisor and escola keyword, it's high)
+        self.assertGreater(processed.lead_score, 10)
+        self.assertEqual(processed.enrichment_quality_score, 8)
+
+    def test_payload_contains_separated_scores(self):
+        lead = Lead(
+            institution_name="Escola Total",
+            city="Sao Paulo",
+            region="Vila Mariana",
+            lead_score=85,
+            enrichment_quality_score=9,
+        )
+        row = prospect_to_api_row(lead)
+        self.assertIn("Score comercial Atlas: 85/100", row["notes"])
+        self.assertIn("Qualidade dos dados: 9/10", row["notes"])
+
+    def test_qualified_prospects_raises_in_production_without_min_score(self):
+        import os
+        lead = Lead("Escola", "Sao Paulo", "Vila Mariana", lead_score=80)
+        # Using patch to set environment
+        with patch.dict(os.environ, {"ATLAS_ENV": "production"}):
+            with self.assertRaises(ValueError) as ctx:
+                qualified_prospects([lead], minimum_score=None)
+            self.assertIn("exige o argumento minimum_score de forma explicita", str(ctx.exception))
+

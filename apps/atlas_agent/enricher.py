@@ -93,5 +93,4 @@ class EnrichmentService:
         else:
             enriched = self.enrich_mock(lead)
         enriched.enrichment_quality_score = self.calculate_lead_score(enriched)
-        enriched.lead_score = enriched.enrichment_quality_score
         return enriched

@@ -31,10 +31,13 @@ A PoC coleta prospects, enriquece dados quando houver chaves reais, aplica scori
 ### Entendendo os Scores
 
 O pipeline do Atlas utiliza duas métricas distintas para avaliar os prospects coletados:
-1. **Qualidade dos Dados (Enriquecimento)**: Uma nota de **0 a 10** calculada por `EnrichmentService` que mede o quão completos estão os dados do prospect (presença de e-mail, telefone, site, nome e cargo do decisor).
-2. **Score Comercial**: Uma nota de **0 a 100** calculada por `ScoringEngine` baseada no segmento de atuação, aderência geográfica (região de SP e Grande SP) e presença de decisor qualificado.
+1. **Qualidade dos Dados (Enriquecimento)** (`enrichment_quality_score`): Uma nota de **0 a 10** calculada por `EnrichmentService` que mede o quão completos estão os dados do prospect (presença de e-mail, telefone, site, nome e cargo do decisor). Esta métrica avalia a qualidade do enriquecimento e não deve ser confundida com o potencial comercial.
+2. **Score Comercial** (`lead_score`): Uma nota de **0 a 100** calculada de forma isolada e exclusiva pelo `ScoringEngine` baseada no segmento de atuação, aderência geográfica (região de SP e Grande SP) e presença de decisor qualificado.
 
-O parâmetro de qualificação `ATLAS_MIN_SCORE` é avaliado estritamente contra o **Score Comercial (0-100)**.
+O parâmetro de qualificação `ATLAS_MIN_SCORE` é avaliado estritamente contra o **Score Comercial (0-100)** (`lead_score`), nunca contra a qualidade dos dados.
+- Em `production/google_places`, o valor default seguro é **70** caso a variável não seja informada.
+- Em `development/mock`, o valor default é **5** apenas para facilitar testes locais rápidos.
+
 As duas notas são enviadas ao Smart360 e salvas no campo `notes` da oportunidade de forma transparente para auditoria do operador:
 `Score comercial Atlas: {lead.lead_score}/100. Qualidade dos dados: {lead.enrichment_quality_score}/10.`
 

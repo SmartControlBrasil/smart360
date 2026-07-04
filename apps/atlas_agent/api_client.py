@@ -9,11 +9,26 @@ import requests
 from .models import Lead
 
 
+import os
+import warnings
+
 ATLAS_IMPORT_PATH = "/api/v1/ai-agents/atlas/import-prospects/"
 DEFAULT_MIN_SCORE = 5
 
 
-def qualified_prospects(leads: Iterable[Lead], minimum_score: int = DEFAULT_MIN_SCORE) -> list[Lead]:
+def qualified_prospects(leads: Iterable[Lead], minimum_score: int | None = None) -> list[Lead]:
+    if minimum_score is None:
+        if os.environ.get("ATLAS_ENV") == "production":
+            raise ValueError(
+                "qualified_prospects exige o argumento minimum_score de forma explicita em ambiente de producao."
+            )
+        warnings.warn(
+            "Uso isolado de qualified_prospects sem passar minimum_score explicitamente esta depreciado. "
+            "Use qualified_prospects(leads, minimum_score=X) onde X e o score comercial minimo (0-100).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        minimum_score = DEFAULT_MIN_SCORE
     return [lead for lead in leads if lead.lead_score >= minimum_score]
 
 

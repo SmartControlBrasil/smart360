@@ -1,5 +1,7 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
+from .views import ingest_livia_lead
 from .views import (
     LeadAssignmentViewSet,
     LeadCampaignViewSet,
@@ -19,4 +21,5 @@ router.register("interactions", LeadInteractionViewSet, basename="growth-interac
 router.register("qualifications", LeadQualificationViewSet, basename="growth-qualifications")
 router.register("assignments", LeadAssignmentViewSet, basename="growth-assignments")
 
-urlpatterns = router.urls
+urlpatterns = [path("leads/ingest/", ingest_livia_lead, name="growth-livia-leads-ingest")]
+urlpatterns += router.urls

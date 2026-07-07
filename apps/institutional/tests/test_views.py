@@ -343,11 +343,21 @@ class InstitutionalRoutesTests(SimpleTestCase):
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     CONTACT_FORM_RECIPIENTS=["contato@smartcontrolbrasil.com.br"],
     CONTACT_FORM_BCC=["engenharia@smartcontrolbrasil.com.br"],
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    },
+    CONTACT_FORM_RATE_LIMIT=5,
+    CONTACT_FORM_RATE_WINDOW_SECONDS=900,
 )
 class ContactViewTests(SimpleTestCase):
     databases = {"default"}
 
     def setUp(self):
+        from django.core.cache import cache
+
+        cache.clear()
         mail.outbox.clear()
         self.url = reverse("institutional:contact")
         self.valid_data = {
@@ -431,3 +441,48 @@ class ContactViewTests(SimpleTestCase):
         response = self.client.post(self.url, spam_data)
         self.assertRedirects(response, self.url, fetch_redirect_response=False)
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_ken_carrell_spam_example_does_not_send_email(self):
+        spam_data = {
+            "contact_name": "Ken Carrell",
+            "company": "Ken",
+            "whatsapp": "737550229",
+            "email": "kenp2025x@yahoo.com",
+            "interest": "software",
+            "message": (
+                "Was just browsing smartcontrolbrasil.com.br and was impressed the layout. "
+                "Nicely design and great user experience. Just had to drop a message, "
+                "have a great day! we7f8sd82"
+            ),
+        }
+        response = self.client.post(self.url, spam_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_legitimate_english_submission_sends_email(self):
+        english_data = {
+            "contact_name": "John Smith",
+            "company": "Acme Packaging Ltd",
+            "whatsapp": "+1 555 123 4567",
+            "email": "john@gmail.com",
+            "interest": "automacao",
+            "message": (
+                "We need PLC integration for our packaging line. "
+                "Please send a quote and estimated timeline."
+            ),
+        }
+        response = self.client.post(self.url, english_data)
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_rate_limit_blocks_rapid_submissions(self):
+        from django.core.cache import cache
+
+        with override_settings(CONTACT_FORM_RATE_LIMIT=2, CONTACT_FORM_RATE_WINDOW_SECONDS=60):
+            cache.clear()
+            mail.outbox.clear()
+            self.client.post(self.url, self.valid_data)
+            self.client.post(self.url, {**self.valid_data, "email": "maria2@example.com"})
+            response = self.client.post(self.url, {**self.valid_data, "email": "maria3@example.com"})
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 2)

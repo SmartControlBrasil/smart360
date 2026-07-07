@@ -1,5 +1,4 @@
 import logging
-import re
 
 from django.conf import settings
 from django.contrib import messages
@@ -9,63 +8,46 @@ from django.core.validators import validate_email
 from django.http import Http404
 from django.shortcuts import redirect, render
 
+from .services.contact_spam_guard import (
+    ContactSubmissionClass,
+    classify_contact_submission,
+    is_contact_rate_limited,
+    partial_ip,
+)
 from .xyron_robots import XYRON_ROBOTS, get_featured_xyron_robots, get_other_xyron_robots, get_xyron_robot
 
 
 logger = logging.getLogger(__name__)
 
-SUSPICIOUS_CONTACT_TERMS = (
-    "casino",
-    "cassino",
-    "betting",
-    "bet",
-    "crypto",
-    "bitcoin",
-    "loan",
-    "viagra",
-    "seo backlinks",
-    "backlink",
-    "pornography",
-    "adult",
-    "hacked",
-    "free money",
-)
-
-LINK_RE = re.compile(r"(https?://|www\.)", re.IGNORECASE)
-REPEATED_CHARS_RE = re.compile(r"(.)\1{7,}")
+CONTACT_GENERIC_SUCCESS_MESSAGE = "Mensagem recebida. Obrigado pelo contato."
 
 
-def _is_contact_spam(data):
-    contact_name = str(data.get("contact_name", "")).strip()
-    email = str(data.get("email", "")).strip()
-    message = str(data.get("message", "")).strip()
-    honeypot = str(data.get("website", "")).strip()
+def _client_ip(request) -> str:
+    forwarded = (request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")[0].strip()
+    return forwarded or (request.META.get("REMOTE_ADDR") or "").strip()
 
-    if honeypot:
-        return True
 
-    if not contact_name or not email or not message:
-        return True
-
-    useful_message = re.sub(r"\s+", " ", message).strip()
-    if len(useful_message) < 10:
-        return True
-
-    if len(LINK_RE.findall(message)) > 5:
-        return True
-
-    lowered = useful_message.lower()
-    if any(term in lowered for term in SUSPICIOUS_CONTACT_TERMS):
-        return True
-
-    if REPEATED_CHARS_RE.search(lowered):
-        return True
-
-    unique_chars = set(lowered)
-    if len(lowered) >= 60 and len(unique_chars) <= 8:
-        return True
-
-    return False
+def _log_contact_guard_event(
+    *,
+    classification: str,
+    score: int,
+    reasons: tuple[str, ...],
+    ip: str,
+    email: str,
+) -> None:
+    email_domain = email.split("@", 1)[1].lower() if "@" in email else ""
+    logger.info(
+        "Contato institucional classificado como %s.",
+        classification,
+        extra={
+            "event": "institutional_contact_spam_guard",
+            "classification": classification,
+            "score": score,
+            "reasons": list(reasons[:5]),
+            "ip_partial": partial_ip(ip),
+            "email_domain": email_domain,
+        },
+    )
 
 
 def home(request):
@@ -137,18 +119,35 @@ def contact(request):
         )
         main_problem = request.POST.get("main_problem", "").strip()
         message = request.POST.get("message", "").strip()
-        honeypot = request.POST.get("website", "").strip()
+        client_ip = _client_ip(request)
 
-        if _is_contact_spam(request.POST):
-            logger.info(
-                "Mensagem de contato institucional bloqueada por anti-spam.",
-                extra={
-                    "contact_name": contact_name[:150],
-                    "email": email[:200],
-                    "honeypot_filled": bool(honeypot),
-                },
+        rate_limit = getattr(settings, "CONTACT_FORM_RATE_LIMIT", 5)
+        rate_window = getattr(settings, "CONTACT_FORM_RATE_WINDOW_SECONDS", 900)
+        if is_contact_rate_limited(
+            client_ip,
+            limit=rate_limit,
+            window_seconds=rate_window,
+        ):
+            _log_contact_guard_event(
+                classification="rate_limited",
+                score=0,
+                reasons=("rate_limit_exceeded",),
+                ip=client_ip,
+                email=email,
             )
-            messages.success(request, "Mensagem recebida. Obrigado pelo contato.")
+            messages.success(request, CONTACT_GENERIC_SUCCESS_MESSAGE)
+            return redirect("institutional:contact")
+
+        verdict = classify_contact_submission(request.POST)
+        if verdict.classification in {ContactSubmissionClass.SPAM, ContactSubmissionClass.SUSPICIOUS}:
+            _log_contact_guard_event(
+                classification=verdict.classification.value,
+                score=verdict.score,
+                reasons=verdict.reasons,
+                ip=client_ip,
+                email=email,
+            )
+            messages.success(request, CONTACT_GENERIC_SUCCESS_MESSAGE)
             return redirect("institutional:contact")
 
         interest_label_by_value = {

@@ -1,0 +1,301 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}MowerBot | Robô Cortador de Grama Xyron | Smart Control Brasil{% endblock %}
+{% block meta_description %}MowerBot Xyron para corte de grama, manutenção de áreas externas, jardins, condomínios, clubes, escolas, hotéis e áreas corporativas.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "MowerBot",
+  "description": "MowerBot Xyron para corte de grama, manutenção de áreas externas, jardins, condomínios, clubes, escolas, hotéis e áreas corporativas.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô cortador de grama",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'mowerbot' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-mowerbot.webp' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>MowerBot</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>MowerBot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='mowerbot' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Corte de grama</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Áreas externas</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Condomínios</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Clubes</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Hotéis</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Paisagismo</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se MowerBot faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-mowerbot.webp' %}" alt="MowerBot da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>MowerBot</h2>
+            <div class="space20"></div>
+            <p>Robô cortador de grama para áreas externas, condomínios, clubes, escolas, hotéis e manutenção paisagística automatizada.</p>
+            <div class="space20"></div>
+            <p>O MowerBot é uma solução Xyron para corte de grama e apoio à manutenção paisagística em áreas externas como condomínios, clubes, escolas, hotéis, áreas corporativas, jardins e pequenas propriedades.</p>
+            <div class="space20"></div>
+            <p>Ele deve ser posicionado como apoio para produtividade, padronização e redução de esforço operacional, sempre após avaliação do terreno, segurança e rotina de manutenção.</p>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Corte de grama em áreas planejadas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio à manutenção paisagística</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Padronização de áreas externas</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Redução de esforço repetitivo</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Operação em condomínios, clubes, escolas, hotéis e áreas corporativas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio à produtividade de equipes externas</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô cortador de grama</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Corte de grama e apoio à manutenção paisagística</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Condomínios, clubes, escolas, hotéis, áreas corporativas, jardins e pequenas propriedades</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Uso planejado após avaliação do terreno</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Capacidade, inclinação, autonomia e recursos devem ser confirmados conforme modelo, terreno e escopo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Corte de grama em áreas externas planejadas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a condomínios, clubes, hotéis e escolas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Padronização da manutenção paisagística</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Redução de esforço em tarefas repetitivas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Avaliação de terreno, inclinação e obstáculos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Operação com critérios de segurança e supervisão</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Condomínios</span>
+              <span class="xyron-product-tags__tag">Clubes</span>
+              <span class="xyron-product-tags__tag">Escolas</span>
+              <span class="xyron-product-tags__tag">Hotéis</span>
+              <span class="xyron-product-tags__tag">Áreas corporativas</span>
+              <span class="xyron-product-tags__tag">Jardins</span>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Manutenção paisagística com processo e segurança</h4>
+              <div class="space12"></div>
+              <p>O MowerBot funciona melhor quando o terreno, as rotas, horários, áreas de risco e critérios de supervisão são definidos antes da operação regular.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/blog/banner-mowerbot.webp' %}" alt="MowerBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/robots-xyron.png' %}" alt="MowerBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>O MowerBot apoia produtividade e padronização, mas depende de avaliação do terreno, segurança e rotina de manutenção.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o MowerBot</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil avalia área, inclinação, obstáculos, rotina de jardinagem, pontos de carga e restrições de segurança.</p>
+            <div class="space20"></div>
+            <p>A proposta considera produtividade, padronização e aderência ao ambiente antes de qualquer recomendação comercial.</p>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronMowerbot">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronMowerbotFaq1" aria-expanded="true" aria-controls="xyronMowerbotFaq1">
+                      MowerBot serve para qualquer terreno?
+                    </button>
+                  </h2>
+                  <div id="xyronMowerbotFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronMowerbot">
+                    <div class="accordion-body">
+                      <p>Não necessariamente. É preciso avaliar inclinação, obstáculos, tipo de área e condições de segurança.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronMowerbotFaq2" aria-expanded="false" aria-controls="xyronMowerbotFaq2">
+                      Ele substitui toda a jardinagem?
+                    </button>
+                  </h2>
+                  <div id="xyronMowerbotFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronMowerbot">
+                    <div class="accordion-body">
+                      <p>Não. Ele apoia o corte de grama e pode reduzir esforço, mas a rotina paisagística continua exigindo planejamento.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronMowerbotFaq3" aria-expanded="false" aria-controls="xyronMowerbotFaq3">
+                      Pode ser usado em condomínios?
+                    </button>
+                  </h2>
+                  <div id="xyronMowerbotFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronMowerbot">
+                    <div class="accordion-body">
+                      <p>Pode ser avaliado para condomínios, clubes, escolas, hotéis e áreas corporativas.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronMowerbotFaq4" aria-expanded="false" aria-controls="xyronMowerbotFaq4">
+                      A Smart Control Brasil faz avaliação do local?
+                    </button>
+                  </h2>
+                  <div id="xyronMowerbotFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronMowerbot">
+                    <div class="accordion-body">
+                      <p>Sim. O diagnóstico do terreno e da operação é parte importante da recomendação.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie MowerBot com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

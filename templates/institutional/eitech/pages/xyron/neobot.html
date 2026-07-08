@@ -1,0 +1,300 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}NeoBot | Robô de Recepção e Comunicação | Smart Control Brasil{% endblock %}
+{% block meta_description %}NeoBot Xyron para recepção, orientação de visitantes, eventos, showrooms e comunicação institucional com implantação consultiva.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "NeoBot",
+  "description": "NeoBot Xyron para recepção, orientação de visitantes, eventos, showrooms e comunicação institucional com implantação consultiva.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô de recepção e comunicação",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'neobot' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-neo.webp' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>NeoBot</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>NeoBot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='neobot' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Recepção</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Eventos</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Showroom</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Atendimento</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Comunicação</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Experiência</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se NeoBot faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-neo.webp' %}" alt="NeoBot da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>NeoBot</h2>
+            <div class="space20"></div>
+            <p>Robô de recepção e atendimento para comunicação institucional, orientação de visitantes e experiências de relacionamento.</p>
+            <div class="space20"></div>
+            <p>O NeoBot é um robô de recepção da Xyron Robotics voltado a empresas, escolas, clínicas, eventos, showrooms e ambientes que precisam orientar pessoas com mais presença tecnológica.</p>
+            <div class="space20"></div>
+            <p>Ele pode apoiar boas-vindas, apresentação de informações, direcionamento de visitantes e comunicação institucional, sempre como complemento ao atendimento humano e à operação local.</p>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Recepção e boas-vindas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Orientação de visitantes</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Comunicação institucional</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apresentação de serviços e informações</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio em eventos, feiras e showrooms</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Direcionamento para equipe humana quando necessário</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô de recepção e atendimento</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Orientação e interação com visitantes</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Empresas, escolas, clínicas, eventos, lojas e showrooms</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Atendimento assistido com roteiro e supervisão</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Recursos de idioma, conteúdo e integração variam conforme configuração e escopo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Recepção e boas-vindas a visitantes</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Comunicação institucional em eventos e showrooms</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a clínicas, escolas e empresas</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apresentação de produtos, serviços e orientações</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Experiência interativa com supervisão da equipe</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Implantação alinhada à privacidade e ao fluxo do ambiente</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Recepções corporativas</span>
+              <span class="xyron-product-tags__tag">Eventos</span>
+              <span class="xyron-product-tags__tag">Showrooms</span>
+              <span class="xyron-product-tags__tag">Clínicas</span>
+              <span class="xyron-product-tags__tag">Escolas</span>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Atendimento presencial com experiência guiada</h4>
+              <div class="space12"></div>
+              <p>O NeoBot faz mais sentido quando existe uma jornada clara: quem será atendido, quais mensagens devem ser exibidas, quais dúvidas serão direcionadas e quando a equipe humana deve assumir o contato.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/elements/neo-recepicionista-robot.png' %}" alt="NeoBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/team/neobot.webp' %}" alt="NeoBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>A implantação deve definir jornada, mensagens, limites de atendimento e momento de transferência para equipe humana.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o NeoBot</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil avalia o ambiente, o fluxo de visitantes, os pontos de interação e a comunicação desejada antes de propor a aplicação do NeoBot.</p>
+            <div class="space20"></div>
+            <p>Também orientamos integração com conteúdos, rotinas de atendimento e boas práticas de privacidade quando houver captura ou consulta de informações.</p>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronNeobot">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronNeobotFaq1" aria-expanded="true" aria-controls="xyronNeobotFaq1">
+                      O NeoBot substitui recepcionistas?
+                    </button>
+                  </h2>
+                  <div id="xyronNeobotFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronNeobot">
+                    <div class="accordion-body">
+                      <p>Não. Ele apoia a experiência e ajuda em orientações repetitivas, mas deve operar com supervisão e fluxo de atendimento definido.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronNeobotFaq2" aria-expanded="false" aria-controls="xyronNeobotFaq2">
+                      Pode ser usado em eventos?
+                    </button>
+                  </h2>
+                  <div id="xyronNeobotFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronNeobot">
+                    <div class="accordion-body">
+                      <p>Sim. Eventos, feiras e showrooms são cenários naturais quando há roteiro, conteúdo e equipe de apoio.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronNeobotFaq3" aria-expanded="false" aria-controls="xyronNeobotFaq3">
+                      É possível personalizar mensagens?
+                    </button>
+                  </h2>
+                  <div id="xyronNeobotFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronNeobot">
+                    <div class="accordion-body">
+                      <p>A personalização depende do escopo, mas o projeto deve prever conteúdo, idioma, jornada e limites de atendimento.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronNeobotFaq4" aria-expanded="false" aria-controls="xyronNeobotFaq4">
+                      A Smart Control Brasil ajuda na implantação?
+                    </button>
+                  </h2>
+                  <div id="xyronNeobotFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronNeobot">
+                    <div class="accordion-body">
+                      <p>Sim. Apoiamos diagnóstico, orientação técnica e alinhamento consultivo conforme o cenário.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie NeoBot com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

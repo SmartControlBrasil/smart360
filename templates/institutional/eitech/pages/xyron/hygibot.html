@@ -1,0 +1,568 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}HygiBot | Robô de Limpeza e Higienização | Smart Control Brasil{% endblock %}
+{% block meta_description %}HygiBot Xyron: robô de limpeza inteligente para grandes áreas, com varrição, aspiração, lavagem, mapeamento a laser, programação de rotas e apoio à operação de facilities.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "HygiBot",
+  "description": "HygiBot Xyron: limpeza inteligente para grandes áreas, com varrer, aspirar, lavar e passar pano seco, mapeamento a laser, programação de áreas e horários e autonomia de até 4 horas, com apoio consultivo à operação de facilities.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô de limpeza e higienização",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'hygibot' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-hygibot.webp' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>HygiBot</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>HygiBot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='hygibot' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Limpeza</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Higienização</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Hospitais</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Escolas</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Condomínios</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Padronização</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Grandes áreas</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Facilities</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Indústrias</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Supermercados</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se HygiBot faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-hygibot.webp' %}" alt="HygiBot da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>HygiBot</h2>
+            <div class="space20"></div>
+            <p>Robô de limpeza e higienização para padronizar rotinas em ambientes comerciais, educacionais, hospitalares e condominiais.</p>
+            <div class="space20"></div>
+            <p>O HygiBot é uma solução Xyron para apoiar rotinas de limpeza e higienização em shoppings, escolas, hospitais, clínicas, condomínios e ambientes comerciais.</p>
+            <div class="space20"></div>
+            <p>A aplicação deve ser pensada como apoio operacional para padronização, previsibilidade e organização da equipe, não como substituição automática de todo o processo de limpeza.</p>
+
+            <div class="space32"></div>
+            <div class="pera-box xyron-detail-highlight">
+              <h4>Limpeza inteligente para grandes áreas</h4>
+              <div class="space12"></div>
+              <p>O HygiBot foi pensado para ambientes com fluxo intenso, escala operacional e necessidade de rotina padronizada. Ele varre, aspira e passa pano de forma automatizada, ajudando a manter áreas amplas limpas com eficiência e constância.</p>
+              <div class="space12"></div>
+              <p>Indicado para operações que exigem padrão, continuidade e controle, o robô atua como apoio à equipe de facilities — com programação de áreas e horários, mapeamento a laser, controle remoto ou app e acompanhamento em tempo real, sempre com diagnóstico, treinamento e supervisão definidos.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a limpeza e higienização</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Padronização de rotinas por área</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio em grandes áreas internas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Varre, aspira, lava e passa pano seco</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Programação de áreas e horários</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Operação por rotas e mapas</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Redução de esforço operacional repetitivo</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Uso em ambientes comerciais e institucionais</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Acompanhamento com processo e supervisão definidos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Acompanhamento em tempo real</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Indicação visual de status no visor LED</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Ciclos prolongados com bateria de longa duração</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Por que o HygiBot é diferente</h2>
+            <div class="space20"></div>
+            <p>Recursos do catálogo Xyron que reforçam produtividade, padronização e controle operacional em grandes áreas — sempre com implantação consultiva e acompanhamento humano.</p>
+            <div class="space24"></div>
+            <div class="xyron-product-features-grid xyron-product-features-grid--cols-4">
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
+                <h4>Escovas de alta rotação</h4>
+                <p>Sucção forte e escovas laterais para ampliar alcance e remover poeira e resíduos em diferentes superfícies.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-road"></i></span>
+                <h4>Deslocamento estável</h4>
+                <p>Rodas duráveis e escovas laterais para percursos consistentes, com sensores que ajudam a contornar obstáculos.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-map-location-dot"></i></span>
+                <h4>Mapeamento a laser</h4>
+                <p>Geração de mapas com agilidade para organizar áreas, rotas e otimizar percursos com menos repetição operacional.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-display"></i></span>
+                <h4>Visor LED expressivo</h4>
+                <p>Comunicação clara de status: carregamento, espera, limpeza e erro, facilitando o acompanhamento da operação.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-mobile-screen"></i></span>
+                <h4>Controle remoto e app</h4>
+                <p>Programação de áreas e horários com antecedência e acompanhamento em tempo real da rotina de limpeza.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-droplet"></i></span>
+                <h4>Reabastecimento automático</h4>
+                <p>Reabastecimento de água e descarte de resíduos conforme infraestrutura e escopo do projeto.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-route"></i></span>
+                <h4>Rotas otimizadas</h4>
+                <p>Contorna obstáculos, otimiza percursos e mantém processo contínuo em áreas mapeadas e supervisionadas.</p>
+              </article>
+              <article class="xyron-product-card">
+                <span class="xyron-product-card__icon" aria-hidden="true"><i class="fa-solid fa-battery-full"></i></span>
+                <h4>Bateria de longa duração</h4>
+                <p>Autonomia de até 4 horas para ciclos prolongados, conforme piso, configuração e rotina definida.</p>
+              </article>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô de limpeza/higienização</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Rotinas de limpeza assistida</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Escolas, clínicas, hospitais, shoppings, condomínios e ambientes comerciais</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Uso planejado por áreas, horários e protocolos</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Funções, insumos, autonomia e compatibilidade com piso variam conforme modelo e ambiente</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Dimensões</span>
+                  <span class="xyron-product-specs__value">50 x 60 x 68 cm (altura x largura x comprimento)</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Peso</span>
+                  <span class="xyron-product-specs__value">53,8 kg</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Bateria</span>
+                  <span class="xyron-product-specs__value">46.000 mAh</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tempo de carregamento</span>
+                  <span class="xyron-product-specs__value">2 horas e meia</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Autonomia</span>
+                  <span class="xyron-product-specs__value">Até 4 horas, conforme ciclo, piso e rotina</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Funções de limpeza</span>
+                  <span class="xyron-product-specs__value">Lavar, varrer, aspirar e passar pano seco</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Navegação e controle</span>
+                  <span class="xyron-product-specs__value">Mapeamento a laser, programação de áreas e acompanhamento via app/controle remoto</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a rotinas de limpeza padronizadas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Uso em escolas, clínicas, shoppings e condomínios</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Melhor previsibilidade operacional</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Redução de deslocamentos repetitivos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Planejamento por áreas, horários e prioridades</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Orientação técnica para operação e manutenção</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Indústrias e áreas operacionais amplas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Ginásios, academias e espaços esportivos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Hotéis e ambientes de hospitalidade</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Supermercados e varejo de alto fluxo</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Ambientes comerciais e institucionais diversos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Padronização em operações que exigem escala</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Melhor controle de áreas, horários e frequência</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Mais previsibilidade para equipes de facilities</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Shoppings</span>
+              <span class="xyron-product-tags__tag">Indústrias</span>
+              <span class="xyron-product-tags__tag">Hospitais</span>
+              <span class="xyron-product-tags__tag">Ginásios</span>
+              <span class="xyron-product-tags__tag">Hotéis</span>
+              <span class="xyron-product-tags__tag">Academias</span>
+              <span class="xyron-product-tags__tag">Supermercados</span>
+              <span class="xyron-product-tags__tag">Escolas</span>
+              <span class="xyron-product-tags__tag">Clínicas</span>
+              <span class="xyron-product-tags__tag">Condomínios</span>
+              <span class="xyron-product-tags__tag">Ambientes comerciais</span>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Antes e depois na operação</h2>
+            <div class="space20"></div>
+            <p>Visão consultiva de como o HygiBot pode contribuir quando há diagnóstico, processo e acompanhamento — sem promessa de eliminação total de mão de obra ou ROI garantido.</p>
+            <div class="space24"></div>
+            <div class="xyron-before-after">
+              <div class="xyron-before-after__column">
+                <h4>Antes</h4>
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Dificuldade de padronização em grandes áreas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Resultados inconsistentes entre turnos e setores</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Rotinas fragmentadas e dependentes de improviso</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Supervisão constante para manter o padrão</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Esforço repetitivo em tarefas de grande escala</li>
+                </ul>
+              </div>
+              <div class="xyron-before-after__column xyron-before-after__column--after">
+                <h4>Depois com HygiBot</h4>
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Rotinas programadas por área e horário</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Limpeza mais consistente em áreas amplas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Menos repetição operacional em percursos definidos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Melhor controle de áreas, horários e frequência</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Mais previsibilidade para a equipe de facilities</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Higienização com rotina e acompanhamento</h4>
+              <div class="space12"></div>
+              <p>O HygiBot deve entrar em um processo com áreas definidas, frequência planejada, supervisão, insumos adequados e indicadores simples de acompanhamento.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/blog/banner-hygibot.webp' %}" alt="HygiBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/robots-xyron.png' %}" alt="HygiBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>O HygiBot apoia a equipe de limpeza e exige supervisão, protocolos e diagnóstico do espaço antes da proposta.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o HygiBot</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil analisa área, piso, fluxo de pessoas, rotina atual e limitações do ambiente antes de indicar o uso do HygiBot.</p>
+            <div class="space20"></div>
+            <p>O foco é ajudar a operação a ganhar padronização com tecnologia viável e treinamento compatível com a equipe.</p>
+
+            <div class="space32"></div>
+            <h2>Como a Smart Control Brasil implanta</h2>
+            <div class="space20"></div>
+            <p>Engenharia aplicada e venda consultiva: cada projeto começa pelo diagnóstico e só avança quando há aderência operacional, segurança e processo definido.</p>
+            <div class="space24"></div>
+            <div class="xyron-process-steps">
+              <article class="xyron-process-steps__item">
+                <span class="xyron-process-steps__number">01</span>
+                <div>
+                  <h4>Diagnóstico da área</h4>
+                  <p>Avaliamos piso, fluxo de pessoas, rotina atual, obstáculos e limitações do ambiente.</p>
+                </div>
+              </article>
+              <article class="xyron-process-steps__item">
+                <span class="xyron-process-steps__number">02</span>
+                <div>
+                  <h4>Definição de áreas e horários</h4>
+                  <p>Organizamos zonas de limpeza, frequência, prioridades e janelas operacionais seguras.</p>
+                </div>
+              </article>
+              <article class="xyron-process-steps__item">
+                <span class="xyron-process-steps__number">03</span>
+                <div>
+                  <h4>Infraestrutura de apoio</h4>
+                  <p>Verificamos pontos de recarga, abastecimento de água, descarte de resíduos e circulação.</p>
+                </div>
+              </article>
+              <article class="xyron-process-steps__item">
+                <span class="xyron-process-steps__number">04</span>
+                <div>
+                  <h4>Configuração e testes</h4>
+                  <p>Realizamos mapeamento a laser, configuração de rotas, testes práticos e validação de status.</p>
+                </div>
+              </article>
+              <article class="xyron-process-steps__item">
+                <span class="xyron-process-steps__number">05</span>
+                <div>
+                  <h4>Treinamento da equipe</h4>
+                  <p>Capacitamos a operação em programação, abastecimento, descarte, limpeza do equipamento e rotina de acompanhamento.</p>
+                </div>
+              </article>
+              <article class="xyron-process-steps__item">
+                <span class="xyron-process-steps__number">06</span>
+                <div>
+                  <h4>Acompanhamento inicial</h4>
+                  <p>Apoiamos os primeiros ciclos, ajustamos rotinas e orientamos melhorias conforme a operação real.</p>
+                </div>
+              </article>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronHygibot">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq1" aria-expanded="true" aria-controls="xyronHygibotFaq1">
+                      O HygiBot substitui a equipe de limpeza?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Não. Ele apoia rotinas e pode reduzir esforço repetitivo, mas exige supervisão e processo definido.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq2" aria-expanded="false" aria-controls="xyronHygibotFaq2">
+                      Pode ser usado em hospitais?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Pode ser avaliado, respeitando protocolos, áreas permitidas e regras de higiene do local.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq3" aria-expanded="false" aria-controls="xyronHygibotFaq3">
+                      Precisa mapear o ambiente?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Sim. O diagnóstico do espaço é essencial para definir viabilidade e rotina.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq4" aria-expanded="false" aria-controls="xyronHygibotFaq4">
+                      A Smart Control Brasil orienta a operação?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Sim. Apoiamos diagnóstico, implantação consultiva e orientação conforme o escopo.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq5" aria-expanded="false" aria-controls="xyronHygibotFaq5">
+                      Quais funções de limpeza o HygiBot executa?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq5" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Lavar, varrer, aspirar e passar pano seco, conforme configuração, piso e ambiente avaliado no diagnóstico.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq6" aria-expanded="false" aria-controls="xyronHygibotFaq6">
+                      Qual é a autonomia do HygiBot?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq6" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>O catálogo informa autonomia de até 4 horas, dependendo do ciclo de limpeza, tipo de piso, carga de trabalho e rotina definida.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq7" aria-expanded="false" aria-controls="xyronHygibotFaq7">
+                      Ele precisa de mapeamento a laser?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq7" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Sim. O mapeamento a laser ajuda a organizar áreas, rotas e percursos, tornando a operação mais previsível e controlada.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq8" aria-expanded="false" aria-controls="xyronHygibotFaq8">
+                      Ele pode operar em áreas de alto fluxo?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq8" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Pode ser avaliado para áreas de alto fluxo, desde que existam horários, sinalização, supervisão e critérios de segurança definidos.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronHygibotFaq9" aria-expanded="false" aria-controls="xyronHygibotFaq9">
+                      A operação exige treinamento?
+                    </button>
+                  </h2>
+                  <div id="xyronHygibotFaq9" class="accordion-collapse collapse" data-bs-parent="#accordionXyronHygibot">
+                    <div class="accordion-body">
+                      <p>Sim. A equipe precisa entender programação, abastecimento, descarte, limpeza do próprio equipamento e rotina de acompanhamento.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie HygiBot com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

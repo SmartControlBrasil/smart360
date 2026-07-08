@@ -1,0 +1,299 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}Buddy | Robô Social e Interativo Xyron | Smart Control Brasil{% endblock %}
+{% block meta_description %}Buddy Xyron para interação, demonstrações tecnológicas, educação, eventos e aproximação humano-robô com orientação técnica.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Buddy",
+  "description": "Buddy Xyron para interação, demonstrações tecnológicas, educação, eventos e aproximação humano-robô com orientação técnica.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô social e interativo",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'buddy' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-budybot.webp' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>Buddy</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>Buddy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='buddy' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Interação</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Educação</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Eventos</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Demonstração</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Robótica social</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Inovação</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se Buddy faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-budybot.webp' %}" alt="Buddy da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>Buddy</h2>
+            <div class="space20"></div>
+            <p>Robô compacto e social para interação, demonstrações, educação, eventos e aproximação humano-robô.</p>
+            <div class="space20"></div>
+            <p>O Buddy é uma solução robótica compacta para interação social, demonstrações tecnológicas, educação e experiências de aproximação entre pessoas e robôs.</p>
+            <div class="space20"></div>
+            <p>Ele pode apoiar apresentações, atividades educativas, eventos e ações institucionais, desde que o uso seja planejado e acompanhado por responsáveis pelo ambiente.</p>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Interação social com público</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Demonstração tecnológica</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Atendimento leve e guiado</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio educacional e institucional</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Aproximação humano-robô</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Presença em eventos e ações de inovação</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô social/interativo</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Demonstração, interação e apoio educacional</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Escolas, eventos, empresas e ambientes controlados</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Uso supervisionado com roteiro de interação</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Configuração, autonomia e acessórios devem ser confirmados conforme modelo e fornecimento</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Interação social e demonstrações tecnológicas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a ações educacionais e eventos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Experiência de aproximação humano-robô</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Uso em ambientes controlados e supervisionados</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Conteúdo e roteiro ajustados ao público</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Implantação com orientação técnica e operacional</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Eventos</span>
+              <span class="xyron-product-tags__tag">Escolas</span>
+              <span class="xyron-product-tags__tag">Demonstrações</span>
+              <span class="xyron-product-tags__tag">Ações institucionais</span>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Robótica social para despertar interesse</h4>
+              <div class="space12"></div>
+              <p>O Buddy funciona bem quando o objetivo é criar contato acessível com robótica, estimular curiosidade e apoiar atividades conduzidas por pessoas, sem transformar a tecnologia em promessa isolada.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/elements/budy-dog-robot.png' %}" alt="Buddy em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/team/budy.webp' %}" alt="Buddy em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>O Buddy deve ser posicionado como apoio à interação e demonstração, não como solução isolada para atendimento ou segurança.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o Buddy</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil ajuda a entender público, ambiente, roteiro de uso e necessidades de demonstração.</p>
+            <div class="space20"></div>
+            <p>O projeto pode evoluir para integração com outras soluções Xyron, automação e dados conforme a maturidade da instituição.</p>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronBuddy">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronBuddyFaq1" aria-expanded="true" aria-controls="xyronBuddyFaq1">
+                      O Buddy é indicado para escolas?
+                    </button>
+                  </h2>
+                  <div id="xyronBuddyFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronBuddy">
+                    <div class="accordion-body">
+                      <p>Pode ser, principalmente em demonstrações e projetos educativos com mediação humana.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronBuddyFaq2" aria-expanded="false" aria-controls="xyronBuddyFaq2">
+                      Ele substitui atendimento humano?
+                    </button>
+                  </h2>
+                  <div id="xyronBuddyFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronBuddy">
+                    <div class="accordion-body">
+                      <p>Não. O foco é apoio à interação, demonstração e engajamento.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronBuddyFaq3" aria-expanded="false" aria-controls="xyronBuddyFaq3">
+                      Precisa de roteiro de uso?
+                    </button>
+                  </h2>
+                  <div id="xyronBuddyFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronBuddy">
+                    <div class="accordion-body">
+                      <p>Sim. Um roteiro claro melhora a experiência e reduz improvisos na operação.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronBuddyFaq4" aria-expanded="false" aria-controls="xyronBuddyFaq4">
+                      Vocês apoiam eventos com robôs?
+                    </button>
+                  </h2>
+                  <div id="xyronBuddyFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronBuddy">
+                    <div class="accordion-body">
+                      <p>A Smart Control Brasil pode orientar escopo, demonstração e operação conforme o projeto.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie Buddy com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

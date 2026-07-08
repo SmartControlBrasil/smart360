@@ -3,7 +3,47 @@ from django.core import mail
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
+from apps.institutional.views import XYRON_ROBOT_PAGE_TEMPLATES
 from apps.institutional.xyron_robots import XYRON_ROBOTS
+
+XYRON_HTML_DETAIL_PAGE_SEO = {
+    "liro-littlebot": {
+        "seo_title": "LIRO / LittleBot | Robô Educacional Xyron | Smart Control Brasil",
+        "meta_description": "Robô educacional Xyron para escolas, espaços maker e projetos pedagógicos",
+    },
+    "neobot": {
+        "seo_title": "NeoBot | Robô de Recepção e Comunicação | Smart Control Brasil",
+        "meta_description": "NeoBot Xyron para recepção, orientação de visitantes, eventos, showrooms",
+    },
+    "buddy": {
+        "seo_title": "Buddy | Robô Social e Interativo Xyron | Smart Control Brasil",
+        "meta_description": "Buddy Xyron para interação, demonstrações tecnológicas, educação, eventos",
+    },
+    "patrol-orbit": {
+        "seo_title": "Patrol / Orbit | Robô de Segurança e Ronda | Smart Control Brasil",
+        "meta_description": "Robô Xyron para apoio a rondas, inspeção, presença ostensiva e monitoramento assistido",
+    },
+    "hygibot": {
+        "seo_title": "HygiBot | Robô de Limpeza e Higienização | Smart Control Brasil",
+        "meta_description": "HygiBot Xyron: robô de limpeza inteligente para grandes áreas, com varrição, aspiração, lavagem, mapeamento a laser",
+    },
+    "hostbot": {
+        "seo_title": "HostBot | Robô de Recepção e Hospitalidade | Smart Control Brasil",
+        "meta_description": "HostBot Xyron para recepção, hospitalidade, orientação de visitantes",
+    },
+    "waiterbot": {
+        "seo_title": "WaiterBot | Robô Garçom de Apoio Operacional | Smart Control Brasil",
+        "meta_description": "WaiterBot Xyron para apoio ao atendimento de salão, transporte interno de itens",
+    },
+    "carebot": {
+        "seo_title": "CareBot | Robô de Apoio Assistido | Smart Control Brasil",
+        "meta_description": "CareBot Xyron para interação, orientação e apoio assistido em clínicas, hospitais",
+    },
+    "mowerbot": {
+        "seo_title": "MowerBot | Robô Cortador de Grama Xyron | Smart Control Brasil",
+        "meta_description": "MowerBot Xyron para corte de grama, manutenção de áreas externas, jardins",
+    },
+}
 
 TEST_MIDDLEWARE = [
     mw
@@ -98,13 +138,13 @@ class InstitutionalRoutesTests(SimpleTestCase):
                     reverse("institutional:xyron_robot_detail", args=[robot["slug"]])
                 )
 
+                expected_template = XYRON_ROBOT_PAGE_TEMPLATES[robot["slug"]]
                 self.assertEqual(response.status_code, 200)
-                self.assertTemplateUsed(
-                    response, "institutional/eitech/pages/xyron-liro-littlebot.html"
-                )
+                self.assertTemplateUsed(response, expected_template)
                 self.assertContains(response, robot["name"])
-                self.assertContains(response, robot["seo_title"])
-                self.assertContains(response, robot["meta_description"])
+                html_page_seo = XYRON_HTML_DETAIL_PAGE_SEO[robot["slug"]]
+                self.assertContains(response, html_page_seo["seo_title"])
+                self.assertContains(response, html_page_seo["meta_description"])
                 self.assertContains(response, f"<h1>{robot['name']}</h1>", html=True)
                 self.assertContains(response, "<h1", count=1)
                 self.assertContains(response, "Product")
@@ -211,10 +251,31 @@ class InstitutionalRoutesTests(SimpleTestCase):
             with self.subTest(route_name=route_name):
                 self.assertContains(response, reverse(route_name))
 
+    def test_xyron_hygibot_enriched_catalog_content(self):
+        response = self.client.get(
+            reverse("institutional:xyron_robot_detail", args=["hygibot"])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "institutional/eitech/pages/xyron/hygibot.html")
+        self.assertContains(response, "Limpeza inteligente para grandes áreas")
+        self.assertContains(response, "Por que o HygiBot é diferente")
+        self.assertContains(response, "Antes e depois na operação")
+        self.assertContains(response, "Como a Smart Control Brasil implanta")
+        self.assertContains(response, "46.000 mAh")
+        self.assertContains(response, "Mapeamento a laser")
+        self.assertContains(response, "até 4 horas")
+        self.assertContains(response, "Lavar, varrer, aspirar e passar pano seco")
+        self.assertContains(response, "Quais funções de limpeza o HygiBot executa?")
+        self.assertContains(response, "Product")
+        self.assertContains(response, "limpeza inteligente para grandes áreas")
+
     def test_xyron_robot_detail_keeps_consultative_guardrails(self):
         checks = [
             ("liro-littlebot", "não substitui o professor"),
             ("patrol-orbit", "não é substituir completamente equipes de segurança"),
+            ("hygibot", "não como substituição automática"),
+            ("hostbot", "não substitui acolhimento humano"),
             ("waiterbot", "não deve ser tratado como substituto completo de garçons"),
             ("carebot", "não realiza promessa médica"),
             ("mowerbot", "corte de grama"),

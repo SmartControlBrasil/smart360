@@ -858,3 +858,93 @@
   }
 }
 
+/* Xyron robot detail pages — enriched sections */
+.xyron-detail-page .xyron-detail-highlight {
+  border-left: 4px solid #5838a8;
+}
+
+.xyron-detail-page .xyron-product-features-grid {
+  margin-bottom: 0;
+}
+
+.xyron-detail-page .xyron-before-after {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.xyron-detail-page .xyron-before-after__column {
+  background: #ffffff;
+  border: 1px solid rgba(88, 56, 168, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(26, 16, 51, 0.05);
+  padding: 24px 22px;
+}
+
+.xyron-detail-page .xyron-before-after__column--after {
+  background: linear-gradient(180deg, #f8f6fc 0%, #ffffff 100%);
+}
+
+.xyron-detail-page .xyron-before-after__column h4 {
+  color: #1a1033;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.xyron-detail-page .xyron-process-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.xyron-detail-page .xyron-process-steps__item {
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid rgba(88, 56, 168, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(26, 16, 51, 0.04);
+  display: flex;
+  gap: 18px;
+  padding: 20px 22px;
+}
+
+.xyron-detail-page .xyron-process-steps__number {
+  align-items: center;
+  background: #5838a8;
+  border-radius: 50%;
+  color: #ffffff;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.xyron-detail-page .xyron-process-steps__item h4 {
+  color: #1a1033;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.xyron-detail-page .xyron-process-steps__item p {
+  color: #4a4560;
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 991px) {
+  .xyron-detail-page .xyron-before-after {
+    grid-template-columns: 1fr;
+  }
+
+  .xyron-detail-page .xyron-product-features-grid,
+  .xyron-detail-page .xyron-product-features-grid--cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+

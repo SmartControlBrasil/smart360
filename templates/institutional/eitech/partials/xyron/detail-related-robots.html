@@ -1,0 +1,32 @@
+{% load static %}
+<div class="service1-section-area sp2 xyron-related-robots" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/service-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5 m-auto">
+        <div class="heading2 text-center space-margin60">
+          <h2>Ver mais robôs Xyron</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      {% for related_robot in related_robots %}
+        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-duration="{{ forloop.counter }}00">
+          <div class="service1-boxarea">
+            <div class="icons">
+              <img src="{% static 'institutional/eitech/img/icons/service-icon11.svg' %}" alt="" aria-hidden="true">
+            </div>
+            <div class="arrow">
+              <a href="{% url 'institutional:xyron_robot_detail' related_robot.slug %}" aria-label="Ver {{ related_robot.name }}"><i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="space24"></div>
+            <a href="{% url 'institutional:xyron_robot_detail' related_robot.slug %}">{{ related_robot.name }}</a>
+            <div class="space16"></div>
+            <p>{{ related_robot.subtitle }}</p>
+            <div class="space24"></div>
+            <h5>0{{ forloop.counter }}</h5>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

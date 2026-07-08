@@ -1,0 +1,299 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}CareBot | Robô de Apoio Assistido | Smart Control Brasil{% endblock %}
+{% block meta_description %}CareBot Xyron para interação, orientação e apoio assistido em clínicas, hospitais e casas de repouso, sem promessa médica.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "CareBot",
+  "description": "CareBot Xyron para interação, orientação e apoio assistido em clínicas, hospitais e casas de repouso, sem promessa médica.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô de apoio assistido",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'carebot' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-carebot.webp' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>CareBot</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>CareBot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='carebot' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Cuidado assistido</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Clínicas</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Hospitais</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Casas de repouso</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Humanização</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#LGPD</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se CareBot faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-carebot.webp' %}" alt="CareBot da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>CareBot</h2>
+            <div class="space20"></div>
+            <p>Robô de cuidado assistido para clínicas, hospitais, casas de repouso e ambientes de apoio a equipes e pacientes.</p>
+            <div class="space20"></div>
+            <p>O CareBot é uma solução Xyron voltada a cuidado assistido, interação, orientação e apoio operacional em clínicas, hospitais, casas de repouso e ambientes de saúde.</p>
+            <div class="space20"></div>
+            <p>Ele não realiza promessa médica. Seu papel deve ser avaliado como apoio à equipe, humanização tecnológica e organização de interações conforme protocolos do local.</p>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio assistido e interação</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Orientação em rotinas informativas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Lembretes operacionais conforme escopo</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio à equipe em fluxos definidos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Humanização tecnológica</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Atenção a privacidade, consentimento e protocolos</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô de cuidado assistido</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Apoio à interação e orientação em ambientes de cuidado</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Clínicas, hospitais, casas de repouso e instituições de cuidado</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Uso assistido conforme protocolos do local</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Recursos de interação, monitoramento e integração devem ser avaliados conforme modelo, privacidade e escopo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a clínicas, hospitais e casas de repouso</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Interação e orientação assistida</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Humanização tecnológica com supervisão</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a equipes em rotinas informativas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Uso alinhado a protocolos do ambiente</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Atenção a privacidade, consentimento e LGPD</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Clínicas</span>
+              <span class="xyron-product-tags__tag">Hospitais</span>
+              <span class="xyron-product-tags__tag">Casas de repouso</span>
+              <span class="xyron-product-tags__tag">Cuidado assistido</span>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidado assistido sem promessa médica</h4>
+              <div class="space12"></div>
+              <p>O CareBot deve respeitar protocolos clínicos, privacidade, consentimento e limites de atuação. A tecnologia apoia pessoas, mas não substitui julgamento profissional de saúde.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/blog/banner-carebot.webp' %}" alt="CareBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/robots-xyron.png' %}" alt="CareBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>O CareBot não realiza promessa médica e não substitui profissionais de saúde, cuidadores ou protocolos clínicos.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o CareBot</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil conduz uma análise consultiva do ambiente, do público, dos protocolos e da governança de dados antes de recomendar a aplicação.</p>
+            <div class="space20"></div>
+            <p>O objetivo é identificar usos seguros, úteis e compatíveis com a rotina da instituição.</p>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronCarebot">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronCarebotFaq1" aria-expanded="true" aria-controls="xyronCarebotFaq1">
+                      CareBot realiza atendimento médico?
+                    </button>
+                  </h2>
+                  <div id="xyronCarebotFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronCarebot">
+                    <div class="accordion-body">
+                      <p>Não. Ele pode apoiar orientação e interação, mas não substitui profissionais ou protocolos de saúde.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronCarebotFaq2" aria-expanded="false" aria-controls="xyronCarebotFaq2">
+                      Pode ser usado com idosos?
+                    </button>
+                  </h2>
+                  <div id="xyronCarebotFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronCarebot">
+                    <div class="accordion-body">
+                      <p>Pode ser avaliado em casas de repouso e cuidado assistido, com supervisão e regras claras.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronCarebotFaq3" aria-expanded="false" aria-controls="xyronCarebotFaq3">
+                      Há cuidados com dados pessoais?
+                    </button>
+                  </h2>
+                  <div id="xyronCarebotFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronCarebot">
+                    <div class="accordion-body">
+                      <p>Sim. Privacidade, consentimento e LGPD devem ser tratados desde o diagnóstico.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronCarebotFaq4" aria-expanded="false" aria-controls="xyronCarebotFaq4">
+                      Vocês fazem integração com rotinas da clínica?
+                    </button>
+                  </h2>
+                  <div id="xyronCarebotFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronCarebot">
+                    <div class="accordion-body">
+                      <p>A Smart Control Brasil pode orientar integração e operação conforme escopo e viabilidade.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie CareBot com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

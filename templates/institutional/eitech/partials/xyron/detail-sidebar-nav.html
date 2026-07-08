@@ -1,0 +1,19 @@
+<div class="search-area">
+  <h3>Buscar</h3>
+  <div class="space24"></div>
+  <form action="{% url 'institutional:xyron_robotics' %}" method="get">
+    <input type="text" name="q" placeholder="Buscar robô...">
+    <button type="submit" aria-label="Buscar robô Xyron"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </form>
+</div>
+<div class="space30"></div>
+
+<div class="category-list-area" data-current-robot="{{ current_slug }}">
+  <h3>Robôs Xyron</h3>
+  <div class="space10"></div>
+  <ul>
+    {% for sidebar_robot in sidebar_robots %}
+      <li data-robot-slug="{{ sidebar_robot.slug }}"><a href="{% url 'institutional:xyron_robot_detail' sidebar_robot.slug %}">{{ sidebar_robot.name }} <span><i class="fa-solid fa-angle-right"></i></span></a></li>
+    {% endfor %}
+  </ul>
+</div>

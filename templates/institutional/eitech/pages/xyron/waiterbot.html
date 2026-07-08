@@ -1,0 +1,300 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}WaiterBot | Robô Garçom de Apoio Operacional | Smart Control Brasil{% endblock %}
+{% block meta_description %}WaiterBot Xyron para apoio ao atendimento de salão, transporte interno de itens e redução de deslocamentos em restaurantes, hotéis e eventos.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "WaiterBot",
+  "description": "WaiterBot Xyron para apoio ao atendimento de salão, transporte interno de itens e redução de deslocamentos em restaurantes, hotéis e eventos.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô garçom de apoio operacional",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'waiterbot' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-waiterbot.webp' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>WaiterBot</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>WaiterBot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='waiterbot' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Restaurantes</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Hotéis</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Eventos</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Entrega interna</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Salão</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Operação</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se WaiterBot faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-waiterbot.webp' %}" alt="WaiterBot da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>WaiterBot</h2>
+            <div class="space20"></div>
+            <p>Robô de apoio ao atendimento de salão e entrega interna para restaurantes, bares, hotéis, eventos e ambientes de serviço.</p>
+            <div class="space20"></div>
+            <p>O WaiterBot é um robô de apoio operacional para deslocamento e entrega de itens dentro de restaurantes, bares, hotéis, eventos e ambientes de atendimento.</p>
+            <div class="space20"></div>
+            <p>Ele não deve ser tratado como substituto completo de garçons. Seu melhor uso é reduzir deslocamentos repetitivos e apoiar a equipe em fluxos bem definidos.</p>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio ao atendimento de salão</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Transporte interno de itens</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a garçons e equipe operacional</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Redução de deslocamentos repetitivos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Operação em restaurantes, hotéis e eventos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Melhoria de fluxo interno com rotas definidas</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô de apoio a entregas internas</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Transporte assistido de itens no salão</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Restaurantes, hotéis, bares, eventos e ambientes de serviço</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Rotas internas com pontos de retirada e entrega</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Capacidade, autonomia e recursos de navegação variam conforme modelo, layout e escopo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio à entrega interna de itens</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Uso em restaurantes, hotéis, bares e eventos</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Redução de deslocamentos repetitivos</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Fluxos definidos por pontos de retirada e entrega</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Operação assistida pela equipe de salão</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Diagnóstico de layout antes da implantação</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Restaurantes</span>
+              <span class="xyron-product-tags__tag">Hotéis</span>
+              <span class="xyron-product-tags__tag">Eventos</span>
+              <span class="xyron-product-tags__tag">Bares</span>
+              <span class="xyron-product-tags__tag">Food service</span>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Atendimento de salão com apoio operacional</h4>
+              <div class="space12"></div>
+              <p>O WaiterBot depende de layout, circulação, pontos de entrega, rotina da equipe e sinalização clara para funcionar de forma organizada e útil.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/about/relay-robot-entrega-xyron.png' %}" alt="WaiterBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/blog/banner-waiterbot.webp' %}" alt="WaiterBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>O WaiterBot apoia deslocamentos e entregas. Não deve ser vendido como substituto completo de garçons ou da equipe de salão.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o WaiterBot</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil avalia fluxo de salão, distância entre pontos, obstáculos, rotina de atendimento e experiência desejada.</p>
+            <div class="space20"></div>
+            <p>A proposta é apoiar produtividade e padronização sem perder qualidade no contato humano com o cliente.</p>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronWaiterbot">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronWaiterbotFaq1" aria-expanded="true" aria-controls="xyronWaiterbotFaq1">
+                      WaiterBot substitui garçons?
+                    </button>
+                  </h2>
+                  <div id="xyronWaiterbotFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronWaiterbot">
+                    <div class="accordion-body">
+                      <p>Não. Ele apoia deslocamentos e entregas, enquanto a equipe mantém atendimento, relacionamento e decisões.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronWaiterbotFaq2" aria-expanded="false" aria-controls="xyronWaiterbotFaq2">
+                      Precisa adaptar o salão?
+                    </button>
+                  </h2>
+                  <div id="xyronWaiterbotFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronWaiterbot">
+                    <div class="accordion-body">
+                      <p>Pode ser necessário ajustar rotas, pontos de entrega e organização do fluxo.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronWaiterbotFaq3" aria-expanded="false" aria-controls="xyronWaiterbotFaq3">
+                      Funciona em eventos?
+                    </button>
+                  </h2>
+                  <div id="xyronWaiterbotFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronWaiterbot">
+                    <div class="accordion-body">
+                      <p>Pode ser avaliado para eventos com trajetos claros e operação supervisionada.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronWaiterbotFaq4" aria-expanded="false" aria-controls="xyronWaiterbotFaq4">
+                      A Smart Control Brasil faz diagnóstico?
+                    </button>
+                  </h2>
+                  <div id="xyronWaiterbotFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronWaiterbot">
+                    <div class="accordion-body">
+                      <p>Sim. O diagnóstico do ambiente é recomendado antes de qualquer proposta.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie WaiterBot com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

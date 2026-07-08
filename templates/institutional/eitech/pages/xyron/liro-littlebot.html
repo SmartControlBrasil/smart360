@@ -1,0 +1,299 @@
+{% extends 'institutional/eitech/base.html' %}
+{% load static %}
+
+{% block title %}LIRO / LittleBot | Robô Educacional Xyron | Smart Control Brasil{% endblock %}
+{% block meta_description %}Robô educacional Xyron para escolas, espaços maker e projetos pedagógicos com IA responsável, robótica e mediação humana.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-xyron.css' %}">
+{% endblock %}
+
+{% block body_extra %} class="xyron-page xyron-detail-page"{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "LIRO / LittleBot",
+  "description": "Robô educacional Xyron para escolas, espaços maker e projetos pedagógicos com IA responsável, robótica e mediação humana.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Xyron Robotics"
+  },
+  "category": "Robô educacional Xyron",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'institutional:xyron_robot_detail' 'liro-littlebot' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/eitech/img/all-images/blog/banner-little.png' %}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+  <!--===== HERO AREA STARTS =======-->
+  <div class="inner-page-hero-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %}); background-position: center; background-repeat: no-repeat; background-size: cover;">
+    <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" alt="" aria-hidden="true" class="elements5">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" alt="" aria-hidden="true" class="elements4">
+    <img src="{% static 'institutional/eitech/img/elements/gemini-ia-02.webp' %}" alt="" aria-hidden="true" class="elements1 keyframe5">
+    <img src="{% static 'institutional/eitech/img/elements/elements16.png' %}" alt="" aria-hidden="true" class="elements16">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 m-auto">
+          <div class="inner-header text-center heading1">
+            <h1>LIRO / LittleBot</h1>
+            <div class="space28"></div>
+            <a href="{% url 'institutional:home' %}">Início</a> <i class="fa-solid fa-angle-right"></i> <a href="{% url 'institutional:xyron_robotics' %}">Xyron Robotics</a> <i class="fa-solid fa-angle-right"></i> <span>LIRO / LittleBot</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== HERO AREA ENDS =======-->
+
+  <!--===== SERVICE SIDE AREA STARTS =======-->
+  <div class="service-sidebar-area sp1 xyron-service-detail">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="service-widget-sidebar">
+            {% include 'institutional/eitech/partials/xyron/detail-sidebar-nav.html' with current_slug='liro-littlebot' %}
+            <div class="space30"></div>
+
+            <div class="tags-area">
+              <h3>Aplicações</h3>
+              <div class="space8"></div>
+              <ul>
+                <li><a href="{% url 'institutional:contact' %}">#Educação</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Robótica pedagógica</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#IA responsável</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Metodologias ativas</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Inclusão</a></li>
+                <li><a href="{% url 'institutional:contact' %}">#Espaço maker</a></li>
+              </ul>
+            </div>
+
+            <div class="space30"></div>
+            <div class="contact-boxarea">
+              <h3>Fale com a Smart Control</h3>
+              <div class="space8"></div>
+              <p>Avalie se LIRO / LittleBot faz sentido para sua operação, instituição ou projeto.</p>
+              <div class="space24"></div>
+              <div class="input-area text-end">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn2">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="service2-widget-sidebar">
+            <div class="img1 reveal image-anime">
+              <img src="{% static 'institutional/eitech/img/all-images/blog/banner-little.png' %}" alt="LIRO / LittleBot da Xyron Robotics">
+            </div>
+            <div class="space32"></div>
+            <h2>LIRO / LittleBot</h2>
+            <div class="space20"></div>
+            <p>Robô educacional com IA para experiências pedagógicas, projetos maker e interação humano-robô com mediação humana.</p>
+            <div class="space20"></div>
+            <p>O LIRO / LittleBot é um robô educacional da Xyron Robotics pensado para aproximar estudantes, educadores e instituições de experiências práticas com robótica, inteligência artificial e interação humano-robô.</p>
+            <div class="space20"></div>
+            <p>Ele não substitui o professor. Ele amplia a mediação pedagógica, cria pontos de interação e ajuda a transformar conceitos abstratos de tecnologia em experiências visíveis, conversáveis e memoráveis.</p>
+
+            <div class="space32"></div>
+            <h2>Funções principais</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Interação educacional com estudantes e educadores</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a atividades pedagógicas e projetos maker</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Conversas assistidas e demonstrações de IA</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Experiências de robótica com mediação do professor</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a apresentações, feiras e aulas guiadas</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Uso consultivo em inclusão e engajamento escolar</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Ficha técnica e recursos</h2>
+            <div class="space20"></div>
+            <div class="xyron-product-specs">
+              <ul class="xyron-product-specs__list">
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Categoria</span>
+                  <span class="xyron-product-specs__value">Robô educacional/interativo</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Aplicação principal</span>
+                  <span class="xyron-product-specs__value">Experiências pedagógicas com robótica e IA</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Ambiente indicado</span>
+                  <span class="xyron-product-specs__value">Escolas, laboratórios, espaços maker e projetos educacionais</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Tipo de operação</span>
+                  <span class="xyron-product-specs__value">Uso assistido com mediação humana</span>
+                </li>
+                <li class="xyron-product-specs__item">
+                  <span class="xyron-product-specs__label">Observações</span>
+                  <span class="xyron-product-specs__value">Recursos e configuração devem ser confirmados conforme modelo e escopo do projeto</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Aplicações e benefícios</h2>
+            <div class="space20"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Robótica educacional para escolas e projetos maker</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Interação por voz, toque e recursos multimídia</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Apoio a atividades de IA, programação e inovação</li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <ul class="list">
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Experiências pedagógicas com mediação humana</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Demonstrações institucionais e feiras de tecnologia</li>
+                  <li><img src="{% static 'institutional/eitech/img/icons/check1.svg' %}" alt="" aria-hidden="true">Implantação com atenção a LGPD e uso responsável de dados</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space24"></div>
+            <div class="xyron-product-tags">
+              <span class="xyron-product-tags__tag">Escolas</span>
+              <span class="xyron-product-tags__tag">Espaços maker</span>
+              <span class="xyron-product-tags__tag">Projetos educacionais</span>
+              <span class="xyron-product-tags__tag">Feiras de tecnologia</span>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Robótica pedagógica com propósito</h4>
+              <div class="space12"></div>
+              <p>O LIRO deve ser aplicado com plano de aula, objetivo pedagógico, supervisão e contexto institucional. A tecnologia funciona melhor quando ajuda educadores a conduzir experiências guiadas, conectadas à realidade da turma e às políticas da instituição.</p>
+            </div>
+
+            <div class="space18"></div>
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/elements/liro-robo-educacional.png' %}" alt="LIRO / LittleBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6">
+                <div class="space30"></div>
+                <div class="img1 reveal image-anime">
+                  <img src="{% static 'institutional/eitech/img/all-images/team/littlebot.webp' %}" alt="LIRO / LittleBot em aplicação Xyron Robotics">
+                </div>
+              </div>
+            </div>
+
+            <div class="space32"></div>
+            <div class="pera-box">
+              <h4>Cuidados comerciais</h4>
+              <div class="space12"></div>
+              <p>A recomendação depende de objetivo pedagógico, idade do público, infraestrutura, governança de dados e rotina de uso. O LIRO não substitui o professor.</p>
+            </div>
+
+            <div class="space32"></div>
+            <h2>Nossa abordagem com o LIRO</h2>
+            <div class="space20"></div>
+            <p>A Smart Control Brasil atua em diagnóstico, demonstração, alinhamento com a escola, implantação, orientação operacional e evolução para projetos com IA, automação e dados.</p>
+            <div class="space20"></div>
+            <p>Antes de recomendar qualquer caminho, avaliamos objetivo pedagógico, público, infraestrutura, governança de dados e rotina de uso.</p>
+
+            <div class="space48"></div>
+            <h2>Perguntas frequentes</h2>
+            <div class="space20"></div>
+            <p>Veja respostas para dúvidas comuns sobre aplicação, operação, privacidade e suporte consultivo.</p>
+
+            <div class="faq-widget-area">
+              <div class="accordion" id="accordionXyronLiro">
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#xyronLiroFaq1" aria-expanded="true" aria-controls="xyronLiroFaq1">
+                      O LIRO substitui o professor?
+                    </button>
+                  </h2>
+                  <div id="xyronLiroFaq1" class="accordion-collapse collapse show" data-bs-parent="#accordionXyronLiro">
+                    <div class="accordion-body">
+                      <p>Não. Ele amplia a mediação e funciona melhor com planejamento pedagógico.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronLiroFaq2" aria-expanded="false" aria-controls="xyronLiroFaq2">
+                      O LIRO pode ser usado com crianças?
+                    </button>
+                  </h2>
+                  <div id="xyronLiroFaq2" class="accordion-collapse collapse" data-bs-parent="#accordionXyronLiro">
+                    <div class="accordion-body">
+                      <p>Sim, desde que haja supervisão, consentimento quando aplicável e regras claras de privacidade.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronLiroFaq3" aria-expanded="false" aria-controls="xyronLiroFaq3">
+                      É necessário ter laboratório de robótica?
+                    </button>
+                  </h2>
+                  <div id="xyronLiroFaq3" class="accordion-collapse collapse" data-bs-parent="#accordionXyronLiro">
+                    <div class="accordion-body">
+                      <p>Não obrigatoriamente. A aplicação pode começar com demonstrações, projetos maker e atividades guiadas.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space24"></div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#xyronLiroFaq4" aria-expanded="false" aria-controls="xyronLiroFaq4">
+                      A Smart Control Brasil presta suporte?
+                    </button>
+                  </h2>
+                  <div id="xyronLiroFaq4" class="accordion-collapse collapse" data-bs-parent="#accordionXyronLiro">
+                    <div class="accordion-body">
+                      <p>A Smart Control Brasil apoia diagnóstico, orientação, integração e encaminhamento consultivo conforme o escopo do projeto.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space48"></div>
+            <h2>Próximo passo</h2>
+            <div class="space20"></div>
+            <div class="pera-box">
+              <h4>Avalie LIRO / LittleBot com a Smart Control Brasil</h4>
+              <div class="space12"></div>
+              <p>Converse com a Smart Control Brasil para entender aderência, cenário de uso, infraestrutura, operação assistida e próximos passos.</p>
+              <div class="space24"></div>
+              <div class="btn-area1">
+                <a href="{% url 'institutional:contact' %}" class="vl-btn1">Falar com especialista <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--===== SERVICE SIDE AREA ENDS =======-->
+
+  {% include 'institutional/eitech/partials/xyron/detail-related-robots.html' %}
+{% endblock %}

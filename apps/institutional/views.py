@@ -16,6 +16,18 @@ from .services.contact_spam_guard import (
 )
 from .xyron_robots import XYRON_ROBOTS, get_featured_xyron_robots, get_other_xyron_robots, get_xyron_robot
 
+XYRON_ROBOT_PAGE_TEMPLATES = {
+    "liro-littlebot": "institutional/eitech/pages/xyron/liro-littlebot.html",
+    "neobot": "institutional/eitech/pages/xyron/neobot.html",
+    "buddy": "institutional/eitech/pages/xyron/buddy.html",
+    "patrol-orbit": "institutional/eitech/pages/xyron/patrol-orbit.html",
+    "hygibot": "institutional/eitech/pages/xyron/hygibot.html",
+    "hostbot": "institutional/eitech/pages/xyron/hostbot.html",
+    "waiterbot": "institutional/eitech/pages/xyron/waiterbot.html",
+    "carebot": "institutional/eitech/pages/xyron/carebot.html",
+    "mowerbot": "institutional/eitech/pages/xyron/mowerbot.html",
+}
+
 
 logger = logging.getLogger(__name__)
 
@@ -251,15 +263,15 @@ def _render_xyron_robot_detail(request, slug):
         raise Http404("Robô Xyron não encontrado")
 
     sidebar_robots = get_other_xyron_robots(slug)
-    benefits = robot.get("benefits", [])
-    split_at = (len(benefits) + 1) // 2
     context = {
         "robot": robot,
+        "current_slug": slug,
         "sidebar_robots": sidebar_robots,
         "related_robots": get_featured_xyron_robots(slug),
-        "benefit_columns": [benefits[:split_at], benefits[split_at:]],
     }
-    return render(request, "institutional/eitech/pages/xyron-liro-littlebot.html", context)
+
+    template = XYRON_ROBOT_PAGE_TEMPLATES[slug]
+    return render(request, template, context)
 
 
 def xyron_robot_detail(request, slug):

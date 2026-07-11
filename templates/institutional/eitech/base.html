@@ -89,6 +89,7 @@
   <script src="{% static 'institutional/eitech/js/plugins/jquery-3-7-1.min.js' %}"></script>
   {% include 'institutional/eitech/partials/scripts.html' %}
   {% block extra_js %}{% endblock %}
+  <script src="{% static 'institutional/eitech/js/main.min.js' %}" defer></script>
   {% if not livia_assistant_enabled %}
     <script type="module">
       // Injeta o chat apenas 2 segundos após a tela inteira estar desenhada e carregada

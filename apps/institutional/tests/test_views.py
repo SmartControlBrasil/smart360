@@ -67,6 +67,25 @@ def rendered_images(response):
     parser.feed(response.content.decode(response.charset or "utf-8"))
     return parser.images
 
+
+class ScriptTagParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.scripts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "script":
+            attrs = dict(attrs)
+            src = attrs.get("src")
+            if src:
+                self.scripts.append(src)
+
+
+def rendered_scripts(response):
+    parser = ScriptTagParser()
+    parser.feed(response.content.decode(response.charset or "utf-8"))
+    return parser.scripts
+
 TEST_MIDDLEWARE = [
     mw
     for mw in settings.MIDDLEWARE
@@ -78,6 +97,120 @@ TEST_MIDDLEWARE = [
 class InstitutionalRoutesTests(SimpleTestCase):
     # Middleware de observabilidade grava traces no banco durante requests ao client.
     databases = {"default"}
+
+    def assert_script_once(self, scripts, needle):
+        matches = [src for src in scripts if needle in src]
+        self.assertEqual(len(matches), 1, f"Expected exactly one script matching {needle!r}; found {matches}")
+
+    def assert_script_absent(self, scripts, needle):
+        matches = [src for src in scripts if needle in src]
+        self.assertEqual(matches, [], f"Expected no script matching {needle!r}; found {matches}")
+
+    def assert_scripts_unique(self, scripts):
+        duplicates = sorted({src for src in scripts if scripts.count(src) > 1})
+        self.assertEqual(duplicates, [])
+
+    def assert_script_order(self, scripts, first, second):
+        first_index = next(i for i, src in enumerate(scripts) if first in src)
+        second_index = next(i for i, src in enumerate(scripts) if second in src)
+        self.assertLess(first_index, second_index)
+
+    def test_global_javascript_plugins_replace_bundle(self):
+        response = self.client.get(reverse("institutional:about"))
+
+        self.assertEqual(response.status_code, 200)
+        scripts = rendered_scripts(response)
+
+        self.assert_script_absent(scripts, "plugins.bundle.min.js")
+        for script in [
+            "plugins/jquery-3-7-1.min.js",
+            "plugins/bootstrap.min.js",
+            "plugins/aos.js",
+            "plugins/mobilemenu.js",
+            "plugins/sidebar.js",
+            "plugins/gsap.min.js",
+            "plugins/ScrollTrigger.min.js",
+            "plugins/Splitetext.js",
+            "main.min.js",
+        ]:
+            self.assert_script_once(scripts, script)
+
+        self.assert_script_order(scripts, "plugins/jquery-3-7-1.min.js", "plugins/bootstrap.min.js")
+        self.assert_script_order(scripts, "plugins/jquery-3-7-1.min.js", "plugins/aos.js")
+        self.assert_script_order(scripts, "plugins/bootstrap.min.js", "main.min.js")
+        self.assert_script_order(scripts, "plugins/Splitetext.js", "main.min.js")
+        self.assert_scripts_unique(scripts)
+
+    def test_home_loads_carousel_gallery_and_counter_plugins_before_main(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        self.assertEqual(response.status_code, 200)
+        scripts = rendered_scripts(response)
+
+        for script in [
+            "plugins/waypoints.js",
+            "plugins/counter.js",
+            "plugins/circle-progress.js",
+            "plugins/owlcarousel.min.js",
+            "plugins/slick-slider.js",
+        ]:
+            self.assert_script_once(scripts, script)
+            self.assert_script_order(scripts, script, "main.min.js")
+        self.assert_script_absent(scripts, "plugins.bundle.min.js")
+        self.assert_scripts_unique(scripts)
+
+    def test_contact_loads_nice_select_before_main(self):
+        response = self.client.get(reverse("institutional:contact"))
+
+        self.assertEqual(response.status_code, 200)
+        scripts = rendered_scripts(response)
+
+        self.assert_script_once(scripts, "plugins/nice-select.js")
+        self.assert_script_order(scripts, "plugins/nice-select.js", "main.min.js")
+        self.assert_scripts_unique(scripts)
+
+    def test_blog_details_loads_magnific_popup_before_main(self):
+        response = self.client.get(reverse("institutional:blog_details"))
+
+        self.assertEqual(response.status_code, 200)
+        scripts = rendered_scripts(response)
+
+        self.assert_script_once(scripts, "plugins/magnific-popup.js")
+        self.assert_script_order(scripts, "plugins/magnific-popup.js", "main.min.js")
+        self.assert_scripts_unique(scripts)
+
+    def test_common_page_does_not_load_page_specific_plugins(self):
+        response = self.client.get(reverse("institutional:about"))
+
+        self.assertEqual(response.status_code, 200)
+        scripts = rendered_scripts(response)
+
+        for script in [
+            "plugins/owlcarousel.min.js",
+            "plugins/slick-slider.js",
+            "plugins/nice-select.js",
+            "plugins/magnific-popup.js",
+        ]:
+            self.assert_script_absent(scripts, script)
+        self.assert_scripts_unique(scripts)
+
+    def test_service_slider_pages_load_only_owl_before_main(self):
+        for route_name in [
+            "institutional:service_sistemas_web_aplicativos",
+            "institutional:service_inteligencia_artificial",
+        ]:
+            with self.subTest(route_name=route_name):
+                response = self.client.get(reverse(route_name))
+
+                self.assertEqual(response.status_code, 200)
+                scripts = rendered_scripts(response)
+
+                self.assert_script_once(scripts, "plugins/owlcarousel.min.js")
+                self.assert_script_order(scripts, "plugins/owlcarousel.min.js", "main.min.js")
+                self.assert_script_absent(scripts, "plugins/slick-slider.js")
+                self.assert_script_absent(scripts, "plugins/nice-select.js")
+                self.assert_script_absent(scripts, "plugins/magnific-popup.js")
+                self.assert_scripts_unique(scripts)
     def test_public_pages_render(self):
         route_names = [
             "institutional:home",

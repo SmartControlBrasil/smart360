@@ -12,7 +12,7 @@ $(document).ready(function(){
      $("#vl-header-sticky").addClass("header-sticky");
    }
  });
- 
+
 //========== HEADER ACTIVE ENDS ============= //
 
 //========== MOBILE MENU STARTS ============= //
@@ -49,7 +49,7 @@ $(".vl-offcanvas-close-toggle,.vl-offcanvas-overlay").on('click', function(){
 
 //========== MOBILE MENU ENDS ============= //
 
-  //========== PAGE PROGRESS STARTS ============= // 
+  //========== PAGE PROGRESS STARTS ============= //
   var progressPath = document.querySelector(".progress-wrap path");
   if (progressPath) {
     var pathLength = progressPath.getTotalLength();
@@ -83,7 +83,7 @@ $(".vl-offcanvas-close-toggle,.vl-offcanvas-overlay").on('click', function(){
       return false;
     });
   }
-//========== PAGE PROGRESS STARTS ============= // 
+//========== PAGE PROGRESS STARTS ============= //
 
 //========== TOGGOL PRICING AREA ============= //
 $("#ce-toggle").click(function (event) {
@@ -141,7 +141,7 @@ if ($.fn.niceSelect && $('select').length) {
 setTimeout(function() {
     var $owlPrev = $('.owl-prev');
     var $owlNext = $('.owl-next');
-    
+
     $owlPrev.removeAttr('role').attr('aria-label', 'Depoimento anterior');
     $owlNext.removeAttr('role').attr('aria-label', 'Próximo depoimento');
 }, 500);
@@ -150,7 +150,7 @@ setTimeout(function() {
 //========== COUNTER UP============= //
 const ucounter = $('.counter');
 if ($.fn.countUp && ucounter.length > 0) {
- ucounter.countUp();  
+ ucounter.countUp();
 };
 
 //========== TESTIMONIAL AREA ============= //
@@ -169,7 +169,7 @@ $('.case-slider-widget').owlCarousel({
   responsiveClass:true,
   responsive:{
   0:{
-    items:1,                
+    items:1,
   },
   600:{
     items:1,
@@ -226,7 +226,7 @@ $('.testimonial4-slider').owlCarousel({
   responsiveClass:true,
   responsive:{
   0:{
-    items:1,                
+    items:1,
   },
   600:{
     items:2,
@@ -253,7 +253,7 @@ $('.case4-slider').owlCarousel({
   responsiveClass:true,
   responsive:{
   0:{
-    items:1,                
+    items:1,
   },
   600:{
     items:2,
@@ -280,7 +280,7 @@ $('.service5-slider-box').owlCarousel({
   responsiveClass:true,
   responsive:{
   0:{
-    items:1,                
+    items:1,
   },
   600:{
     items:2,
@@ -401,8 +401,12 @@ if (window.gsap && window.SplitText && window.ScrollTrigger && $('.text-anime-st
 
   if (window.gsap && window.SplitText && window.ScrollTrigger && $('.text-anime-style-3').length) {
   let	animatedTextElements = document.querySelectorAll('.text-anime-style-3');
+  let shouldSkipHomeHeroTitle = window.matchMedia && (window.matchMedia('(max-width: 767.98px)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   animatedTextElements.forEach((element) => {
+  if (shouldSkipHomeHeroTitle && element.classList.contains('scb-home-hero-title')) {
+    return;
+  }
   //Reset if needed
   if (element.animation) {
     element.animation.progress(1).kill();
@@ -460,7 +464,7 @@ if (window.gsap && window.SplitText && window.ScrollTrigger && $('.text-anime-st
       }
     });
   }
-  
+
   // Show animated elements
   animateElements();
   $(window).scroll(animateElements);

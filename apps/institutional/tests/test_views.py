@@ -1,4 +1,6 @@
 from html.parser import HTMLParser
+from pathlib import Path
+import struct
 from xml.etree import ElementTree
 
 from django.conf import settings
@@ -85,6 +87,73 @@ def rendered_scripts(response):
     parser = ScriptTagParser()
     parser.feed(response.content.decode(response.charset or "utf-8"))
     return parser.scripts
+
+
+class LinkTagParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.links = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "link":
+            self.links.append(dict(attrs))
+
+
+def rendered_links(response):
+    parser = LinkTagParser()
+    parser.feed(response.content.decode(response.charset or "utf-8"))
+    return parser.links
+
+
+def get_png_dimensions(image_path):
+    with image_path.open("rb") as image_file:
+        signature = image_file.read(8)
+        if signature != b"\x89PNG\r\n\x1a\n":
+            raise ValueError(f"Invalid PNG signature: {image_path}")
+        chunk_length = struct.unpack(">I", image_file.read(4))[0]
+        chunk_type = image_file.read(4)
+        if chunk_type != b"IHDR" or chunk_length != 13:
+            raise ValueError(f"Invalid PNG IHDR chunk: {image_path}")
+        width, height = struct.unpack(">II", image_file.read(8))
+        return width, height
+
+
+def get_webp_dimensions(image_path):
+    with image_path.open("rb") as image_file:
+        data = image_file.read()
+
+    if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+        raise ValueError(f"Invalid WEBP file: {image_path}")
+
+    offset = 12
+    while offset + 8 <= len(data):
+        chunk_type = data[offset:offset + 4]
+        chunk_size = struct.unpack("<I", data[offset + 4:offset + 8])[0]
+        chunk_data_start = offset + 8
+        chunk_data_end = chunk_data_start + chunk_size
+        chunk_data = data[chunk_data_start:chunk_data_end]
+
+        if chunk_type == b"VP8X" and len(chunk_data) >= 10:
+            width = int.from_bytes(chunk_data[4:7], "little") + 1
+            height = int.from_bytes(chunk_data[7:10], "little") + 1
+            return width, height
+
+        if chunk_type == b"VP8 " and len(chunk_data) >= 10:
+            if chunk_data[3:6] == b"\x9d\x01\x2a":
+                width = struct.unpack("<H", chunk_data[6:8])[0] & 0x3FFF
+                height = struct.unpack("<H", chunk_data[8:10])[0] & 0x3FFF
+                return width, height
+
+        if chunk_type == b"VP8L" and len(chunk_data) >= 5:
+            if chunk_data[0] == 0x2F:
+                bits = int.from_bytes(chunk_data[1:5], "little")
+                width = (bits & 0x3FFF) + 1
+                height = ((bits >> 14) & 0x3FFF) + 1
+                return width, height
+
+        offset = chunk_data_end + (chunk_size % 2)
+
+    raise ValueError(f"Could not read WEBP dimensions: {image_path}")
 
 TEST_MIDDLEWARE = [
     mw
@@ -287,6 +356,59 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertEqual(hero_visual["height"], "571")
         self.assertNotIn("loading", hero_visual)
         self.assertNotIn("loading", hero_priority_element)
+
+    def test_home_lcp_contract_and_hero_background_assets(self):
+        home_response = self.client.get(reverse("institutional:home"))
+        about_response = self.client.get(reverse("institutional:about"))
+
+        self.assertEqual(home_response.status_code, 200)
+        self.assertEqual(about_response.status_code, 200)
+
+        home_html = home_response.content.decode(home_response.charset or "utf-8")
+        self.assertIn("hero-bg1.webp", home_html)
+        self.assertNotIn(
+            'hero1-section-area" style="background-image: url(/static/institutional/eitech/img/all-images/bg/hero-bg1.png)',
+            home_html,
+        )
+
+        images = rendered_images(home_response)
+        elements4 = next(
+            image for image in images if "institutional/eitech/img/elements/elements4.png" in image.get("src", "")
+        )
+        hero_visual = next(
+            image for image in images if "institutional/eitech/img/all-images/hero/image214.webp" in image.get("src", "")
+        )
+
+        self.assertNotEqual(elements4.get("fetchpriority"), "high")
+        self.assertEqual(hero_visual.get("fetchpriority"), "high")
+        self.assertEqual(hero_visual.get("decoding"), "async")
+        self.assertNotEqual(hero_visual.get("loading"), "lazy")
+
+        home_links = rendered_links(home_response)
+        about_links = rendered_links(about_response)
+        hero_preload_links = [
+            link
+            for link in home_links
+            if link.get("rel") == "preload"
+            and "institutional/eitech/img/all-images/hero/image214.webp" in link.get("href", "")
+        ]
+        hero_preload_links_other_page = [
+            link
+            for link in about_links
+            if link.get("rel") == "preload"
+            and "institutional/eitech/img/all-images/hero/image214.webp" in link.get("href", "")
+        ]
+        self.assertEqual(len(hero_preload_links), 1)
+        self.assertEqual(hero_preload_links_other_page, [])
+
+        static_root = Path(settings.BASE_DIR) / "static"
+        hero_png_path = static_root / "institutional/eitech/img/all-images/bg/hero-bg1.png"
+        hero_webp_path = static_root / "institutional/eitech/img/all-images/bg/hero-bg1.webp"
+
+        self.assertTrue(hero_png_path.exists())
+        self.assertTrue(hero_webp_path.exists())
+        self.assertEqual(get_webp_dimensions(hero_webp_path), (1440, 730))
+        self.assertEqual(get_png_dimensions(hero_png_path), (1440, 730))
 
     def test_xyron_robotics_page_uses_partner_template(self):
         response = self.client.get(reverse("institutional:parceiro_xyron_robotics"))

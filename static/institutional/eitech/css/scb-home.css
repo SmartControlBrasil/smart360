@@ -319,3 +319,13 @@ body.home-page .hero1-section-area {
     min-height: 220px;
   }
 }
+
+@media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
+  .home-page .scb-home-hero-title,
+  .home-page .scb-home-hero-title .split-line,
+  .home-page .scb-home-hero-title [style] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

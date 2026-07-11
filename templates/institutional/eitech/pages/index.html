@@ -8,16 +8,26 @@
 
 {% block body_extra %} class="home-page"{% endblock %}
 
+{% block extra_head %}
+<link
+  rel="preload"
+  as="image"
+  href="{% static 'institutional/eitech/img/all-images/hero/image214.webp' %}"
+  type="image/webp"
+  fetchpriority="high"
+>
+{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'institutional/eitech/css/scb-home.css' %}">
 {% endblock %}
 
 {% block content %}
   <!--===== HERO AREA STARTS =======-->
-  <div class="hero1-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.png' %});">
+  <div class="hero1-section-area" style="background-image: url({% static 'institutional/eitech/img/all-images/bg/hero-bg1.webp' %});">
     <img src="{% static 'institutional/eitech/img/elements/elements6.png' %}" height="238" width="289" alt="" aria-hidden="true" class="elements6">
     <img src="{% static 'institutional/eitech/img/elements/elements5.png' %}" height="221" width="214" alt="" aria-hidden="true" class="elements5">
-    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" height="722" width="1105" alt="" aria-hidden="true" class="elements4" fetchpriority="high">
+    <img src="{% static 'institutional/eitech/img/elements/elements4.png' %}" height="722" width="1105" alt="" aria-hidden="true" class="elements4">
 
     <div class="container">
       <div class="row align-items-center">
@@ -29,7 +39,7 @@
             </div>
             <div class="space16"></div>
 
-            <h1 class="text-anime-style-3">Engenharia, Inovação e Confiança para Transformar a sua Operação.</h1>
+            <h1 class="text-anime-style-3 scb-home-hero-title">Engenharia, Inovação e Confiança para Transformar a sua Operação.</h1>
 
             <div class="space16"></div>
             <div class="h5" data-aos="fade-left" data-aos-duration="800" style="font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;">
@@ -58,7 +68,7 @@
         <div class="col-lg-5">
           <div class="hero-images-area">
             <div class="img1">
-              <img src="{% static 'institutional/eitech/img/all-images/hero/image214.webp' %}" height="571" width="381" alt="Painel de Automação, Robótica Xyron e Softwares Smart Control Brasil">
+              <img src="{% static 'institutional/eitech/img/all-images/hero/image214.webp' %}" height="571" width="381" alt="Painel de Automação, Robótica Xyron e Softwares Smart Control Brasil" fetchpriority="high" decoding="async">
             </div>
             <div class="image-bg1" style="aspect-ratio: 520 / 460; content-visibility: auto; contain-intrinsic-size: 520px 460px;">
               <img src="{% static 'institutional/eitech/img/all-images/bg/anel-xyron.png' %}" height="460" width="520" alt="Hostbot Smart Control Brasil" aria-hidden="true">

@@ -75,7 +75,12 @@
 
   {% include 'institutional/eitech/partials/footer.html' %}
 
-  <a class="whatsapp-floating-button" href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20atendimento%20humano." target="_blank" rel="noopener noreferrer" aria-label="Atendimento humano no WhatsApp">
+  <a class="whatsapp-floating-button" 
+   href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20atendimento%20humano." 
+   target="_blank" 
+   rel="noopener noreferrer" 
+   aria-label="Atendimento humano no WhatsApp"
+   onclick="gtag('event', 'clique_whatsapp', {'origem': 'botao_flutuante_site'});">
     <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
   </a>
 

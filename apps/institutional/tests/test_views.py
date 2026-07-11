@@ -1,3 +1,4 @@
+from html.parser import HTMLParser
 from xml.etree import ElementTree
 
 from django.conf import settings
@@ -49,6 +50,23 @@ XYRON_HTML_DETAIL_PAGE_SEO = {
     },
 }
 
+
+
+class ImageTagParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.images = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "img":
+            self.images.append(dict(attrs))
+
+
+def rendered_images(response):
+    parser = ImageTagParser()
+    parser.feed(response.content.decode(response.charset or "utf-8"))
+    return parser.images
+
 TEST_MIDDLEWARE = [
     mw
     for mw in settings.MIDDLEWARE
@@ -92,6 +110,50 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertContains(response, "Smart Control Brasil")
         self.assertNotContains(response, "em construção", status_code=200)
         self.assertNotContains(response, "coming soon", status_code=200)
+
+    def test_home_rendered_images_have_width_and_height(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        self.assertEqual(response.status_code, 200)
+        images = rendered_images(response)
+        missing_width = [image.get("src", "") for image in images if not image.get("width")]
+        missing_height = [image.get("src", "") for image in images if not image.get("height")]
+
+        self.assertEqual(missing_width, [])
+        self.assertEqual(missing_height, [])
+
+    def test_header_and_footer_logos_have_dimensions(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        images = rendered_images(response)
+        header_logo = next(
+            image for image in images if "logo-cores-03.webp" in image.get("src", "")
+        )
+        footer_logo = next(
+            image for image in images if "logo-cores-04.webp" in image.get("src", "")
+        )
+
+        self.assertEqual(header_logo["width"], "192")
+        self.assertEqual(header_logo["height"], "80")
+        self.assertNotIn("loading", header_logo)
+        self.assertEqual(footer_logo["width"], "192")
+        self.assertEqual(footer_logo["height"], "80")
+
+    def test_priority_hero_images_do_not_use_lazy_loading(self):
+        response = self.client.get(reverse("institutional:home"))
+
+        images = rendered_images(response)
+        hero_visual = next(
+            image for image in images if "all-images/hero/image214.webp" in image.get("src", "")
+        )
+        hero_priority_element = next(
+            image for image in images if image.get("fetchpriority") == "high"
+        )
+
+        self.assertEqual(hero_visual["width"], "381")
+        self.assertEqual(hero_visual["height"], "571")
+        self.assertNotIn("loading", hero_visual)
+        self.assertNotIn("loading", hero_priority_element)
 
     def test_xyron_robotics_page_uses_partner_template(self):
         response = self.client.get(reverse("institutional:parceiro_xyron_robotics"))

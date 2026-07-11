@@ -1,9 +1,13 @@
+from xml.etree import ElementTree
+
 from django.conf import settings
 from django.core import mail
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from apps.institutional.views import XYRON_ROBOT_PAGE_TEMPLATES
+from apps.marketplace_ecom.models import TechnicalProduct
+from apps.marketplace_ecom.services.catalog_seed import seed_technical_catalog_from_static
 from apps.institutional.xyron_robots import XYRON_ROBOTS
 
 XYRON_HTML_DETAIL_PAGE_SEO = {
@@ -396,6 +400,130 @@ class InstitutionalRoutesTests(SimpleTestCase):
         self.assertContains(response, "institutional/eitech/css/scb-service.css")
         self.assertNotContains(response, "scb-maintenance.css")
         self.assertContains(response, "scb-maintenance-scope-note")
+
+
+@override_settings(MIDDLEWARE=TEST_MIDDLEWARE)
+class SitemapRobotsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        seed_technical_catalog_from_static()
+        TechnicalProduct.objects.create(
+            title="Produto inativo fora do sitemap",
+            slug="produto-inativo-sitemap",
+            brand="Teste",
+            supplier_name="Smart Control Brasil",
+            category="Linha desativada",
+            short_description="Produto desativado para validar exclusao do sitemap.",
+            application_area="Teste",
+            is_active=False,
+        )
+
+    def sitemap_response(self):
+        return self.client.get(
+            "/sitemap.xml",
+            HTTP_HOST="www.example.test",
+            secure=False,
+        )
+
+    def sitemap_locations(self):
+        response = self.sitemap_response()
+        root = ElementTree.fromstring(response.content)
+        namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+        return [node.text for node in root.findall("sm:url/sm:loc", namespace)]
+
+    def test_sitemap_response_is_google_compatible_xml(self):
+        response = self.sitemap_response()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/xml")
+        self.assertTrue(response.content.startswith(b"<?xml version"))
+
+    def test_sitemap_uses_canonical_https_domain_without_duplicates(self):
+        locations = self.sitemap_locations()
+
+        self.assertEqual(len(locations), len(set(locations)))
+        self.assertTrue(locations)
+        for location in locations:
+            with self.subTest(location=location):
+                self.assertTrue(location.startswith("https://smartcontrolbrasil.com.br/"))
+                self.assertNotIn("https://www.smartcontrolbrasil.com.br", location)
+                self.assertNotIn("?", location)
+
+    def test_sitemap_includes_main_public_urls(self):
+        locations = set(self.sitemap_locations())
+        expected_paths = [
+            reverse("institutional:home"),
+            reverse("institutional:about"),
+            reverse("institutional:contact"),
+            reverse("institutional:services"),
+            reverse("institutional:representada_mitsubishi_automacao"),
+            reverse("institutional:xyron_robotics"),
+            reverse("institutional:xyron_robot_detail", args=["hygibot"]),
+            reverse("institutional:service_automacao_industrial_clps"),
+            reverse("institutional:service_manutencao_tpm_confiabilidade"),
+            reverse("institutional:projects"),
+            reverse("institutional:automacao_industrial_clps_ihms"),
+            reverse("institutional:blog"),
+            reverse("institutional:blog_paineis_eletricos_automacao"),
+            reverse("marketplace_ecom:home"),
+            reverse("marketplace_ecom:products"),
+            reverse("marketplace_ecom:product-detail", kwargs={"slug": "mitsubishi-clp-melsec"}),
+            reverse("marketplace_ecom:product-detail", kwargs={"slug": "xyron-hygibot-dune-bot"}),
+        ]
+
+        for path in expected_paths:
+            with self.subTest(path=path):
+                self.assertIn(f"https://smartcontrolbrasil.com.br{path}", locations)
+
+    def test_sitemap_excludes_private_redirect_api_and_inactive_urls(self):
+        locations = self.sitemap_locations()
+        forbidden_fragments = [
+            "/admin/",
+            "/api/",
+            "/login/",
+            "/logout/",
+            "/livia/",
+            "/dashboard/",
+            "/ecossistema/",
+            "/field/",
+            "/portal/",
+            "/parceiros/refrigeracao/",
+            "/produto-inativo-sitemap/",
+            "/request-quote/",
+        ]
+
+        for fragment in forbidden_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertFalse(any(fragment in location for location in locations))
+
+    def test_sitemap_product_entries_have_lastmod(self):
+        response = self.sitemap_response()
+        root = ElementTree.fromstring(response.content)
+        namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+        product_url = (
+            "https://smartcontrolbrasil.com.br"
+            + reverse("marketplace_ecom:product-detail", kwargs={"slug": "mitsubishi-clp-melsec"})
+        )
+
+        for url_node in root.findall("sm:url", namespace):
+            loc = url_node.find("sm:loc", namespace)
+            if loc is not None and loc.text == product_url:
+                self.assertIsNotNone(url_node.find("sm:lastmod", namespace))
+                break
+        else:
+            self.fail(f"Product URL not found in sitemap: {product_url}")
+
+    def test_robots_txt_points_to_canonical_sitemap(self):
+        response = self.client.get("/robots.txt")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertContains(
+            response,
+            "Sitemap: https://smartcontrolbrasil.com.br/sitemap.xml",
+        )
+        self.assertContains(response, "Disallow: /admin/")
+        self.assertContains(response, "Disallow: /api/")
 
 
 

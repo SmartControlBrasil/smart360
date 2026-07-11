@@ -992,3 +992,47 @@ class ContactViewTests(SimpleTestCase):
             response = self.client.post(self.url, {**self.valid_data, "email": "maria3@example.com"})
         self.assertRedirects(response, self.url, fetch_redirect_response=False)
         self.assertEqual(len(mail.outbox), 2)
+
+
+class PreloaderFailSafeTests(TestCase):
+    """Garante fail-safe do preloader institucional (mobile e desktop)."""
+
+    def test_home_renders_preloader_markup(self):
+        response = self.client.get(reverse("institutional:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'class="preloader"')
+
+    def test_main_js_has_preloader_fail_safe(self):
+        main_js = (
+            Path(settings.BASE_DIR) / "static/institutional/eitech/js/main.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("function hidePreloader", main_js)
+        self.assertIn('preloader.classList.add("is-hidden")', main_js)
+        self.assertIn('document.addEventListener("DOMContentLoaded", hidePreloader', main_js)
+        self.assertIn('window.addEventListener("load", hidePreloader', main_js)
+        self.assertIn("setTimeout(hidePreloader, PRELOADER_TIMEOUT_MS)", main_js)
+        self.assertIn("PRELOADER_TIMEOUT_MS = 2500", main_js)
+        self.assertIn("releasePageLock", main_js)
+        self.assertNotIn('$(".preloader").fadeToggle()', main_js)
+
+    def test_main_min_js_has_preloader_fail_safe(self):
+        main_min_js = (
+            Path(settings.BASE_DIR) / "static/institutional/eitech/js/main.min.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("hidePreloader", main_min_js)
+        self.assertIn("is-hidden", main_min_js)
+        self.assertIn("DOMContentLoaded", main_min_js)
+        self.assertIn("2500", main_min_js)
+        self.assertNotIn("fadeToggle", main_min_js)
+
+    def test_preloader_css_has_hidden_state(self):
+        main_css = (
+            Path(settings.BASE_DIR) / "static/institutional/eitech/css/main.css"
+        ).read_text(encoding="utf-8")
+        bundle_css = (
+            Path(settings.BASE_DIR)
+            / "static/institutional/eitech/css/main.bundle.min.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn(".preloader.is-hidden", main_css)
+        self.assertIn("pointer-events: none", main_css)
+        self.assertIn(".preloader.is-hidden", bundle_css)

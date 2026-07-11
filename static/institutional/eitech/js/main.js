@@ -1,3 +1,45 @@
+;(function () {
+  var preloaderHidden = false;
+  var PRELOADER_TIMEOUT_MS = 2500;
+  var PRELOADER_REMOVE_DELAY_MS = 400;
+
+  function releasePageLock() {
+    document.documentElement.classList.remove("loading", "is-loading", "no-scroll");
+    document.body.classList.remove("loading", "is-loading", "no-scroll", "overflow-hidden");
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }
+
+  function hidePreloader() {
+    if (preloaderHidden) {
+      return;
+    }
+    var preloader = document.querySelector(".preloader");
+    if (!preloader) {
+      releasePageLock();
+      preloaderHidden = true;
+      return;
+    }
+    preloaderHidden = true;
+    preloader.classList.add("is-hidden");
+    releasePageLock();
+    window.setTimeout(function () {
+      if (preloader.parentNode) {
+        preloader.remove();
+      }
+    }, PRELOADER_REMOVE_DELAY_MS);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hidePreloader, { once: true });
+  } else {
+    hidePreloader();
+  }
+
+  window.addEventListener("load", hidePreloader, { once: true });
+  window.setTimeout(hidePreloader, PRELOADER_TIMEOUT_MS);
+})();
+
 ;(function($){
 
 $(document).ready(function(){
@@ -291,13 +333,6 @@ $('.service5-slider-box').owlCarousel({
   }
 });
 }
-//========== PRELOADER ============= //
-$(window).on("load", function (event) {
-  setTimeout(function () {
-    $(".preloader").fadeToggle();
-  }, 200);
-
-});
 //========== PROGRESS BAR AREA ============= //
 const linearProgressWrappers = document.querySelectorAll('.bg-progress .progress-bar');
 if (linearProgressWrappers.length > 0) {

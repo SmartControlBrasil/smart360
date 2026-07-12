@@ -1,43 +1,65 @@
 ;(function () {
-  var preloaderHidden = false;
+  "use strict";
+
+  var preloaderReleased = false;
+  var fallbackTimer = null;
   var PRELOADER_TIMEOUT_MS = 2500;
+  var PRELOADER_AFTER_LOAD_DELAY_MS = 200;
   var PRELOADER_REMOVE_DELAY_MS = 400;
 
   function releasePageLock() {
-    document.documentElement.classList.remove("loading", "is-loading", "no-scroll");
-    document.body.classList.remove("loading", "is-loading", "no-scroll", "overflow-hidden");
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
+    var root = document.documentElement;
+    var body = document.body;
+
+    root.classList.remove("loading", "is-loading", "no-scroll", "overflow-hidden");
+
+    if (body) {
+      body.classList.remove("loading", "is-loading", "no-scroll", "overflow-hidden");
+      body.style.removeProperty("overflow");
+    }
+
+    root.style.removeProperty("overflow");
   }
 
   function hidePreloader() {
-    if (preloaderHidden) {
+    if (preloaderReleased) {
       return;
     }
+
+    preloaderReleased = true;
+
+    if (fallbackTimer) {
+      window.clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
+
+    releasePageLock();
+
     var preloader = document.querySelector(".preloader");
     if (!preloader) {
-      releasePageLock();
-      preloaderHidden = true;
       return;
     }
-    preloaderHidden = true;
+
     preloader.classList.add("is-hidden");
-    releasePageLock();
+
     window.setTimeout(function () {
       if (preloader.parentNode) {
-        preloader.remove();
+        preloader.parentNode.removeChild(preloader);
       }
     }, PRELOADER_REMOVE_DELAY_MS);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", hidePreloader, { once: true });
-  } else {
-    hidePreloader();
+  function hideAfterLoad() {
+    window.setTimeout(hidePreloader, PRELOADER_AFTER_LOAD_DELAY_MS);
   }
 
-  window.addEventListener("load", hidePreloader, { once: true });
-  window.setTimeout(hidePreloader, PRELOADER_TIMEOUT_MS);
+  if (document.readyState === "complete") {
+    hideAfterLoad();
+  } else {
+    window.addEventListener("load", hideAfterLoad, { once: true });
+  }
+
+  fallbackTimer = window.setTimeout(hidePreloader, PRELOADER_TIMEOUT_MS);
 })();
 
 ;(function($){

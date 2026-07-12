@@ -4,70 +4,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Smart Control Brasil | Tecnologia, Automacao e IA{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Tecnologia, automacao e inteligencia artificial para empresas com mais controle, seguranca e eficiencia.{% endblock %}">
 
-  <!-- SEO Core & OpenGraph -->
-  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-  <meta property="og:title" content="{% block og_title %}Smart Control Brasil | Tecnologia, Automacao e IA{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Tecnologia, automacao e inteligencia artificial para empresas com mais controle, seguranca e eficiencia.{% endblock %}">
-  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-  <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/brand/logo-cores-04.webp' %}{% endblock %}">
+  <title>
+    {% block title %}Smart Control Brasil | Tecnologia, Automação e IA{% endblock %}
+  </title>
+
+  <meta
+    name="description"
+    content="{% block meta_description %}Tecnologia, automação e inteligência artificial para empresas com mais controle, segurança e eficiência.{% endblock %}"
+  >
+
+  <!-- SEO Core -->
+  <link
+    rel="canonical"
+    href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+  >
+
+  <!-- Open Graph -->
+  <meta
+    property="og:title"
+    content="{% block og_title %}Smart Control Brasil | Automação e Engenharia{% endblock %}"
+  >
+
+  <meta
+    property="og:description"
+    content="{% block og_description %}Tratamento inteligente de dados de ativos críticos, IoT, telemetria e robótica de serviço.{% endblock %}"
+  >
+
+  <meta
+    property="og:image"
+    content="{% block og_image %}https://www.smartcontrolbrasil.com.br{% static 'institutional/brand/logo-cores-04.webp' %}{% endblock %}"
+  >
+
+  <meta
+    property="og:url"
+    content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+  >
+
+  <meta
+    property="og:type"
+    content="{% block og_type %}website{% endblock %}"
+  >
+
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="Smart Control Brasil">
 
-  <!-- JSON-LD LocalBusiness & WebSite -->
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+
+  <meta
+    name="twitter:title"
+    content="{% block twitter_title %}Smart Control Brasil | Automação e Engenharia{% endblock %}"
+  >
+
+  <meta
+    name="twitter:description"
+    content="{% block twitter_description %}Tratamento inteligente de dados de ativos críticos, IoT, telemetria e robótica de serviço.{% endblock %}"
+  >
+
+  <meta
+    name="twitter:image"
+    content="{% block twitter_image %}https://www.smartcontrolbrasil.com.br{% static 'institutional/brand/logo-cores-04.webp' %}{% endblock %}"
+  >
+
+  <!-- JSON-LD: Organization + WebSite -->
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Smart Control Brasil",
-      "url": "{{ request.scheme }}://{{ request.get_host }}/"
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "Smart Control Brasil",
-      "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'institutional/brand/logo-cores-04.webp' %}",
-      "url": "{{ request.scheme }}://{{ request.get_host }}/",
-      "telephone": "+551151968525",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "São Paulo",
-        "addressRegion": "SP",
-        "addressCountry": "BR"
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.smartcontrolbrasil.com.br/#organization",
+        "name": "Smart Control Brasil",
+        "url": "https://www.smartcontrolbrasil.com.br/",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://www.smartcontrolbrasil.com.br/#logo",
+          "url": "https://www.smartcontrolbrasil.com.br{% static 'institutional/brand/logo-cores-04.webp' %}",
+          "contentUrl": "https://www.smartcontrolbrasil.com.br{% static 'institutional/brand/logo-cores-04.webp' %}",
+          "caption": "Smart Control Brasil"
+        },
+        "image": {
+          "@id": "https://www.smartcontrolbrasil.com.br/#logo"
+        },
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "+55-11-5196-8525",
+            "contactType": "customer service",
+            "areaServed": "BR",
+            "availableLanguage": [
+              "pt-BR"
+            ]
+          }
+        ],
+        "sameAs": [
+          "https://www.linkedin.com/company/smartcontrolbrasil"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.smartcontrolbrasil.com.br/#website",
+        "url": "https://www.smartcontrolbrasil.com.br/",
+        "name": "Smart Control Brasil",
+        "inLanguage": "pt-BR",
+        "publisher": {
+          "@id": "https://www.smartcontrolbrasil.com.br/#organization"
+        }
       }
-    }
-  ]
+    ]
+  }
   </script>
+
   {% block structured_data %}{% endblock %}
   {% block extra_head %}{% endblock %}
-  <link rel="shortcut icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
-  <link rel="icon" href="{% static 'institutional/brand/favicon.ico' %}" type="image/x-icon">
-  <!-- Preconnect para Google Fonts (Redução drástica do DNS/TLS overhead) -->
+
+  <!-- Favicon -->
+  <link
+    rel="shortcut icon"
+    href="{% static 'institutional/brand/favicon.ico' %}"
+    type="image/x-icon"
+  >
+
+  <link
+    rel="icon"
+    href="{% static 'institutional/brand/favicon.ico' %}"
+    type="image/x-icon"
+  >
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 
-  <!-- CSS Bundles (Carregamento Padrão Seguro) -->
-  <link rel="stylesheet" href="{% static 'institutional/eitech/css/plugins.bundle.min.css' %}">
-  <link rel="stylesheet" href="{% static 'institutional/eitech/css/main.bundle.min.css' %}">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- CSS Bundles -->
+  <link
+    rel="stylesheet"
+    href="{% static 'institutional/eitech/css/plugins.bundle.min.css' %}"
+  >
+
+  <link
+    rel="stylesheet"
+    href="{% static 'institutional/eitech/css/main.bundle.min.css' %}"
+  >
+
   {% block extra_css %}{% endblock %}
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VZ01CGR5M1"></script>
+  <!-- Google Analytics -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-VZ01CGR5M1"
+  ></script>
+
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
 
-    gtag('config', 'G-VZ01CGR5M1');
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+    gtag("config", "G-VZ01CGR5M1");
   </script>
-
-
 </head>
+
 <body{% block body_extra %}{% endblock %}>
   {% include 'institutional/eitech/partials/preloader.html' %}
   {% include 'institutional/eitech/partials/header.html' %}
@@ -76,32 +180,48 @@
 
   {% include 'institutional/eitech/partials/footer.html' %}
 
-  <a class="whatsapp-floating-button" 
-   href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20atendimento%20humano." 
-   target="_blank" 
-   rel="noopener noreferrer" 
-   aria-label="Atendimento humano no WhatsApp"
-   onclick="gtag('event', 'clique_whatsapp', {'origem': 'botao_flutuante_site'});">
+  <!-- WhatsApp flutuante -->
+  <a
+    class="whatsapp-floating-button"
+    href="https://wa.me/551151968525?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Smart%20Control%20Brasil%20e%20gostaria%20de%20um%20atendimento%20humano."
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Atendimento humano no WhatsApp"
+    onclick="gtag('event', 'clique_whatsapp', {'origem': 'botao_flutuante_site'});"
+  >
     <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
   </a>
 
   {% include "includes/livia_widget.html" %}
 
+  <!-- JavaScript -->
   <script src="{% static 'institutional/eitech/js/plugins/jquery-3-7-1.min.js' %}"></script>
+
   {% include 'institutional/eitech/partials/scripts.html' %}
+
   {% block extra_js %}{% endblock %}
-  <script src="{% static 'institutional/eitech/js/main.min.js' %}" defer></script>
+
+  <script
+    src="{% static 'institutional/eitech/js/main.min.js' %}"
+    defer
+  ></script>
+
   {% if not livia_assistant_enabled %}
     <script type="module">
-      // Injeta o chat apenas 2 segundos após a tela inteira estar desenhada e carregada
-      window.addEventListener("load", function() {
-        setTimeout(async function() {
+      window.addEventListener("load", function () {
+        window.setTimeout(async function () {
           try {
-            const module = await import("https://agent-factory-chat.hostgator.io/scripts/start-chat.js");
+            const module = await import(
+              "https://agent-factory-chat.hostgator.io/scripts/start-chat.js"
+            );
+
             const BubbleChat = module.default;
             const hashId = "13d80814-dbe6-4c84-9764-4d57b34fea14";
-            const bubbleChat = new BubbleChat(hashId, "prod");
-          } catch(e) { console.warn("Chat delay error:", e); }
+
+            new BubbleChat(hashId, "prod");
+          } catch (error) {
+            console.warn("Chat delay error:", error);
+          }
         }, 2000);
       });
     </script>
